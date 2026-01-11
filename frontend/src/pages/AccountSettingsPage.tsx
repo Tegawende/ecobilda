@@ -120,14 +120,6 @@ export function AccountSettingsPage() {
     }
   };
 
-  const handleLogout = () => {
-    // For now, just clear local tokens without API call (mock mode)
-    // TODO: Re-enable API call when backend is ready
-    clearAuthTokens();
-    localStorage.removeItem('mock_user');
-    // Force redirect to landing page using window.location to ensure full page reload
-    window.location.href = '/';
-  };
 
   return (
     <Layout>

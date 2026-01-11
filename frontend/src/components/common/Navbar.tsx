@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Burger, Container, Group, Menu, Avatar, Drawer, Stack, Divider, Anchor, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -13,7 +13,6 @@ import {
   IconLogout,
 } from '@tabler/icons-react';
 import { isAuthenticated, clearAuthTokens } from '../../services/api';
-import { authService } from '../../services/auth';
 import { profileService } from '../../services/profile';
 import { NotificationBell } from './NotificationBell';
 import classes from './Navbar.module.css';
@@ -23,7 +22,6 @@ const links: Array<{ link: string; label: string }> = [];
 
 export function Navbar() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const location = useLocation();
   const isLoggedIn = isAuthenticated();
   const [opened, { toggle, close }] = useDisclosure(false);

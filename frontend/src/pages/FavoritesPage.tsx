@@ -131,7 +131,7 @@ function ProjectCardList({ project }: { project: Project }) {
 
 export function FavoritesPage() {
   const { t } = useTranslation();
-  const [favorites, setFavorites] = useState<Project[]>(mockFavoriteProjects);
+  const [favorites] = useState<Project[]>(mockFavoriteProjects);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const isLoading = false;
 

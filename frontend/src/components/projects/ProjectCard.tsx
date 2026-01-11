@@ -5,7 +5,6 @@ import {
   IconMapPin,
   IconUsers,
   IconClock,
-  IconHeart,
   IconHome,
   IconLeaf,
   IconWifi,

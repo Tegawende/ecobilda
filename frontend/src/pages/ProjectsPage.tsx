@@ -213,25 +213,6 @@ function ProjectCardList({
   );
 }
 
-// Filter Tabs Component
-function FilterTabs({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
-  return (
-    <div className="flex gap-1 p-1 bg-gray-100/80 rounded-xl w-full max-w-[400px]">
-      {options.map((option) => (
-        <button
-          key={option.value}
-          onClick={() => onChange(option.value)}
-          className={`flex-1 px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${value === option.value
-            ? 'bg-white text-eco-primary shadow-sm'
-            : 'text-gray-500 hover:text-gray-700'
-            }`}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 export function ProjectsPage() {
   const { t } = useTranslation();

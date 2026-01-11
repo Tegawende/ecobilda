@@ -106,7 +106,7 @@ export function NotificationBell() {
                         <img
                           src={notification.sender_profile_picture}
                           alt=""
-                          style={{ width: '100%', height: '100%', objectCover: 'cover' }}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
                       </Box>
                     ) : (

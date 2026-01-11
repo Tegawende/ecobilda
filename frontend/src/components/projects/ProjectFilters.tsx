@@ -422,7 +422,6 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect }: P
         // Calculate percentage positions for visual track
         const minPercent = ((value[0] - min) / (max - min)) * 100;
         const maxPercent = ((value[1] - min) / (max - min)) * 100;
-        const midPoint = (minPercent + maxPercent) / 2;
 
         return (
             <div className="space-y-3">

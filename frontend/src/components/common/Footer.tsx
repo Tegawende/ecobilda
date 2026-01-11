@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { IconBrandFacebook, IconBrandTwitter, IconBrandInstagram, IconWorld } from '@tabler/icons-react';
+import { IconBrandTwitter, IconBrandInstagram, IconWorld } from '@tabler/icons-react';
 
 export function Footer() {
   const { t, i18n } = useTranslation();

@@ -6,7 +6,6 @@ import {
   IconHeartHandshake,
   IconArrowRight,
   IconMapPin,
-  IconCalendar,
   IconUserPlus
 } from '@tabler/icons-react';
 import { Layout } from '../components/common/Layout';
@@ -149,7 +148,7 @@ export function HomePage() {
                       <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
                         <div className="flex -space-x-2">
                           <img
-                            src={project.owner?.profile_picture}
+                            src={project.owner?.profile_picture || undefined}
                             alt={project.owner?.first_name}
                             className="w-8 h-8 rounded-full border-2 border-white object-cover"
                           />
