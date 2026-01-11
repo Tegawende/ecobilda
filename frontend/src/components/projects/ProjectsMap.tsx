@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import { useTranslation } from 'react-i18next';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Project } from '../../types';
@@ -34,6 +35,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
     onMoveStart,
     hoveredProjectId,
 }, ref) {
+    const { t } = useTranslation();
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<mapboxgl.Map | null>(null);
     const markersRef = useRef<{ [key: number]: { marker: mapboxgl.Marker; element: HTMLDivElement } }>({});
@@ -230,7 +232,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
 
         const isNatB = project.project_type === 'NATB';
         const badgeColor = isNatB ? '#70A771' : '#c3595b';
-        const badgeText = isNatB ? 'Construction' : 'Permaculture';
+        const badgeText = isNatB ? t('projects.naturalBuilding') : t('projects.permaculture');
 
         // Icon SVGs for badge - matching IconHome and IconLeaf from Tabler Icons
         const iconSvg = isNatB
@@ -242,19 +244,19 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
         if (project.internet_provided) {
             amenities.push(`<span style="display:inline-flex;align-items:center;gap:2px;padding:2px 6px;background:#f3f4f6;border-radius:9999px;font-size:10px;color:#4b5563;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 18h.01"/><path d="M9.172 15.172a4 4 0 0 1 5.656 0"/><path d="M6.343 12.343a8 8 0 0 1 11.314 0"/><path d="M3.515 9.515a12 12 0 0 1 16.97 0"/></svg>
-                WiFi
+                ${t('projects.wifi')}
             </span>`);
         }
         if (project.family_friendly) {
             amenities.push(`<span style="display:inline-flex;align-items:center;gap:2px;padding:2px 6px;background:#f3f4f6;border-radius:9999px;font-size:10px;color:#4b5563;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="20" rx="10" ry="3"/><circle cx="12" cy="14" r="4"/><circle cx="12" cy="6" r="2"/></svg>
-                Famille
+                ${t('projects.familyFriendly')}
             </span>`);
         }
         if (project.pets_allowed) {
             amenities.push(`<span style="display:inline-flex;align-items:center;gap:2px;padding:2px 6px;background:#f3f4f6;border-radius:9999px;font-size:10px;color:#4b5563;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 16c-3 0-5-2-5-5c0-4 5-9 5-9s5 5 5 9c0 3-2 5-5 5z"/><path d="M16 16c-1.5 0-3-1-3-2.5"/></svg>
-                Animaux
+                ${t('projects.petsAllowed')}
             </span>`);
         }
 
@@ -325,11 +327,11 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
             <div style="display: flex; gap: 16px; font-size: 12px; color: #666; margin-bottom: 10px;">
               <span style="display: flex; align-items: center; gap: 4px;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                ${project.max_helpers} max
+                ${project.max_helpers} ${t('projects.max')}
               </span>
               <span style="display: flex; align-items: center; gap: 4px;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                ${project.hours_per_day}h/jour
+                ${project.hours_per_day}${t('projects.hoursPerDayShort')}
               </span>
             </div>
             

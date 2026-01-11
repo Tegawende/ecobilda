@@ -110,6 +110,13 @@
         "activeProjects": "Projetos ativos",
         "pastProjects": "Projetos passados",
         "volunteers": "voluntários",
+        "internetProvided": "Internet fornecido",
+        "familyFriendly": "Adequado para famílias",
+        "petsAllowed": "Animais permitidos",
+        "smokingAllowed": "Fumar permitido",
+        "wifi": "WiFi",
+        "max": "máx",
+        "hoursPerDayShort": "h/dia",
         "filters": {
             "all": "Todos",
             "construction": "Construção",

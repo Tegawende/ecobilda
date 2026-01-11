@@ -85,7 +85,7 @@ function ProjectCardList({ project }: { project: Project }) {
           <div className="flex flex-wrap gap-1 mb-3">
             {project.internet_provided && (
               <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
-                <IconWifi size={12} /> WiFi
+                <IconWifi size={12} /> {t('projects.wifi')}
               </span>
             )}
             {project.family_friendly && (

@@ -188,6 +188,9 @@
         "familyFriendly": "Adapté familles",
         "petsAllowed": "Animaux acceptés",
         "smokingAllowed": "Fumeur accepté",
+        "wifi": "WiFi",
+        "max": "max",
+        "hoursPerDayShort": "h/jour",
         "filters": {
             "all": "Tous",
             "construction": "Construction",

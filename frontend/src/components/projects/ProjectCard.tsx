@@ -236,7 +236,7 @@ export function ProjectCard({
         <div className="flex flex-wrap gap-1.5 pt-1">
           {project.internet_provided && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
-              <IconWifi size={10} /> WiFi
+              <IconWifi size={10} /> {t('projects.wifi')}
             </span>
           )}
           {project.family_friendly && (
