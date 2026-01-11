@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -25,6 +25,55 @@ interface ProjectCardProps {
   showStatus?: boolean;
 }
 
+// Preload images hook for performance
+function useImagePreloader(images: string[]) {
+  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    // Preload all images in background
+    images.forEach((src) => {
+      if (!loadedImages.has(src)) {
+        const img = new Image();
+        img.onload = () => {
+          setLoadedImages((prev) => new Set(prev).add(src));
+        };
+        img.src = src;
+      }
+    });
+  }, [images]);
+
+  return loadedImages;
+}
+
+// Memoized image component to prevent unnecessary re-renders
+const CarouselImage = memo(({
+  src,
+  alt,
+  isActive,
+  isGroupHovered
+}: {
+  src: string;
+  alt: string;
+  isActive: boolean;
+  isGroupHovered?: boolean;
+}) => (
+  <img
+    src={src}
+    alt={alt}
+    loading="lazy"
+    decoding="async"
+    className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-out will-change-[opacity,transform] ${isActive
+        ? 'opacity-100 z-[1]'
+        : 'opacity-0 z-0'
+      } ${isGroupHovered && isActive ? 'scale-105' : 'scale-100'}`}
+    style={{
+      transitionProperty: 'opacity, transform',
+    }}
+  />
+));
+
+CarouselImage.displayName = 'CarouselImage';
+
 export function ProjectCard({
   project,
   isHovered = false,
@@ -36,22 +85,36 @@ export function ProjectCard({
 }: ProjectCardProps) {
   const { t } = useTranslation();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isCardHovered, setIsCardHovered] = useState(false);
 
   const images = project.images && project.images.length > 0
     ? project.images.map(img => img.image)
     : ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'];
 
-  const nextImage = (e: React.MouseEvent) => {
+  // Preload all images for instant switching
+  useImagePreloader(images);
+
+  const nextImage = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
-  };
+  }, [images.length]);
 
-  const prevImage = (e: React.MouseEvent) => {
+  const prevImage = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
+  }, [images.length]);
+
+  const handleMouseEnter = useCallback(() => {
+    setIsCardHovered(true);
+    onHover?.(project);
+  }, [onHover, project]);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsCardHovered(false);
+    onHover?.(null);
+  }, [onHover]);
 
   const isNatB = project.project_type === 'NATB';
 
@@ -59,16 +122,21 @@ export function ProjectCard({
     <Link
       to={`/projects/${project.id}`}
       className={`block group cursor-pointer transition-all duration-200 ${isHovered ? 'scale-[1.02]' : ''}`}
-      onMouseEnter={() => onHover?.(project)}
-      onMouseLeave={() => onHover?.(null)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      {/* Image Carousel */}
-      <div className="relative rounded-xl overflow-hidden aspect-[4/3] mb-3">
-        <img
-          src={images[currentImageIndex]}
-          alt={project.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
+      {/* Optimized Image Carousel with stacked images */}
+      <div className="relative rounded-xl overflow-hidden aspect-[4/3] mb-3 bg-gray-100">
+        {/* Stack all images - only the active one is visible via opacity */}
+        {images.map((imageSrc, idx) => (
+          <CarouselImage
+            key={imageSrc}
+            src={imageSrc}
+            alt={`${project.title} - Image ${idx + 1}`}
+            isActive={idx === currentImageIndex}
+            isGroupHovered={isCardHovered}
+          />
+        ))}
 
         {/* Favorite Button (Hidden if showEdit is true) */}
         {!showEdit && (

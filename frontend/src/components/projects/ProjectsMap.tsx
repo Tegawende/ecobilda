@@ -222,6 +222,12 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
             ? project.images.map(img => img.image)
             : ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400'];
 
+        // Preload all images for instant switching
+        images.forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+
         const isNatB = project.project_type === 'NATB';
         const badgeColor = isNatB ? '#70A771' : '#c3595b';
         const badgeText = isNatB ? 'Construction' : 'Permaculture';
