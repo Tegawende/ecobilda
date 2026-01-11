@@ -83,11 +83,13 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
             if (!map.current) return null;
             const bounds = map.current.getBounds();
             if (!bounds) return null;
+            // TypeScript assertion: bounds is not null after check
+            const boundsNonNull = bounds;
             return {
-                north: bounds.getNorth(),
-                south: bounds.getSouth(),
-                east: bounds.getEast(),
-                west: bounds.getWest(),
+                north: boundsNonNull.getNorth(),
+                south: boundsNonNull.getSouth(),
+                east: boundsNonNull.getEast(),
+                west: boundsNonNull.getWest(),
             };
         };
 

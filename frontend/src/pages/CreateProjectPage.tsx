@@ -19,7 +19,6 @@ import { ProjectFormStep2 } from '../components/projects/ProjectFormStep2';
 import { ProjectFormStep3 } from '../components/projects/ProjectFormStep3';
 import { ProjectFormStep4 } from '../components/projects/ProjectFormStep4';
 import { projectsService } from '../services/projects';
-import type { Project } from '../types';
 
 export interface ProjectFormData {
   // Step 1: Basic Info
@@ -132,24 +131,24 @@ export function CreateProjectPage() {
     setError(null);
 
     try {
-      const projectPayload: Partial<Project> = {
+      const projectPayload: Record<string, unknown> = {
         title: formData.title,
         description: formData.description,
         project_type: formData.project_type,
-        address: formData.address as any, // Backend will handle address creation
+        address: formData.address, // Backend will handle address creation
         hours_per_day: formData.hours_per_day,
         days_per_week: formData.days_per_week,
         max_helpers: formData.max_helpers,
         accommodation_details: formData.accommodation_details,
         food_details: formData.food_details,
-        skills: formData.skills as any, // Backend expects skill codes
+        skills: formData.skills, // Backend expects skill codes
         internet_provided: formData.internet_provided,
         family_friendly: formData.family_friendly,
         pets_allowed: formData.pets_allowed,
         smoking_allowed: formData.smoking_allowed,
       };
 
-      const project = await projectsService.createProject(projectPayload);
+      const project = await projectsService.createProject(projectPayload as any);
 
       // Upload images if any
       if (formData.images.length > 0) {
