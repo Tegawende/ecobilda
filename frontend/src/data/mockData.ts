@@ -1,0 +1,637 @@
+/**
+ * Mock Data for Ecobilda Frontend
+ * Used for development and testing without backend connection
+ */
+
+import type { User, Project, Address, Country, Language, Skill, Review, Conversation, Message, Notification } from '../types';
+
+// ============== COUNTRIES & LANGUAGES ==============
+export const mockCountries: Country[] = [
+    { code: 'BE', name: 'Belgium' },
+    { code: 'FR', name: 'France' },
+    { code: 'PT', name: 'Portugal' },
+    { code: 'ES', name: 'Spain' },
+];
+
+export const mockLanguages: Language[] = [
+    { code: 'fr', name: 'Français' },
+    { code: 'en', name: 'English' },
+    { code: 'nl', name: 'Nederlands' },
+    { code: 'de', name: 'Deutsch' },
+];
+
+// ============== SKILLS ==============
+export const mockSkills: Skill[] = [
+    { code: 'STRAW', category: 'NATB', display_name_en: 'Straw Bale Construction', display_name_fr: 'Construction en Paille', display_name_es: 'Construcción con Paja', display_name_de: 'Strohballenbau', icon: '🌾' },
+    { code: 'COB', category: 'NATB', display_name_en: 'Cob Building', display_name_fr: 'Construction en Torchis', display_name_es: 'Construcción con Cob', display_name_de: 'Lehmbau', icon: '🏠' },
+    { code: 'PLASTER', category: 'NATB', display_name_en: 'Natural Plasters', display_name_fr: 'Enduits Naturels', display_name_es: 'Yesos Naturales', display_name_de: 'Naturputz', icon: '🎨' },
+    { code: 'PERM_DESIGN', category: 'PERM', display_name_en: 'Permaculture Design', display_name_fr: 'Design Permaculture', display_name_es: 'Diseño Permacultura', display_name_de: 'Permakultur-Design', icon: '🌿' },
+    { code: 'GARDEN', category: 'PERM', display_name_en: 'Organic Gardening', display_name_fr: 'Jardinage Bio', display_name_es: 'Jardinería Orgánica', display_name_de: 'Bio-Gärtnerei', icon: '🥬' },
+    { code: 'EARTHSHIP', category: 'NATB', display_name_en: 'Earthship Building', display_name_fr: 'Construction Earthship', display_name_es: 'Construcción Earthship', display_name_de: 'Earthship Bau', icon: '🌍' },
+];
+
+// ============== ADDRESSES ==============
+const mockAddressBrussels: Address = {
+    id: 1,
+    city: 'Brussels',
+    street: 'Rue de la Loi',
+    street_number: '42',
+    postal_code: '1000',
+    country: mockCountries[0],
+    latitude: 50.8503,
+    longitude: 4.3517,
+    formatted_address: '42 Rue de la Loi, 1000 Brussels, Belgium',
+};
+
+const mockAddressWallonia: Address = {
+    id: 2,
+    city: 'Namur',
+    street: 'Chemin des Collines',
+    street_number: '18',
+    postal_code: '5000',
+    country: mockCountries[0],
+    latitude: 50.4674,
+    longitude: 4.8719,
+    formatted_address: '18 Chemin des Collines, 5000 Namur, Belgium',
+};
+
+const mockAddressArdennes: Address = {
+    id: 3,
+    city: 'Bouillon',
+    street: 'Route des Forêts',
+    street_number: '7',
+    postal_code: '6830',
+    country: mockCountries[0],
+    latitude: 49.7932,
+    longitude: 5.0667,
+    formatted_address: '7 Route des Forêts, 6830 Bouillon, Belgium',
+};
+
+const mockAddressProvence: Address = {
+    id: 4,
+    city: 'Apt',
+    street: 'Chemin des Lavandes',
+    street_number: '25',
+    postal_code: '84400',
+    country: mockCountries[1],
+    latitude: 43.8768,
+    longitude: 5.3960,
+    formatted_address: '25 Chemin des Lavandes, 84400 Apt, France',
+};
+
+const mockAddressPortugal: Address = {
+    id: 5,
+    city: 'Aljezur',
+    street: 'Estrada da Serra',
+    street_number: '12',
+    postal_code: '8670',
+    country: mockCountries[2],
+    latitude: 37.3177,
+    longitude: -8.8024,
+    formatted_address: '12 Estrada da Serra, 8670 Aljezur, Portugal',
+};
+
+const mockAddressDrome: Address = {
+    id: 6,
+    city: 'Die',
+    street: 'Chemin du Jardin',
+    street_number: '4',
+    postal_code: '26150',
+    country: mockCountries[1],
+    latitude: 44.7524,
+    longitude: 5.3708,
+    formatted_address: '4 Chemin du Jardin, 26150 Die, France',
+};
+
+// ============== MOCK USER (test@test.be) ==============
+export const mockUser: User = {
+    id: 1,
+    email: 'test@test.be',
+    first_name: 'Marie',
+    last_name: 'Dupont',
+    date_of_birth: '1990-05-15',
+    gender: 'F',
+    bio: 'Passionate about eco-construction and permaculture. Building a sustainable future one project at a time. 🌱 I love sharing knowledge and learning from others in the community.',
+    profile_picture: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face',
+    address: mockAddressBrussels,
+    languages: [mockLanguages[0], mockLanguages[1], mockLanguages[2]],
+    skills: [mockSkills[0], mockSkills[2], mockSkills[3]],
+    email_notifications: true,
+    newsletter: true,
+    in_app_notifications: true,
+    notification_language: 'fr',
+    average_rating: 4.8,
+    review_count: 12,
+};
+
+// ============== OTHER MOCK USERS ==============
+const mockUserPierre: User = {
+    id: 2,
+    email: 'pierre@example.com',
+    first_name: 'Pierre',
+    last_name: 'Dubois',
+    date_of_birth: '1985-03-22',
+    gender: 'M',
+    bio: 'Natural builder and permaculture enthusiast from Brittany.',
+    profile_picture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
+    address: mockAddressProvence,
+    languages: [mockLanguages[0], mockLanguages[1]],
+    skills: [mockSkills[1], mockSkills[4]],
+    email_notifications: true,
+    newsletter: false,
+    in_app_notifications: true,
+    notification_language: 'fr',
+    average_rating: 4.5,
+    review_count: 8,
+};
+
+const mockUserCatherine: User = {
+    id: 3,
+    email: 'catherine@example.com',
+    first_name: 'Catherine',
+    last_name: 'Moreau',
+    date_of_birth: '1992-11-08',
+    gender: 'F',
+    bio: 'Eco-architect and workshop facilitator.',
+    profile_picture: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face',
+    address: mockAddressDrome,
+    languages: [mockLanguages[0], mockLanguages[1], mockLanguages[3]],
+    skills: [mockSkills[0], mockSkills[1], mockSkills[2]],
+    email_notifications: true,
+    newsletter: true,
+    in_app_notifications: true,
+    notification_language: 'fr',
+    average_rating: 4.9,
+    review_count: 15,
+};
+
+const mockUserJean: User = {
+    id: 4,
+    email: 'jean@example.com',
+    first_name: 'Jean',
+    last_name: 'Martin',
+    date_of_birth: '1988-07-14',
+    gender: 'M',
+    bio: 'Permaculture teacher and natural building volunteer.',
+    profile_picture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face',
+    address: mockAddressWallonia,
+    languages: [mockLanguages[0]],
+    skills: [mockSkills[3], mockSkills[4]],
+    email_notifications: true,
+    newsletter: true,
+    in_app_notifications: true,
+    notification_language: 'fr',
+    average_rating: 4.7,
+    review_count: 6,
+};
+
+const mockUserSophie: User = {
+    id: 5,
+    email: 'sophie@example.com',
+    first_name: 'Sophie',
+    last_name: 'Laurent',
+    date_of_birth: '1995-02-28',
+    gender: 'F',
+    bio: 'Young volunteer passionate about sustainable living.',
+    profile_picture: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&h=200&fit=crop&crop=face',
+    address: mockAddressArdennes,
+    languages: [mockLanguages[0], mockLanguages[1]],
+    skills: [mockSkills[4]],
+    email_notifications: true,
+    newsletter: false,
+    in_app_notifications: true,
+    notification_language: 'en',
+    average_rating: 4.6,
+    review_count: 3,
+};
+
+// ============== MOCK PROJECTS (User's own projects) ==============
+export const mockUserProjects: Project[] = [
+    {
+        id: 1,
+        owner: mockUser,
+        title: 'Eco-Farm Renovation',
+        description: 'Renovating an old farm using straw bale and natural plasters. Join us for a hands-on learning experience in the beautiful Wallonia countryside.',
+        project_type: 'NATB',
+        address: mockAddressWallonia,
+        hours_per_day: 6,
+        days_per_week: 5,
+        max_helpers: 4,
+        accommodation_details: 'Shared dormitory in the renovated barn. Comfortable beds and hot showers available.',
+        food_details: 'Vegetarian meals prepared together. Local organic produce from the farm.',
+        internet_provided: true,
+        family_friendly: true,
+        pets_allowed: false,
+        smoking_allowed: false,
+        is_free: true,
+        skills: [mockSkills[0], mockSkills[2]],
+        is_active: true,
+        flagged_count: 0,
+        created_at: '2025-10-15T10:00:00Z',
+        updated_at: '2026-01-05T14:30:00Z',
+        images: [
+            { id: 1, project: 1, image: 'https://images.unsplash.com/photo-1593106578502-27fa8479d060?w=800', is_cover: true, order: 0 },
+            { id: 2, project: 1, image: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800', is_cover: false, order: 1 },
+        ],
+        availabilities: [{ id: 1, project: 1, year: 2026, january: false, february: false, march: true, april: true, may: true, june: true, july: true, august: true, september: true, october: false, november: false, december: false }],
+    },
+    {
+        id: 2,
+        owner: mockUser,
+        title: 'Urban Permaculture Garden',
+        description: 'Creating a community permaculture garden in the heart of Brussels. Learn urban farming techniques and food forest design.',
+        project_type: 'PERM',
+        address: mockAddressBrussels,
+        hours_per_day: 4,
+        days_per_week: 3,
+        max_helpers: 6,
+        accommodation_details: 'Day project only - no accommodation provided.',
+        food_details: 'Shared lunch prepared with garden produce.',
+        internet_provided: false,
+        family_friendly: true,
+        pets_allowed: true,
+        smoking_allowed: false,
+        is_free: true,
+        skills: [mockSkills[3], mockSkills[4]],
+        is_active: true,
+        flagged_count: 0,
+        created_at: '2025-11-20T09:00:00Z',
+        updated_at: '2026-01-08T11:00:00Z',
+        images: [
+            { id: 3, project: 2, image: 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800', is_cover: true, order: 0 },
+        ],
+        availabilities: [{ id: 2, project: 2, year: 2026, january: true, february: true, march: true, april: true, may: true, june: true, july: true, august: true, september: true, october: true, november: true, december: true }],
+    },
+    {
+        id: 3,
+        owner: mockUser,
+        title: 'Tiny House Workshop',
+        description: 'Building a tiny house in the Ardennes forest. Learn about sustainable tiny living and off-grid solutions.',
+        project_type: 'NATB',
+        address: mockAddressArdennes,
+        hours_per_day: 7,
+        days_per_week: 5,
+        max_helpers: 3,
+        accommodation_details: 'Camping on site. Beautiful forest setting. Outdoor kitchen and composting toilet.',
+        food_details: 'Shared vegetarian/vegan meals. Cooking together is part of the experience!',
+        internet_provided: false,
+        family_friendly: false,
+        pets_allowed: false,
+        smoking_allowed: false,
+        is_free: true,
+        skills: [mockSkills[0], mockSkills[1]],
+        is_active: true,
+        flagged_count: 0,
+        created_at: '2025-12-01T08:00:00Z',
+        updated_at: '2026-01-02T16:00:00Z',
+        images: [
+            { id: 4, project: 3, image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800', is_cover: true, order: 0 },
+        ],
+        availabilities: [{ id: 3, project: 3, year: 2026, january: false, february: false, march: false, april: true, may: true, june: true, july: true, august: true, september: true, october: false, november: false, december: false }],
+    },
+];
+
+// ============== MOCK FAVORITE PROJECTS ==============
+export const mockFavoriteProjects: Project[] = [
+    {
+        id: 10,
+        owner: mockUserPierre,
+        title: 'Straw Bale House in Provence',
+        description: 'Building a beautiful straw bale house in the lavender fields of Provence. An unforgettable learning experience.',
+        project_type: 'NATB',
+        address: mockAddressProvence,
+        hours_per_day: 6,
+        days_per_week: 5,
+        max_helpers: 5,
+        accommodation_details: 'Shared guesthouse with private rooms available.',
+        food_details: 'Full board with provençal cuisine. Wine included!',
+        internet_provided: true,
+        family_friendly: true,
+        pets_allowed: false,
+        smoking_allowed: false,
+        is_free: true,
+        skills: [mockSkills[0], mockSkills[2]],
+        is_active: true,
+        flagged_count: 0,
+        created_at: '2025-09-10T10:00:00Z',
+        updated_at: '2026-01-06T09:00:00Z',
+        images: [
+            { id: 10, project: 10, image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800', is_cover: true, order: 0 },
+        ],
+        availabilities: [{ id: 10, project: 10, year: 2026, january: false, february: false, march: false, april: false, may: true, june: true, july: true, august: true, september: false, october: false, november: false, december: false }],
+    },
+    {
+        id: 11,
+        owner: mockUserCatherine,
+        title: 'Earthship Build in Portugal',
+        description: 'Join us for an earthship construction project on the beautiful Algarve coast. Sustainable living by the sea.',
+        project_type: 'NATB',
+        address: mockAddressPortugal,
+        hours_per_day: 7,
+        days_per_week: 6,
+        max_helpers: 8,
+        accommodation_details: 'Camping and caravan spots available. Beach access.',
+        food_details: 'Shared vegetarian meals. Fresh fish on weekends.',
+        internet_provided: false,
+        family_friendly: false,
+        pets_allowed: true,
+        smoking_allowed: false,
+        is_free: true,
+        skills: [mockSkills[5]],
+        is_active: true,
+        flagged_count: 0,
+        created_at: '2025-08-05T14:00:00Z',
+        updated_at: '2026-01-03T10:00:00Z',
+        images: [
+            { id: 11, project: 11, image: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800', is_cover: true, order: 0 },
+        ],
+        availabilities: [{ id: 11, project: 11, year: 2026, january: true, february: true, march: true, april: true, may: false, june: false, july: false, august: false, september: true, october: true, november: true, december: true }],
+    },
+];
+
+// ============== MOCK PARTICIPATIONS ==============
+export interface Participation {
+    id: number;
+    project: Project;
+    status: 'pending' | 'accepted' | 'rejected' | 'completed';
+    start_date: string;
+    end_date: string;
+    created_at: string;
+}
+
+const mockProjectCob: Project = {
+    id: 20,
+    owner: mockUserCatherine,
+    title: 'Cob House Workshop',
+    description: 'Learn traditional cob building techniques in the Drôme valley.',
+    project_type: 'NATB',
+    address: mockAddressDrome,
+    hours_per_day: 6,
+    days_per_week: 5,
+    max_helpers: 6,
+    accommodation_details: 'Shared accommodation in renovated barn.',
+    food_details: 'Full board vegetarian meals.',
+    internet_provided: true,
+    family_friendly: true,
+    pets_allowed: false,
+    smoking_allowed: false,
+    is_free: true,
+    skills: [mockSkills[1]],
+    is_active: true,
+    flagged_count: 0,
+    created_at: '2025-06-15T10:00:00Z',
+    updated_at: '2026-01-01T10:00:00Z',
+    images: [{ id: 20, project: 20, image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800', is_cover: true, order: 0 }],
+    availabilities: [],
+};
+
+const mockProjectPermaCourse: Project = {
+    id: 21,
+    owner: mockUserPierre,
+    title: 'Permaculture Design Course',
+    description: 'Intensive 2-week PDC in Provence.',
+    project_type: 'PERM',
+    address: mockAddressProvence,
+    hours_per_day: 8,
+    days_per_week: 6,
+    max_helpers: 15,
+    accommodation_details: 'Glamping tents provided.',
+    food_details: 'Organic vegetarian meals included.',
+    internet_provided: true,
+    family_friendly: false,
+    pets_allowed: false,
+    smoking_allowed: false,
+    is_free: false,
+    skills: [mockSkills[3], mockSkills[4]],
+    is_active: true,
+    flagged_count: 0,
+    created_at: '2025-07-20T10:00:00Z',
+    updated_at: '2026-01-05T10:00:00Z',
+    images: [{ id: 21, project: 21, image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800', is_cover: true, order: 0 }],
+    availabilities: [],
+};
+
+const mockProjectGathering: Project = {
+    id: 22,
+    owner: mockUserJean,
+    title: 'Natural Building Gathering',
+    description: 'Annual gathering of natural builders in Wallonia.',
+    project_type: 'NATB',
+    address: mockAddressWallonia,
+    hours_per_day: 4,
+    days_per_week: 3,
+    max_helpers: 30,
+    accommodation_details: 'Bring your own tent. Showers available.',
+    food_details: 'Shared potluck meals.',
+    internet_provided: false,
+    family_friendly: true,
+    pets_allowed: true,
+    smoking_allowed: false,
+    is_free: true,
+    skills: mockSkills,
+    is_active: false,
+    flagged_count: 0,
+    created_at: '2025-05-01T10:00:00Z',
+    updated_at: '2025-12-20T10:00:00Z',
+    images: [{ id: 22, project: 22, image: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800', is_cover: true, order: 0 }],
+    availabilities: [],
+};
+
+export const mockParticipations: Participation[] = [
+    {
+        id: 1,
+        project: mockProjectCob,
+        status: 'accepted',
+        start_date: '2026-07-01',
+        end_date: '2026-07-15',
+        created_at: '2026-01-05T10:00:00Z',
+    },
+    {
+        id: 2,
+        project: mockProjectPermaCourse,
+        status: 'pending',
+        start_date: '2026-08-10',
+        end_date: '2026-08-24',
+        created_at: '2026-01-08T14:00:00Z',
+    },
+    {
+        id: 3,
+        project: mockProjectGathering,
+        status: 'completed',
+        start_date: '2025-12-05',
+        end_date: '2025-12-07',
+        created_at: '2025-11-20T09:00:00Z',
+    },
+];
+
+// ============== MOCK REVIEWS ==============
+export const mockReviews: Review[] = [
+    {
+        id: 1,
+        writer: mockUserJean,
+        receiver: mockUser,
+        rating: 5,
+        feedback: 'Marie was an incredible host! Her knowledge of straw bale construction is impressive and she creates such a welcoming atmosphere. Highly recommend!',
+        response: 'Thank you Jean! It was such a pleasure having you. Your help was invaluable!',
+        response_date: '2025-12-20T10:00:00Z',
+        created_at: '2025-12-15T10:00:00Z',
+        updated_at: '2025-12-20T10:00:00Z',
+    },
+    {
+        id: 2,
+        writer: mockUserSophie,
+        receiver: mockUser,
+        rating: 4,
+        feedback: 'Great experience at the permaculture garden. Learned so much about urban farming. Only wish we had more time!',
+        response: '',
+        response_date: null,
+        created_at: '2026-01-02T14:00:00Z',
+        updated_at: '2026-01-02T14:00:00Z',
+    },
+];
+
+// ============== MOCK CONVERSATIONS ==============
+export const mockConversations: Conversation[] = [
+    {
+        id: 1,
+        user1: mockUser,
+        user2: mockUserPierre,
+        last_message_text: 'Looking forward to seeing you at the project!',
+        last_message_at: '2026-01-10T15:30:00Z',
+        unread_count_user1: 1,
+        unread_count_user2: 0,
+        user1_muted: false,
+        user2_muted: false,
+    },
+    {
+        id: 2,
+        user1: mockUser,
+        user2: mockUserCatherine,
+        last_message_text: 'Your participation request has been received. I will get back to you soon!',
+        last_message_at: '2026-01-09T11:00:00Z',
+        unread_count_user1: 0,
+        unread_count_user2: 0,
+        user1_muted: false,
+        user2_muted: false,
+    },
+];
+
+export const mockMessages: Message[] = [
+    {
+        id: 1,
+        conversation: 1,
+        sender: mockUserPierre,
+        body: 'Hi Marie! I saw your Eco-Farm project and I am very interested.',
+        created_at: '2026-01-08T10:00:00Z',
+    },
+    {
+        id: 2,
+        conversation: 1,
+        sender: mockUser,
+        body: 'Hello Pierre! Thank you for your interest. The project starts in March. Would that work for you?',
+        created_at: '2026-01-08T14:30:00Z',
+    },
+    {
+        id: 3,
+        conversation: 1,
+        sender: mockUserPierre,
+        body: 'That sounds perfect! I am available from March 15th.',
+        created_at: '2026-01-09T09:00:00Z',
+    },
+    {
+        id: 4,
+        conversation: 1,
+        sender: mockUser,
+        body: 'Great! I will send you more details soon.',
+        created_at: '2026-01-09T11:00:00Z',
+    },
+    {
+        id: 5,
+        conversation: 1,
+        sender: mockUserPierre,
+        body: 'Looking forward to seeing you at the project!',
+        created_at: '2026-01-10T15:30:00Z',
+    },
+    {
+        id: 6,
+        conversation: 2,
+        sender: mockUser,
+        body: 'Hi Catherine! I would love to participate in your Cob House Workshop.',
+        created_at: '2026-01-05T10:00:00Z',
+    },
+    {
+        id: 7,
+        conversation: 2,
+        sender: mockUserCatherine,
+        body: 'Your participation request has been received. I will get back to you soon!',
+        created_at: '2026-01-09T11:00:00Z',
+    },
+];
+
+// ============== MOCK NOTIFICATIONS ==============
+export const mockNotifications: Notification[] = [
+    {
+        id: 1,
+        recipient: 1,
+        type: 'MESSAGE',
+        title: 'New message from Pierre',
+        message: 'Pierre Dubois sent you a new message about Eco-Farm Renovation.',
+        link_url: '/messages/1',
+        is_read: false,
+        read_at: null,
+        created_at: '2026-01-10T15:30:00Z',
+    },
+    {
+        id: 2,
+        recipient: 1,
+        type: 'PROJECT',
+        title: 'Participation request accepted',
+        message: 'Catherine Moreau accepted your request to join Cob House Workshop.',
+        link_url: '/participations',
+        is_read: false,
+        read_at: null,
+        created_at: '2026-01-09T11:00:00Z',
+    },
+    {
+        id: 3,
+        recipient: 1,
+        type: 'REVIEW',
+        title: 'New review received',
+        message: 'Sophie Laurent left you a 4-star review.',
+        link_url: '/profile',
+        is_read: true,
+        read_at: '2026-01-03T08:00:00Z',
+        created_at: '2026-01-02T14:00:00Z',
+    },
+    {
+        id: 4,
+        recipient: 1,
+        type: 'PROJECT',
+        title: 'Project update',
+        message: 'Your project "Eco-Farm Renovation" has received 5 new views this week.',
+        link_url: '/my-projects',
+        is_read: true,
+        read_at: '2026-01-07T10:00:00Z',
+        created_at: '2026-01-06T09:00:00Z',
+    },
+    {
+        id: 5,
+        recipient: 1,
+        type: 'SYSTEM',
+        title: 'Welcome to Ecobilda!',
+        message: 'Thank you for joining our community. Start by browsing projects or creating your own!',
+        link_url: '/projects',
+        is_read: true,
+        read_at: '2025-10-15T10:30:00Z',
+        created_at: '2025-10-15T10:00:00Z',
+    },
+];
+
+// ============== ALL PROJECTS (for browsing) ==============
+export const mockAllProjects: Project[] = [
+    ...mockUserProjects,
+    ...mockFavoriteProjects,
+    mockProjectCob,
+    mockProjectPermaCourse,
+    mockProjectGathering,
+];

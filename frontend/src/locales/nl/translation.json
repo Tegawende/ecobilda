@@ -1,0 +1,315 @@
+{
+    "common": {
+        "welcome": "Welkom bij Ecobilda",
+        "loading": "Laden...",
+        "error": "Er is een fout opgetreden",
+        "save": "Opslaan",
+        "cancel": "Annuleren",
+        "delete": "Verwijderen",
+        "edit": "Bewerken",
+        "search": "Zoeken",
+        "filter": "Filteren",
+        "submit": "Verzenden",
+        "login": "Inloggen of registreren",
+        "active": "Actief",
+        "inactive": "Inactief",
+        "back": "Terug",
+        "day": "dag"
+    },
+    "nav": {
+        "home": "Home",
+        "projects": "Projecten",
+        "messages": "Berichten",
+        "profile": "Profiel",
+        "login": "Inloggen of registreren",
+        "register": "Registreren",
+        "logout": "Uitloggen",
+        "userMenu": {
+            "favorites": "Favorieten",
+            "myProjects": "Mijn projecten",
+            "participations": "Mijn deelnames",
+            "messages": "Berichten",
+            "profile": "Mijn profiel",
+            "settings": "Accountinstellingen"
+        }
+    },
+    "about": {
+        "hero": {
+            "title": "Over Ecobilda",
+            "subtitle": "Vrijwilligers verbinden met natuurlijke bouw- en permacultuurprojecten wereldwijd"
+        },
+        "mission": {
+            "title": "Onze Missie",
+            "description1": "Ecobilda is een platform gewijd aan het bevorderen van duurzaam leven door middel van natuurlijk bouwen en permacultuur. Wij verbinden gepassioneerde vrijwilligers met milieuvriendelijke projecten over de hele wereld.",
+            "description2": "Ons doel is om een wereldwijde gemeenschap te creëren van mensen die zich inzetten voor milieuduurzaamheid, waar iedereen kan leren, delen en bijdragen aan een ecologischere toekomst."
+        },
+        "values": {
+            "title": "Onze Waarden",
+            "sustainability": {
+                "title": "Duurzaamheid",
+                "desc": "Het bevorderen van milieuvriendelijke praktijken en duurzame levensoplossingen"
+            },
+            "community": {
+                "title": "Gemeenschap",
+                "desc": "Het opbouwen van een wereldwijd netwerk van gelijkgestemden"
+            },
+            "collaboration": {
+                "title": "Samenwerking",
+                "desc": "Het aanmoedigen van kennisdeling en wederzijdse ondersteuning"
+            },
+            "permaculture": {
+                "title": "Permacultuur",
+                "desc": "Het ontwerpen van duurzame agrarische ecosystemen"
+            },
+            "naturalBuilding": {
+                "title": "Natuurlijk Bouwen",
+                "desc": "Het creëren van milieuvriendelijke structuren met natuurlijke materialen"
+            },
+            "globalImpact": {
+                "title": "Wereldwijde Impact",
+                "desc": "Een positief verschil maken wereldwijd"
+            }
+        },
+        "howItWorks": {
+            "title": "Hoe het werkt",
+            "step1": {
+                "title": "Projecten ontdekken",
+                "desc": "Doorblader natuurlijke bouw- en permacultuurprojecten van over de hele wereld"
+            },
+            "step2": {
+                "title": "Contact met gastheren",
+                "desc": "Neem contact op met projecteigenaren en bespreek mogelijkheden"
+            },
+            "step3": {
+                "title": "Leren en bijdragen",
+                "desc": "Doe praktische ervaring op terwijl u duurzame projecten helpt slagen"
+            },
+            "step4": {
+                "title": "Deel uw ervaring",
+                "desc": "Laat beoordelingen achter en help anderen geweldige kansen te vinden"
+            }
+        }
+    },
+    "contact": {
+        "title": "Neem contact op",
+        "subtitle": "Heeft u een vraag of wilt u contact opnemen? We horen graag van u!",
+        "formTitle": "Stuur ons een bericht",
+        "successMessage": "Uw bericht is succesvol verzonden! We nemen binnenkort contact met u op.",
+        "form": {
+            "name": "Naam",
+            "namePlaceholder": "Uw naam",
+            "email": "E-mail",
+            "emailPlaceholder": "uw.email@voorbeeld.com",
+            "subject": "Onderwerp",
+            "subjectPlaceholder": "Waar gaat het over?",
+            "message": "Bericht",
+            "messagePlaceholder": "Vertel ons meer...",
+            "submit": "Bericht verzenden"
+        }
+    },
+    "home": {
+        "hero": {
+            "title": "Natuurlijk Bouwen Overal",
+            "subtitle": "Vrijwilligers verbinden met natuurlijke bouw- en permacultuurprojecten wereldwijd.",
+            "browseProjects": "Bekijk Projecten"
+        },
+        "about": {
+            "title": "Onze Waarden",
+            "intro": "Wij geloven in duurzaam leven en het delen van kennis."
+        },
+        "naturalBuilding": {
+            "title": "Natuurlijk Bouwen",
+            "content": "Leer ecologisch bouwen met aarde, stro en steen."
+        },
+        "permaculture": {
+            "title": "Permacultuur",
+            "content": "Creëer veerkrachtige systemen in harmonie met de natuur."
+        },
+        "community": {
+            "title": "Gemeenschap",
+            "content": "Ontmoet gepassioneerde mensen en deel oude wijsheid.",
+            "joinTitle": "Word lid van de gemeenschap",
+            "joinBtn": "Word Gratis Lid"
+        },
+        "stats": {
+            "participants": "Deelnemers",
+            "projects": "Projecten",
+            "countries": "Landen"
+        }
+    },
+    "footer": {
+        "copyright": "© {{year}} Ecobilda. Alle rechten voorbehouden.",
+        "about": {
+            "title": "Over ons",
+            "us": "Over ons",
+            "contact": "Contact",
+            "faq": "FAQ",
+            "blog": "Blog"
+        },
+        "links": {
+            "facebook": "Facebook",
+            "support": "Steun ons",
+            "terms": "Voorwaarden",
+            "privacy": "Privacy"
+        },
+        "projects": {
+            "title": "Projecten",
+            "browse": "Bekijk Projecten",
+            "howItWorks": "Hoe het werkt",
+            "forHosts": "Voor Gastheren"
+        },
+        "community": {
+            "title": "Gemeenschap"
+        }
+    },
+    "projects": {
+        "title": "Projecten",
+        "explore": "Projecten verkennen",
+        "found": "{{count}} projecten gevonden",
+        "searchPlaceholder": "Zoek projecten of locaties...",
+        "noResults": "Geen projecten gevonden",
+        "noResultsDesc": "Probeer uw filters of zoektermen aan te passen om te vinden wat u zoekt.",
+        "clearFilters": "Alle filters wissen",
+        "spotsLeft": "{{count}} plaatsen over",
+        "full": "Vol",
+        "createProject": "Project aanmaken",
+        "projectType": "Projecttype",
+        "permaculture": "Permacultuur",
+        "naturalBuilding": "Natuurlijk bouwen",
+        "filters": {
+            "all": "Alles",
+            "construction": "Bouw",
+            "permaculture": "Permacultuur",
+            "renovation": "Renovatie",
+            "community": "Gemeenschap",
+            "categories": "Categorieën",
+            "locations": "Locaties"
+        },
+        "helpersMax": "vrijwilligers max"
+    },
+    "projectDetail": {
+        "notFound": "Project niet gevonden",
+        "backToProjects": "Terug naar projecten",
+        "about": "Over het project",
+        "details": "Projectdetails",
+        "status": "Status",
+        "startDate": "Startdatum",
+        "volunteers": "Vrijwilligers",
+        "volunteersNeeded": "{{count}} nodig",
+        "apply": "Solliciteren",
+        "freeForMembers": "Gratis voor leden."
+    },
+    "dashboard": {
+        "welcome": "Welkom terug, {{name}}!",
+        "stats": {
+            "projects": "Mijn projecten",
+            "rating": "Beoordeling",
+            "reviews": "Beoordelingen",
+            "messages": "Nieuwe berichten"
+        },
+        "quickActions": "Snelle acties",
+        "actions": {
+            "browse": "Projecten doorbladeren",
+            "browseDesc": "Nieuwe kansen vinden",
+            "myProjects": "Mijn projecten",
+            "myProjectsDesc": "Uw advertenties beheren",
+            "messages": "Berichten",
+            "messagesDesc": "Chatten met de gemeenschap",
+            "create": "Project aanmaken",
+            "createDesc": "Iets nieuws beginnen"
+        },
+        "myProjects": "Mijn projecten",
+        "viewAll": "Alles bekijken",
+        "helpers": "vrijwilligers max",
+        "noProjects": "Nog geen projecten",
+        "noProjectsDesc": "Maak uw eerste project aan om te beginnen",
+        "createFirst": "Project aanmaken",
+        "notifications": "Meldingen",
+        "quickLinks": "Snelle links",
+        "links": {
+            "profile": "Mijn profiel",
+            "profileDesc": "Uw profiel bekijken en bewerken",
+            "favorites": "Mijn favorieten",
+            "favoritesDesc": "Projecten die u heeft opgeslagen",
+            "participations": "Mijn deelnames",
+            "participationsDesc": "Projecten waaraan u heeft deelgenomen",
+            "settings": "Accountinstellingen",
+            "settingsDesc": "Uw account beheren"
+        }
+    },
+    "myProjects": {
+        "title": "Mijn projecten",
+        "subtitle": "Beheer uw gepubliceerde projecten",
+        "createNew": "Nieuw project aanmaken",
+        "noProjects": "Nog geen projecten",
+        "noProjectsDesc": "U heeft nog geen projecten aangemaakt. Maak uw eerste project aan en maak contact met vrijwilligers!",
+        "createFirst": "Maak uw eerste project aan"
+    },
+    "participations": {
+        "title": "Mijn deelnames",
+        "subtitle": "Projecten waarop u heeft gesolliciteerd",
+        "all": "Alles",
+        "pending": "In afwachting",
+        "accepted": "Geaccepteerd",
+        "rejected": "Afgewezen",
+        "completed": "Voltooid",
+        "hostedBy": "Gehost door",
+        "viewProject": "Project bekijken",
+        "noParticipations": "Nog geen deelnames",
+        "noParticipationsDesc": "Begin met het verkennen van projecten en solliciteer om deel te nemen!",
+        "browseProjects": "Projecten doorbladeren"
+    },
+    "favorites": {
+        "title": "Mijn favorieten",
+        "subtitle": "Projecten die u heeft opgeslagen",
+        "remove": "Uit favorieten verwijderen",
+        "noFavorites": "Nog geen favorieten",
+        "noFavoritesDesc": "Begin met het verkennen van projecten en sla de projecten op die u leuk vindt!",
+        "browseProjects": "Projecten doorbladeren"
+    },
+    "profile": {
+        "editProfile": "Profiel bewerken",
+        "backToProfile": "Terug naar profiel",
+        "about": "Over",
+        "location": "Locatie",
+        "birthday": "Verjaardag",
+        "languages": "Talen",
+        "skills": "Vaardigheden",
+        "bio": "Over mij",
+        "bioPlaceholder": "Vertel anderen over uzelf...",
+        "review": "beoordeling",
+        "reviews": "beoordelingen",
+        "reviewsTitle": "Beoordelingen",
+        "yourResponse": "Uw reactie"
+    },
+    "settings": {
+        "title": "Accountinstellingen",
+        "subtitle": "Beheer uw voorkeuren en beveiliging",
+        "saved": "Instellingen opgeslagen!",
+        "notifications": "Meldingen",
+        "emailNotifications": "E-mailmeldingen",
+        "emailNotificationsDesc": "E-mailmeldingen ontvangen voor belangrijke updates",
+        "projectUpdates": "Projectupdates",
+        "projectUpdatesDesc": "Op de hoogte worden gehouden van projecten die u interesseren",
+        "messageNotifications": "Berichtmeldingen",
+        "messageNotificationsDesc": "Meldingen ontvangen voor nieuwe berichten",
+        "marketingEmails": "Marketing-e-mails",
+        "marketingEmailsDesc": "Nieuws en promotionele content ontvangen",
+        "saveChanges": "Wijzigingen opslaan",
+        "language": "Taal",
+        "preferredLanguage": "Voorkeurstaal",
+        "saveLanguage": "Taal opslaan",
+        "changePassword": "Wachtwoord wijzigen",
+        "currentPassword": "Huidig wachtwoord",
+        "newPassword": "Nieuw wachtwoord",
+        "confirmPassword": "Nieuw wachtwoord bevestigen",
+        "updatePassword": "Wachtwoord bijwerken",
+        "logout": "Uitloggen",
+        "logoutDesc": "Uitloggen van uw account",
+        "logoutBtn": "Uitloggen",
+        "dangerZone": "Gevarenzone",
+        "deleteWarning": "Zodra u uw account verwijdert, is er geen weg terug. Wees alstublieft zeker.",
+        "deleteAccount": "Account verwijderen",
+        "deleteConfirm": "Weet u zeker dat u uw account wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt."
+    }
+}

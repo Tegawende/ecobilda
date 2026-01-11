@@ -1,0 +1,521 @@
+{
+  "common": {
+    "welcome": "Welcome to Ecobilda",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "filter": "Filter",
+    "submit": "Submit",
+    "login": "Log in or Sign up",
+    "active": "Active",
+    "inactive": "Inactive",
+    "back": "Back",
+    "day": "day"
+  },
+  "nav": {
+    "home": "Home",
+    "projects": "Projects",
+    "messages": "Messages",
+    "profile": "Profile",
+    "login": "Log in or sign up",
+    "register": "Register",
+    "logout": "Logout",
+    "userMenu": {
+      "favorites": "Favorites",
+      "myProjects": "My Projects",
+      "participations": "My Participations",
+      "messages": "Messages",
+      "profile": "My Profile",
+      "settings": "Account Settings"
+    }
+  },
+  "about": {
+    "hero": {
+      "title": "About Ecobilda",
+      "subtitle": "Connecting volunteers with natural building and permaculture projects worldwide"
+    },
+    "mission": {
+      "title": "Our Mission",
+      "description1": "Ecobilda is a platform dedicated to promoting sustainable living through natural building and permaculture. We connect passionate volunteers with eco-friendly projects around the world, facilitating knowledge exchange and hands-on learning experiences.",
+      "description2": "Our goal is to create a global community of individuals committed to environmental sustainability, where everyone can learn, share, and contribute to building a more ecological future."
+    },
+    "values": {
+      "title": "Our Values",
+      "sustainability": {
+        "title": "Sustainability",
+        "desc": "Promoting eco-friendly practices and sustainable living solutions"
+      },
+      "community": {
+        "title": "Community",
+        "desc": "Building a global network of like-minded individuals"
+      },
+      "collaboration": {
+        "title": "Collaboration",
+        "desc": "Encouraging knowledge sharing and mutual support"
+      },
+      "permaculture": {
+        "title": "Permaculture",
+        "desc": "Designing sustainable agricultural ecosystems"
+      },
+      "naturalBuilding": {
+        "title": "Natural Building",
+        "desc": "Creating eco-friendly structures with natural materials"
+      },
+      "globalImpact": {
+        "title": "Global Impact",
+        "desc": "Making a positive difference worldwide"
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "step1": {
+        "title": "Discover Projects",
+        "desc": "Browse natural building and permaculture projects from around the world"
+      },
+      "step2": {
+        "title": "Connect with Hosts",
+        "desc": "Reach out to project owners and discuss opportunities"
+      },
+      "step3": {
+        "title": "Learn & Contribute",
+        "desc": "Gain hands-on experience while helping sustainable projects succeed"
+      },
+      "step4": {
+        "title": "Share Your Experience",
+        "desc": "Leave reviews and help others find great opportunities"
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Have a question or want to get in touch? We'd love to hear from you!",
+    "formTitle": "Send us a message",
+    "successMessage": "Your message has been sent successfully! We'll get back to you soon.",
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "email": "Email",
+      "emailPlaceholder": "your.email@example.com",
+      "subject": "Subject",
+      "subjectPlaceholder": "What is this about?",
+      "message": "Message",
+      "messagePlaceholder": "Tell us more...",
+      "submit": "Send Message"
+    }
+  },
+  "auth": {
+    "loginOrSignup": "Log in or Sign up",
+    "welcome": "Welcome to Ecobilda",
+    "finishSignup": "Finish signing up",
+    "continue": "Continue",
+    "agreeAndContinue": "Agree and continue",
+    "legalName": "Legal name",
+    "contactInfo": "Contact info",
+    "emailInfo": "We'll email you trip confirmations and receipts.",
+    "nameDesc": "Make sure this matches the name on your government ID.",
+    "dobDesc": "To sign up, you need to be at least 18. Your birthday won't be shared with other people who use Ecobilda.",
+    "marketingOptOut": "I don't want to receive marketing messages from Ecobilda.",
+    "agreementText": "By selecting Agree and continue, I agree to Ecobilda's Terms of Service, Payments Terms of Service, and Nondiscrimination Policy and acknowledge the Privacy Policy.",
+    "loginTitle": "Welcome back!",
+    "registerTitle": "Create an Account",
+    "loginSubtitle": "Log in to access your space.",
+    "registerSubtitle": "Join the Ecobilda community today.",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "dateOfBirth": "Date of Birth",
+    "orContinueWith": "Or continue with",
+    "orContinueWithEmail": "Or continue with email",
+    "continueWithEmail": "Continue with email",
+    "googleLogin": "Continue with Google",
+    "appleLogin": "Continue with Apple",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "login": "Log in",
+    "register": "Create account",
+    "loggingIn": "Logging in...",
+    "registering": "Creating account...",
+    "errorLogin": "Login failed. Check your credentials.",
+    "errorRegister": "Registration failed. Please try again.",
+    "termsAccept": "I accept the",
+    "termsLink": "Terms & Conditions",
+    "validation": {
+      "email": "Invalid email",
+      "password": "Password must be at least 8 characters",
+      "passwordMatch": "Passwords do not match",
+      "passwordComplexity": "Min. 8 characters and 1 number or symbol",
+      "firstName": "First name must be at least 2 characters",
+      "lastName": "Last name must be at least 2 characters",
+      "birthDateRequired": "Date of birth required",
+      "ageRequirement": "You must be at least 18 years old",
+      "terms": "You must accept the terms"
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "explore": "Explore Projects",
+    "found": "{{count}} projects found",
+    "searchPlaceholder": "Search projects or locations...",
+    "noResults": "No projects found",
+    "noResultsDesc": "Try adjusting your filters or search terms to find what you're looking for.",
+    "clearFilters": "Clear all filters",
+    "spotsLeft": "{{count}} spots left",
+    "full": "Full",
+    "createProject": "Create Project",
+    "projectType": "Project Type",
+    "permaculture": "Permaculture",
+    "naturalBuilding": "Natural Building",
+    "availability": "Availability",
+    "skills": "Skills",
+    "location": "Location",
+    "maxHelpers": "Max Helpers",
+    "hoursPerDay": "Hours per Day",
+    "daysPerWeek": "Days per Week",
+    "accommodation": "Accommodation",
+    "food": "Food",
+    "amenities": "Amenities",
+    "internetProvided": "Internet Provided",
+    "familyFriendly": "Family Friendly",
+    "petsAllowed": "Pets Allowed",
+    "smokingAllowed": "Smoking Allowed",
+    "filters": {
+      "all": "All",
+      "construction": "Construction",
+      "permaculture": "Permaculture",
+      "renovation": "Renovation",
+      "community": "Community",
+      "categories": "Categories",
+      "locations": "Locations"
+    },
+    "helpersMax": "helpers max"
+  },
+  "projectDetail": {
+    "notFound": "Project not found",
+    "backToProjects": "Back to Projects",
+    "about": "About the Project",
+    "details": "Project Details",
+    "status": "Status",
+    "startDate": "Start Date",
+    "volunteers": "Volunteers",
+    "volunteersNeeded": "{{count}} Needed",
+    "apply": "Apply to Join",
+    "freeForMembers": "Free for members."
+  },
+  "dashboard": {
+    "welcome": "Welcome back, {{name}}!",
+    "stats": {
+      "projects": "My Projects",
+      "rating": "Rating",
+      "reviews": "Reviews",
+      "messages": "New Messages"
+    },
+    "quickActions": "Quick Actions",
+    "actions": {
+      "browse": "Browse Projects",
+      "browseDesc": "Find new opportunities",
+      "myProjects": "My Projects",
+      "myProjectsDesc": "Manage your listings",
+      "messages": "Messages",
+      "messagesDesc": "Chat with the community",
+      "create": "Create Project",
+      "createDesc": "Start something new"
+    },
+    "myProjects": "My Projects",
+    "viewAll": "View All",
+    "helpers": "helpers max",
+    "noProjects": "No projects yet",
+    "noProjectsDesc": "Create your first project to get started",
+    "createFirst": "Create Project",
+    "notifications": "Notifications",
+    "quickLinks": "Quick Links",
+    "links": {
+      "profile": "My Profile",
+      "profileDesc": "View and edit your profile",
+      "favorites": "My Favorites",
+      "favoritesDesc": "Projects you saved",
+      "participations": "My Participations",
+      "participationsDesc": "Projects you joined",
+      "settings": "Account Settings",
+      "settingsDesc": "Manage your account"
+    }
+  },
+  "myProjects": {
+    "title": "My Projects",
+    "subtitle": "Manage your published projects",
+    "createNew": "Create New Project",
+    "noProjects": "No projects yet",
+    "noProjectsDesc": "You haven't created any projects yet. Start your first project and connect with volunteers!",
+    "createFirst": "Create Your First Project"
+  },
+  "participations": {
+    "title": "My Participations",
+    "subtitle": "Projects you applied to join",
+    "all": "All",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "rejected": "Rejected",
+    "completed": "Completed",
+    "hostedBy": "Hosted by",
+    "viewProject": "View Project",
+    "noParticipations": "No participations yet",
+    "noParticipationsDesc": "Start exploring projects and apply to join them!",
+    "browseProjects": "Browse Projects"
+  },
+  "favorites": {
+    "title": "My Favorites",
+    "subtitle": "Projects you saved for later",
+    "remove": "Remove from favorites",
+    "noFavorites": "No favorites yet",
+    "noFavoritesDesc": "Start exploring projects and save the ones you like!",
+    "browseProjects": "Browse Projects"
+  },
+  "profile": {
+    "editProfile": "Edit Profile",
+    "backToProfile": "Back to Profile",
+    "about": "About",
+    "location": "Location",
+    "birthday": "Birthday",
+    "languages": "Languages",
+    "skills": "Skills",
+    "bio": "About me",
+    "bioPlaceholder": "Tell others about yourself...",
+    "review": "review",
+    "reviews": "reviews",
+    "reviewsTitle": "Reviews",
+    "yourResponse": "Your response"
+  },
+  "settings": {
+    "title": "Account Settings",
+    "subtitle": "Manage your preferences and security",
+    "saved": "Settings saved!",
+    "notifications": "Notifications",
+    "emailNotifications": "Email Notifications",
+    "emailNotificationsDesc": "Receive email notifications for important updates",
+    "projectUpdates": "Project Updates",
+    "projectUpdatesDesc": "Get notified about projects you're interested in",
+    "messageNotifications": "Message Notifications",
+    "messageNotificationsDesc": "Receive notifications for new messages",
+    "marketingEmails": "Marketing Emails",
+    "marketingEmailsDesc": "Receive news and promotional content",
+    "saveChanges": "Save Changes",
+    "language": "Language",
+    "preferredLanguage": "Preferred Language",
+    "saveLanguage": "Save Language",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "updatePassword": "Update Password",
+    "logout": "Log Out",
+    "logoutDesc": "Sign out of your account",
+    "logoutBtn": "Log Out",
+    "dangerZone": "Danger Zone",
+    "deleteWarning": "Once you delete your account, there is no going back. Please be certain.",
+    "deleteAccount": "Delete Account",
+    "deleteConfirm": "Are you sure you want to delete your account? This action cannot be undone."
+  },
+  "messaging": {
+    "inbox": "Inbox",
+    "newMessage": "New Message",
+    "sendMessage": "Send Message",
+    "noMessages": "No messages yet",
+    "typeMessage": "Type a message...",
+    "title": "Messages",
+    "placeholder": "Type your message...",
+    "selectConversation": "Select a conversation",
+    "selectConversationDesc": "Choose from your existing conversations to start messaging",
+    "noConversations": "No conversations yet",
+    "conversationOptions": "Options",
+    "mute": "Mute notifications",
+    "unmute": "Unmute notifications",
+    "delete": "Delete conversation",
+    "viewProfile": "View profile"
+  },
+  "reviews": {
+    "title": "Reviews",
+    "writeReview": "Write a Review",
+    "rating": "Rating",
+    "feedback": "Feedback",
+    "response": "Response",
+    "noReviews": "No reviews yet"
+  },
+  "skills": {
+    "permaculture": {
+      "gardenMaintenance": "Garden Maintenance",
+      "grafting": "Grafting",
+      "pruning": "Pruning",
+      "harvesting": "Harvesting",
+      "composting": "Composting",
+      "weeding": "Weeding",
+      "propagating": "Propagating",
+      "seedsHarvesting": "Seeds Harvesting"
+    },
+    "naturalBuilding": {
+      "carpentry": "Carpentry",
+      "masonry": "Masonry",
+      "strawbaleBuilding": "Strawbale Building",
+      "cobBuilding": "Cob Building",
+      "earthenPlaster": "Earthen Plaster",
+      "limePlaster": "Lime Plaster",
+      "hempcrete": "Hempcrete",
+      "tadelaktPlaster": "Tadelakt Plaster"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Natural Building Everywhere",
+      "subtitle": "Connect with eco-construction and permaculture projects worldwide. Learn new skills while contributing to sustainable communities.",
+      "browseProjects": "Browse Projects",
+      "register": "Get Started"
+    },
+    "about": {
+      "title": "Welcome to Ecobilda",
+      "intro": "Ecobilda is dedicated to natural building and permaculture, but above all to human connections. A platform to travel, meet, and learn.",
+      "mission": "Ecobilda links those who build naturally with those eager to travel and learn."
+    },
+    "naturalBuilding": {
+      "title": "Natural Building",
+      "content": "Learn by doing. Build ecological and sustainable habitats using local materials like earth, straw, and timber."
+    },
+    "permaculture": {
+      "title": "Permaculture",
+      "content": "Create resilient systems. Grow in harmony with nature by observing and mimicking its ecosystems for sustainable abundance."
+    },
+    "community": {
+      "title": "Community",
+      "content": "Meet passionate people. Share life moments, knowledge, and meals. The human adventure is at the heart of every project.",
+      "joinTitle": "Join a Committed Community",
+      "joinBtn": "Become a Member",
+      "badges": {
+        "community": "Community",
+        "learning": "Learning",
+        "cultural": "Cultural Exchange"
+      }
+    },
+    "stats": {
+      "participants": "Participants",
+      "projects": "Completed Projects",
+      "countries": "Countries Represented"
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "steps": {
+        "register": {
+          "title": "Register",
+          "desc": "Create your account and build your profile"
+        },
+        "browse": {
+          "title": "Browse or Create Projects",
+          "desc": "Find opportunities or share your own project"
+        },
+        "connect": {
+          "title": "Connect & Collaborate",
+          "desc": "Send messages and arrange details"
+        },
+        "learn": {
+          "title": "Learn & Share",
+          "desc": "Gain new skills, leave reviews, build community"
+        }
+      }
+    },
+    "cta": {
+      "title": "Ready to Start Your Journey?",
+      "subtitle": "Join our community of eco-builders and permaculture enthusiasts today."
+    },
+    "featured": {
+      "title": "Featured Projects",
+      "subtitle": "Discover the latest participatory workshops.",
+      "viewAll": "View all",
+      "badges": {
+        "site": "Construction Site",
+        "workshop": "Workshop"
+      },
+      "status": {
+        "open": "Open",
+        "full": "Full"
+      },
+      "project1": {
+        "title": "Straw & Earth Construction",
+        "desc": "Join us to learn the GREB technique on a bioclimatic house."
+      },
+      "project2": {
+        "title": "Permaculture Design",
+        "desc": "Introduction to permaculture design for an abundant food garden."
+      },
+      "project3": {
+        "title": "Superadobe Eco-Dome",
+        "desc": "Participate in building a collective eco-dome using earth bags."
+      }
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Find answers to common questions about Ecobilda",
+    "searchPlaceholder": "Search for answers...",
+    "noResults": "No questions found matching \"{{term}}\"",
+    "stillHaveQuestions": "Still have questions?",
+    "cantFindAnswer": "Can't find the answer you're looking for? Our support team is here to help.",
+    "contactSupport": "Contact Support",
+    "categories": {
+      "gettingStarted": {
+        "title": "Getting Started",
+        "q1": "What is Ecobilda?",
+        "a1": "Ecobilda is a platform connecting volunteers with eco-construction and permaculture projects worldwide. Learn sustainable skills while helping eco-friendly communities.",
+        "q2": "How do I create an account?",
+        "a2": "Click on \"Register\" in the top navigation, fill in your details including name, email, date of birth, and password. Once registered, you can start browsing and applying to projects.",
+        "q3": "Is Ecobilda free to use?",
+        "a3": "Yes, creating an account and browsing projects is completely free. Some project hosts may have specific requirements or fees, which will be clearly stated in their project description."
+      },
+      "forVolunteers": {
+        "title": "For Volunteers",
+        "q1": "How do I find projects?",
+        "a1": "Use the Projects page to browse all available opportunities. You can filter by location, project type (Permaculture or Natural Building), and required skills.",
+        "q2": "What should I bring to a project?",
+        "a2": "Each project has different requirements. Check the project details page for specific information about what to bring, accommodation provided, and work expectations.",
+        "q3": "Can I leave a review?",
+        "a3": "Yes! After completing a project, both volunteers and hosts can leave reviews. This helps build trust in our community."
+      },
+      "forHosts": {
+        "title": "For Hosts",
+        "q1": "How do I create a project?",
+        "a1": "Once logged in, click on \"Create Project\" and fill in all the details about your project, including description, location, required skills, and work conditions.",
+        "q2": "How many volunteers can I host?",
+        "a2": "You can specify the maximum number of volunteers when creating your project. You can also set different limits for male and female volunteers if needed.",
+        "q3": "Can I edit my project after publishing?",
+        "a3": "Yes, you can edit your project details at any time from your profile. Make sure to keep the information up-to-date for potential volunteers."
+      }
+    }
+  },
+  "footer": {
+    "about": {
+      "title": "About",
+      "us": "About us",
+      "contact": "Contact",
+      "faq": "FAQ",
+      "blog": "Blog"
+    },
+    "projects": {
+      "title": "Projects",
+      "browse": "Browse Projects",
+      "howItWorks": "How it works",
+      "forHosts": "For Hosts"
+    },
+    "community": {
+      "title": "Community"
+    },
+    "links": {
+      "facebook": "Facebook",
+      "support": "Support",
+      "terms": "Terms",
+      "privacy": "Privacy"
+    },
+    "copyright": "© {{year}} Ecobilda. All rights reserved."
+  }
+}

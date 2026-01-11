@@ -1,0 +1,308 @@
+{
+  "common": {
+    "welcome": "Willkommen bei Ecobilda",
+    "loading": "Lädt...",
+    "error": "Ein Fehler ist aufgetreten",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "submit": "Absenden",
+    "login": "Anmelden oder registrieren",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "back": "Zurück",
+    "day": "Tag"
+  },
+  "nav": {
+    "home": "Startseite",
+    "projects": "Projekte",
+    "messages": "Nachrichten",
+    "profile": "Profil",
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "logout": "Abmelden",
+    "userMenu": {
+      "favorites": "Favoriten",
+      "myProjects": "Meine Projekte",
+      "participations": "Meine Teilnahmen",
+      "messages": "Nachrichten",
+      "profile": "Mein Profil",
+      "settings": "Kontoeinstellungen"
+    }
+  },
+  "auth": {
+    "loginTitle": "Bei Ecobilda anmelden",
+    "registerTitle": "Konto erstellen",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "orContinueWith": "Oder fortfahren mit",
+    "googleLogin": "Mit Google fortfahren",
+    "appleLogin": "Mit Apple fortfahren",
+    "forgotPassword": "Passwort vergessen?",
+    "noAccount": "Noch kein Konto?",
+    "hasAccount": "Bereits ein Konto?"
+  },
+  "projects": {
+    "title": "Projekte",
+    "explore": "Projekte erkunden",
+    "found": "{{count}} Projekte gefunden",
+    "searchPlaceholder": "Projekte oder Standorte suchen...",
+    "noResults": "Keine Projekte gefunden",
+    "noResultsDesc": "Versuchen Sie, Ihre Filter oder Suchbegriffe anzupassen, um zu finden, wonach Sie suchen.",
+    "clearFilters": "Alle Filter löschen",
+    "spotsLeft": "{{count}} Plätze übrig",
+    "full": "Voll",
+    "createProject": "Projekt erstellen",
+    "projectType": "Projekttyp",
+    "permaculture": "Permakultur",
+    "naturalBuilding": "Naturbau",
+    "availability": "Verfügbarkeit",
+    "skills": "Fähigkeiten",
+    "location": "Standort",
+    "maxHelpers": "Maximale Helfer",
+    "hoursPerDay": "Stunden pro Tag",
+    "daysPerWeek": "Tage pro Woche",
+    "accommodation": "Unterkunft",
+    "food": "Verpflegung",
+    "amenities": "Annehmlichkeiten",
+    "internetProvided": "Internet vorhanden",
+    "familyFriendly": "Familienfreundlich",
+    "petsAllowed": "Haustiere erlaubt",
+    "smokingAllowed": "Rauchen erlaubt",
+    "filters": {
+      "all": "Alle",
+      "construction": "Bau",
+      "permaculture": "Permakultur",
+      "renovation": "Renovierung",
+      "community": "Gemeinschaft",
+      "categories": "Kategorien",
+      "locations": "Standorte"
+    },
+    "helpersMax": "Helfer max"
+  },
+  "projectDetail": {
+    "notFound": "Projekt nicht gefunden",
+    "backToProjects": "Zurück zu Projekten",
+    "about": "Über das Projekt",
+    "details": "Projektdetails",
+    "status": "Status",
+    "startDate": "Startdatum",
+    "volunteers": "Freiwillige",
+    "volunteersNeeded": "{{count}} benötigt",
+    "apply": "Bewerben",
+    "freeForMembers": "Kostenlos für Mitglieder."
+  },
+  "dashboard": {
+    "welcome": "Willkommen zurück, {{name}}!",
+    "stats": {
+      "projects": "Meine Projekte",
+      "rating": "Bewertung",
+      "reviews": "Bewertungen",
+      "messages": "Neue Nachrichten"
+    },
+    "quickActions": "Schnellaktionen",
+    "actions": {
+      "browse": "Projekte durchsuchen",
+      "browseDesc": "Neue Möglichkeiten finden",
+      "myProjects": "Meine Projekte",
+      "myProjectsDesc": "Ihre Anzeigen verwalten",
+      "messages": "Nachrichten",
+      "messagesDesc": "Mit der Gemeinschaft chatten",
+      "create": "Projekt erstellen",
+      "createDesc": "Etwas Neues beginnen"
+    },
+    "myProjects": "Meine Projekte",
+    "viewAll": "Alle anzeigen",
+    "helpers": "Helfer max",
+    "noProjects": "Noch keine Projekte",
+    "noProjectsDesc": "Erstellen Sie Ihr erstes Projekt, um zu beginnen",
+    "createFirst": "Projekt erstellen",
+    "notifications": "Benachrichtigungen",
+    "quickLinks": "Schnelllinks",
+    "links": {
+      "profile": "Mein Profil",
+      "profileDesc": "Ihr Profil anzeigen und bearbeiten",
+      "favorites": "Meine Favoriten",
+      "favoritesDesc": "Von Ihnen gespeicherte Projekte",
+      "participations": "Meine Teilnahmen",
+      "participationsDesc": "Projekte, an denen Sie teilgenommen haben",
+      "settings": "Kontoeinstellungen",
+      "settingsDesc": "Ihr Konto verwalten"
+    }
+  },
+  "myProjects": {
+    "title": "Meine Projekte",
+    "subtitle": "Verwalten Sie Ihre veröffentlichten Projekte",
+    "createNew": "Neues Projekt erstellen",
+    "noProjects": "Noch keine Projekte",
+    "noProjectsDesc": "Sie haben noch keine Projekte erstellt. Erstellen Sie Ihr erstes Projekt und verbinden Sie sich mit Freiwilligen!",
+    "createFirst": "Erstellen Sie Ihr erstes Projekt"
+  },
+  "participations": {
+    "title": "Meine Teilnahmen",
+    "subtitle": "Projekte, für die Sie sich beworben haben",
+    "all": "Alle",
+    "pending": "Ausstehend",
+    "accepted": "Akzeptiert",
+    "rejected": "Abgelehnt",
+    "completed": "Abgeschlossen",
+    "hostedBy": "Gehostet von",
+    "viewProject": "Projekt anzeigen",
+    "noParticipations": "Noch keine Teilnahmen",
+    "noParticipationsDesc": "Beginnen Sie, Projekte zu erkunden und bewerben Sie sich, um teilzunehmen!",
+    "browseProjects": "Projekte durchsuchen"
+  },
+  "favorites": {
+    "title": "Meine Favoriten",
+    "subtitle": "Von Ihnen gespeicherte Projekte",
+    "remove": "Aus Favoriten entfernen",
+    "noFavorites": "Noch keine Favoriten",
+    "noFavoritesDesc": "Beginnen Sie, Projekte zu erkunden und speichern Sie die, die Ihnen gefallen!",
+    "browseProjects": "Projekte durchsuchen"
+  },
+  "profile": {
+    "editProfile": "Profil bearbeiten",
+    "backToProfile": "Zurück zum Profil",
+    "about": "Über",
+    "location": "Standort",
+    "birthday": "Geburtstag",
+    "languages": "Sprachen",
+    "skills": "Fähigkeiten",
+    "bio": "Über mich",
+    "bioPlaceholder": "Erzählen Sie anderen von sich...",
+    "review": "Bewertung",
+    "reviews": "Bewertungen",
+    "reviewsTitle": "Bewertungen",
+    "yourResponse": "Ihre Antwort"
+  },
+  "settings": {
+    "title": "Kontoeinstellungen",
+    "subtitle": "Verwalten Sie Ihre Präferenzen und Sicherheit",
+    "saved": "Einstellungen gespeichert!",
+    "notifications": "Benachrichtigungen",
+    "emailNotifications": "E-Mail-Benachrichtigungen",
+    "emailNotificationsDesc": "E-Mail-Benachrichtigungen für wichtige Updates erhalten",
+    "projectUpdates": "Projekt-Updates",
+    "projectUpdatesDesc": "Über Projekte benachrichtigt werden, die Sie interessieren",
+    "messageNotifications": "Nachrichtenbenachrichtigungen",
+    "messageNotificationsDesc": "Benachrichtigungen für neue Nachrichten erhalten",
+    "marketingEmails": "Marketing-E-Mails",
+    "marketingEmailsDesc": "Neuigkeiten und Werbeinhalte erhalten",
+    "saveChanges": "Änderungen speichern",
+    "language": "Sprache",
+    "preferredLanguage": "Bevorzugte Sprache",
+    "saveLanguage": "Sprache speichern",
+    "changePassword": "Passwort ändern",
+    "currentPassword": "Aktuelles Passwort",
+    "newPassword": "Neues Passwort",
+    "confirmPassword": "Neues Passwort bestätigen",
+    "updatePassword": "Passwort aktualisieren",
+    "logout": "Abmelden",
+    "logoutDesc": "Von Ihrem Konto abmelden",
+    "logoutBtn": "Abmelden",
+    "dangerZone": "Gefahrenzone",
+    "deleteWarning": "Sobald Sie Ihr Konto löschen, gibt es kein Zurück. Bitte seien Sie sicher.",
+    "deleteAccount": "Konto löschen",
+    "deleteConfirm": "Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
+  },
+  "messaging": {
+    "inbox": "Posteingang",
+    "newMessage": "Neue Nachricht",
+    "sendMessage": "Senden",
+    "noMessages": "Keine Nachrichten",
+    "typeMessage": "Nachricht eingeben..."
+  },
+  "reviews": {
+    "title": "Bewertungen",
+    "writeReview": "Bewertung schreiben",
+    "rating": "Bewertung",
+    "feedback": "Rückmeldung",
+    "response": "Antwort",
+    "noReviews": "Keine Bewertungen"
+  },
+  "skills": {
+    "permaculture": {
+      "gardenMaintenance": "Gartenpflege",
+      "grafting": "Veredelung",
+      "pruning": "Beschneidung",
+      "harvesting": "Ernte",
+      "composting": "Kompostierung",
+      "weeding": "Jäten",
+      "propagating": "Vermehrung",
+      "seedsHarvesting": "Saatguternte"
+    },
+    "naturalBuilding": {
+      "carpentry": "Zimmerei",
+      "masonry": "Maurerarbeit",
+      "strawbaleBuilding": "Strohballenbau",
+      "cobBuilding": "Lehmbau",
+      "earthenPlaster": "Lehmputz",
+      "limePlaster": "Kalkputz",
+      "hempcrete": "Hanfbeton",
+      "tadelaktPlaster": "Tadelakt-Putz"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Natürliches Bauen auf der ganzen Welt",
+      "subtitle": "Vernetzen Sie sich mit Öko-Bau- und Permakulturprojekten weltweit. Lernen Sie neue Fähigkeiten, während Sie zu nachhaltigen Gemeinschaften beitragen.",
+      "browseProjects": "Projekte durchsuchen",
+      "register": "Loslegen"
+    },
+    "about": {
+      "title": "Willkommen bei Ecobilda",
+      "intro": "Ecobilda widmet sich natürlichem Bauen und Permakultur, aber vor allem widmet es sich zu menschlichen Verbindungen. Ecobilda ist eine Plattform, die Möglichkeiten zum Reisen, Kennenlernen und Erlernen neuer Fähigkeiten bietet.",
+      "mission": "Ecobilda stellt die Verbindung zwischen denen her, die natürlich bauen, sei es ihr Haus oder ihr Garten, Obstgarten oder sogar nährender Wald, und denen, die reisen und lernen möchten. Natürliches Bauen ist bei weitem die nachhaltigste Art, Häuser zu bauen, und wir glauben fest daran, dass es in naher Zukunft als solche anerkannt wird."
+    },
+    "naturalBuilding": {
+      "title": "Was ist natürliches Bauen?",
+      "content": "Natürliches Bauen wird hauptsächlich durch die verwendeten Materialien wie Holz, Erde, Lehm, Stroh, Hanf, Stein usw. definiert. Kaum verarbeitete Rohstoffe, meist aus der Region, sind auf mehreren Ebenen bemerkenswert. Erstens verbrauchen sie für ihre Herstellung sehr wenig oder keine Energie. Stroh zum Beispiel ist ein Nebenprodukt der Landwirtschaft, das im Allgemeinen nicht geschätzt wird, während es beim Bauen unglaublich isolierend, kostengünstig ist und unter anderem ermöglicht, dass Kohlenstoff gespeichert und nicht mit Kohlensäure versetzt wird. Dann haben natürliche Materialien hygrometrische und wärmeregulierende Eigenschaften, was besonders gesunde Umgebungen schafft. Schließlich haben diese Materialien sehr warme Aspekte und Texturen, die diese Häuser bemerkenswert komfortabel machen. Der einzige Nachteil, wenn Sie einen für sie finden müssen, ist, dass es normalerweise viel Manpower erfordert, sie einzurichten. Die meisten Naturbaumeister haben sich dies jedoch zu einem Vorteil gemacht: Sie rufen die Gemeinde zu Baustellen auf! Das Ergebnis ist so einfach und effektiv wie diese Materialien: ein Abenteuer und eine immens reiche menschliche Erfahrung."
+    },
+    "permaculture": {
+      "title": "Was ist Permakultur?",
+      "content": "Permakultur ist die Praxis, die Natur zu beobachten, um mit ihr zusammenzuarbeiten, um die beste Leistung aus ihr herauszuholen, indem man so wenig wie möglich eingreift, sondern die Natur anleitet und dann wirken lässt. Zu verstehen, wie die Natur funktioniert, ist der Schlüssel zu dieser Praxis, daher die Notwendigkeit, zu beobachten und zu studieren. Die Anwendung dieses Wissens ist der richtige Weg. In der Permakultur wird alles, was zuerst als Problem wahrgenommen wird, in eine Stärke und Chance umgewandelt, das System, an dem Sie arbeiten, noch effizienter zu machen, um bessere Erträge zu erzielen. Es ist mehr als eine Wissenschaft, es ist eine Lebensweise. Bei Ecobilda gehen wir davon aus, dass natürliches Bauen und Permakultur Hand in Hand gehen, da die meisten Menschen, die sich für das eine interessieren, normalerweise auch für das andere interessiert sind. Deshalb widmen wir diese Plattform beiden Disziplinen als eine Disziplin."
+    },
+    "community": {
+      "title": "Auf menschlichen Verbindungen aufgebaut",
+      "content": "Wie oben erläutert, können diese Praktiken, insbesondere das natürliche Bauen, arbeitsintensiv sein. Und das ist großartig, denn es gibt uns einen guten Grund, zusammenzukommen! Menschliches Abenteuer ist der Grundstein jedes natürlichen Bau- und Permakulturprojekts. Die Zusammenarbeit, das Kennenlernen, die Bindungen und manchmal auch die Freundschaften, die daraus resultieren, machen ein Projekt eindeutig zu einem unvergesslichen Erlebnis.",
+      "badges": {
+        "community": "Gemeinschaft",
+        "learning": "Lernen",
+        "cultural": "Kultureller Austausch"
+      }
+    },
+    "howItWorks": {
+      "title": "Wie es funktioniert",
+      "steps": {
+        "register": {
+          "title": "Registrieren",
+          "desc": "Erstellen Sie Ihr Konto und bauen Sie Ihr Profil auf"
+        },
+        "browse": {
+          "title": "Projekte durchsuchen oder erstellen",
+          "desc": "Finden Sie Möglichkeiten oder teilen Sie Ihr eigenes Projekt"
+        },
+        "connect": {
+          "title": "Verbinden und zusammenarbeiten",
+          "desc": "Nachrichten senden und Details arrangieren"
+        },
+        "learn": {
+          "title": "Lernen und teilen",
+          "desc": "Erwerben Sie neue Fähigkeiten, hinterlassen Sie Bewertungen, bauen Sie eine Gemeinschaft auf"
+        }
+      }
+    },
+    "cta": {
+      "title": "Bereit, Ihre Reise zu beginnen?",
+      "subtitle": "Treten Sie noch heute unserer Gemeinschaft von Öko-Bauern und Permakultur-Enthusiasten bei. Teilen Sie Ihre Fähigkeiten, lernen Sie neue Techniken und tragen Sie zu nachhaltigen Projekten auf der ganzen Welt bei.",
+      "browseProjects": "Projekte durchsuchen",
+      "register": "Jetzt starten"
+    }
+  }
+}

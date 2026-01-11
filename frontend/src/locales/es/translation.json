@@ -1,0 +1,241 @@
+{
+  "common": {
+    "welcome": "Bienvenido a Ecobilda",
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "submit": "Enviar",
+    "login": "Iniciar sesión o registrarse",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "back": "Volver",
+    "day": "día"
+  },
+  "nav": {
+    "home": "Inicio",
+    "projects": "Proyectos",
+    "messages": "Mensajes",
+    "profile": "Perfil",
+    "login": "Acceder",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión",
+    "userMenu": {
+      "favorites": "Favoritos",
+      "myProjects": "Mis proyectos",
+      "participations": "Mis participaciones",
+      "messages": "Mensajes",
+      "profile": "Mi perfil",
+      "settings": "Configuración de cuenta"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Construcción Natural en Gran Escala",
+      "subtitle": "Conectando voluntarios con proyectos de construcción natural y permacultura en todo el mundo.",
+      "browseProjects": "Ver Proyectos"
+    },
+    "about": {
+      "title": "Nuestros Valores",
+      "intro": "Creemos en la vida sostenible y el intercambio de conocimientos."
+    },
+    "naturalBuilding": {
+      "title": "Construcción Natural",
+      "content": "Aprende a construir hábitats ecológicos con tierra, paja y piedra."
+    },
+    "permaculture": {
+      "title": "Permacultura",
+      "content": "Crea sistemas resilientes en armonía con la naturaleza."
+    },
+    "community": {
+      "title": "Comunidad",
+      "content": "Conoce gente apasionada y comparte sabiduría ancestral.",
+      "joinTitle": "Únete a la Comunidad",
+      "joinBtn": "Hazte Miembro (Gratis)"
+    },
+    "stats": {
+      "participants": "Participantes",
+      "projects": "Proyectos",
+      "countries": "Países"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Ecobilda. Todos los derechos reservados.",
+    "about": {
+      "title": "Nosotros",
+      "us": "Sobre Nosotros",
+      "contact": "Contacto",
+      "faq": "FAQ",
+      "blog": "Blog"
+    },
+    "links": {
+      "facebook": "Facebook",
+      "support": "Apóyanos",
+      "terms": "Términos",
+      "privacy": "Privacidad"
+    },
+    "projects": {
+      "title": "Proyectos",
+      "browse": "Ver Proyectos",
+      "howItWorks": "Cómo Funciona",
+      "forHosts": "Para Anfitriones"
+    },
+    "community": {
+      "title": "Comunidad"
+    }
+  },
+  "projects": {
+    "title": "Proyectos",
+    "explore": "Explorar proyectos",
+    "found": "{{count}} proyectos encontrados",
+    "searchPlaceholder": "Buscar proyectos o ubicaciones...",
+    "noResults": "No se encontraron proyectos",
+    "noResultsDesc": "Intente ajustar sus filtros o términos de búsqueda para encontrar lo que busca.",
+    "clearFilters": "Limpiar todos los filtros",
+    "spotsLeft": "{{count}} plazas restantes",
+    "full": "Completo",
+    "createProject": "Crear proyecto",
+    "projectType": "Tipo de proyecto",
+    "permaculture": "Permacultura",
+    "naturalBuilding": "Construcción natural",
+    "filters": {
+      "all": "Todos",
+      "construction": "Construcción",
+      "permaculture": "Permacultura",
+      "renovation": "Renovación",
+      "community": "Comunidad",
+      "categories": "Categorías",
+      "locations": "Ubicaciones"
+    },
+    "helpersMax": "voluntarios máx"
+  },
+  "projectDetail": {
+    "notFound": "Proyecto no encontrado",
+    "backToProjects": "Volver a proyectos",
+    "about": "Acerca del proyecto",
+    "details": "Detalles del proyecto",
+    "status": "Estado",
+    "startDate": "Fecha de inicio",
+    "volunteers": "Voluntarios",
+    "volunteersNeeded": "{{count}} necesarios",
+    "apply": "Aplicar",
+    "freeForMembers": "Gratis para miembros."
+  },
+  "dashboard": {
+    "welcome": "¡Bienvenido de nuevo, {{name}}!",
+    "stats": {
+      "projects": "Mis proyectos",
+      "rating": "Calificación",
+      "reviews": "Reseñas",
+      "messages": "Nuevos mensajes"
+    },
+    "quickActions": "Acciones rápidas",
+    "actions": {
+      "browse": "Explorar proyectos",
+      "browseDesc": "Encontrar nuevas oportunidades",
+      "myProjects": "Mis proyectos",
+      "myProjectsDesc": "Gestionar tus anuncios",
+      "messages": "Mensajes",
+      "messagesDesc": "Chatear con la comunidad",
+      "create": "Crear proyecto",
+      "createDesc": "Comenzar algo nuevo"
+    },
+    "myProjects": "Mis proyectos",
+    "viewAll": "Ver todo",
+    "helpers": "voluntarios máx",
+    "noProjects": "Aún no hay proyectos",
+    "noProjectsDesc": "Crea tu primer proyecto para comenzar",
+    "createFirst": "Crear proyecto",
+    "notifications": "Notificaciones",
+    "quickLinks": "Enlaces rápidos",
+    "links": {
+      "profile": "Mi perfil",
+      "profileDesc": "Ver y editar tu perfil",
+      "favorites": "Mis favoritos",
+      "favoritesDesc": "Proyectos que guardaste",
+      "participations": "Mis participaciones",
+      "participationsDesc": "Proyectos en los que participaste",
+      "settings": "Configuración de cuenta",
+      "settingsDesc": "Gestionar tu cuenta"
+    }
+  },
+  "myProjects": {
+    "title": "Mis proyectos",
+    "subtitle": "Gestiona tus proyectos publicados",
+    "createNew": "Crear nuevo proyecto",
+    "noProjects": "Aún no hay proyectos",
+    "noProjectsDesc": "Aún no has creado ningún proyecto. ¡Crea tu primer proyecto y conéctate con voluntarios!",
+    "createFirst": "Crea tu primer proyecto"
+  },
+  "participations": {
+    "title": "Mis participaciones",
+    "subtitle": "Proyectos a los que te postulaste",
+    "all": "Todos",
+    "pending": "Pendiente",
+    "accepted": "Aceptado",
+    "rejected": "Rechazado",
+    "completed": "Completado",
+    "hostedBy": "Alojado por",
+    "viewProject": "Ver proyecto",
+    "noParticipations": "Aún no hay participaciones",
+    "noParticipationsDesc": "¡Comienza a explorar proyectos y postúlate para unirte!",
+    "browseProjects": "Explorar proyectos"
+  },
+  "favorites": {
+    "title": "Mis favoritos",
+    "subtitle": "Proyectos que guardaste",
+    "remove": "Quitar de favoritos",
+    "noFavorites": "Aún no hay favoritos",
+    "noFavoritesDesc": "¡Comienza a explorar proyectos y guarda los que te gusten!",
+    "browseProjects": "Explorar proyectos"
+  },
+  "profile": {
+    "editProfile": "Editar perfil",
+    "backToProfile": "Volver al perfil",
+    "about": "Acerca de",
+    "location": "Ubicación",
+    "birthday": "Cumpleaños",
+    "languages": "Idiomas",
+    "skills": "Habilidades",
+    "bio": "Acerca de mí",
+    "bioPlaceholder": "Cuéntanos sobre ti...",
+    "review": "reseña",
+    "reviews": "reseñas",
+    "reviewsTitle": "Reseñas",
+    "yourResponse": "Tu respuesta"
+  },
+  "settings": {
+    "title": "Configuración de cuenta",
+    "subtitle": "Gestiona tus preferencias y seguridad",
+    "saved": "¡Configuración guardada!",
+    "notifications": "Notificaciones",
+    "emailNotifications": "Notificaciones por email",
+    "emailNotificationsDesc": "Recibir notificaciones por email para actualizaciones importantes",
+    "projectUpdates": "Actualizaciones de proyectos",
+    "projectUpdatesDesc": "Ser notificado sobre proyectos que te interesan",
+    "messageNotifications": "Notificaciones de mensajes",
+    "messageNotificationsDesc": "Recibir notificaciones para nuevos mensajes",
+    "marketingEmails": "Emails de marketing",
+    "marketingEmailsDesc": "Recibir noticias y contenido promocional",
+    "saveChanges": "Guardar cambios",
+    "language": "Idioma",
+    "preferredLanguage": "Idioma preferido",
+    "saveLanguage": "Guardar idioma",
+    "changePassword": "Cambiar contraseña",
+    "currentPassword": "Contraseña actual",
+    "newPassword": "Nueva contraseña",
+    "confirmPassword": "Confirmar nueva contraseña",
+    "updatePassword": "Actualizar contraseña",
+    "logout": "Cerrar sesión",
+    "logoutDesc": "Cerrar sesión de tu cuenta",
+    "logoutBtn": "Cerrar sesión",
+    "dangerZone": "Zona de peligro",
+    "deleteWarning": "Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, ten certeza.",
+    "deleteAccount": "Eliminar cuenta",
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer."
+  }
+}

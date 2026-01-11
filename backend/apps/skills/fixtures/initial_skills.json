@@ -1,0 +1,194 @@
+[
+  {
+    "model": "skills.skill",
+    "pk": "garden_maintenance",
+    "fields": {
+      "category": "PERM",
+      "display_name_en": "Garden maintenance",
+      "display_name_fr": "Entretien jardin",
+      "display_name_es": "Mantenimiento de jardín",
+      "display_name_de": "Gartenpflege",
+      "icon": "🌿"
+    }
+  },
+  {
+    "model": "skills.skill",
+    "pk": "grafting",
+    "fields": {
+      "category": "PERM",
+      "display_name_en": "Grafting",
+      "display_name_fr": "Greffage",
+      "display_name_es": "Injerto",
+      "display_name_de": "Pfropfen",
+      "icon": "🌱"
+    }
+  },
+  {
+    "model": "skills.skill",
+    "pk": "pruning",
+    "fields": {
+      "category": "PERM",
+      "display_name_en": "Pruning",
+      "display_name_fr": "Taille",
+      "display_name_es": "Poda",
+      "display_name_de": "Beschneiden",
+      "icon": "✂️"
+    }
+  },
+  {
+    "model": "skills.skill",
+    "pk": "harvesting",
+    "fields": {
+      "category": "PERM",
+      "display_name_en": "Harvesting",
+      "display_name_fr": "Récolte",
+      "display_name_es": "Cosecha",
+      "display_name_de": "Ernte",
+      "icon": "🥕"
+    }
+  },
+  {
+    "model": "skills.skill",
+    "pk": "composting",
+    "fields": {
+      "category": "PERM",
+      "display_name_en": "Composting",
+      "display_name_fr": "Compostage",
+      "display_name_es": "Compostaje",
+      "display_name_de": "Kompostierung",
+      "icon": "♻️"
+    }
+  },
+  {
+    "model": "skills.skill",
+    "pk": "weeding",
+    "fields": {
+      "category": "PERM",
+      "display_name_en": "Weeding",
+      "display_name_fr": "Désherbage",
+      "display_name_es": "Deshierbe",
+      "display_name_de": "Jäten",
+      "icon": "🌾"
+    }
+  },
+  {
+    "model": "skills.skill",
+    "pk": "propagating",
+    "fields": {
+      "category": "PERM",
+      "display_name_en": "Propagating",
+      "display_name_fr": "Multiplication",
+      "display_name_es": "Propagación",
+      "display_name_de": "Vermehrung",
+      "icon": "🌸"
+    }
+  },
+  {
+    "model": "skills.skill",
+    "pk": "seeds_harvesting",
+    "fields": {
+      "category": "PERM",
+      "display_name_en": "Seeds harvesting",
+      "display_name_fr": "Récolte graines",
+      "display_name_es": "Cosecha de semillas",
+      "display_name_de": "Samenernte",
+      "icon": "🌰"
+    }
+  },
+  {
+    "model": "skills.skill",
+    "pk": "carpentry",
+    "fields": {
+      "category": "NATB",
+      "display_name_en": "Carpentry",
+      "display_name_fr": "Charpenterie",
+      "display_name_es": "Carpintería",
+      "display_name_de": "Zimmerei",
+      "icon": "🪚"
+    }
+  },
+  {
+    "model": "skills.skill",
+    "pk": "masonry",
+    "fields": {
+      "category": "NATB",
+      "display_name_en": "Masonry",
+      "display_name_fr": "Maçonnerie",
+      "display_name_es": "Albañilería",
+      "display_name_de": "Maurerarbeit",
+      "icon": "🧱"
+    }
+  },
+  {
+    "model": "skills.skill",
+    "pk": "strawbale_building",
+    "fields": {
+      "category": "NATB",
+      "display_name_en": "Strawbale building",
+      "display_name_fr": "Construction paille",
+      "display_name_es": "Construcción con paja",
+      "display_name_de": "Strohballenbau",
+      "icon": "🌾"
+    }
+  },
+  {
+    "model": "skills.skill",
+    "pk": "cob_building",
+    "fields": {
+      "category": "NATB",
+      "display_name_en": "Cob building",
+      "display_name_fr": "Construction torchis",
+      "display_name_es": "Construcción de adobe",
+      "display_name_de": "Lehmbau",
+      "icon": "🏚️"
+    }
+  },
+  {
+    "model": "skills.skill",
+    "pk": "earthen_plaster",
+    "fields": {
+      "category": "NATB",
+      "display_name_en": "Earthen plaster",
+      "display_name_fr": "Enduit terre",
+      "display_name_es": "Enlucido de tierra",
+      "display_name_de": "Lehmputz",
+      "icon": "🏔️"
+    }
+  },
+  {
+    "model": "skills.skill",
+    "pk": "lime_plaster",
+    "fields": {
+      "category": "NATB",
+      "display_name_en": "Lime plaster",
+      "display_name_fr": "Enduit chaux",
+      "display_name_es": "Enlucido de cal",
+      "display_name_de": "Kalkputz",
+      "icon": "🪨"
+    }
+  },
+  {
+    "model": "skills.skill",
+    "pk": "hempcrete",
+    "fields": {
+      "category": "NATB",
+      "display_name_en": "Hempcrete",
+      "display_name_fr": "Béton chanvre",
+      "display_name_es": "Hormigón de cáñamo",
+      "display_name_de": "Hanfbeton",
+      "icon": "🌿"
+    }
+  },
+  {
+    "model": "skills.skill",
+    "pk": "tadelakt_plaster",
+    "fields": {
+      "category": "NATB",
+      "display_name_en": "Tadelakt plaster",
+      "display_name_fr": "Tadelakt",
+      "display_name_es": "Enlucido tadelakt",
+      "display_name_de": "Tadelakt-Putz",
+      "icon": "✨"
+    }
+  }
+]

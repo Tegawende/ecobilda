@@ -1,0 +1,241 @@
+{
+    "common": {
+        "welcome": "Bem-vindo ao Ecobilda",
+        "loading": "A carregar...",
+        "error": "Ocorreu um erro",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "edit": "Editar",
+        "search": "Pesquisar",
+        "filter": "Filtrar",
+        "submit": "Submeter",
+        "login": "Entrar ou registar",
+        "active": "Ativo",
+        "inactive": "Inativo",
+        "back": "Voltar",
+        "day": "dia"
+    },
+    "nav": {
+        "home": "Início",
+        "projects": "Projetos",
+        "messages": "Mensagens",
+        "profile": "Perfil",
+        "login": "Entrar",
+        "register": "Registar",
+        "logout": "Sair",
+        "userMenu": {
+            "favorites": "Favoritos",
+            "myProjects": "Os meus projetos",
+            "participations": "As minhas participações",
+            "messages": "Mensagens",
+            "profile": "O meu perfil",
+            "settings": "Definições da conta"
+        }
+    },
+    "home": {
+        "hero": {
+            "title": "Construção Natural em Todo o Lado",
+            "subtitle": "Conectando voluntários com projetos de construção natural e permacultura em todo o mundo.",
+            "browseProjects": "Ver Projetos"
+        },
+        "about": {
+            "title": "Os Nossos Valores",
+            "intro": "Acreditamos na vida sustentável e na partilha de conhecimento."
+        },
+        "naturalBuilding": {
+            "title": "Construção Natural",
+            "content": "Aprenda a construir habitats ecológicos com terra, palha e pedra."
+        },
+        "permaculture": {
+            "title": "Permacultura",
+            "content": "Crie sistemas resilientes em harmonia com a natureza."
+        },
+        "community": {
+            "title": "Comunidade",
+            "content": "Conheça pessoas apaixonadas e partilhe sabedoria ancestral.",
+            "joinTitle": "Junte-se à Comunidade",
+            "joinBtn": "Tornar-se Membro (Grátis)"
+        },
+        "stats": {
+            "participants": "Participantes",
+            "projects": "Projetos",
+            "countries": "Países"
+        }
+    },
+    "footer": {
+        "copyright": "© {{year}} Ecobilda. Todos os direitos reservados.",
+        "about": {
+            "title": "Sobre",
+            "us": "Sobre Nós",
+            "contact": "Contacto",
+            "faq": "FAQ",
+            "blog": "Blog"
+        },
+        "links": {
+            "facebook": "Facebook",
+            "support": "Apoie-nos",
+            "terms": "Termos",
+            "privacy": "Privacidade"
+        },
+        "projects": {
+            "title": "Projetos",
+            "browse": "Ver Projetos",
+            "howItWorks": "Como Funciona",
+            "forHosts": "Para Anfitriões"
+        },
+        "community": {
+            "title": "Comunidade"
+        }
+    },
+    "projects": {
+        "title": "Projetos",
+        "explore": "Explorar projetos",
+        "found": "{{count}} projetos encontrados",
+        "searchPlaceholder": "Pesquisar projetos ou localizações...",
+        "noResults": "Nenhum projeto encontrado",
+        "noResultsDesc": "Tente ajustar os seus filtros ou termos de pesquisa para encontrar o que procura.",
+        "clearFilters": "Limpar todos os filtros",
+        "spotsLeft": "{{count}} lugares restantes",
+        "full": "Completo",
+        "createProject": "Criar projeto",
+        "projectType": "Tipo de projeto",
+        "permaculture": "Permacultura",
+        "naturalBuilding": "Construção natural",
+        "filters": {
+            "all": "Todos",
+            "construction": "Construção",
+            "permaculture": "Permacultura",
+            "renovation": "Renovação",
+            "community": "Comunidade",
+            "categories": "Categorias",
+            "locations": "Localizações"
+        },
+        "helpersMax": "voluntários máx"
+    },
+    "projectDetail": {
+        "notFound": "Projeto não encontrado",
+        "backToProjects": "Voltar aos projetos",
+        "about": "Sobre o projeto",
+        "details": "Detalhes do projeto",
+        "status": "Estado",
+        "startDate": "Data de início",
+        "volunteers": "Voluntários",
+        "volunteersNeeded": "{{count}} necessários",
+        "apply": "Candidatar",
+        "freeForMembers": "Gratuito para membros."
+    },
+    "dashboard": {
+        "welcome": "Bem-vindo de volta, {{name}}!",
+        "stats": {
+            "projects": "Os meus projetos",
+            "rating": "Classificação",
+            "reviews": "Avaliações",
+            "messages": "Novas mensagens"
+        },
+        "quickActions": "Ações rápidas",
+        "actions": {
+            "browse": "Explorar projetos",
+            "browseDesc": "Encontrar novas oportunidades",
+            "myProjects": "Os meus projetos",
+            "myProjectsDesc": "Gerir os seus anúncios",
+            "messages": "Mensagens",
+            "messagesDesc": "Conversar com a comunidade",
+            "create": "Criar projeto",
+            "createDesc": "Começar algo novo"
+        },
+        "myProjects": "Os meus projetos",
+        "viewAll": "Ver tudo",
+        "helpers": "voluntários máx",
+        "noProjects": "Ainda sem projetos",
+        "noProjectsDesc": "Crie o seu primeiro projeto para começar",
+        "createFirst": "Criar projeto",
+        "notifications": "Notificações",
+        "quickLinks": "Links rápidos",
+        "links": {
+            "profile": "O meu perfil",
+            "profileDesc": "Ver e editar o seu perfil",
+            "favorites": "Os meus favoritos",
+            "favoritesDesc": "Projetos que guardou",
+            "participations": "As minhas participações",
+            "participationsDesc": "Projetos em que participou",
+            "settings": "Definições da conta",
+            "settingsDesc": "Gerir a sua conta"
+        }
+    },
+    "myProjects": {
+        "title": "Os meus projetos",
+        "subtitle": "Gerir os seus projetos publicados",
+        "createNew": "Criar novo projeto",
+        "noProjects": "Ainda sem projetos",
+        "noProjectsDesc": "Ainda não criou nenhum projeto. Crie o seu primeiro projeto e conecte-se com voluntários!",
+        "createFirst": "Crie o seu primeiro projeto"
+    },
+    "participations": {
+        "title": "As minhas participações",
+        "subtitle": "Projetos a que se candidatou",
+        "all": "Todos",
+        "pending": "Pendente",
+        "accepted": "Aceite",
+        "rejected": "Rejeitado",
+        "completed": "Concluído",
+        "hostedBy": "Alojado por",
+        "viewProject": "Ver projeto",
+        "noParticipations": "Ainda sem participações",
+        "noParticipationsDesc": "Comece a explorar projetos e candidate-se para participar!",
+        "browseProjects": "Explorar projetos"
+    },
+    "favorites": {
+        "title": "Os meus favoritos",
+        "subtitle": "Projetos que guardou",
+        "remove": "Remover dos favoritos",
+        "noFavorites": "Ainda sem favoritos",
+        "noFavoritesDesc": "Comece a explorar projetos e guarde os que gostar!",
+        "browseProjects": "Explorar projetos"
+    },
+    "profile": {
+        "editProfile": "Editar perfil",
+        "backToProfile": "Voltar ao perfil",
+        "about": "Sobre",
+        "location": "Localização",
+        "birthday": "Aniversário",
+        "languages": "Idiomas",
+        "skills": "Competências",
+        "bio": "Sobre mim",
+        "bioPlaceholder": "Conte aos outros sobre si...",
+        "review": "avaliação",
+        "reviews": "avaliações",
+        "reviewsTitle": "Avaliações",
+        "yourResponse": "A sua resposta"
+    },
+    "settings": {
+        "title": "Definições da conta",
+        "subtitle": "Gerir as suas preferências e segurança",
+        "saved": "Definições guardadas!",
+        "notifications": "Notificações",
+        "emailNotifications": "Notificações por email",
+        "emailNotificationsDesc": "Receber notificações por email para atualizações importantes",
+        "projectUpdates": "Atualizações de projetos",
+        "projectUpdatesDesc": "Ser notificado sobre projetos que o interessam",
+        "messageNotifications": "Notificações de mensagens",
+        "messageNotificationsDesc": "Receber notificações para novas mensagens",
+        "marketingEmails": "Emails de marketing",
+        "marketingEmailsDesc": "Receber notícias e conteúdo promocional",
+        "saveChanges": "Guardar alterações",
+        "language": "Idioma",
+        "preferredLanguage": "Idioma preferido",
+        "saveLanguage": "Guardar idioma",
+        "changePassword": "Alterar palavra-passe",
+        "currentPassword": "Palavra-passe atual",
+        "newPassword": "Nova palavra-passe",
+        "confirmPassword": "Confirmar nova palavra-passe",
+        "updatePassword": "Atualizar palavra-passe",
+        "logout": "Sair",
+        "logoutDesc": "Sair da sua conta",
+        "logoutBtn": "Sair",
+        "dangerZone": "Zona de perigo",
+        "deleteWarning": "Assim que eliminar a sua conta, não há volta atrás. Por favor, tenha certeza.",
+        "deleteAccount": "Eliminar conta",
+        "deleteConfirm": "Tem a certeza de que deseja eliminar a sua conta? Esta ação não pode ser desfeita."
+    }
+}

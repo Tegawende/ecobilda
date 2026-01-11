@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@layer theme {
+  :root {
+    --color-eco-primary: #70A771;
+    --color-eco-primaryDark: #558356;
+    --color-eco-secondary: #97BC62;
+    --color-eco-accent: #D4A373;
+    --color-eco-terracotta: #c9696b;
+    --color-eco-cream: #FEFAE0;
+    --color-eco-sage: #CCD5AE;
+    --color-eco-brown: #606C38;
+
+    --font-display: "Outfit", sans-serif;
+    --font-sans: "Inter", sans-serif;
+  }
+}
+
+@theme {
+  --color-eco-primary: var(--color-eco-primary);
+  --color-eco-primaryDark: var(--color-eco-primaryDark);
+  --color-eco-secondary: var(--color-eco-secondary);
+  --color-eco-accent: var(--color-eco-accent);
+  --color-eco-terracotta: var(--color-eco-terracotta);
+  --color-eco-cream: var(--color-eco-cream);
+  --color-eco-sage: var(--color-eco-sage);
+  --color-eco-brown: var(--color-eco-brown);
+
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+}
+
+/* Custom Eco-friendly Base Styles */
+@layer base {
+  body {
+    background-color: var(--color-eco-cream);
+    color: #1f2937;
+    /* gray-800 */
+    font-family: var(--font-sans);
+  }
+}
+
+@keyframes heart-burst {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(0.6);
+  }
+
+  70% {
+    transform: scale(1.4);
+  }
+
+  100% {
+    transform: scale(1.1);
+  }
+}
+
+.animate-heart-burst {
+  animation: heart-burst 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
