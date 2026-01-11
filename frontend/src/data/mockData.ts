@@ -230,8 +230,11 @@ export const mockUserProjects: Project[] = [
         created_at: '2025-10-15T10:00:00Z',
         updated_at: '2026-01-05T14:30:00Z',
         images: [
-            { id: 1, project: 1, image: 'https://images.unsplash.com/photo-1593106578502-27fa8479d060?w=800', is_cover: true, order: 0 },
-            { id: 2, project: 1, image: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800', is_cover: false, order: 1 },
+            { id: 1, project: 1, image: '/images/projects/1/image_1.png', is_cover: true, order: 0 },
+            { id: 2, project: 1, image: '/images/projects/1/image_2.png', is_cover: false, order: 1 },
+            { id: 101, project: 1, image: '/images/projects/1/image_3.png', is_cover: false, order: 2 },
+            { id: 102, project: 1, image: '/images/projects/1/image_4.png', is_cover: false, order: 3 },
+            { id: 103, project: 1, image: '/images/projects/1/image_5.png', is_cover: false, order: 4 },
         ],
         availabilities: [{ id: 1, project: 1, year: 2026, january: false, february: false, march: true, april: true, may: true, june: true, july: true, august: true, september: true, october: false, november: false, december: false }],
     },
@@ -258,7 +261,11 @@ export const mockUserProjects: Project[] = [
         created_at: '2025-11-20T09:00:00Z',
         updated_at: '2026-01-08T11:00:00Z',
         images: [
-            { id: 3, project: 2, image: 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800', is_cover: true, order: 0 },
+            { id: 3, project: 2, image: '/images/projects/2/image_1.png', is_cover: true, order: 0 },
+            { id: 201, project: 2, image: '/images/projects/2/image_2.png', is_cover: false, order: 1 },
+            { id: 202, project: 2, image: '/images/projects/2/image_3.png', is_cover: false, order: 2 },
+            { id: 203, project: 2, image: '/images/projects/2/image_4.png', is_cover: false, order: 3 },
+            { id: 204, project: 2, image: '/images/projects/2/image_5.png', is_cover: false, order: 4 },
         ],
         availabilities: [{ id: 2, project: 2, year: 2026, january: true, february: true, march: true, april: true, may: true, june: true, july: true, august: true, september: true, october: true, november: true, december: true }],
     },
@@ -285,7 +292,11 @@ export const mockUserProjects: Project[] = [
         created_at: '2025-12-01T08:00:00Z',
         updated_at: '2026-01-02T16:00:00Z',
         images: [
-            { id: 4, project: 3, image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800', is_cover: true, order: 0 },
+            { id: 4, project: 3, image: '/images/projects/3/image_1.png', is_cover: true, order: 0 },
+            { id: 301, project: 3, image: '/images/projects/3/image_2.png', is_cover: false, order: 1 },
+            { id: 302, project: 3, image: '/images/projects/3/image_3.png', is_cover: false, order: 2 },
+            { id: 303, project: 3, image: '/images/projects/3/image_4.png', is_cover: false, order: 3 },
+            { id: 304, project: 3, image: '/images/projects/3/image_5.png', is_cover: false, order: 4 },
         ],
         availabilities: [{ id: 3, project: 3, year: 2026, january: false, february: false, march: false, april: true, may: true, june: true, july: true, august: true, september: true, october: false, november: false, december: false }],
     },
@@ -316,7 +327,11 @@ export const mockFavoriteProjects: Project[] = [
         created_at: '2025-09-10T10:00:00Z',
         updated_at: '2026-01-06T09:00:00Z',
         images: [
-            { id: 10, project: 10, image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800', is_cover: true, order: 0 },
+            { id: 10, project: 10, image: '/images/projects/10/image_1.png', is_cover: true, order: 0 },
+            { id: 1001, project: 10, image: '/images/projects/10/image_2.png', is_cover: false, order: 1 },
+            { id: 1002, project: 10, image: '/images/projects/10/image_3.png', is_cover: false, order: 2 },
+            { id: 1003, project: 10, image: '/images/projects/10/image_4.png', is_cover: false, order: 3 },
+            { id: 1004, project: 10, image: '/images/projects/10/image_5.png', is_cover: false, order: 4 },
         ],
         availabilities: [{ id: 10, project: 10, year: 2026, january: false, february: false, march: false, april: false, may: true, june: true, july: true, august: true, september: false, october: false, november: false, december: false }],
     },
@@ -343,7 +358,11 @@ export const mockFavoriteProjects: Project[] = [
         created_at: '2025-08-05T14:00:00Z',
         updated_at: '2026-01-03T10:00:00Z',
         images: [
-            { id: 11, project: 11, image: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800', is_cover: true, order: 0 },
+            { id: 11, project: 11, image: '/images/projects/11/image_1.png', is_cover: true, order: 0 },
+            { id: 1101, project: 11, image: '/images/projects/11/image_2.png', is_cover: false, order: 1 },
+            { id: 1102, project: 11, image: '/images/projects/11/image_3.png', is_cover: false, order: 2 },
+            { id: 1103, project: 11, image: '/images/projects/11/image_4.png', is_cover: false, order: 3 },
+            { id: 1104, project: 11, image: '/images/projects/11/image_5.png', is_cover: false, order: 4 },
         ],
         availabilities: [{ id: 11, project: 11, year: 2026, january: true, february: true, march: true, april: true, may: false, june: false, july: false, august: false, september: true, october: true, november: true, december: true }],
     },
@@ -381,7 +400,13 @@ const mockProjectCob: Project = {
     flagged_count: 0,
     created_at: '2025-06-15T10:00:00Z',
     updated_at: '2026-01-01T10:00:00Z',
-    images: [{ id: 20, project: 20, image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800', is_cover: true, order: 0 }],
+    images: [
+        { id: 20, project: 20, image: '/images/projects/20/image_1.png', is_cover: true, order: 0 },
+        { id: 2001, project: 20, image: '/images/projects/20/image_2.png', is_cover: false, order: 1 },
+        { id: 2002, project: 20, image: '/images/projects/20/image_3.png', is_cover: false, order: 2 },
+        { id: 2003, project: 20, image: '/images/projects/20/image_4.png', is_cover: false, order: 3 },
+        { id: 2004, project: 20, image: '/images/projects/20/image_5.png', is_cover: false, order: 4 },
+    ],
     availabilities: [],
 };
 
@@ -407,7 +432,13 @@ const mockProjectPermaCourse: Project = {
     flagged_count: 0,
     created_at: '2025-07-20T10:00:00Z',
     updated_at: '2026-01-05T10:00:00Z',
-    images: [{ id: 21, project: 21, image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800', is_cover: true, order: 0 }],
+    images: [
+        { id: 21, project: 21, image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800', is_cover: true, order: 0 },
+        { id: 2101, project: 21, image: 'https://images.unsplash.com/photo-1598197748967-b418e06a3e6c?w=800', is_cover: false, order: 1 },
+        { id: 2102, project: 21, image: 'https://images.unsplash.com/photo-1592595896551-12b371d546d5?w=800', is_cover: false, order: 2 },
+        { id: 2103, project: 21, image: 'https://images.unsplash.com/photo-1557800636-894a64c1696f?w=800', is_cover: false, order: 3 },
+        { id: 2104, project: 21, image: 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=800', is_cover: false, order: 4 },
+    ],
     availabilities: [],
 };
 
@@ -433,7 +464,14 @@ const mockProjectGathering: Project = {
     flagged_count: 0,
     created_at: '2025-05-01T10:00:00Z',
     updated_at: '2025-12-20T10:00:00Z',
-    images: [{ id: 22, project: 22, image: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800', is_cover: true, order: 0 }],
+    images: [
+        { id: 22, project: 22, image: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800', is_cover: true, order: 0 },
+        { id: 2201, project: 22, image: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800', is_cover: false, order: 1 },
+        { id: 2202, project: 22, image: 'https://images.unsplash.com/photo-1522748906645-95d8adfd66c7?w=800', is_cover: false, order: 2 },
+        { id: 2203, project: 22, image: 'https://images.unsplash.com/photo-1523301346798-090d57544062?w=800', is_cover: false, order: 3 },
+        { id: 2204, project: 22, image: 'https://images.unsplash.com/photo-1541427468627-a89a96e5ca1d?w=800', is_cover: false, order: 4 },
+        { id: 2205, project: 22, image: 'https://images.unsplash.com/photo-1621682372775-533449e5502d?w=800', is_cover: false, order: 5 },
+    ],
     availabilities: [],
 };
 

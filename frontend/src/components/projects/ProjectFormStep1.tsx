@@ -1,4 +1,5 @@
 import { useForm } from '@mantine/form';
+import { useTranslation } from 'react-i18next';
 import {
   Stack,
   Title,
@@ -28,6 +29,7 @@ interface ProjectFormStep1Props {
 }
 
 export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Props) {
+  const { t } = useTranslation();
   const form = useForm<Step1FormData>({
     initialValues: {
       title: data.title || '',
@@ -36,13 +38,13 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
     },
     validate: {
       title: (value) => {
-        if (value.length < 10) return 'Title must be at least 10 characters';
-        if (value.length > 200) return 'Title is too long';
+        if (value.length < 10) return t('createProject.step1.validation.titleMin');
+        if (value.length > 200) return t('createProject.step1.validation.titleMax');
         return null;
       },
       description: (value) => {
-        if (value.length < 50) return 'Description must be at least 50 characters';
-        if (value.length > 2000) return 'Description is too long';
+        if (value.length < 50) return t('createProject.step1.validation.descriptionMin');
+        if (value.length > 2000) return t('createProject.step1.validation.descriptionMax');
         return null;
       },
     },
@@ -60,16 +62,16 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
       <Stack gap="xl">
         <div>
           <Title order={2} mb="md">
-            Basic Information
+            {t('createProject.step1.title')}
           </Title>
           <Text c="dimmed">
-            Tell us about your project. Be descriptive and engaging to attract the right volunteers.
+            {t('createProject.step1.description')}
           </Text>
         </div>
 
         {/* Project Type */}
         <Radio.Group
-          label="Project Type *"
+          label={t('createProject.step1.projectType')}
           {...form.getInputProps('project_type')}
         >
           <Group mt="sm" grow>
@@ -79,16 +81,16 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
               style={{
                 cursor: 'pointer',
                 borderWidth: 2,
-                borderColor: form.values.project_type === 'PERM' ? 'var(--mantine-color-blue-6)' : undefined,
-                backgroundColor: form.values.project_type === 'PERM' ? 'var(--mantine-color-blue-0)' : undefined,
+                borderColor: form.values.project_type === 'PERM' ? 'var(--mantine-color-eco-terracotta-5)' : undefined,
+                backgroundColor: form.values.project_type === 'PERM' ? 'var(--mantine-color-eco-terracotta-0)' : undefined,
               }}
               onClick={() => form.setFieldValue('project_type', 'PERM')}
             >
               <Stack gap="xs" align="center">
                 <IconPlant size={40} color="var(--mantine-color-green-6)" />
-                <Text fw={600}>Permaculture</Text>
+                <Text fw={600}>{t('createProject.step1.permaculture')}</Text>
                 <Text size="sm" c="dimmed" ta="center">
-                  Garden, composting, harvesting, etc.
+                  {t('createProject.step1.permacultureDesc')}
                 </Text>
                 <Radio value="PERM" styles={{ root: { display: 'none' } }} />
               </Stack>
@@ -100,16 +102,16 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
               style={{
                 cursor: 'pointer',
                 borderWidth: 2,
-                borderColor: form.values.project_type === 'NATB' ? 'var(--mantine-color-blue-6)' : undefined,
-                backgroundColor: form.values.project_type === 'NATB' ? 'var(--mantine-color-blue-0)' : undefined,
+                borderColor: form.values.project_type === 'NATB' ? 'var(--mantine-color-eco-terracotta-5)' : undefined,
+                backgroundColor: form.values.project_type === 'NATB' ? 'var(--mantine-color-eco-terracotta-0)' : undefined,
               }}
               onClick={() => form.setFieldValue('project_type', 'NATB')}
             >
               <Stack gap="xs" align="center">
                 <IconHammer size={40} color="var(--mantine-color-orange-6)" />
-                <Text fw={600}>Natural Building</Text>
+                <Text fw={600}>{t('createProject.step1.naturalBuilding')}</Text>
                 <Text size="sm" c="dimmed" ta="center">
-                  Carpentry, masonry, earthen plaster, etc.
+                  {t('createProject.step1.naturalBuildingDesc')}
                 </Text>
                 <Radio value="NATB" styles={{ root: { display: 'none' } }} />
               </Stack>
@@ -119,27 +121,22 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
 
         {/* Title */}
         <TextInput
-          label="Project Title *"
-          placeholder="e.g., Organic Farm in the French Alps"
-          description="Choose a catchy title that describes your project"
+          label={t('createProject.step1.projectTitle')}
+          placeholder={t('createProject.step1.projectTitlePlaceholder')}
+          description={t('createProject.step1.projectTitleDescription')}
           {...form.getInputProps('title')}
         />
 
         {/* Description */}
         <Textarea
-          label="Project Description *"
-          placeholder="Describe your project in detail. Include:
-• What volunteers will be doing
-• What they will learn
-• Your project's mission and values
-• Daily routine and atmosphere
-• Anything else that makes your project unique"
+          label={t('createProject.step1.projectDescription')}
+          placeholder={t('createProject.step1.projectDescriptionPlaceholder')}
           minRows={8}
           {...form.getInputProps('description')}
           description={
             <Group justify="space-between" mt="xs">
               <Text size="sm" c="dimmed">
-                Be detailed and authentic. This is your chance to attract the right people!
+                {t('createProject.step1.projectDescriptionHint')}
               </Text>
               <Text
                 size="sm"
@@ -149,26 +146,26 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
                     : 'dimmed'
                 }
               >
-                {descriptionLength} / 2000
+                {t('createProject.step1.projectDescriptionCounter', { count: descriptionLength })}
               </Text>
             </Group>
           }
         />
 
         {/* Tips */}
-        <Alert color="blue" title="💡 Tips for a great description:" icon={<IconBulb />}>
+        <Alert color="eco-terracotta" title={t('createProject.step1.tipsTitle')} icon={<IconBulb />}>
           <List size="sm">
-            <List.Item>Be specific about daily tasks and learning opportunities</List.Item>
-            <List.Item>Mention your values and what makes your project special</List.Item>
-            <List.Item>Describe the location, surroundings, and living conditions</List.Item>
-            <List.Item>Share your vision and what you hope to achieve together</List.Item>
+            <List.Item>{t('createProject.step1.tip1')}</List.Item>
+            <List.Item>{t('createProject.step1.tip2')}</List.Item>
+            <List.Item>{t('createProject.step1.tip3')}</List.Item>
+            <List.Item>{t('createProject.step1.tip4')}</List.Item>
           </List>
         </Alert>
 
         {/* Navigation */}
         <Group justify="flex-end" pt="md" style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}>
-          <Button type="submit">
-            Next: Location & Work Details →
+          <Button type="submit" color="eco-terracotta">
+            {t('createProject.step1.next')}
           </Button>
         </Group>
       </Stack>

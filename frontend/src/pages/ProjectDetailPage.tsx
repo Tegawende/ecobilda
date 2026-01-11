@@ -1,12 +1,12 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { DatePickerInput } from '@mantine/dates';
 import { Layout } from '../components/common/Layout';
 import {
   IconMapPin,
   IconCalendar,
   IconUsers,
-  IconArrowLeft,
-  IconCheck,
   IconClock,
   IconWifi,
   IconBabyCarriage,
@@ -17,11 +17,13 @@ import {
   IconStar,
 } from '@tabler/icons-react';
 import { mockAllProjects } from '../data/mockData';
+import { ProjectImageGallery } from '../components/projects/ProjectImageGallery';
 
 export function ProjectDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams();
   const project = mockAllProjects.find(p => p.id === Number(id));
+  const [dates, setDates] = useState<[Date | null, Date | null]>([null, null]);
 
   if (!project) {
     return (
@@ -34,44 +36,35 @@ export function ProjectDetailPage() {
     );
   }
 
-  const coverImage = project.images[0]?.image || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200';
   const isNatB = project.project_type === 'NATB';
+  // Get all images as array of strings
+  const projectImages = project.images && project.images.length > 0
+    ? project.images.map(img => img.image)
+    : ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200'];
 
   return (
     <Layout>
       <div className="bg-white min-h-screen pb-20">
-        {/* Navigation Breadcrumb */}
-        <div className="bg-stone-50 border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 py-4">
-            <Link to="/projects" className="inline-flex items-center text-gray-500 hover:text-eco-primary transition-colors text-sm font-medium cursor-pointer">
-              <IconArrowLeft size={18} className="mr-1" />
-              {t('projectDetail.backToProjects')}
-            </Link>
-          </div>
-        </div>
-
-        {/* Hero Section */}
-        <div className="relative h-96 w-full">
-          <img src={coverImage} alt={project.title} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-12">
-            <div className="max-w-7xl mx-auto">
-              <span className={`inline-flex items-center gap-1.5 text-white text-xs font-bold px-3 py-1.5 rounded-full mb-4 uppercase tracking-wider shadow-sm ${isNatB ? 'bg-eco-primary' : 'bg-eco-terracotta'
-                }`}>
-                {isNatB ? <IconHome size={14} /> : <IconLeaf size={14} />}
-                {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
-              </span>
-              <h1 className="text-4xl sm:text-5xl font-display font-bold text-white mb-2">{project.title}</h1>
-              <div className="flex items-center text-white/90 text-lg">
-                <IconMapPin size={22} className="mr-2" />
-                {project.address?.city}, {project.address?.country?.name}
-              </div>
+        {/* Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+          {/* Title and Location Header */}
+          <div className="mb-6">
+            <span className={`inline-flex items-center gap-1.5 text-white text-xs font-bold px-3 py-1.5 rounded-full mb-4 uppercase tracking-wider shadow-sm ${isNatB ? 'bg-eco-primary' : 'bg-eco-terracotta'
+              }`}>
+              {isNatB ? <IconHome size={14} /> : <IconLeaf size={14} />}
+              {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
+            </span>
+            <h1 className="text-4xl sm:text-5xl font-display font-bold text-gray-900 mb-4">{project.title}</h1>
+            <div className="flex items-center text-gray-600 text-lg">
+              <IconMapPin size={22} className="mr-2" />
+              {project.address?.city}, {project.address?.country?.name}
             </div>
           </div>
-        </div>
 
-        {/* Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
+          {/* Photo Gallery */}
+          <div className="mb-8">
+            <ProjectImageGallery images={projectImages} title={project.title} />
+          </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
             {/* Main Info */}
@@ -231,13 +224,35 @@ export function ProjectDetailPage() {
                       {project.max_helpers} max
                     </div>
                   </div>
-                  <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+                  <div className="flex items-center justify-between pb-4">
                     <div className="text-gray-500 text-sm">Localisation</div>
                     <div className="font-bold text-gray-900 flex items-center">
                       <IconMapPin size={18} className="mr-2 text-gray-400" />
                       {project.address?.city}
                     </div>
                   </div>
+                </div>
+
+                <div className="mb-6">
+                  <div className="text-gray-500 text-sm mb-2">{t('projectDetail.selectDates')}</div>
+                  <DatePickerInput
+                    type="range"
+                    placeholder={t('projectDetail.pickDates')}
+                    value={dates}
+                    onChange={setDates}
+                    numberOfColumns={2}
+                    size="md"
+                    radius="xl"
+                    leftSection={<IconCalendar size={18} stroke={1.5} />}
+                    styles={{
+                      input: {
+                        borderColor: '#e5e7eb',
+                        '&:focus': {
+                          borderColor: 'var(--eco-primary)',
+                        }
+                      }
+                    }}
+                  />
                 </div>
 
                 <button className="w-full bg-eco-primary hover:bg-eco-primaryDark text-white font-bold py-4 rounded-xl shadow-lg shadow-eco-primary/20 transition-all transform hover:-translate-y-1 active:translate-y-0 text-lg cursor-pointer">

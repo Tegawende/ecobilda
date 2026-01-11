@@ -14,7 +14,8 @@
     "active": "Aktiv",
     "inactive": "Inaktiv",
     "back": "Zurück",
-    "day": "Tag"
+    "day": "Tag",
+    "by": "von"
   },
   "nav": {
     "home": "Startseite",
@@ -62,6 +63,9 @@
     "projectType": "Projekttyp",
     "permaculture": "Permakultur",
     "naturalBuilding": "Naturbau",
+    "activeProjects": "Aktuelle Projekte",
+    "pastProjects": "Vergangene Projekte",
+    "volunteers": "Freiwillige",
     "availability": "Verfügbarkeit",
     "skills": "Fähigkeiten",
     "location": "Standort",
@@ -96,7 +100,149 @@
     "volunteers": "Freiwillige",
     "volunteersNeeded": "{{count}} benötigt",
     "apply": "Bewerben",
-    "freeForMembers": "Kostenlos für Mitglieder."
+    "freeForMembers": "Kostenlos für Mitglieder.",
+    "showAllPhotos": "Alle Fotos anzeigen",
+    "showAllXPhotos": "Alle {{count}} Fotos anzeigen"
+  },
+  "createProject": {
+    "title": "Neues Projekt erstellen",
+    "subtitle": "Teilen Sie Ihr Öko-Bau- oder Permakultur-Projekt mit der Community",
+    "step": "Schritt {{current}} von {{total}}",
+    "complete": "{{percent}}% abgeschlossen",
+    "steps": {
+      "basicInfo": "Grundinformationen",
+      "locationWork": "Standort & Arbeitsdetails",
+      "skillsAmenities": "Fähigkeiten & Ausstattung",
+      "availabilityImages": "Verfügbarkeit & Bilder"
+    },
+    "error": {
+      "createFailed": "Projekt konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
+    },
+    "step1": {
+      "title": "Grundinformationen",
+      "description": "Erzählen Sie uns von Ihrem Projekt. Seien Sie beschreibend und ansprechend, um die richtigen Freiwilligen anzuziehen.",
+      "projectType": "Projekttyp *",
+      "permaculture": "Permakultur",
+      "permacultureDesc": "Garten, Kompostierung, Ernte, etc.",
+      "naturalBuilding": "Natürliches Bauen",
+      "naturalBuildingDesc": "Tischlerei, Maurerei, Lehmputz, etc.",
+      "projectTitle": "Projekttitel *",
+      "projectTitlePlaceholder": "z.B. Bio-Bauernhof in den französischen Alpen",
+      "projectTitleDescription": "Wählen Sie einen einprägsamen Titel, der Ihr Projekt beschreibt",
+      "projectDescription": "Projektbeschreibung *",
+      "projectDescriptionPlaceholder": "Beschreiben Sie Ihr Projekt im Detail. Enthalten Sie:\n• Was Freiwillige tun werden\n• Was sie lernen werden\n• Die Mission und Werte Ihres Projekts\n• Tagesablauf und Atmosphäre\n• Alles andere, was Ihr Projekt einzigartig macht",
+      "projectDescriptionHint": "Seien Sie detailliert und authentisch. Dies ist Ihre Chance, die richtigen Leute anzuziehen!",
+      "projectDescriptionCounter": "{{count}} / 2000",
+      "tipsTitle": "💡 Tipps für eine großartige Beschreibung:",
+      "tip1": "Seien Sie spezifisch über tägliche Aufgaben und Lernmöglichkeiten",
+      "tip2": "Erwähnen Sie Ihre Werte und was Ihr Projekt besonders macht",
+      "tip3": "Beschreiben Sie den Standort, die Umgebung und die Lebensbedingungen",
+      "tip4": "Teilen Sie Ihre Vision und was Sie gemeinsam erreichen möchten",
+      "next": "Weiter: Standort & Arbeitsdetails →",
+      "validation": {
+        "titleMin": "Titel muss mindestens 10 Zeichen lang sein",
+        "titleMax": "Titel ist zu lang",
+        "descriptionMin": "Beschreibung muss mindestens 50 Zeichen lang sein",
+        "descriptionMax": "Beschreibung ist zu lang"
+      }
+    },
+    "step2": {
+      "title": "Standort & Arbeitsdetails",
+      "description": "Helfen Sie Freiwilligen, Sie zu finden und die Arbeitsorganisation zu verstehen.",
+      "location": "Standort",
+      "city": "Stadt *",
+      "cityPlaceholder": "z.B. Lyon",
+      "postalCode": "Postleitzahl *",
+      "postalCodePlaceholder": "z.B. 69000",
+      "country": "Land *",
+      "countryPlaceholder": "Land auswählen",
+      "privacyNote": "Exakte Adresse ist für den Datenschutz nicht erforderlich. Stadt und Land reichen aus.",
+      "workArrangement": "Arbeitsorganisation",
+      "hoursPerDay": "Stunden pro Tag *",
+      "hoursPerDayDesc": "1-10 Stunden",
+      "daysPerWeek": "Tage pro Woche *",
+      "daysPerWeekDesc": "1-7 Tage",
+      "maxVolunteers": "Max. Freiwillige *",
+      "maxVolunteersDesc": "1-20 Personen",
+      "accommodationDetails": "Unterkunftsdetails *",
+      "accommodationPlaceholder": "Beschreiben Sie, wo Freiwillige schlafen werden. Zum Beispiel:\n• Privatzimmer, Gemeinschaftszimmer, Zelt, Wohnwagen, etc.\n• Gemeinschafts- oder Privatbad\n• Bettwäsche und Handtücher bereitgestellt?\n• Heizung/Kühlung\n• Alle anderen relevanten Details",
+      "foodDetails": "Essensdetails *",
+      "foodPlaceholder": "Beschreiben Sie die Essensregelung. Zum Beispiel:\n• Wie viele Mahlzeiten pro Tag werden bereitgestellt?\n• Art der Nahrung (vegetarisch, vegan, Allesfresser)\n• Quelle (selbst angebaut, bio, lokaler Markt)\n• Kochen Freiwillige zusammen oder werden Mahlzeiten bereitgestellt?\n• Küchenzugang für Freiwillige?",
+      "back": "← Zurück",
+      "next": "Weiter: Fähigkeiten & Ausstattung →",
+      "validation": {
+        "cityRequired": "Stadt ist erforderlich",
+        "postalCodeRequired": "Postleitzahl ist erforderlich",
+        "countryRequired": "Land ist erforderlich",
+        "hoursRange": "Muss zwischen 1 und 10 liegen",
+        "daysRange": "Muss zwischen 1 und 7 liegen",
+        "maxVolunteersRange": "Muss zwischen 1 und 20 liegen",
+        "accommodationMin": "Bitte geben Sie Details zur Unterkunft an (min. 20 Zeichen)",
+        "foodMin": "Bitte geben Sie Details zum Essen an (min. 20 Zeichen)"
+      }
+    },
+    "step3": {
+      "title": "Fähigkeiten & Ausstattung",
+      "description": "Wählen Sie die Fähigkeiten aus, die Freiwillige nutzen werden, und die Ausstattung, die Sie bereitstellen.",
+      "skillsTitle": "{{type}} Fähigkeiten *",
+      "skillsDescription": "Wählen Sie alle Fähigkeiten aus, mit denen Freiwillige arbeiten werden. Wählen Sie mindestens eine.",
+      "selected": "Ausgewählt: {{count}} Fähigkeit(en)",
+      "amenities": "Ausstattung",
+      "amenitiesDescription": "Wählen Sie die Ausstattung und Präferenzen für Ihr Projekt aus.",
+      "internetProvided": "Internet bereitgestellt",
+      "internetProvidedDesc": "WLAN oder Internetzugang ist für Freiwillige verfügbar",
+      "familyFriendly": "Familienfreundlich",
+      "familyFriendlyDesc": "Geeignet für Familien mit Kindern",
+      "petsAllowed": "Haustiere erlaubt",
+      "petsAllowedDesc": "Freiwillige können ihre Haustiere mitbringen",
+      "smokingAllowed": "Rauchen erlaubt",
+      "smokingAllowedDesc": "Rauchen ist auf dem Grundstück erlaubt",
+      "back": "← Zurück",
+      "next": "Weiter: Verfügbarkeit & Bilder →",
+      "validation": {
+        "skillsRequired": "Bitte wählen Sie mindestens eine Fähigkeit aus"
+      }
+    },
+    "step4": {
+      "title": "Verfügbarkeit & Bilder",
+      "description": "Wann können Sie Freiwillige aufnehmen? Fügen Sie einige Fotos hinzu, um Ihr Projekt zu präsentieren.",
+      "availability": "Verfügbarkeit (Optional)",
+      "availabilityDescription": "Wählen Sie die Monate aus, in denen Sie Freiwillige aufnehmen können. Sie können dies überspringen und später hinzufügen.",
+      "year": "Jahr:",
+      "monthsSelected": "{{count}} Monat(e) ausgewählt für {{year}}",
+      "images": "Projektbilder (Optional)",
+      "imagesDescription": "Fügen Sie Fotos Ihres Projekts, Arbeitsplatzes, Unterkunft und Umgebung hinzu. Das erste Bild wird das Titelbild. (Max. 10 Bilder)",
+      "uploadButton": "Klicken Sie, um Bilder hochzuladen",
+      "uploadHint": "PNG, JPG bis zu 10MB jeweils",
+      "cover": "Titelbild",
+      "imagesUploaded": "{{count}} / 10 Bilder hochgeladen",
+      "maxImagesAlert": "Maximal 10 Bilder erlaubt",
+      "reviewTitle": "✨ Überprüfen Sie Ihr Projekt",
+      "reviewProject": "<strong>{{type}}</strong> Projekt",
+      "reviewTitleLabel": "Titel: {{title}}",
+      "reviewLocation": "Standort: {{city}}, {{country}}",
+      "reviewWork": "Arbeit: {{hours}}h/Tag, {{days}} Tage/Woche, max. {{max}} Freiwillige",
+      "reviewSkills": "Fähigkeiten: {{count}} ausgewählt",
+      "reviewImages": "Bilder: {{count}} hochgeladen",
+      "reviewNotSet": "(nicht gesetzt)",
+      "back": "← Zurück",
+      "create": "Projekt erstellen",
+      "creating": "Projekt wird erstellt...",
+      "monthLabels": {
+        "jan": "Jan",
+        "feb": "Feb",
+        "mar": "Mär",
+        "apr": "Apr",
+        "may": "Mai",
+        "jun": "Jun",
+        "jul": "Jul",
+        "aug": "Aug",
+        "sep": "Sep",
+        "oct": "Okt",
+        "nov": "Nov",
+        "dec": "Dez"
+      }
+    }
   },
   "dashboard": {
     "welcome": "Willkommen zurück, {{name}}!",
@@ -303,6 +449,35 @@
       "subtitle": "Treten Sie noch heute unserer Gemeinschaft von Öko-Bauern und Permakultur-Enthusiasten bei. Teilen Sie Ihre Fähigkeiten, lernen Sie neue Techniken und tragen Sie zu nachhaltigen Projekten auf der ganzen Welt bei.",
       "browseProjects": "Projekte durchsuchen",
       "register": "Jetzt starten"
+    }
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "markAllRead": "Alle als gelesen markieren",
+    "noNew": "Keine neuen Benachrichtigungen",
+    "viewAllMessages": "Alle Nachrichten anzeigen"
+  },
+  "footer": {
+    "copyright": "© {{year}} Ecobilda. Alle Rechte vorbehalten.",
+    "about": {
+      "title": "Über uns",
+      "us": "Über uns",
+      "contact": "Kontakt",
+      "faq": "FAQ"
+    },
+    "projects": {
+      "title": "Projekte",
+      "browse": "Projekte durchsuchen",
+      "howItWorks": "Wie es funktioniert",
+      "forHosts": "Für Gastgeber"
+    },
+    "legal": {
+      "title": "Rechtliches & Support"
+    },
+    "links": {
+      "support": "Unterstützen Sie uns",
+      "terms": "Nutzungsbedingungen",
+      "privacy": "Datenschutz"
     }
   }
 }

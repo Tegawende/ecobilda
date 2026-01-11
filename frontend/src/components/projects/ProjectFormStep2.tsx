@@ -1,4 +1,5 @@
 import { useForm } from '@mantine/form';
+import { useTranslation } from 'react-i18next';
 import {
   Stack,
   Title,
@@ -41,6 +42,7 @@ interface ProjectFormStep2Props {
 }
 
 export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectFormStep2Props) {
+  const { t } = useTranslation();
   const form = useForm<Step2FormData>({
     initialValues: {
       city: data.address.city || '',
@@ -53,16 +55,16 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
       food_details: data.food_details || '',
     },
     validate: {
-      city: (value) => (value.length < 2 ? 'City is required' : null),
-      postal_code: (value) => (value.length < 2 ? 'Postal code is required' : null),
-      country_code: (value) => (value.length < 2 ? 'Country is required' : null),
-      hours_per_day: (value) => (value < 1 || value > 10 ? 'Must be between 1 and 10' : null),
-      days_per_week: (value) => (value < 1 || value > 7 ? 'Must be between 1 and 7' : null),
-      max_helpers: (value) => (value < 1 || value > 20 ? 'Must be between 1 and 20' : null),
+      city: (value) => (value.length < 2 ? t('createProject.step2.validation.cityRequired') : null),
+      postal_code: (value) => (value.length < 2 ? t('createProject.step2.validation.postalCodeRequired') : null),
+      country_code: (value) => (value.length < 2 ? t('createProject.step2.validation.countryRequired') : null),
+      hours_per_day: (value) => (value < 1 || value > 10 ? t('createProject.step2.validation.hoursRange') : null),
+      days_per_week: (value) => (value < 1 || value > 7 ? t('createProject.step2.validation.daysRange') : null),
+      max_helpers: (value) => (value < 1 || value > 20 ? t('createProject.step2.validation.maxVolunteersRange') : null),
       accommodation_details: (value) =>
-        value.length < 20 ? 'Please provide details about accommodation (min 20 characters)' : null,
+        value.length < 20 ? t('createProject.step2.validation.accommodationMin') : null,
       food_details: (value) =>
-        value.length < 20 ? 'Please provide details about food (min 20 characters)' : null,
+        value.length < 20 ? t('createProject.step2.validation.foodMin') : null,
     },
   });
 
@@ -89,10 +91,10 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
       <Stack gap="xl">
         <div>
           <Title order={2} mb="md">
-            Location & Work Details
+            {t('createProject.step2.title')}
           </Title>
           <Text c="dimmed">
-            Help volunteers find you and understand the work arrangement.
+            {t('createProject.step2.description')}
           </Text>
         </div>
 
@@ -102,30 +104,30 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
             <ThemeIcon size="lg" color="red" variant="light">
               <IconMapPin size={20} />
             </ThemeIcon>
-            <Title order={3}>Location</Title>
+            <Title order={3}>{t('createProject.step2.location')}</Title>
           </Group>
 
           <Grid gutter="md">
             <Grid.Col span={12}>
               <TextInput
-                label="City *"
-                placeholder="e.g., Lyon"
+                label={t('createProject.step2.city')}
+                placeholder={t('createProject.step2.cityPlaceholder')}
                 {...form.getInputProps('city')}
               />
             </Grid.Col>
 
             <Grid.Col span={{ base: 12, sm: 6 }}>
               <TextInput
-                label="Postal Code *"
-                placeholder="e.g., 69000"
+                label={t('createProject.step2.postalCode')}
+                placeholder={t('createProject.step2.postalCodePlaceholder')}
                 {...form.getInputProps('postal_code')}
               />
             </Grid.Col>
 
             <Grid.Col span={{ base: 12, sm: 6 }}>
               <Select
-                label="Country *"
-                placeholder="Select a country"
+                label={t('createProject.step2.country')}
+                placeholder={t('createProject.step2.countryPlaceholder')}
                 {...form.getInputProps('country_code')}
                 data={[
                   { value: 'FR', label: 'France' },
@@ -149,46 +151,46 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
           </Grid>
 
           <Alert color="yellow" icon={<IconBulb />} mt="md">
-            Exact address is not required for privacy. City and country are sufficient.
+            {t('createProject.step2.privacyNote')}
           </Alert>
         </div>
 
         {/* Work Arrangement */}
         <div>
           <Group mb="sm">
-            <ThemeIcon size="lg" color="blue" variant="light">
+            <ThemeIcon size="lg" color="eco-terracotta" variant="light">
               <IconClock size={20} />
             </ThemeIcon>
-            <Title order={3}>Work Arrangement</Title>
+            <Title order={3}>{t('createProject.step2.workArrangement')}</Title>
           </Group>
 
           <Grid gutter="md">
             <Grid.Col span={{ base: 12, sm: 4 }}>
               <NumberInput
-                label="Hours per day *"
+                label={t('createProject.step2.hoursPerDay')}
                 min={1}
                 max={10}
-                description="1-10 hours"
+                description={t('createProject.step2.hoursPerDayDesc')}
                 {...form.getInputProps('hours_per_day')}
               />
             </Grid.Col>
 
             <Grid.Col span={{ base: 12, sm: 4 }}>
               <NumberInput
-                label="Days per week *"
+                label={t('createProject.step2.daysPerWeek')}
                 min={1}
                 max={7}
-                description="1-7 days"
+                description={t('createProject.step2.daysPerWeekDesc')}
                 {...form.getInputProps('days_per_week')}
               />
             </Grid.Col>
 
             <Grid.Col span={{ base: 12, sm: 4 }}>
               <NumberInput
-                label="Max volunteers *"
+                label={t('createProject.step2.maxVolunteers')}
                 min={1}
                 max={20}
-                description="1-20 people"
+                description={t('createProject.step2.maxVolunteersDesc')}
                 {...form.getInputProps('max_helpers')}
               />
             </Grid.Col>
@@ -198,16 +200,11 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
         {/* Accommodation */}
         <div>
           <Group mb="sm">
-            <IconHome size={20} color="var(--mantine-color-blue-6)" />
-            <Text fw={500}>Accommodation Details *</Text>
+            <IconHome size={20} color="var(--mantine-color-eco-terracotta-5)" />
+            <Text fw={500}>{t('createProject.step2.accommodationDetails')}</Text>
           </Group>
           <Textarea
-            placeholder={`Describe where volunteers will sleep. For example:
-• Private room, shared room, tent, caravan, etc.
-• Shared or private bathroom
-• Bedding and towels provided?
-• Heating/cooling
-• Any other relevant details`}
+            placeholder={t('createProject.step2.accommodationPlaceholder')}
             minRows={4}
             {...form.getInputProps('accommodation_details')}
           />
@@ -216,16 +213,11 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
         {/* Food */}
         <div>
           <Group mb="sm">
-            <IconToolsKitchen2 size={20} color="var(--mantine-color-blue-6)" />
-            <Text fw={500}>Food Details *</Text>
+            <IconToolsKitchen2 size={20} color="var(--mantine-color-eco-terracotta-5)" />
+            <Text fw={500}>{t('createProject.step2.foodDetails')}</Text>
           </Group>
           <Textarea
-            placeholder={`Describe the food arrangement. For example:
-• How many meals per day are provided?
-• Type of food (vegetarian, vegan, omnivore)
-• Source (homegrown, organic, local market)
-• Volunteers cook together or meals provided?
-• Kitchen access for volunteers?`}
+            placeholder={t('createProject.step2.foodPlaceholder')}
             minRows={4}
             {...form.getInputProps('food_details')}
           />
@@ -234,10 +226,10 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
         {/* Navigation */}
         <Group justify="space-between" pt="md" style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}>
           <Button type="button" onClick={onBack} variant="default">
-            ← Back
+            {t('createProject.step2.back')}
           </Button>
-          <Button type="submit">
-            Next: Skills & Amenities →
+          <Button type="submit" color="eco-terracotta">
+            {t('createProject.step2.next')}
           </Button>
         </Group>
       </Stack>

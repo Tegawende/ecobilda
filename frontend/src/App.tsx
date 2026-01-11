@@ -12,7 +12,6 @@ import { MyProjectsPage } from './pages/MyProjectsPage';
 import { MyParticipationsPage } from './pages/MyParticipationsPage';
 import { AccountSettingsPage } from './pages/AccountSettingsPage';
 import { MessagesPage } from './pages/MessagesPage';
-import { ChatPage } from './pages/ChatPage';
 import FAQ from './pages/FAQ';
 import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';

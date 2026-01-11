@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Badge, ActionIcon, Menu, Text, Stack, Button, ScrollArea, Group, Box, Indicator } from '@mantine/core';
+import { ActionIcon, Menu, Text, Stack, Button, ScrollArea, Group, Box, Indicator } from '@mantine/core';
 import { IconBell, IconCheck, IconMessage } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { isAuthenticated } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +11,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 
 export function NotificationBell() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { unreadCount, notifications, markAsRead, markAllAsRead, refreshNotifications } = useNotifications();
   const [opened, setOpened] = useState(false);
@@ -53,7 +55,7 @@ export function NotificationBell() {
           disabled={unreadCount === 0}
           offset={4}
         >
-          <ActionIcon variant="subtle" size="lg" radius="xl" aria-label="Notifications">
+          <ActionIcon variant="subtle" size="lg" radius="xl" aria-label={t('notifications.title')}>
             <IconBell size={20} />
           </ActionIcon>
         </Indicator>
@@ -62,7 +64,7 @@ export function NotificationBell() {
       <Menu.Dropdown>
         <Menu.Label>
           <Group justify="space-between">
-            <Text fw={600}>Notifications</Text>
+            <Text fw={600}>{t('notifications.title')}</Text>
             {unreadCount > 0 && (
               <Button
                 variant="subtle"
@@ -70,7 +72,7 @@ export function NotificationBell() {
                 leftSection={<IconCheck size={14} />}
                 onClick={handleMarkAllRead}
               >
-                Mark all read
+                {t('notifications.markAllRead')}
               </Button>
             )}
           </Group>
@@ -91,20 +93,38 @@ export function NotificationBell() {
                   }}
                 >
                   <Group gap="sm" wrap="nowrap" align="flex-start">
-                    <Box
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: '50%',
-                        backgroundColor: 'var(--mantine-color-blue-1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}
-                    >
-                      <IconMessage size={20} color="var(--mantine-color-blue-6)" />
-                    </Box>
+                    {notification.sender_profile_picture ? (
+                      <Box
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: '50%',
+                          overflow: 'hidden',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <img
+                          src={notification.sender_profile_picture}
+                          alt=""
+                          style={{ width: '100%', height: '100%', objectCover: 'cover' }}
+                        />
+                      </Box>
+                    ) : (
+                      <Box
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: '50%',
+                          backgroundColor: 'var(--mantine-color-blue-1)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <IconMessage size={20} color="var(--mantine-color-blue-6)" />
+                      </Box>
+                    )}
                     <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
                       <Text size="sm" fw={notification.is_read ? 400 : 600} lineClamp={1}>
                         {notification.title}
@@ -135,7 +155,7 @@ export function NotificationBell() {
             <Box p="md" ta="center">
               <IconBell size={32} color="var(--mantine-color-gray-5)" />
               <Text size="sm" c="dimmed" mt="xs">
-                No new notifications
+                {t('notifications.noNew')}
               </Text>
             </Box>
           )}
@@ -146,7 +166,7 @@ export function NotificationBell() {
             <Menu.Divider />
             <Menu.Item onClick={() => { navigate('/messages'); setOpened(false); }}>
               <Text size="sm" fw={500} c="blue" ta="center">
-                View all messages
+                {t('notifications.viewAllMessages')}
               </Text>
             </Menu.Item>
           </>

@@ -12,10 +12,12 @@ import {
   IconFolder,
   IconLogout,
 } from '@tabler/icons-react';
-import { isAuthenticated } from '../../services/api';
+import { isAuthenticated, clearAuthTokens } from '../../services/api';
 import { authService } from '../../services/auth';
+import { profileService } from '../../services/profile';
 import { NotificationBell } from './NotificationBell';
 import classes from './Navbar.module.css';
+import type { User } from '../../types';
 
 const links: Array<{ link: string; label: string }> = [];
 
@@ -27,9 +29,21 @@ export function Navbar() {
   const [opened, { toggle, close }] = useDisclosure(false);
   const [active, setActive] = useState('');
   const [scrolled, setScrolled] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   // Check if we're on the home page
   const isHomePage = location.pathname === '/';
+
+  // Fetch user profile for avatar
+  useEffect(() => {
+    if (isLoggedIn) {
+      profileService.getProfile()
+        .then(user => setCurrentUser(user))
+        .catch(err => console.error('Failed to fetch profile:', err));
+    } else {
+      setCurrentUser(null);
+    }
+  }, [isLoggedIn]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,15 +60,13 @@ export function Navbar() {
     }
   }, [isHomePage]);
 
-  const handleLogout = async () => {
-    try {
-      await authService.logout();
-      navigate('/');
-    } catch (error) {
-      console.error('Logout failed:', error);
-      await authService.logout();
-      navigate('/');
-    }
+  const handleLogout = () => {
+    // For now, just clear local tokens without API call (mock mode)
+    // TODO: Re-enable API call when backend is ready
+    clearAuthTokens();
+    setCurrentUser(null);
+    // Force redirect to landing page using window.location to ensure full page reload
+    window.location.href = '/';
   };
 
   // Transparent only on Home Page AND when not scrolled
@@ -107,10 +119,7 @@ export function Navbar() {
             {/* "Browse Projects" button - visible to all */}
             <Link
               to="/projects"
-              className={`text-sm font-semibold px-6 py-2.5 rounded-full transition-all hidden sm:block shadow-lg hover:-translate-y-0.5 ${isTransparent
-                ? `bg-white/75 backdrop-blur text-eco-primary hover:bg-white border border-transparent ${location.pathname === '/projects' ? 'ring-2 ring-white ring-offset-2 ring-offset-transparent' : ''}`
-                : `bg-eco-primary text-white hover:bg-eco-primaryDark shadow-eco-primary/20 border border-transparent ${location.pathname === '/projects' ? 'ring-2 ring-eco-primary ring-offset-2' : ''}`
-                }`}
+              className={`text-sm font-semibold px-6 py-2.5 rounded-full transition-all hidden sm:block shadow-lg hover:-translate-y-0.5 bg-eco-primary text-white hover:bg-eco-primaryDark shadow-eco-primary/20 border border-transparent ${location.pathname === '/projects' ? 'ring-2 ring-eco-primary ring-offset-2' : ''}`}
             >
               {t('home.hero.browseProjects') || "Parcourir les projets"}
             </Link>
@@ -120,13 +129,20 @@ export function Navbar() {
                 <NotificationBell />
                 <Menu shadow="md" width={220} position="bottom-end">
                   <Menu.Target>
-                    <Avatar color="eco-primary" radius="xl" style={{ cursor: 'pointer' }} className="bg-eco-primary text-white">
-                      <IconUser size={20} />
+                    <Avatar
+                      src={currentUser?.profile_picture || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face'}
+                      color="eco-primary"
+                      radius="xl"
+                      size="md"
+                      style={{ cursor: 'pointer', border: '2px solid transparent' }}
+                      className="bg-eco-primary text-white hover:ring-2 hover:ring-eco-primary/50 transition-all"
+                    >
+                      {!currentUser?.profile_picture && <IconUser size={20} />}
                     </Avatar>
                   </Menu.Target>
 
                   <Menu.Dropdown>
-                    <Menu.Item component={Link} to="/favorites" leftSection={<IconHeart size={16} color="red" />}>
+                    <Menu.Item component={Link} to="/favorites" leftSection={<IconHeart size={16} />}>
                       {t('nav.userMenu.favorites')}
                     </Menu.Item>
 
@@ -162,10 +178,7 @@ export function Navbar() {
               <>
                 <Link
                   to="/login"
-                  className={`text-sm font-semibold px-6 py-2.5 rounded-full transition-all hidden sm:block shadow-lg hover:-translate-y-0.5 ${isTransparent
-                    ? `bg-white/75 backdrop-blur text-eco-primary hover:bg-white border border-transparent ${location.pathname === '/login' || location.pathname === '/register' ? 'ring-2 ring-white ring-offset-2 ring-offset-transparent' : ''}`
-                    : `bg-eco-primary text-white hover:bg-eco-primaryDark shadow-eco-primary/20 border border-transparent ${location.pathname === '/login' || location.pathname === '/register' ? 'ring-2 ring-eco-primary ring-offset-2' : ''}`
-                    }`}
+                  className={`text-sm font-semibold px-6 py-2.5 rounded-full transition-all hidden sm:block shadow-lg hover:-translate-y-0.5 bg-eco-primary text-white hover:bg-eco-primaryDark shadow-eco-primary/20 border border-transparent ${location.pathname === '/login' || location.pathname === '/register' ? 'ring-2 ring-eco-primary ring-offset-2' : ''}`}
                 >
                   {t('common.login')}
                 </Link>
@@ -212,7 +225,7 @@ export function Navbar() {
               <Stack gap="xs">
                 <Anchor component={Link} to="/favorites" onClick={close} className="py-2">
                   <Group gap="xs">
-                    <IconHeart size={20} color="red" />
+                    <IconHeart size={20} />
                     {t('nav.userMenu.favorites')}
                   </Group>
                 </Anchor>

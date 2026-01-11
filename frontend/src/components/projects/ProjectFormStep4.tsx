@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Stack,
   Title,
@@ -40,6 +41,7 @@ export function ProjectFormStep4({
   onBack,
   isSubmitting,
 }: ProjectFormStep4Props) {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [images, setImages] = useState<File[]>(data.images);
@@ -61,18 +63,18 @@ export function ProjectFormStep4({
   ];
 
   const monthLabels = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
+    t('createProject.step4.monthLabels.jan'),
+    t('createProject.step4.monthLabels.feb'),
+    t('createProject.step4.monthLabels.mar'),
+    t('createProject.step4.monthLabels.apr'),
+    t('createProject.step4.monthLabels.may'),
+    t('createProject.step4.monthLabels.jun'),
+    t('createProject.step4.monthLabels.jul'),
+    t('createProject.step4.monthLabels.aug'),
+    t('createProject.step4.monthLabels.sep'),
+    t('createProject.step4.monthLabels.oct'),
+    t('createProject.step4.monthLabels.nov'),
+    t('createProject.step4.monthLabels.dec'),
   ];
 
   // Get or create availability for selected year
@@ -112,7 +114,7 @@ export function ProjectFormStep4({
 
     // Limit to 10 images
     if (allImages.length > 10) {
-      alert('Maximum 10 images allowed');
+      alert(t('createProject.step4.maxImagesAlert'));
       return;
     }
 
@@ -148,31 +150,32 @@ export function ProjectFormStep4({
       <Stack gap="xl">
         <div>
           <Title order={2} mb="md">
-            Availability & Images
+            {t('createProject.step4.title')}
           </Title>
           <Text c="dimmed">
-            When are you available to host volunteers? Add some photos to showcase your project.
+            {t('createProject.step4.description')}
           </Text>
         </div>
 
         {/* Availability Calendar */}
         <div>
           <Group mb="sm">
-            <IconCalendar size={20} color="var(--mantine-color-blue-6)" />
-            <Title order={3}>Availability (Optional)</Title>
+            <IconCalendar size={20} color="var(--mantine-color-eco-terracotta-5)" />
+            <Title order={3}>{t('createProject.step4.availability')}</Title>
           </Group>
           <Text size="sm" c="dimmed" mb="md">
-            Select the months when you can host volunteers. You can skip this and add it later.
+            {t('createProject.step4.availabilityDescription')}
           </Text>
 
           {/* Year Selector */}
           <Group mb="md">
             <Text size="sm" fw={500}>
-              Year:
+              {t('createProject.step4.year')}
             </Text>
             <SegmentedControl
               value={selectedYear.toString()}
               onChange={(value) => setSelectedYear(parseInt(value))}
+              color="eco-terracotta"
               data={[
                 { label: currentYear.toString(), value: currentYear.toString() },
                 { label: (currentYear + 1).toString(), value: (currentYear + 1).toString() },
@@ -189,6 +192,7 @@ export function ProjectFormStep4({
                 <Grid.Col key={month} span={{ base: 3, sm: 2 }}>
                   <Button
                     variant={isSelected ? 'filled' : 'default'}
+                    color={isSelected ? 'eco-terracotta' : undefined}
                     fullWidth
                     onClick={() => toggleMonth(month)}
                     styles={{
@@ -205,19 +209,18 @@ export function ProjectFormStep4({
           </Grid>
 
           <Text size="sm" c="dimmed" mt="xs">
-            {Object.values(availability).filter((v) => v === true).length} month(s) selected for {selectedYear}
+            {t('createProject.step4.monthsSelected', { count: Object.values(availability).filter((v) => v === true).length, year: selectedYear })}
           </Text>
         </div>
 
         {/* Image Upload */}
         <div>
           <Group mb="sm">
-            <IconPhoto size={20} color="var(--mantine-color-blue-6)" />
-            <Title order={3}>Project Images (Optional)</Title>
+            <IconPhoto size={20} color="var(--mantine-color-eco-terracotta-5)" />
+            <Title order={3}>{t('createProject.step4.images')}</Title>
           </Group>
           <Text size="sm" c="dimmed" mb="md">
-            Add photos of your project, workspace, accommodation, and surroundings. First image will be the cover
-            photo. (Max 10 images)
+            {t('createProject.step4.imagesDescription')}
           </Text>
 
           {/* Upload Button */}
@@ -236,9 +239,9 @@ export function ProjectFormStep4({
                 >
                   <Stack align="center" gap="xs">
                     <IconPhoto size={48} color="var(--mantine-color-gray-6)" />
-                    <Text fw={500}>Click to upload images</Text>
+                    <Text fw={500}>{t('createProject.step4.uploadButton')}</Text>
                     <Text size="xs" c="dimmed">
-                      PNG, JPG up to 10MB each
+                      {t('createProject.step4.uploadHint')}
                     </Text>
                   </Stack>
                 </Card>
@@ -259,10 +262,10 @@ export function ProjectFormStep4({
                   />
                   {index === 0 && (
                     <Badge
-                      color="blue"
+                      color="eco-terracotta"
                       style={{ position: 'absolute', top: 8, left: 8 }}
                     >
-                      Cover
+                      {t('createProject.step4.cover')}
                     </Badge>
                   )}
                   <ActionIcon
@@ -282,25 +285,25 @@ export function ProjectFormStep4({
           )}
 
           <Text size="sm" c="dimmed" mt="xs">
-            {images.length} / 10 images uploaded
+            {t('createProject.step4.imagesUploaded', { count: images.length })}
           </Text>
         </div>
 
         {/* Summary */}
-        <Alert color="green" title="✨ Review Your Project" icon={<IconSparkles />}>
+        <Alert color="green" title={t('createProject.step4.reviewTitle')} icon={<IconSparkles />}>
           <List size="sm" icon={<IconCheck size={16} />}>
             <List.Item>
-              <strong>{data.project_type === 'PERM' ? 'Permaculture' : 'Natural Building'}</strong> project
+              <span dangerouslySetInnerHTML={{ __html: t('createProject.step4.reviewProject', { type: data.project_type === 'PERM' ? t('createProject.step1.permaculture') : t('createProject.step1.naturalBuilding') }) }} />
             </List.Item>
-            <List.Item>Title: {data.title || '(not set)'}</List.Item>
+            <List.Item>{t('createProject.step4.reviewTitleLabel', { title: data.title || t('createProject.step4.reviewNotSet') })}</List.Item>
             <List.Item>
-              Location: {data.address.city || '(not set)'}, {data.address.country_code || '(not set)'}
+              {t('createProject.step4.reviewLocation', { city: data.address.city || t('createProject.step4.reviewNotSet'), country: data.address.country_code || t('createProject.step4.reviewNotSet') })}
             </List.Item>
             <List.Item>
-              Work: {data.hours_per_day}h/day, {data.days_per_week} days/week, max {data.max_helpers} volunteers
+              {t('createProject.step4.reviewWork', { hours: data.hours_per_day, days: data.days_per_week, max: data.max_helpers })}
             </List.Item>
-            <List.Item>Skills: {data.skills.length} selected</List.Item>
-            <List.Item>Images: {images.length} uploaded</List.Item>
+            <List.Item>{t('createProject.step4.reviewSkills', { count: data.skills.length })}</List.Item>
+            <List.Item>{t('createProject.step4.reviewImages', { count: images.length })}</List.Item>
           </List>
         </Alert>
 
@@ -312,16 +315,16 @@ export function ProjectFormStep4({
             disabled={isSubmitting}
             variant="default"
           >
-            ← Back
+            {t('createProject.step4.back')}
           </Button>
           <Button
             type="submit"
             disabled={isSubmitting}
-            color="green"
+            color="eco-terracotta"
             loading={isSubmitting}
             leftSection={!isSubmitting && <span>🚀</span>}
           >
-            {isSubmitting ? 'Creating Project...' : 'Create Project'}
+            {isSubmitting ? t('createProject.step4.creating') : t('createProject.step4.create')}
           </Button>
         </Group>
       </Stack>

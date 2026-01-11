@@ -151,6 +151,7 @@ export interface Notification {
   is_read: boolean;
   read_at: string | null;
   created_at: string;
+  sender_profile_picture?: string;
 }
 
 // Auth types

@@ -14,7 +14,8 @@
     "active": "Activo",
     "inactive": "Inactivo",
     "back": "Volver",
-    "day": "día"
+    "day": "día",
+    "by": "por"
   },
   "nav": {
     "home": "Inicio",
@@ -63,29 +64,33 @@
       "countries": "Países"
     }
   },
+  "notifications": {
+    "title": "Notificaciones",
+    "markAllRead": "Marcar todas como leídas",
+    "noNew": "No hay nuevas notificaciones",
+    "viewAllMessages": "Ver todos los mensajes"
+  },
   "footer": {
     "copyright": "© {{year}} Ecobilda. Todos los derechos reservados.",
     "about": {
-      "title": "Nosotros",
-      "us": "Sobre Nosotros",
+      "title": "Sobre nosotros",
+      "us": "Sobre nosotros",
       "contact": "Contacto",
-      "faq": "FAQ",
-      "blog": "Blog"
-    },
-    "links": {
-      "facebook": "Facebook",
-      "support": "Apóyanos",
-      "terms": "Términos",
-      "privacy": "Privacidad"
+      "faq": "FAQ"
     },
     "projects": {
       "title": "Proyectos",
       "browse": "Ver Proyectos",
-      "howItWorks": "Cómo Funciona",
+      "howItWorks": "Cómo funciona",
       "forHosts": "Para Anfitriones"
     },
-    "community": {
-      "title": "Comunidad"
+    "legal": {
+      "title": "Legal y Soporte"
+    },
+    "links": {
+      "support": "Apóyanos",
+      "terms": "Términos",
+      "privacy": "Privacidad"
     }
   },
   "projects": {
@@ -102,6 +107,9 @@
     "projectType": "Tipo de proyecto",
     "permaculture": "Permacultura",
     "naturalBuilding": "Construcción natural",
+    "activeProjects": "Proyectos actuales",
+    "pastProjects": "Proyectos pasados",
+    "volunteers": "voluntarios",
     "filters": {
       "all": "Todos",
       "construction": "Construcción",
@@ -123,7 +131,149 @@
     "volunteers": "Voluntarios",
     "volunteersNeeded": "{{count}} necesarios",
     "apply": "Aplicar",
-    "freeForMembers": "Gratis para miembros."
+    "freeForMembers": "Gratis para miembros.",
+    "showAllPhotos": "Mostrar todas las fotos",
+    "showAllXPhotos": "Mostrar todas las {{count}} fotos"
+  },
+  "createProject": {
+    "title": "Crear nuevo proyecto",
+    "subtitle": "Comparte tu proyecto de eco-construcción o permacultura con la comunidad",
+    "step": "Paso {{current}} de {{total}}",
+    "complete": "{{percent}}% completado",
+    "steps": {
+      "basicInfo": "Información básica",
+      "locationWork": "Ubicación y detalles del trabajo",
+      "skillsAmenities": "Habilidades y comodidades",
+      "availabilityImages": "Disponibilidad e imágenes"
+    },
+    "error": {
+      "createFailed": "Error al crear el proyecto. Por favor, inténtalo de nuevo."
+    },
+    "step1": {
+      "title": "Información básica",
+      "description": "Cuéntanos sobre tu proyecto. Sé descriptivo y atractivo para atraer a los voluntarios adecuados.",
+      "projectType": "Tipo de proyecto *",
+      "permaculture": "Permacultura",
+      "permacultureDesc": "Jardín, compostaje, cosecha, etc.",
+      "naturalBuilding": "Construcción natural",
+      "naturalBuildingDesc": "Carpintería, albañilería, yeso de tierra, etc.",
+      "projectTitle": "Título del proyecto *",
+      "projectTitlePlaceholder": "ej., Granja orgánica en los Alpes franceses",
+      "projectTitleDescription": "Elige un título llamativo que describa tu proyecto",
+      "projectDescription": "Descripción del proyecto *",
+      "projectDescriptionPlaceholder": "Describe tu proyecto en detalle. Incluye:\n• Lo que harán los voluntarios\n• Lo que aprenderán\n• La misión y valores de tu proyecto\n• Rutina diaria y atmósfera\n• Cualquier otra cosa que haga único tu proyecto",
+      "projectDescriptionHint": "¡Sé detallado y auténtico. Esta es tu oportunidad de atraer a las personas adecuadas!",
+      "projectDescriptionCounter": "{{count}} / 2000",
+      "tipsTitle": "💡 Consejos para una gran descripción:",
+      "tip1": "Sé específico sobre las tareas diarias y las oportunidades de aprendizaje",
+      "tip2": "Menciona tus valores y lo que hace especial tu proyecto",
+      "tip3": "Describe la ubicación, el entorno y las condiciones de vida",
+      "tip4": "Comparte tu visión y lo que esperas lograr juntos",
+      "next": "Siguiente: Ubicación y detalles del trabajo →",
+      "validation": {
+        "titleMin": "El título debe tener al menos 10 caracteres",
+        "titleMax": "El título es demasiado largo",
+        "descriptionMin": "La descripción debe tener al menos 50 caracteres",
+        "descriptionMax": "La descripción es demasiado larga"
+      }
+    },
+    "step2": {
+      "title": "Ubicación y detalles del trabajo",
+      "description": "Ayuda a los voluntarios a encontrarte y entender la organización del trabajo.",
+      "location": "Ubicación",
+      "city": "Ciudad *",
+      "cityPlaceholder": "ej., Lyon",
+      "postalCode": "Código postal *",
+      "postalCodePlaceholder": "ej., 69000",
+      "country": "País *",
+      "countryPlaceholder": "Seleccionar un país",
+      "privacyNote": "La dirección exacta no es necesaria por privacidad. La ciudad y el país son suficientes.",
+      "workArrangement": "Organización del trabajo",
+      "hoursPerDay": "Horas por día *",
+      "hoursPerDayDesc": "1-10 horas",
+      "daysPerWeek": "Días por semana *",
+      "daysPerWeekDesc": "1-7 días",
+      "maxVolunteers": "Máx. voluntarios *",
+      "maxVolunteersDesc": "1-20 personas",
+      "accommodationDetails": "Detalles del alojamiento *",
+      "accommodationPlaceholder": "Describe dónde dormirán los voluntarios. Por ejemplo:\n• Habitación privada, habitación compartida, tienda, caravana, etc.\n• Baño compartido o privado\n• ¿Ropa de cama y toallas proporcionadas?\n• Calefacción/refrigeración\n• Cualquier otro detalle relevante",
+      "foodDetails": "Detalles de la comida *",
+      "foodPlaceholder": "Describe el arreglo de comida. Por ejemplo:\n• ¿Cuántas comidas al día se proporcionan?\n• Tipo de comida (vegetariana, vegana, omnívora)\n• Fuente (cultivada en casa, orgánica, mercado local)\n• ¿Los voluntarios cocinan juntos o se proporcionan comidas?\n• ¿Acceso a la cocina para voluntarios?",
+      "back": "← Atrás",
+      "next": "Siguiente: Habilidades y comodidades →",
+      "validation": {
+        "cityRequired": "La ciudad es requerida",
+        "postalCodeRequired": "El código postal es requerido",
+        "countryRequired": "El país es requerido",
+        "hoursRange": "Debe estar entre 1 y 10",
+        "daysRange": "Debe estar entre 1 y 7",
+        "maxVolunteersRange": "Debe estar entre 1 y 20",
+        "accommodationMin": "Por favor proporciona detalles sobre el alojamiento (mín. 20 caracteres)",
+        "foodMin": "Por favor proporciona detalles sobre la comida (mín. 20 caracteres)"
+      }
+    },
+    "step3": {
+      "title": "Habilidades y comodidades",
+      "description": "Selecciona las habilidades que usarán los voluntarios y las comodidades que proporcionas.",
+      "skillsTitle": "Habilidades {{type}} *",
+      "skillsDescription": "Selecciona todas las habilidades con las que trabajarán los voluntarios. Elige al menos una.",
+      "selected": "Seleccionado: {{count}} habilidad(es)",
+      "amenities": "Comodidades",
+      "amenitiesDescription": "Selecciona las comodidades y preferencias para tu proyecto.",
+      "internetProvided": "Internet proporcionado",
+      "internetProvidedDesc": "WiFi o acceso a internet está disponible para voluntarios",
+      "familyFriendly": "Apto para familias",
+      "familyFriendlyDesc": "Adecuado para familias con niños",
+      "petsAllowed": "Mascotas permitidas",
+      "petsAllowedDesc": "Los voluntarios pueden traer sus mascotas",
+      "smokingAllowed": "Fumar permitido",
+      "smokingAllowedDesc": "Fumar está permitido en la propiedad",
+      "back": "← Atrás",
+      "next": "Siguiente: Disponibilidad e imágenes →",
+      "validation": {
+        "skillsRequired": "Por favor selecciona al menos una habilidad"
+      }
+    },
+    "step4": {
+      "title": "Disponibilidad e imágenes",
+      "description": "¿Cuándo estás disponible para acoger voluntarios? Añade algunas fotos para mostrar tu proyecto.",
+      "availability": "Disponibilidad (Opcional)",
+      "availabilityDescription": "Selecciona los meses en los que puedes acoger voluntarios. Puedes omitir esto y añadirlo más tarde.",
+      "year": "Año:",
+      "monthsSelected": "{{count}} mes(es) seleccionado(s) para {{year}}",
+      "images": "Imágenes del proyecto (Opcional)",
+      "imagesDescription": "Añade fotos de tu proyecto, espacio de trabajo, alojamiento y alrededores. La primera imagen será la foto de portada. (Máx. 10 imágenes)",
+      "uploadButton": "Haz clic para subir imágenes",
+      "uploadHint": "PNG, JPG hasta 10MB cada una",
+      "cover": "Portada",
+      "imagesUploaded": "{{count}} / 10 imágenes subidas",
+      "maxImagesAlert": "Máximo 10 imágenes permitidas",
+      "reviewTitle": "✨ Revisa tu proyecto",
+      "reviewProject": "Proyecto <strong>{{type}}</strong>",
+      "reviewTitleLabel": "Título: {{title}}",
+      "reviewLocation": "Ubicación: {{city}}, {{country}}",
+      "reviewWork": "Trabajo: {{hours}}h/día, {{days}} días/semana, máx. {{max}} voluntarios",
+      "reviewSkills": "Habilidades: {{count}} seleccionadas",
+      "reviewImages": "Imágenes: {{count}} subidas",
+      "reviewNotSet": "(no establecido)",
+      "back": "← Atrás",
+      "create": "Crear proyecto",
+      "creating": "Creando proyecto...",
+      "monthLabels": {
+        "jan": "Ene",
+        "feb": "Feb",
+        "mar": "Mar",
+        "apr": "Abr",
+        "may": "May",
+        "jun": "Jun",
+        "jul": "Jul",
+        "aug": "Ago",
+        "sep": "Sep",
+        "oct": "Oct",
+        "nov": "Nov",
+        "dec": "Dic"
+      }
+    }
   },
   "dashboard": {
     "welcome": "¡Bienvenido de nuevo, {{name}}!",

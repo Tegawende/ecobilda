@@ -14,7 +14,8 @@
         "active": "Actief",
         "inactive": "Inactief",
         "back": "Terug",
-        "day": "dag"
+        "day": "dag",
+        "by": "door"
     },
     "nav": {
         "home": "Home",
@@ -137,20 +138,19 @@
             "countries": "Landen"
         }
     },
+    "notifications": {
+        "title": "Meldingen",
+        "markAllRead": "Alles als gelezen markeren",
+        "noNew": "Geen nieuwe meldingen",
+        "viewAllMessages": "Alle berichten bekijken"
+    },
     "footer": {
         "copyright": "© {{year}} Ecobilda. Alle rechten voorbehouden.",
         "about": {
             "title": "Over ons",
             "us": "Over ons",
             "contact": "Contact",
-            "faq": "FAQ",
-            "blog": "Blog"
-        },
-        "links": {
-            "facebook": "Facebook",
-            "support": "Steun ons",
-            "terms": "Voorwaarden",
-            "privacy": "Privacy"
+            "faq": "FAQ"
         },
         "projects": {
             "title": "Projecten",
@@ -158,8 +158,13 @@
             "howItWorks": "Hoe het werkt",
             "forHosts": "Voor Gastheren"
         },
-        "community": {
-            "title": "Gemeenschap"
+        "legal": {
+            "title": "Juridisch & Ondersteuning"
+        },
+        "links": {
+            "support": "Steun ons",
+            "terms": "Voorwaarden",
+            "privacy": "Privacy"
         }
     },
     "projects": {
@@ -176,6 +181,8 @@
         "projectType": "Projecttype",
         "permaculture": "Permacultuur",
         "naturalBuilding": "Natuurlijk bouwen",
+        "activeProjects": "Lopende projecten",
+        "pastProjects": "Afgeronde projecten",
         "filters": {
             "all": "Alles",
             "construction": "Bouw",
@@ -197,7 +204,149 @@
         "volunteers": "Vrijwilligers",
         "volunteersNeeded": "{{count}} nodig",
         "apply": "Solliciteren",
-        "freeForMembers": "Gratis voor leden."
+        "freeForMembers": "Gratis voor leden.",
+        "showAllPhotos": "Alle foto's tonen",
+        "showAllXPhotos": "Alle {{count}} foto's tonen"
+    },
+    "createProject": {
+        "title": "Nieuw project aanmaken",
+        "subtitle": "Deel je eco-bouw of permacultuur project met de gemeenschap",
+        "step": "Stap {{current}} van {{total}}",
+        "complete": "{{percent}}% voltooid",
+        "steps": {
+            "basicInfo": "Basisinformatie",
+            "locationWork": "Locatie & Werkdetails",
+            "skillsAmenities": "Vaardigheden & Voorzieningen",
+            "availabilityImages": "Beschikbaarheid & Afbeeldingen"
+        },
+        "error": {
+            "createFailed": "Project aanmaken mislukt. Probeer het opnieuw."
+        },
+        "step1": {
+            "title": "Basisinformatie",
+            "description": "Vertel ons over je project. Wees beschrijvend en boeiend om de juiste vrijwilligers aan te trekken.",
+            "projectType": "Projecttype *",
+            "permaculture": "Permacultuur",
+            "permacultureDesc": "Tuin, composteren, oogsten, etc.",
+            "naturalBuilding": "Natuurlijk bouwen",
+            "naturalBuildingDesc": "Timmerman, metselwerk, leemstuc, etc.",
+            "projectTitle": "Projecttitel *",
+            "projectTitlePlaceholder": "bijv. Biologische boerderij in de Franse Alpen",
+            "projectTitleDescription": "Kies een pakkende titel die je project beschrijft",
+            "projectDescription": "Projectbeschrijving *",
+            "projectDescriptionPlaceholder": "Beschrijf je project in detail. Inclusief:\n• Wat vrijwilligers zullen doen\n• Wat ze zullen leren\n• De missie en waarden van je project\n• Dagelijkse routine en sfeer\n• Alles anders dat je project uniek maakt",
+            "projectDescriptionHint": "Wees gedetailleerd en authentiek. Dit is je kans om de juiste mensen aan te trekken!",
+            "projectDescriptionCounter": "{{count}} / 2000",
+            "tipsTitle": "💡 Tips voor een geweldige beschrijving:",
+            "tip1": "Wees specifiek over dagelijkse taken en leermogelijkheden",
+            "tip2": "Vermeld je waarden en wat je project speciaal maakt",
+            "tip3": "Beschrijf de locatie, omgeving en leefomstandigheden",
+            "tip4": "Deel je visie en wat je samen hoopt te bereiken",
+            "next": "Volgende: Locatie & Werkdetails →",
+            "validation": {
+                "titleMin": "Titel moet minimaal 10 tekens bevatten",
+                "titleMax": "Titel is te lang",
+                "descriptionMin": "Beschrijving moet minimaal 50 tekens bevatten",
+                "descriptionMax": "Beschrijving is te lang"
+            }
+        },
+        "step2": {
+            "title": "Locatie & Werkdetails",
+            "description": "Help vrijwilligers je te vinden en de werkregeling te begrijpen.",
+            "location": "Locatie",
+            "city": "Stad *",
+            "cityPlaceholder": "bijv. Lyon",
+            "postalCode": "Postcode *",
+            "postalCodePlaceholder": "bijv. 69000",
+            "country": "Land *",
+            "countryPlaceholder": "Selecteer een land",
+            "privacyNote": "Exact adres is niet vereist voor privacy. Stad en land zijn voldoende.",
+            "workArrangement": "Werkregeling",
+            "hoursPerDay": "Uren per dag *",
+            "hoursPerDayDesc": "1-10 uur",
+            "daysPerWeek": "Dagen per week *",
+            "daysPerWeekDesc": "1-7 dagen",
+            "maxVolunteers": "Max. vrijwilligers *",
+            "maxVolunteersDesc": "1-20 personen",
+            "accommodationDetails": "Accommodatiedetails *",
+            "accommodationPlaceholder": "Beschrijf waar vrijwilligers zullen slapen. Bijvoorbeeld:\n• Privékamer, gedeelde kamer, tent, caravan, etc.\n• Gedeelde of privé badkamer\n• Beddengoed en handdoeken verstrekt?\n• Verwarming/koeling\n• Andere relevante details",
+            "foodDetails": "Eetdetails *",
+            "foodPlaceholder": "Beschrijf de eetregeling. Bijvoorbeeld:\n• Hoeveel maaltijden per dag worden verstrekt?\n• Type voedsel (vegetarisch, veganistisch, alleseter)\n• Bron (zelfgekweekt, biologisch, lokale markt)\n• Koken vrijwilligers samen of maaltijden verstrekt?\n• Keukentoegang voor vrijwilligers?",
+            "back": "← Terug",
+            "next": "Volgende: Vaardigheden & Voorzieningen →",
+            "validation": {
+                "cityRequired": "Stad is vereist",
+                "postalCodeRequired": "Postcode is vereist",
+                "countryRequired": "Land is vereist",
+                "hoursRange": "Moet tussen 1 en 10 liggen",
+                "daysRange": "Moet tussen 1 en 7 liggen",
+                "maxVolunteersRange": "Moet tussen 1 en 20 liggen",
+                "accommodationMin": "Geef details over accommodatie (min. 20 tekens)",
+                "foodMin": "Geef details over eten (min. 20 tekens)"
+            }
+        },
+        "step3": {
+            "title": "Vaardigheden & Voorzieningen",
+            "description": "Selecteer de vaardigheden die vrijwilligers zullen gebruiken en de voorzieningen die je biedt.",
+            "skillsTitle": "{{type}} Vaardigheden *",
+            "skillsDescription": "Selecteer alle vaardigheden waarmee vrijwilligers zullen werken. Kies er minimaal één.",
+            "selected": "Geselecteerd: {{count}} vaardigheid(en)",
+            "amenities": "Voorzieningen",
+            "amenitiesDescription": "Selecteer de voorzieningen en voorkeuren voor je project.",
+            "internetProvided": "Internet beschikbaar",
+            "internetProvidedDesc": "WiFi of internettoegang is beschikbaar voor vrijwilligers",
+            "familyFriendly": "Gezinsvriendelijk",
+            "familyFriendlyDesc": "Geschikt voor gezinnen met kinderen",
+            "petsAllowed": "Huisdieren toegestaan",
+            "petsAllowedDesc": "Vrijwilligers kunnen hun huisdieren meenemen",
+            "smokingAllowed": "Roken toegestaan",
+            "smokingAllowedDesc": "Roken is toegestaan op het terrein",
+            "back": "← Terug",
+            "next": "Volgende: Beschikbaarheid & Afbeeldingen →",
+            "validation": {
+                "skillsRequired": "Selecteer minimaal één vaardigheid"
+            }
+        },
+        "step4": {
+            "title": "Beschikbaarheid & Afbeeldingen",
+            "description": "Wanneer ben je beschikbaar om vrijwilligers te ontvangen? Voeg wat foto's toe om je project te tonen.",
+            "availability": "Beschikbaarheid (Optioneel)",
+            "availabilityDescription": "Selecteer de maanden waarin je vrijwilligers kunt ontvangen. Je kunt dit overslaan en later toevoegen.",
+            "year": "Jaar:",
+            "monthsSelected": "{{count}} maand(en) geselecteerd voor {{year}}",
+            "images": "Projectafbeeldingen (Optioneel)",
+            "imagesDescription": "Voeg foto's toe van je project, werkruimte, accommodatie en omgeving. Eerste afbeelding wordt de omslagfoto. (Max. 10 afbeeldingen)",
+            "uploadButton": "Klik om afbeeldingen te uploaden",
+            "uploadHint": "PNG, JPG tot 10MB elk",
+            "cover": "Omslag",
+            "imagesUploaded": "{{count}} / 10 afbeeldingen geüpload",
+            "maxImagesAlert": "Maximaal 10 afbeeldingen toegestaan",
+            "reviewTitle": "✨ Bekijk je project",
+            "reviewProject": "<strong>{{type}}</strong> project",
+            "reviewTitleLabel": "Titel: {{title}}",
+            "reviewLocation": "Locatie: {{city}}, {{country}}",
+            "reviewWork": "Werk: {{hours}}u/dag, {{days}} dagen/week, max. {{max}} vrijwilligers",
+            "reviewSkills": "Vaardigheden: {{count}} geselecteerd",
+            "reviewImages": "Afbeeldingen: {{count}} geüpload",
+            "reviewNotSet": "(niet ingesteld)",
+            "back": "← Terug",
+            "create": "Project aanmaken",
+            "creating": "Project aanmaken...",
+            "monthLabels": {
+                "jan": "Jan",
+                "feb": "Feb",
+                "mar": "Mrt",
+                "apr": "Apr",
+                "may": "Mei",
+                "jun": "Jun",
+                "jul": "Jul",
+                "aug": "Aug",
+                "sep": "Sep",
+                "oct": "Okt",
+                "nov": "Nov",
+                "dec": "Dec"
+            }
+        }
     },
     "dashboard": {
         "welcome": "Welkom terug, {{name}}!",

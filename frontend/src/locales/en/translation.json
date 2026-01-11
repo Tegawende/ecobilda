@@ -14,7 +14,8 @@
     "active": "Active",
     "inactive": "Inactive",
     "back": "Back",
-    "day": "day"
+    "day": "day",
+    "by": "by"
   },
   "nav": {
     "home": "Home",
@@ -172,6 +173,9 @@
     "projectType": "Project Type",
     "permaculture": "Permaculture",
     "naturalBuilding": "Natural Building",
+    "activeProjects": "Active projects",
+    "pastProjects": "Past projects",
+    "volunteers": "volunteers",
     "availability": "Availability",
     "skills": "Skills",
     "location": "Location",
@@ -192,7 +196,10 @@
       "renovation": "Renovation",
       "community": "Community",
       "categories": "Categories",
-      "locations": "Locations"
+      "locations": "Locations",
+      "workDetails": "Work Details",
+      "maxVolunteers": "Max Volunteers",
+      "applyFilters": "Apply Filters"
     },
     "helpersMax": "helpers max"
   },
@@ -206,7 +213,151 @@
     "volunteers": "Volunteers",
     "volunteersNeeded": "{{count}} Needed",
     "apply": "Apply to Join",
-    "freeForMembers": "Free for members."
+    "freeForMembers": "Free for members.",
+    "showAllPhotos": "Show all photos",
+    "showAllXPhotos": "Show all {{count}} photos",
+    "selectDates": "Select your dates",
+    "pickDates": "Arrive - Depart"
+  },
+  "createProject": {
+    "title": "Create New Project",
+    "subtitle": "Share your eco-construction or permaculture project with the community",
+    "step": "Step {{current}} of {{total}}",
+    "complete": "{{percent}}% Complete",
+    "steps": {
+      "basicInfo": "Basic Information",
+      "locationWork": "Location & Work Details",
+      "skillsAmenities": "Skills & Amenities",
+      "availabilityImages": "Availability & Images"
+    },
+    "error": {
+      "createFailed": "Failed to create project. Please try again."
+    },
+    "step1": {
+      "title": "Basic Information",
+      "description": "Tell us about your project. Be descriptive and engaging to attract the right volunteers.",
+      "projectType": "Project Type *",
+      "permaculture": "Permaculture",
+      "permacultureDesc": "Garden, composting, harvesting, etc.",
+      "naturalBuilding": "Natural Building",
+      "naturalBuildingDesc": "Carpentry, masonry, earthen plaster, etc.",
+      "projectTitle": "Project Title *",
+      "projectTitlePlaceholder": "e.g., Organic Farm in the French Alps",
+      "projectTitleDescription": "Choose a catchy title that describes your project",
+      "projectDescription": "Project Description *",
+      "projectDescriptionPlaceholder": "Describe your project in detail. Include:\n• What volunteers will be doing\n• What they will learn\n• Your project's mission and values\n• Daily routine and atmosphere\n• Anything else that makes your project unique",
+      "projectDescriptionHint": "Be detailed and authentic. This is your chance to attract the right people!",
+      "projectDescriptionCounter": "{{count}} / 2000",
+      "tipsTitle": "💡 Tips for a great description:",
+      "tip1": "Be specific about daily tasks and learning opportunities",
+      "tip2": "Mention your values and what makes your project special",
+      "tip3": "Describe the location, surroundings, and living conditions",
+      "tip4": "Share your vision and what you hope to achieve together",
+      "next": "Next: Location & Work Details →",
+      "validation": {
+        "titleMin": "Title must be at least 10 characters",
+        "titleMax": "Title is too long",
+        "descriptionMin": "Description must be at least 50 characters",
+        "descriptionMax": "Description is too long"
+      }
+    },
+    "step2": {
+      "title": "Location & Work Details",
+      "description": "Help volunteers find you and understand the work arrangement.",
+      "location": "Location",
+      "city": "City *",
+      "cityPlaceholder": "e.g., Lyon",
+      "postalCode": "Postal Code *",
+      "postalCodePlaceholder": "e.g., 69000",
+      "country": "Country *",
+      "countryPlaceholder": "Select a country",
+      "privacyNote": "Exact address is not required for privacy. City and country are sufficient.",
+      "workArrangement": "Work Arrangement",
+      "hoursPerDay": "Hours per day *",
+      "hoursPerDayDesc": "1-10 hours",
+      "daysPerWeek": "Days per week *",
+      "daysPerWeekDesc": "1-7 days",
+      "maxVolunteers": "Max volunteers *",
+      "maxVolunteersDesc": "1-20 people",
+      "accommodationDetails": "Accommodation Details *",
+      "accommodationPlaceholder": "Describe where volunteers will sleep. For example:\n• Private room, shared room, tent, caravan, etc.\n• Shared or private bathroom\n• Bedding and towels provided?\n• Heating/cooling\n• Any other relevant details",
+      "foodDetails": "Food Details *",
+      "foodPlaceholder": "Describe the food arrangement. For example:\n• How many meals per day are provided?\n• Type of food (vegetarian, vegan, omnivore)\n• Source (homegrown, organic, local market)\n• Volunteers cook together or meals provided?\n• Kitchen access for volunteers?",
+      "back": "← Back",
+      "next": "Next: Skills & Amenities →",
+      "validation": {
+        "cityRequired": "City is required",
+        "postalCodeRequired": "Postal code is required",
+        "countryRequired": "Country is required",
+        "hoursRange": "Must be between 1 and 10",
+        "daysRange": "Must be between 1 and 7",
+        "maxVolunteersRange": "Must be between 1 and 20",
+        "accommodationMin": "Please provide details about accommodation (min 20 characters)",
+        "foodMin": "Please provide details about food (min 20 characters)"
+      }
+    },
+    "step3": {
+      "title": "Skills & Amenities",
+      "description": "Select the skills volunteers will use and the amenities you provide.",
+      "skillsTitle": "{{type}} Skills *",
+      "skillsDescription": "Select all skills that volunteers will be working with. Choose at least one.",
+      "selected": "Selected: {{count}} skill(s)",
+      "amenities": "Amenities",
+      "amenitiesDescription": "Select the amenities and preferences for your project.",
+      "internetProvided": "Internet provided",
+      "internetProvidedDesc": "WiFi or internet access is available for volunteers",
+      "familyFriendly": "Family friendly",
+      "familyFriendlyDesc": "Suitable for families with children",
+      "petsAllowed": "Pets allowed",
+      "petsAllowedDesc": "Volunteers can bring their pets",
+      "smokingAllowed": "Smoking allowed",
+      "smokingAllowedDesc": "Smoking is permitted on the property",
+      "back": "← Back",
+      "next": "Next: Availability & Images →",
+      "validation": {
+        "skillsRequired": "Please select at least one skill"
+      }
+    },
+    "step4": {
+      "title": "Availability & Images",
+      "description": "When are you available to host volunteers? Add some photos to showcase your project.",
+      "availability": "Availability (Optional)",
+      "availabilityDescription": "Select the months when you can host volunteers. You can skip this and add it later.",
+      "year": "Year:",
+      "monthsSelected": "{{count}} month(s) selected for {{year}}",
+      "images": "Project Images (Optional)",
+      "imagesDescription": "Add photos of your project, workspace, accommodation, and surroundings. First image will be the cover photo. (Max 10 images)",
+      "uploadButton": "Click to upload images",
+      "uploadHint": "PNG, JPG up to 10MB each",
+      "cover": "Cover",
+      "imagesUploaded": "{{count}} / 10 images uploaded",
+      "maxImagesAlert": "Maximum 10 images allowed",
+      "reviewTitle": "✨ Review Your Project",
+      "reviewProject": "<strong>{{type}}</strong> project",
+      "reviewTitleLabel": "Title: {{title}}",
+      "reviewLocation": "Location: {{city}}, {{country}}",
+      "reviewWork": "Work: {{hours}}h/day, {{days}} days/week, max {{max}} volunteers",
+      "reviewSkills": "Skills: {{count}} selected",
+      "reviewImages": "Images: {{count}} uploaded",
+      "reviewNotSet": "(not set)",
+      "back": "← Back",
+      "create": "Create Project",
+      "creating": "Creating Project...",
+      "monthLabels": {
+        "jan": "Jan",
+        "feb": "Feb",
+        "mar": "Mar",
+        "apr": "Apr",
+        "may": "May",
+        "jun": "Jun",
+        "jul": "Jul",
+        "aug": "Aug",
+        "sep": "Sep",
+        "oct": "Oct",
+        "nov": "Nov",
+        "dec": "Dec"
+      }
+    }
   },
   "dashboard": {
     "welcome": "Welcome back, {{name}}!",
@@ -252,7 +403,11 @@
     "createNew": "Create New Project",
     "noProjects": "No projects yet",
     "noProjectsDesc": "You haven't created any projects yet. Start your first project and connect with volunteers!",
-    "createFirst": "Create Your First Project"
+    "createFirst": "Create Your First Project",
+    "noActive": "No active projects",
+    "noActiveDesc": "You don't have any active projects at the moment.",
+    "noPast": "No past projects",
+    "noPastDesc": "You don't have any past projects yet."
   },
   "participations": {
     "title": "My Participations",
@@ -493,13 +648,18 @@
       }
     }
   },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "noNew": "No new notifications",
+    "viewAllMessages": "View all messages"
+  },
   "footer": {
     "about": {
       "title": "About",
       "us": "About us",
       "contact": "Contact",
-      "faq": "FAQ",
-      "blog": "Blog"
+      "faq": "FAQ"
     },
     "projects": {
       "title": "Projects",
@@ -507,11 +667,10 @@
       "howItWorks": "How it works",
       "forHosts": "For Hosts"
     },
-    "community": {
-      "title": "Community"
+    "legal": {
+      "title": "Legal & Support"
     },
     "links": {
-      "facebook": "Facebook",
       "support": "Support",
       "terms": "Terms",
       "privacy": "Privacy"

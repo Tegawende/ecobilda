@@ -1,242 +1,205 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Carousel } from '@mantine/carousel';
 import {
-  Card,
-  Image,
-  Text,
-  Badge,
-  Group,
-  Center,
-  Skeleton,
-  Box,
-} from '@mantine/core';
-import {
-  IconPlant,
-  IconHammer,
-  IconStarFilled,
+  IconMapPin,
+  IconUsers,
+  IconClock,
+  IconHeart,
+  IconHome,
+  IconLeaf,
+  IconWifi,
+  IconBabyCarriage,
+  IconDog,
+  IconEdit,
 } from '@tabler/icons-react';
 import { FavoriteButton } from '../common/FavoriteButton';
 import type { Project } from '../../types';
-import classes from './ProjectCard.module.css';
 
 interface ProjectCardProps {
-  project: Partial<Project> & { id: number; title: string };
+  project: Project;
+  isHovered?: boolean;
+  onHover?: (project: Project | null) => void;
+  initialFavorite?: boolean;
+  showEdit?: boolean;
+  onEdit?: (id: number) => void;
+  showStatus?: boolean;
 }
 
-// Mock images based on project type
-const getMockImages = (projectType: 'PERM' | 'NATB' | undefined, projectId: number) => {
-  const permImages = [
-    'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1464226184884-fa280b87c399?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-  ];
-
-  const natbImages = [
-    'https://images.unsplash.com/photo-1484154218962-a197022b5858?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-  ];
-
-  const images = projectType === 'PERM' ? permImages : natbImages;
-  // Use project ID to select consistent images for the same project
-  const selectedImages = images.slice(0, 3 + (projectId % 3));
-  return selectedImages;
-};
-
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({
+  project,
+  isHovered = false,
+  onHover,
+  initialFavorite = false,
+  showEdit = false,
+  onEdit,
+  showStatus = false,
+}: ProjectCardProps) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Determine project type icon and label
-  const isPerm = project.project_type === 'PERM';
-  const ProjectIcon = isPerm ? IconPlant : IconHammer;
-  const projectTypeLabel = isPerm
-    ? t('projects.permaculture')
-    : t('projects.naturalBuilding');
-  const projectTypeColor = isPerm ? 'green' : 'orange';
+  const images = project.images && project.images.length > 0
+    ? project.images.map(img => img.image)
+    : ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'];
 
-  // Get all images sorted (cover first), or use mock images
-  const sortedImages = project.images && project.images.length > 0
-    ? [...project.images].sort((a, b) => {
-        if (a.is_cover) return -1;
-        if (b.is_cover) return 1;
-        return a.order - b.order;
-      })
-    : [];
-
-  // Use mock images if no real images
-  const mockImages = sortedImages.length === 0 ? getMockImages(project.project_type, project.id) : [];
-  const allImages = sortedImages.length > 0 
-    ? sortedImages.map(img => img.image)
-    : mockImages;
-
-  const hasMultipleImages = allImages.length > 1;
-
-  // Handle card click (navigate to project)
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Don't navigate if clicking on carousel controls or favorite button
-    const target = e.target as HTMLElement;
-    if (
-      target.closest('[data-carousel-control]') ||
-      target.closest('[data-favorite-button]') ||
-      target.closest('button')
-    ) {
-      return;
-    }
-    navigate(`/projects/${project.id}`);
+  const nextImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
   };
 
-  // Render carousel slides
-  const slides = allImages.map((imageUrl, index) => (
-    <Carousel.Slide key={index}>
-      <Image src={imageUrl} height={220} alt={project.title} />
-    </Carousel.Slide>
-  ));
-
-  // Render image section
-  const renderImageSection = () => {
-    if (allImages.length === 0) {
-      // Fallback placeholder when no images at all
-      return (
-        <Center h={220} bg={isPerm ? 'green.1' : 'orange.1'}>
-          <ProjectIcon size={64} color={isPerm ? 'green' : 'orange'} style={{ opacity: 0.6 }} />
-        </Center>
-      );
-    }
-
-    if (hasMultipleImages) {
-      // Carousel for multiple images
-      return (
-        <Carousel
-          withIndicators
-          loop
-          classNames={{
-            root: classes.carousel,
-            controls: classes.carouselControls,
-            indicator: classes.carouselIndicator,
-          }}
-        >
-          {slides}
-        </Carousel>
-      );
-    }
-
-    // Single image
-    return <Image src={allImages[0]} height={220} alt={project.title} />;
+  const prevImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
-  // Get location string
-  const location = project.address 
-    ? `${project.address.city}, ${project.address.country.name}`
-    : project.title;
+  const isNatB = project.project_type === 'NATB';
 
   return (
-    <Card
-      radius="md"
-      withBorder
-      padding="xl"
-      onClick={handleCardClick}
-      style={{ cursor: 'pointer' }}
+    <Link
+      to={`/projects/${project.id}`}
+      className={`block group cursor-pointer transition-all duration-200 ${isHovered ? 'scale-[1.02]' : ''}`}
+      onMouseEnter={() => onHover?.(project)}
+      onMouseLeave={() => onHover?.(null)}
     >
-      {/* Image Section with Carousel */}
-      <Card.Section>
-        {renderImageSection()}
+      {/* Image Carousel */}
+      <div className="relative rounded-xl overflow-hidden aspect-[4/3] mb-3">
+        <img
+          src={images[currentImageIndex]}
+          alt={project.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
 
-        {/* Project Type Badge */}
-        <Box style={{ position: 'absolute', top: 12, right: 12, zIndex: 10 }}>
-          <Badge
-            color={projectTypeColor}
-            variant="filled"
-            leftSection={<ProjectIcon size={14} />}
-          >
-            {projectTypeLabel}
-          </Badge>
-        </Box>
-
-        {/* Favorite Button */}
-        <Box style={{ position: 'absolute', top: 12, left: 12, zIndex: 10 }} data-favorite-button>
-          <FavoriteButton projectId={project.id} size="sm" />
-        </Box>
-      </Card.Section>
-
-      {/* Location and Rating */}
-      <Group justify="space-between" mt="lg">
-        <Text fw={500} fz="lg" lineClamp={1} style={{ flex: 1 }}>
-          {location}
-        </Text>
-
-        {project.owner?.average_rating && project.owner.average_rating > 0 && (
-          <Group gap={5}>
-            <IconStarFilled size={16} color="var(--mantine-color-yellow-6)" />
-            <Text fz="sm" fw={600}>
-              {project.owner.average_rating.toFixed(2)}
-            </Text>
-          </Group>
-        )}
-      </Group>
-
-      {/* Description */}
-      <Text fz="sm" c="dimmed" mt="sm" lineClamp={2}>
-        {project.description || project.title}
-      </Text>
-
-      {/* Work Details */}
-      {(project.hours_per_day || project.days_per_week) && (
-        <Group justify="space-between" mt="md">
-          <div>
-            {project.hours_per_day && (
-              <>
-                <Text fz="lg" span fw={500}>
-                  {project.hours_per_day}h
-                </Text>
-                <Text span fz="sm" c="dimmed">
-                  {' '}/ day
-                </Text>
-              </>
-            )}
-            {project.hours_per_day && project.days_per_week && (
-              <Text span fz="sm" c="dimmed">
-                {' '}•{' '}
-              </Text>
-            )}
-            {project.days_per_week && (
-              <>
-                <Text fz="lg" span fw={500}>
-                  {project.days_per_week}d
-                </Text>
-                <Text span fz="sm" c="dimmed">
-                  {' '}/ week
-                </Text>
-              </>
-            )}
+        {/* Favorite Button (Hidden if showEdit is true) */}
+        {!showEdit && (
+          <div className="absolute top-3 right-3 z-[5]">
+            <FavoriteButton
+              projectId={project.id}
+              variant="ghost"
+              size="md"
+              initialFavorite={initialFavorite}
+            />
           </div>
-        </Group>
-      )}
-    </Card>
+        )}
+
+        {/* Edit Button */}
+        {showEdit && (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onEdit?.(project.id);
+            }}
+            className="absolute top-3 right-3 z-30 w-9 h-9 rounded-full bg-white/95 backdrop-blur flex items-center justify-center text-gray-700 hover:text-eco-primary hover:bg-white shadow-sm transition-all"
+          >
+            <IconEdit size={18} />
+          </button>
+        )}
+
+        {/* Type Badge */}
+        <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
+          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold shadow-sm uppercase tracking-wider ${isNatB ? 'bg-eco-primary text-white' : 'bg-eco-terracotta text-white'
+            }`}>
+            {isNatB ? <IconHome size={10} /> : <IconLeaf size={10} />}
+            {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
+          </span>
+        </div>
+
+        {/* Image Navigation */}
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={prevImage}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white cursor-pointer z-10"
+            >
+              ‹
+            </button>
+            <button
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white cursor-pointer z-10"
+            >
+              ›
+            </button>
+
+            {/* Dots */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+              {images.map((_, idx) => (
+                <span
+                  key={idx}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${idx === currentImageIndex ? 'bg-white w-2' : 'bg-white/50'
+                    }`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="space-y-1 px-1">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-bold text-gray-900 group-hover:text-eco-primary transition-colors line-clamp-1 text-lg flex-1">
+            {project.title}
+          </h3>
+          {showStatus && (
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider flex-shrink-0 mt-1 ${project.is_active ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-gray-100 text-gray-600 border border-gray-200'}`}>
+              {project.is_active ? (t('common.active') || 'Active') : (t('common.inactive') || 'Inactive')}
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center text-gray-500 text-sm">
+          <IconMapPin size={14} className="mr-1 flex-shrink-0" />
+          <span className="truncate">{project.address?.city}, {project.address?.country?.name}</span>
+        </div>
+
+        <div className="flex items-center gap-3 text-sm text-gray-500">
+          <span className="flex items-center gap-1">
+            <IconUsers size={14} />
+            {project.max_helpers} {t('projects.volunteers') || 'volunteers'}
+          </span>
+          <span className="flex items-center gap-1">
+            <IconClock size={14} />
+            {project.hours_per_day}h/{t('common.day') || 'day'}
+          </span>
+        </div>
+
+        {/* Amenities */}
+        <div className="flex flex-wrap gap-1.5 pt-1">
+          {project.internet_provided && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+              <IconWifi size={10} /> WiFi
+            </span>
+          )}
+          {project.family_friendly && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+              <IconBabyCarriage size={10} /> {t('projects.familyFriendly') || 'Family'}
+            </span>
+          )}
+          {project.pets_allowed && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+              <IconDog size={10} /> {t('projects.petsAllowed') || 'Pets'}
+            </span>
+          )}
+        </div>
+      </div>
+    </Link>
   );
 }
 
-// Skeleton loader for loading state
 export function ProjectCardSkeleton() {
   return (
-    <Card radius="md" withBorder padding="xl">
-      <Card.Section>
-        <Skeleton h={220} />
-      </Card.Section>
-      <Group justify="space-between" mt="lg">
-        <Skeleton h={24} w="60%" />
-        <Skeleton h={20} w={50} />
-      </Group>
-      <Skeleton h={16} mt="sm" />
-      <Skeleton h={16} mt={4} w="80%" />
-      <Group justify="space-between" mt="md">
-        <Skeleton h={20} w={100} />
-      </Group>
-    </Card>
+    <div className="animate-pulse">
+      <div className="aspect-[4/3] bg-gray-200 rounded-xl mb-3" />
+      <div className="space-y-2 px-1">
+        <div className="h-5 bg-gray-200 rounded w-3/4" />
+        <div className="h-4 bg-gray-200 rounded w-1/2" />
+        <div className="flex gap-3">
+          <div className="h-4 bg-gray-200 rounded w-20" />
+          <div className="h-4 bg-gray-200 rounded w-20" />
+        </div>
+      </div>
+    </div>
   );
 }

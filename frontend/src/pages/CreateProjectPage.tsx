@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Container,
   Title,
@@ -18,6 +19,7 @@ import { ProjectFormStep2 } from '../components/projects/ProjectFormStep2';
 import { ProjectFormStep3 } from '../components/projects/ProjectFormStep3';
 import { ProjectFormStep4 } from '../components/projects/ProjectFormStep4';
 import { projectsService } from '../services/projects';
+import type { Project } from '../types';
 
 export interface ProjectFormData {
   // Step 1: Basic Info
@@ -71,6 +73,7 @@ export interface ProjectFormData {
 }
 
 export function CreateProjectPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -129,17 +132,17 @@ export function CreateProjectPage() {
     setError(null);
 
     try {
-      const projectPayload = {
+      const projectPayload: Partial<Project> = {
         title: formData.title,
         description: formData.description,
         project_type: formData.project_type,
-        address: formData.address,
+        address: formData.address as any, // Backend will handle address creation
         hours_per_day: formData.hours_per_day,
         days_per_week: formData.days_per_week,
         max_helpers: formData.max_helpers,
         accommodation_details: formData.accommodation_details,
         food_details: formData.food_details,
-        skills: formData.skills,
+        skills: formData.skills as any, // Backend expects skill codes
         internet_provided: formData.internet_provided,
         family_friendly: formData.family_friendly,
         pets_allowed: formData.pets_allowed,
@@ -164,7 +167,7 @@ export function CreateProjectPage() {
         err.response?.data?.detail ||
         err.response?.data?.title?.[0] ||
         err.response?.data?.description?.[0] ||
-        'Failed to create project. Please try again.';
+        t('createProject.error.createFailed');
       setError(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -172,10 +175,10 @@ export function CreateProjectPage() {
   };
 
   const stepLabels = [
-    'Basic Information',
-    'Location & Work Details',
-    'Skills & Amenities',
-    'Availability & Images',
+    t('createProject.steps.basicInfo'),
+    t('createProject.steps.locationWork'),
+    t('createProject.steps.skillsAmenities'),
+    t('createProject.steps.availabilityImages'),
   ];
 
   return (
@@ -183,9 +186,9 @@ export function CreateProjectPage() {
       {/* Header */}
       <Box bg="white" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
         <Container size="md" py="xl">
-          <Title order={1} mb="xs">Create New Project</Title>
+          <Title order={1} mb="xs">{t('createProject.title')}</Title>
           <Text c="dimmed">
-            Share your eco-construction or permaculture project with the community
+            {t('createProject.subtitle')}
           </Text>
         </Container>
       </Box>
@@ -195,16 +198,17 @@ export function CreateProjectPage() {
         <Box mb="xl">
           <Group justify="space-between" mb="xs">
             <Text size="sm" fw={500}>
-              Step {currentStep + 1} of {totalSteps}
+              {t('createProject.step', { current: currentStep + 1, total: totalSteps })}
             </Text>
             <Text size="sm" c="dimmed">
-              {Math.round(((currentStep + 1) / totalSteps) * 100)}% Complete
+              {t('createProject.complete', { percent: Math.round(((currentStep + 1) / totalSteps) * 100) })}
             </Text>
           </Group>
           <Progress
             value={((currentStep + 1) / totalSteps) * 100}
             size="sm"
             radius="xl"
+            color="eco-terracotta"
           />
         </Box>
 
@@ -213,6 +217,7 @@ export function CreateProjectPage() {
           active={currentStep}
           mb="xl"
           size="sm"
+          color="eco-terracotta"
         >
           {stepLabels.map((label, index) => (
             <Stepper.Step key={index} label={label} />

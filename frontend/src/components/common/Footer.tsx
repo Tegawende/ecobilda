@@ -14,7 +14,6 @@ export function Footer() {
         { label: t('footer.about.us') || 'About Us', link: '/about' },
         { label: t('footer.about.contact') || 'Contact', link: '/contact' },
         { label: t('footer.about.faq') || 'FAQ', link: '/faq' },
-        { label: t('footer.about.blog') || 'Blog', link: '#' },
       ],
     },
     {
@@ -26,9 +25,8 @@ export function Footer() {
       ],
     },
     {
-      title: t('footer.community.title') || 'Community',
+      title: t('footer.legal.title') || 'Legal & Support',
       links: [
-        { label: t('footer.links.facebook') || 'Facebook', link: 'https://www.facebook.com/Ecobilda' },
         { label: t('footer.links.support') || 'Support Us', link: '#' },
         { label: t('footer.links.terms') || 'Terms', link: '#' },
         { label: t('footer.links.privacy') || 'Privacy', link: '#' },
@@ -49,9 +47,6 @@ export function Footer() {
             <div className="flex gap-2">
               <a href="https://twitter.com/Ecobilda" target="_blank" rel="noopener noreferrer" className="p-2 text-gray-400 hover:text-eco-primary transition-colors">
                 <IconBrandTwitter size={20} stroke={1.5} />
-              </a>
-              <a href="https://www.facebook.com/Ecobilda" target="_blank" rel="noopener noreferrer" className="p-2 text-gray-400 hover:text-eco-primary transition-colors">
-                <IconBrandFacebook size={20} stroke={1.5} />
               </a>
               <a href="https://www.instagram.com/ecobilda/" target="_blank" rel="noopener noreferrer" className="p-2 text-gray-400 hover:text-eco-primary transition-colors">
                 <IconBrandInstagram size={20} stroke={1.5} />

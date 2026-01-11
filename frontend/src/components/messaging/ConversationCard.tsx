@@ -46,28 +46,17 @@ export function ConversationCard({ conversation, currentUserId, onClick }: Conve
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
-  const BoxComponent = onClick ? Box : Link;
-  const boxProps = onClick
-    ? { onClick, style: { cursor: 'pointer' } }
-    : { to: `/messages/${conversation.id}` };
+  const commonStyle = {
+    display: 'block',
+    borderBottom: '1px solid var(--mantine-color-gray-3)',
+    textDecoration: 'none',
+    color: 'inherit',
+    transition: 'background-color 0.15s',
+    cursor: 'pointer',
+  };
 
-  return (
-    <Box
-      component={BoxComponent}
-      {...boxProps}
-      p="md"
-      bg={unreadCount > 0 ? 'blue.0' : 'white'}
-      style={{
-        display: 'block',
-        borderBottom: '1px solid var(--mantine-color-gray-3)',
-        textDecoration: 'none',
-        color: 'inherit',
-        transition: 'background-color 0.15s',
-        ...(onClick ? { cursor: 'pointer' } : {}),
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--mantine-color-gray-0)')}
-      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = unreadCount > 0 ? 'var(--mantine-color-blue-0)' : 'white')}
-    >
+  const content = (
+    <>
       <Group align="flex-start" wrap="nowrap">
         {/* Profile Picture */}
         <Avatar
@@ -127,6 +116,35 @@ export function ConversationCard({ conversation, currentUserId, onClick }: Conve
           </Badge>
         )}
       </Group>
+    </>
+  );
+
+  if (onClick) {
+    return (
+      <Box
+        onClick={onClick}
+        p="md"
+        bg={unreadCount > 0 ? 'blue.0' : 'white'}
+        style={commonStyle}
+        onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) => (e.currentTarget.style.backgroundColor = 'var(--mantine-color-gray-0)')}
+        onMouseLeave={(e: React.MouseEvent<HTMLDivElement>) => (e.currentTarget.style.backgroundColor = unreadCount > 0 ? 'var(--mantine-color-blue-0)' : 'white')}
+      >
+        {content}
+      </Box>
+    );
+  }
+
+  return (
+    <Box
+      component={Link}
+      to={`/messages/${conversation.id}`}
+      p="md"
+      bg={unreadCount > 0 ? 'blue.0' : 'white'}
+      style={commonStyle}
+      onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.backgroundColor = 'var(--mantine-color-gray-0)')}
+      onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.backgroundColor = unreadCount > 0 ? 'var(--mantine-color-blue-0)' : 'white')}
+    >
+      {content}
     </Box>
   );
 }

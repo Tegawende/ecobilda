@@ -3,99 +3,58 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   IconFolder,
-  IconEdit,
-  IconMapPin,
   IconPlus,
-  IconCalendar,
-  IconUsers,
 } from '@tabler/icons-react';
 import { Layout } from '../components/common/Layout';
 import { mockUserProjects } from '../data/mockData';
 import type { Project } from '../types';
+import { ProjectCard, ProjectCardSkeleton } from '../components/projects/ProjectCard';
 
-// Project Card Component
-function ProjectCard({ project, showEdit = false }: { project: Project; showEdit?: boolean }) {
-  const { t } = useTranslation();
-
+// Filter Tabs Component
+function FilterTabs({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
   return (
-    <Link
-      to={`/projects/${project.id}`}
-      className="bg-white rounded-2xl overflow-hidden shadow-soft hover:shadow-float transition-all duration-300 border border-gray-100 group relative"
-    >
-      {/* Edit Button */}
-      {showEdit && (
+    <div className="flex gap-1 p-1 bg-gray-100/80 rounded-xl w-full">
+      {options.map((option) => (
         <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            // TODO: Navigate to edit page
-          }}
-          className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-700 hover:text-eco-primary hover:bg-white shadow-sm transition-all"
+          key={option.value}
+          onClick={() => onChange(option.value)}
+          className={`flex-1 px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${value === option.value
+            ? 'bg-white text-eco-primary shadow-sm'
+            : 'text-gray-500 hover:text-gray-700'
+            }`}
         >
-          <IconEdit size={18} />
+          {option.label}
         </button>
-      )}
-
-      {/* Image */}
-      <div className="h-48 overflow-hidden relative">
-        <img
-          src={project.images[0]?.image || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'}
-          alt={project.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-        {/* Status Badge */}
-        <div className="absolute top-4 left-4">
-          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${project.is_active ? 'bg-green-600 text-white' : 'bg-gray-500 text-white'}`}>
-            {project.is_active ? (t('common.active') || 'Active') : (t('common.inactive') || 'Inactive')}
-          </span>
-        </div>
-        {/* Type Badge */}
-        <div className="absolute bottom-4 left-4">
-          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${project.project_type === 'NATB' ? 'bg-white/90 text-eco-primary' : 'bg-white/90 text-eco-terracotta'}`}>
-            {project.project_type === 'NATB' ? (t('projects.naturalBuilding') || 'Natural Building') : (t('projects.permaculture') || 'Permaculture')}
-          </span>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-5">
-        <h3 className="text-lg font-display font-bold text-gray-900 mb-2 group-hover:text-eco-primary transition-colors line-clamp-1">
-          {project.title}
-        </h3>
-
-        <div className="flex items-center text-gray-500 text-sm mb-3">
-          <IconMapPin size={14} className="mr-1 text-eco-terracotta flex-shrink-0" />
-          <span className="truncate">{project.address?.city}, {project.address?.country?.name}</span>
-        </div>
-
-        <div className="flex items-center justify-between text-sm pt-3 border-t border-gray-100">
-          <div className="flex items-center gap-1 text-gray-500">
-            <IconUsers size={14} />
-            <span>{project.max_helpers} {t('projects.helpersMax') || 'helpers max'}</span>
-          </div>
-          <div className="flex items-center gap-1 text-gray-500">
-            <IconCalendar size={14} />
-            <span>{project.hours_per_day}h/{t('common.day') || 'day'}</span>
-          </div>
-        </div>
-      </div>
-    </Link>
+      ))}
+    </div>
   );
 }
 
 export function MyProjectsPage() {
   const { t } = useTranslation();
   const [projects] = useState<Project[]>(mockUserProjects);
+  const [projectStatus, setProjectStatus] = useState<'active' | 'past'>('active');
   const isLoading = false;
+
+  const filteredProjects = projects.filter(project => {
+    if (projectStatus === 'active' && !project.is_active) return false;
+    if (projectStatus === 'past' && project.is_active) return false;
+    return true;
+  });
+
+  const handleEdit = (id: number) => {
+    // TODO: Navigate to edit page
+    console.log('Edit project:', id);
+  };
 
   return (
     <Layout>
       <div className="bg-stone-50 min-h-screen py-12">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-4xl mx-auto px-6">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-eco-brand-50 flex items-center justify-center text-eco-primary">
+              <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center text-eco-primary">
                 <IconFolder size={28} />
               </div>
               <div>
@@ -117,41 +76,59 @@ export function MyProjectsPage() {
             </Link>
           </div>
 
+          {/* Status Tabs */}
+          <div className="flex justify-center mb-8 pb-4 border-b border-gray-100">
+            <FilterTabs
+              value={projectStatus}
+              onChange={(v: any) => setProjectStatus(v)}
+              options={[
+                { value: 'active', label: t('projects.activeProjects') || 'Projets en cours' },
+                { value: 'past', label: t('projects.pastProjects') || 'Anciens projets' }
+              ]}
+            />
+          </div>
+
           {/* Content */}
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
-                  <div className="h-48 bg-gray-200" />
-                  <div className="p-5 space-y-3">
-                    <div className="h-5 bg-gray-200 rounded w-3/4" />
-                    <div className="h-4 bg-gray-200 rounded w-1/2" />
-                  </div>
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <ProjectCardSkeleton key={i} />
               ))}
             </div>
-          ) : projects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((project) => (
-                <ProjectCard key={project.id} project={project} showEdit />
+          ) : filteredProjects.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredProjects.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  showEdit
+                  onEdit={handleEdit}
+                  showStatus
+                />
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-2xl p-16 text-center border border-gray-100 shadow-soft">
+            <div className="bg-white rounded-2xl p-16 text-center border border-gray-100 shadow-soft max-w-4xl mx-auto">
               <IconFolder size={64} className="mx-auto text-gray-300 mb-4" />
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-2">
-                {t('myProjects.noProjects') || 'No projects yet'}
+                {projectStatus === 'active'
+                  ? (t('myProjects.noActive') || 'Aucun projet actif')
+                  : (t('myProjects.noPast') || 'Aucun ancien projet')}
               </h3>
               <p className="text-gray-500 mb-8 max-w-md mx-auto">
-                {t('myProjects.noProjectsDesc') || "You haven't created any projects yet. Start your first project and connect with volunteers!"}
+                {projectStatus === 'active'
+                  ? (t('myProjects.noActiveDesc') || "Vous n'avez pas de projets en cours pour le moment.")
+                  : (t('myProjects.noPastDesc') || "Vous n'avez pas encore d'anciens projets.")}
               </p>
-              <Link
-                to="/projects/new"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-eco-primary text-white font-semibold hover:bg-eco-primaryDark shadow-lg shadow-eco-primary/20 transition-all"
-              >
-                <IconPlus size={20} />
-                {t('myProjects.createFirst') || 'Create Your First Project'}
-              </Link>
+              {projectStatus === 'active' && (
+                <Link
+                  to="/projects/new"
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-eco-primary text-white font-semibold hover:bg-eco-primaryDark shadow-lg shadow-eco-primary/20 transition-all"
+                >
+                  <IconPlus size={20} />
+                  {t('myProjects.createFirst') || 'Create Your First Project'}
+                </Link>
+              )}
             </div>
           )}
         </div>

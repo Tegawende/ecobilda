@@ -9,13 +9,11 @@ import {
   Group,
   Avatar,
   Badge,
-  ActionIcon,
   Center,
 } from '@mantine/core';
 import {
   IconSearch,
   IconMessage,
-  IconVolume,
   IconVolumeOff,
 } from '@tabler/icons-react';
 import dayjs from 'dayjs';
@@ -29,7 +27,7 @@ interface ConversationListProps {
   selectedId?: number;
   currentUserId?: number;
   onSelect: (conversationId: number) => void;
-  onToggleMute?: (conversationId: number) => void;
+  onToggleMute?: (_conversationId: number) => void;
 }
 
 export function ConversationList({
@@ -37,7 +35,7 @@ export function ConversationList({
   selectedId,
   currentUserId,
   onSelect,
-  onToggleMute,
+  onToggleMute: _onToggleMute,
 }: ConversationListProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<string | null>('all');

@@ -121,9 +121,12 @@ export function AccountSettingsPage() {
   };
 
   const handleLogout = () => {
+    // For now, just clear local tokens without API call (mock mode)
+    // TODO: Re-enable API call when backend is ready
     clearAuthTokens();
     localStorage.removeItem('mock_user');
-    navigate('/');
+    // Force redirect to landing page using window.location to ensure full page reload
+    window.location.href = '/';
   };
 
   return (
@@ -268,22 +271,6 @@ export function AccountSettingsPage() {
                   </button>
                 </div>
               </form>
-            </div>
-
-            {/* Logout */}
-            <div className="bg-white rounded-2xl shadow-soft p-6 border border-gray-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold text-gray-900">{t('settings.logout') || 'Log Out'}</h3>
-                  <p className="text-sm text-gray-500 mt-0.5">{t('settings.logoutDesc') || 'Sign out of your account'}</p>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="px-6 py-2.5 rounded-full border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
-                >
-                  {t('settings.logoutBtn') || 'Log Out'}
-                </button>
-              </div>
             </div>
 
             {/* Danger Zone */}

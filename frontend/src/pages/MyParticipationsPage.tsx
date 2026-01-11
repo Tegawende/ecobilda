@@ -59,73 +59,66 @@ function ParticipationCard({ participation }: { participation: Participation }) 
   const { t } = useTranslation();
 
   return (
-    <div className="bg-white rounded-2xl shadow-soft border border-gray-100 hover:shadow-float transition-all duration-300 overflow-hidden">
-      <div className="flex flex-col sm:flex-row">
-        {/* Project Image */}
-        <div className="sm:w-48 h-32 sm:h-auto flex-shrink-0">
-          <img
-            src={participation.project.images[0]?.image || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400'}
-            alt={participation.project.title}
-            className="w-full h-full object-cover"
-          />
+    <div className="bg-white rounded-2xl shadow-soft border border-gray-100 hover:shadow-float transition-all duration-300 overflow-hidden flex flex-col h-full">
+      {/* Project Image */}
+      <div className="relative h-48 overflow-hidden group">
+        <img
+          src={participation.project.images[0]?.image || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400'}
+          alt={participation.project.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute top-3 right-3 z-10">
+          <StatusBadge status={participation.status} />
         </div>
+      </div>
 
-        {/* Content */}
-        <div className="flex-1 p-5 flex flex-col justify-between">
-          <div>
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <Link
-                  to={`/projects/${participation.project.id}`}
-                  className="text-lg font-display font-bold text-gray-900 hover:text-eco-primary transition-colors line-clamp-1"
-                >
-                  {participation.project.title}
-                </Link>
-                <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                  <span className="flex items-center gap-1">
-                    <IconMapPin size={14} className="text-eco-terracotta" />
-                    {participation.project.address?.city}, {participation.project.address?.country?.name}
-                  </span>
-                </div>
-              </div>
-              <StatusBadge status={participation.status} />
-            </div>
-
-            <div className="flex items-center gap-2 mt-4 text-sm">
-              <IconCalendar size={16} className="text-eco-primary" />
-              <span className="text-gray-700">
-                {new Date(participation.start_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
-                {' → '}
-                {new Date(participation.end_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
-              </span>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-            {/* Host Info */}
-            <div className="flex items-center gap-2">
-              <img
-                src={participation.project.owner?.profile_picture || undefined}
-                alt={`${participation.project.owner?.first_name} ${participation.project.owner?.last_name}`}
-                className="w-8 h-8 rounded-full object-cover border border-gray-200"
-              />
-              <span className="text-sm text-gray-600">
-                {t('participations.hostedBy') || 'Hosted by'}{' '}
-                <span className="font-medium text-gray-900">
-                  {participation.project.owner?.first_name}
-                </span>
-              </span>
-            </div>
-
+      {/* Content */}
+      <div className="flex-1 p-5 flex flex-col">
+        <div className="flex-1">
+          <div className="flex items-start justify-between gap-4 mb-2">
             <Link
               to={`/projects/${participation.project.id}`}
-              className="inline-flex items-center gap-1 text-sm font-semibold text-eco-primary hover:text-eco-primaryDark transition-colors group"
+              className="text-lg font-display font-bold text-gray-900 hover:text-eco-primary transition-colors line-clamp-1"
             >
-              {t('participations.viewProject') || 'View Project'}
-              <IconArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              {participation.project.title}
             </Link>
           </div>
+
+          <div className="flex items-center gap-2 mb-4 text-xs text-gray-500">
+            <IconMapPin size={14} className="text-eco-terracotta" />
+            <span className="truncate">{participation.project.address?.city}, {participation.project.address?.country?.name}</span>
+          </div>
+
+          <div className="flex items-center gap-2 mb-4 text-xs font-medium text-eco-primary bg-eco-primary/5 p-2 rounded-lg">
+            <IconCalendar size={16} />
+            <span>
+              {new Date(participation.start_date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+              {' - '}
+              {new Date(participation.end_date).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+            </span>
+          </div>
+        </div>
+
+        {/* Footer info */}
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
+          <div className="flex items-center gap-2">
+            <img
+              src={participation.project.owner?.profile_picture || undefined}
+              alt={participation.project.owner?.first_name}
+              className="w-6 h-6 rounded-full object-cover border border-gray-100"
+            />
+            <span className="text-[10px] text-gray-500 truncate max-w-[80px]">
+              {participation.project.owner?.first_name}
+            </span>
+          </div>
+
+          <Link
+            to={`/projects/${participation.project.id}`}
+            className="inline-flex items-center gap-1 text-xs font-bold text-eco-primary hover:text-eco-primaryDark"
+          >
+            {t('participations.viewProject') || 'Détails'}
+            <IconArrowRight size={14} />
+          </Link>
         </div>
       </div>
     </div>
@@ -135,14 +128,14 @@ function ParticipationCard({ participation }: { participation: Participation }) 
 // Filter Tabs
 function FilterTabs({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
   return (
-    <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
+    <div className="flex gap-1 p-1 bg-gray-100/80 rounded-xl w-full">
       {options.map((option) => (
         <button
           key={option.value}
           onClick={() => onChange(option.value)}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${value === option.value
-              ? 'bg-white text-eco-primary shadow-sm'
-              : 'text-gray-600 hover:text-gray-900'
+          className={`flex-1 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${value === option.value
+            ? 'bg-white text-eco-primary shadow-sm'
+            : 'text-gray-500 hover:text-gray-700'
             }`}
         >
           {option.label}
@@ -175,7 +168,7 @@ export function MyParticipationsPage() {
       <div className="bg-stone-50 min-h-screen py-12">
         <div className="max-w-4xl mx-auto px-6">
           {/* Header */}
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-4 mb-8">
             <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
               <IconCompass size={28} />
             </div>
@@ -190,7 +183,7 @@ export function MyParticipationsPage() {
           </div>
 
           {/* Filters */}
-          <div className="mb-8">
+          <div className="mb-10">
             <FilterTabs
               value={filter}
               onChange={setFilter}
@@ -200,19 +193,19 @@ export function MyParticipationsPage() {
 
           {/* Content */}
           {isLoading ? (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse h-32" />
+                <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse h-64 shadow-soft border border-gray-100" />
               ))}
             </div>
           ) : filteredParticipations.length > 0 ? (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredParticipations.map((participation) => (
                 <ParticipationCard key={participation.id} participation={participation} />
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-2xl p-16 text-center border border-gray-100 shadow-soft">
+            <div className="bg-white rounded-2xl p-16 text-center border border-gray-100 shadow-soft max-w-2xl mx-auto">
               <IconCompass size={64} className="mx-auto text-gray-300 mb-4" />
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-2">
                 {t('participations.noParticipations') || 'No participations yet'}

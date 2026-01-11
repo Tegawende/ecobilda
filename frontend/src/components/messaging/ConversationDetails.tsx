@@ -7,24 +7,18 @@ import {
   Text,
   Button,
   Group,
-  Divider,
   Badge,
-  ActionIcon,
-  Modal,
 } from '@mantine/core';
 import {
-  IconUser,
   IconMapPin,
   IconCalendar,
-  IconStar,
   IconVolume,
   IconVolumeOff,
   IconTrash,
-  IconExternalLink,
 } from '@tabler/icons-react';
 import { modals } from '@mantine/modals';
 import { messagingService } from '../../services/messaging';
-import type { Conversation, User } from '../../types';
+import type { Conversation } from '../../types';
 import dayjs from 'dayjs';
 
 interface ConversationDetailsProps {
@@ -140,8 +134,7 @@ export function ConversationDetails({
 
           <Button
             variant="outline"
-            leftSection={<IconUser size={16} />}
-            onClick={() => navigate(`/users/${otherUser.id}`)}
+            onClick={() => navigate(`/profile/${otherUser.id}`)}
             fullWidth
           >
             View full profile
@@ -167,7 +160,7 @@ export function ConversationDetails({
               <Group gap="xs">
                 <IconCalendar size={16} color="var(--mantine-color-gray-6)" />
                 <Text size="sm" c="dimmed">
-                  Member since {dayjs(otherUser.created_at).format('MMM YYYY')}
+                  Member since {dayjs().format('MMM YYYY')}
                 </Text>
               </Group>
             </Stack>
@@ -180,9 +173,9 @@ export function ConversationDetails({
                 Skills
               </Text>
               <Group gap="xs">
-                {otherUser.skills.slice(0, 5).map((skill) => (
-                  <Badge key={skill.id} variant="light" size="sm">
-                    {skill.name}
+                {otherUser.skills.slice(0, 5).map((skill, index) => (
+                  <Badge key={skill.code || index} variant="light" size="sm">
+                    {skill.display_name_en || skill.code}
                   </Badge>
                 ))}
                 {otherUser.skills.length > 5 && (
@@ -201,8 +194,8 @@ export function ConversationDetails({
                 Languages
               </Text>
               <Group gap="xs">
-                {otherUser.languages.map((language) => (
-                  <Badge key={language.id} variant="outline" size="sm">
+                {otherUser.languages.map((language, index) => (
+                  <Badge key={language.code || index} variant="outline" size="sm">
                     {language.name}
                   </Badge>
                 ))}

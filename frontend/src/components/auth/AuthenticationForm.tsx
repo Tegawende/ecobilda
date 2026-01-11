@@ -46,22 +46,6 @@ const Input = ({ label, error, rightSection, description, ...props }: any) => (
   </div>
 );
 
-const Checkbox = ({ label, error, ...props }: any) => (
-  <div className="flex flex-col gap-1">
-    <div className="flex items-start gap-3">
-      <input
-        type="checkbox"
-        className="mt-1 h-5 w-5 rounded border-gray-300 text-eco-primary focus:ring-eco-primary cursor-pointer accent-eco-primary"
-        {...props}
-      />
-      <label className="text-xs text-gray-600 select-none cursor-pointer leading-relaxed">
-        {label}
-      </label>
-    </div>
-    {error && <span className="text-xs text-red-500 font-medium ml-8">{error}</span>}
-  </div>
-);
-
 // Mock function to check if email exists. 
 const checkEmailExists = async (email: string): Promise<boolean> => {
   await new Promise(resolve => setTimeout(resolve, 600)); // Simulate delay
@@ -70,7 +54,7 @@ const checkEmailExists = async (email: string): Promise<boolean> => {
   return existingEmails.includes(email.toLowerCase());
 };
 
-export function AuthenticationForm({ initialType = 'login' }: AuthenticationFormProps) {
+export function AuthenticationForm({ initialType: _initialType = 'login' }: AuthenticationFormProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 

@@ -1,15 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ActionIcon, Loader, Tooltip } from '@mantine/core';
+import { ActionIcon, Tooltip, Loader } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconHeart, IconHeartFilled, IconCheck, IconX } from '@tabler/icons-react';
+import {
+  IconHeart,
+  IconHeartFilled,
+  IconCheck,
+  IconX,
+} from '@tabler/icons-react';
 import { favoritesService } from '../../services/favorites';
 import { isAuthenticated } from '../../services/api';
 
 interface FavoriteButtonProps {
   projectId: number;
   size?: 'sm' | 'md' | 'lg';
-  showText?: boolean;
+  variant?: 'circle' | 'ghost';
+  initialFavorite?: boolean;
 }
 
 const sizeMap = {
@@ -19,13 +25,18 @@ const sizeMap = {
 } as const;
 
 const iconSizeMap = {
-  sm: 16,
-  md: 20,
-  lg: 24,
+  sm: 20,
+  md: 26,
+  lg: 32,
 };
 
-export function FavoriteButton({ projectId, size = 'md' }: FavoriteButtonProps) {
-  const [isFavorite, setIsFavorite] = useState(false);
+export function FavoriteButton({
+  projectId,
+  size = 'md',
+  variant = 'circle',
+  initialFavorite = false
+}: FavoriteButtonProps) {
+  const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const isLoggedIn = isAuthenticated();
@@ -38,7 +49,6 @@ export function FavoriteButton({ projectId, size = 'md' }: FavoriteButtonProps) 
         const favorites = await favoritesService.getFavorites();
         setIsFavorite(favorites.includes(projectId));
       } catch (error: any) {
-        // Silently ignore 404 errors (favorite doesn't exist yet)
         if (error?.response?.status !== 404) {
           console.error('Failed to check favorite status:', error);
         }
@@ -59,8 +69,6 @@ export function FavoriteButton({ projectId, size = 'md' }: FavoriteButtonProps) 
 
     const previousState = isFavorite;
     setIsLoading(true);
-    
-    // Optimistically update UI
     setIsFavorite(!previousState);
 
     try {
@@ -83,45 +91,16 @@ export function FavoriteButton({ projectId, size = 'md' }: FavoriteButtonProps) 
           position: 'bottom-right',
         });
       }
-      // Refresh favorites list to ensure consistency
       const favorites = await favoritesService.getFavorites();
       setIsFavorite(favorites.includes(projectId));
     } catch (error: any) {
-      // Handle specific error cases
-      const errorMessage = error?.response?.data?.detail || '';
-      
-      // Silently handle "own project" error - this is expected behavior
-      if (errorMessage.includes('cannot favorite your own project')) {
-        // Don't show error, just revert state
-        setIsFavorite(previousState);
-        return;
-      }
-      
-      // Silently handle "already in favorites" error
-      if (errorMessage.includes('already in favorites')) {
-        // Don't show error, just keep current state
-        setIsFavorite(true);
-        return;
-      }
-      
-      // Log other errors for debugging
-      if (error?.response?.status !== 404) {
-        console.error('Failed to toggle favorite:', error);
-        if (error?.response?.data) {
-          console.error('Error details:', error.response.data);
-        }
-
-        // Show error notification
-        notifications.show({
-          title: 'Error',
-          message: 'Failed to update favorites. Please try again.',
-          color: 'red',
-          icon: <IconX size={18} />,
-          position: 'bottom-right',
-        });
-      }
-
-      // Revert to previous state on error
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to update favorites',
+        color: 'red',
+        icon: <IconX size={18} />,
+        position: 'bottom-right',
+      });
       setIsFavorite(previousState);
     } finally {
       setIsLoading(false);
@@ -129,6 +108,45 @@ export function FavoriteButton({ projectId, size = 'md' }: FavoriteButtonProps) 
   };
 
   const label = isFavorite ? 'Remove from favorites' : 'Add to favorites';
+
+  if (variant === 'ghost') {
+    return (
+      <Tooltip label={label} withArrow>
+        <button
+          onClick={handleToggleFavorite}
+          disabled={isLoading}
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            cursor: isLoading ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'transform 0.2s ease',
+          }}
+          className="hover:scale-110 active:scale-95"
+          aria-label={label}
+        >
+          {isLoading ? (
+            <Loader size={iconSizeMap[size] - 4} color="red" />
+          ) : (
+            <IconHeart
+              size={iconSizeMap[size]}
+              stroke={1.5}
+              color="white"
+              fill={isFavorite ? '#ff385c' : 'rgba(0, 0, 0, 0.45)'}
+              style={{
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))',
+                transition: 'fill 0.3s ease, transform 0.2s ease',
+              }}
+              className={isFavorite ? 'fill-[#ff385c]' : ''}
+            />
+          )}
+        </button>
+      </Tooltip>
+    );
+  }
 
   return (
     <Tooltip label={label} withArrow>
@@ -144,9 +162,9 @@ export function FavoriteButton({ projectId, size = 'md' }: FavoriteButtonProps) 
         {isLoading ? (
           <Loader size={iconSizeMap[size] - 4} color="red" />
         ) : isFavorite ? (
-          <IconHeartFilled size={iconSizeMap[size]} />
+          <IconHeartFilled size={iconSizeMap[size] - 4} />
         ) : (
-          <IconHeart size={iconSizeMap[size]} />
+          <IconHeart size={iconSizeMap[size] - 4} />
         )}
       </ActionIcon>
     </Tooltip>

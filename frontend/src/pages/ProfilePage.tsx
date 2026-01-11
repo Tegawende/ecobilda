@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   IconStar,
@@ -12,7 +11,6 @@ import {
   IconArrowLeft,
   IconLanguage,
   IconUser,
-  IconCalendar,
 } from '@tabler/icons-react';
 import { Layout } from '../components/common/Layout';
 import { mockUser, mockReviews } from '../data/mockData';
@@ -38,6 +36,22 @@ const Textarea = ({ label, error, ...props }: any) => (
       {...props}
     />
     {error && <span className="text-xs text-red-600 ml-1">{error}</span>}
+  </div>
+);
+
+const Select = ({ label, value, onChange, options }: { label: string; value: string; onChange: (val: string) => void; options: { value: string; label: string }[] }) => (
+  <div className="flex flex-col gap-1.5">
+    {label && <label className="text-sm font-bold text-gray-700 ml-1">{label}</label>}
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full px-4 py-3 rounded-xl border border-gray-400 focus:border-black focus:ring-2 focus:ring-black/10 focus:outline-none transition-all text-gray-900 bg-white cursor-pointer appearance-none"
+      style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
+    >
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>{option.label}</option>
+      ))}
+    </select>
   </div>
 );
 
@@ -93,11 +107,12 @@ function ReviewCard({ review }: { review: Review }) {
 
 // Edit Profile Form
 function EditProfileForm({ user, onSave, onCancel }: { user: typeof mockUser; onSave: (data: any) => void; onCancel: () => void }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [formData, setFormData] = useState({
     first_name: user.first_name,
     last_name: user.last_name,
     bio: user.bio,
+    language: i18n.language || 'en',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -131,6 +146,19 @@ function EditProfileForm({ user, onSave, onCancel }: { user: typeof mockUser; on
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, bio: e.target.value })}
           placeholder={t('profile.bioPlaceholder') || 'Tell others about yourself...'}
         />
+
+        <Select
+          label={t('settings.preferredLanguage') || 'Preferred Language'}
+          value={formData.language}
+          onChange={(val) => setFormData({ ...formData, language: val })}
+          options={[
+            { value: 'en', label: 'English' },
+            { value: 'fr', label: 'Français' },
+            { value: 'es', label: 'Español' },
+            { value: 'pt', label: 'Português' },
+            { value: 'nl', label: 'Nederlands' },
+          ]}
+        />
       </div>
 
       <div className="flex justify-end gap-3 mt-8">
@@ -154,13 +182,15 @@ function EditProfileForm({ user, onSave, onCancel }: { user: typeof mockUser; on
 
 export function ProfilePage() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [user, setUser] = useState(mockUser);
   const reviews = mockReviews;
 
   const handleSave = (data: any) => {
     setUser({ ...user, ...data });
+    if (data.language) {
+      i18n.changeLanguage(data.language);
+    }
     setIsEditing(false);
   };
 

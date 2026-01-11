@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useForm } from '@mantine/form';
+import { useTranslation } from 'react-i18next';
 import {
   Stack,
   Title,
@@ -42,6 +43,7 @@ interface ProjectFormStep3Props {
 }
 
 export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectFormStep3Props) {
+  const { t } = useTranslation();
   const [allSkills, setAllSkills] = useState<Skill[]>([]);
   const [isLoadingSkills, setIsLoadingSkills] = useState(true);
 
@@ -54,7 +56,7 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
       smoking_allowed: data.smoking_allowed || false,
     },
     validate: {
-      skills: (value) => (value.length === 0 ? 'Please select at least one skill' : null),
+      skills: (value) => (value.length === 0 ? t('createProject.step3.validation.skillsRequired') : null),
     },
   });
 
@@ -98,10 +100,10 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
       <Stack gap="xl">
         <div>
           <Title order={2} mb="md">
-            Skills & Amenities
+            {t('createProject.step3.title')}
           </Title>
           <Text c="dimmed">
-            Select the skills volunteers will use and the amenities you provide.
+            {t('createProject.step3.description')}
           </Text>
         </div>
 
@@ -116,11 +118,11 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
               )}
             </ThemeIcon>
             <Title order={3}>
-              {data.project_type === 'PERM' ? 'Permaculture' : 'Natural Building'} Skills *
+              {t('createProject.step3.skillsTitle', { type: data.project_type === 'PERM' ? t('createProject.step1.permaculture') : t('createProject.step1.naturalBuilding') })}
             </Title>
           </Group>
           <Text size="sm" c="dimmed" mb="md">
-            Select all skills that volunteers will be working with. Choose at least one.
+            {t('createProject.step3.skillsDescription')}
           </Text>
 
           {isLoadingSkills ? (
@@ -143,8 +145,8 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
                       style={{
                         cursor: 'pointer',
                         borderWidth: 2,
-                        borderColor: isSelected ? 'var(--mantine-color-blue-6)' : undefined,
-                        backgroundColor: isSelected ? 'var(--mantine-color-blue-0)' : undefined,
+                        borderColor: isSelected ? 'var(--mantine-color-eco-terracotta-5)' : undefined,
+                        backgroundColor: isSelected ? 'var(--mantine-color-eco-terracotta-0)' : undefined,
                       }}
                       onClick={() => toggleSkill(skill.code)}
                     >
@@ -154,7 +156,7 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
                           {skill.display_name_en}
                         </Text>
                         {isSelected && (
-                          <ThemeIcon color="blue" variant="light" size="sm">
+                          <ThemeIcon color="eco-terracotta" variant="light" size="sm">
                             <IconCheck size={14} />
                           </ThemeIcon>
                         )}
@@ -172,7 +174,7 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
             </Text>
           )}
           <Text size="sm" c="dimmed" mt="xs">
-            Selected: {form.values.skills.length} skill(s)
+            {t('createProject.step3.selected', { count: form.values.skills.length })}
           </Text>
         </div>
 
@@ -182,10 +184,10 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
             <ThemeIcon size="lg" color="yellow" variant="light">
               <IconStar size={20} />
             </ThemeIcon>
-            <Title order={3}>Amenities</Title>
+            <Title order={3}>{t('createProject.step3.amenities')}</Title>
           </Group>
           <Text size="sm" c="dimmed" mb="md">
-            Select the amenities and preferences for your project.
+            {t('createProject.step3.amenitiesDescription')}
           </Text>
 
           <Stack gap="sm">
@@ -195,11 +197,11 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
                 label={
                   <div>
                     <Group gap="xs" mb={4}>
-                      <IconWifi size={18} color="var(--mantine-color-blue-6)" />
-                      <Text fw={500}>Internet provided</Text>
+                      <IconWifi size={18} color="var(--mantine-color-eco-terracotta-5)" />
+                      <Text fw={500}>{t('createProject.step3.internetProvided')}</Text>
                     </Group>
                     <Text size="sm" c="dimmed">
-                      WiFi or internet access is available for volunteers
+                      {t('createProject.step3.internetProvidedDesc')}
                     </Text>
                   </div>
                 }
@@ -213,10 +215,10 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
                   <div>
                     <Group gap="xs" mb={4}>
                       <IconUsers size={18} color="var(--mantine-color-green-6)" />
-                      <Text fw={500}>Family friendly</Text>
+                      <Text fw={500}>{t('createProject.step3.familyFriendly')}</Text>
                     </Group>
                     <Text size="sm" c="dimmed">
-                      Suitable for families with children
+                      {t('createProject.step3.familyFriendlyDesc')}
                     </Text>
                   </div>
                 }
@@ -230,10 +232,10 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
                   <div>
                     <Group gap="xs" mb={4}>
                       <IconDog size={18} color="var(--mantine-color-orange-6)" />
-                      <Text fw={500}>Pets allowed</Text>
+                      <Text fw={500}>{t('createProject.step3.petsAllowed')}</Text>
                     </Group>
                     <Text size="sm" c="dimmed">
-                      Volunteers can bring their pets
+                      {t('createProject.step3.petsAllowedDesc')}
                     </Text>
                   </div>
                 }
@@ -247,10 +249,10 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
                   <div>
                     <Group gap="xs" mb={4}>
                       <IconSmoking size={18} color="var(--mantine-color-red-6)" />
-                      <Text fw={500}>Smoking allowed</Text>
+                      <Text fw={500}>{t('createProject.step3.smokingAllowed')}</Text>
                     </Group>
                     <Text size="sm" c="dimmed">
-                      Smoking is permitted on the property
+                      {t('createProject.step3.smokingAllowedDesc')}
                     </Text>
                   </div>
                 }
@@ -266,12 +268,13 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
             onClick={onBack}
             variant="default"
           >
-            ← Back
+            {t('createProject.step3.back')}
           </Button>
           <Button
             type="submit"
+            color="eco-terracotta"
           >
-            Next: Availability & Images →
+            {t('createProject.step3.next')}
           </Button>
         </Group>
       </Stack>

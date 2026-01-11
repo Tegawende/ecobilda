@@ -10,10 +10,9 @@ import {
   IconBell,
   IconTrash,
   IconUser,
-  IconX,
 } from '@tabler/icons-react';
 import { Layout } from '../components/common/Layout';
-import { mockConversations, mockMessages, mockUser, type Participation } from '../data/mockData';
+import { mockConversations, mockMessages, mockUser } from '../data/mockData';
 import type { Conversation, Message } from '../types';
 
 // Conversation List Item
