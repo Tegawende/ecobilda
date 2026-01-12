@@ -17,6 +17,29 @@
     "day": "Tag",
     "by": "von"
   },
+  "errors": {
+    "notFound": {
+      "title": "Seite nicht gefunden",
+      "description": "Hoppla! Die gesuchte Seite existiert nicht oder wurde verschoben.",
+      "browseProjects": "Projekte durchsuchen",
+      "goBack": "Zurück"
+    },
+    "generic": {
+      "title": "Etwas ist schief gelaufen",
+      "description": "Entschuldigung, etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
+      "retry": "Erneut versuchen",
+      "goHome": "Zur Startseite"
+    }
+  },
+  "a11y": {
+    "skipToContent": "Zum Hauptinhalt springen",
+    "closeModal": "Schließen",
+    "previousImage": "Vorheriges Bild",
+    "nextImage": "Nächstes Bild",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen",
+    "loading": "Wird geladen..."
+  },
   "nav": {
     "home": "Startseite",
     "projects": "Projekte",

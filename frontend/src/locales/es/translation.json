@@ -17,6 +17,29 @@
     "day": "día",
     "by": "por"
   },
+  "errors": {
+    "notFound": {
+      "title": "Página no encontrada",
+      "description": "¡Ups! La página que buscas no existe o ha sido movida.",
+      "browseProjects": "Explorar proyectos",
+      "goBack": "Volver"
+    },
+    "generic": {
+      "title": "Algo salió mal",
+      "description": "Lo sentimos, algo salió mal. Por favor, inténtelo de nuevo.",
+      "retry": "Reintentar",
+      "goHome": "Ir al inicio"
+    }
+  },
+  "a11y": {
+    "skipToContent": "Ir al contenido principal",
+    "closeModal": "Cerrar",
+    "previousImage": "Imagen anterior",
+    "nextImage": "Imagen siguiente",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "loading": "Cargando..."
+  },
   "nav": {
     "home": "Inicio",
     "projects": "Proyectos",

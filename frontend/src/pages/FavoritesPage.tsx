@@ -21,6 +21,7 @@ import type { Project } from '../types';
 import { ProjectCard } from '../components/projects/ProjectCard';
 import { FavoriteButton } from '../components/common/FavoriteButton';
 import { MobileProjectDetailModal } from '../components/projects/MobileProjectDetailModal';
+import { SkeletonProjectCard } from '../components/common/Skeleton';
 
 // Reuse ProjectCardList from ProjectsPage for consistency
 function ProjectCardList({ project }: { project: Project }) {
@@ -182,14 +183,8 @@ export function FavoritesPage() {
           {/* Content */}
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
-                  <div className="h-40 bg-gray-200" />
-                  <div className="p-5 space-y-3">
-                    <div className="h-5 bg-gray-200 rounded w-3/4" />
-                    <div className="h-4 bg-gray-200 rounded w-1/2" />
-                  </div>
-                </div>
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <SkeletonProjectCard key={i} />
               ))}
             </div>
           ) : favorites.length > 0 ? (
