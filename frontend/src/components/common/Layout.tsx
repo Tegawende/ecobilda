@@ -33,32 +33,38 @@ export function Layout({ children, hideFooter = false }: LayoutProps) {
   const isTransparent = isHomePage && !scrolled;
 
   return (
-    <AppShell
-      header={{ height: isHomePage ? 0 : 64 }}
-    >
-      <AppShell.Header
-        style={{
-          backgroundColor: isTransparent ? 'transparent' : 'var(--mantine-color-white)',
-          borderBottom: isTransparent ? 'none' : '1px solid var(--mantine-color-gray-2)',
-          position: isHomePage ? 'fixed' : 'sticky',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 100,
-          width: '100%',
-          minHeight: '64px', // Force height for content visibility
-          transition: 'background-color 0.3s ease, border-bottom 0.3s ease',
-        }}
+    <>
+      {/* Skip link for keyboard navigation */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+      <AppShell
+        header={{ height: isHomePage ? 0 : 64 }}
       >
-        <Navbar />
-      </AppShell.Header>
+        <AppShell.Header
+          style={{
+            backgroundColor: isTransparent ? 'transparent' : 'var(--mantine-color-white)',
+            borderBottom: isTransparent ? 'none' : '1px solid var(--mantine-color-gray-2)',
+            position: isHomePage ? 'fixed' : 'sticky',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 100,
+            width: '100%',
+            minHeight: '64px', // Force height for content visibility
+            transition: 'background-color 0.3s ease, border-bottom 0.3s ease',
+          }}
+        >
+          <Navbar />
+        </AppShell.Header>
 
-      <AppShell.Main style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)', padding: 0 }}>
-        <Box style={{ flex: 1 }}>
-          {children}
-        </Box>
-        {!hideFooter && <Footer />}
-      </AppShell.Main>
-    </AppShell>
+        <AppShell.Main id="main-content" style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)', padding: 0 }}>
+          <Box style={{ flex: 1 }}>
+            {children}
+          </Box>
+          {!hideFooter && <Footer />}
+        </AppShell.Main>
+      </AppShell>
+    </>
   );
 }
