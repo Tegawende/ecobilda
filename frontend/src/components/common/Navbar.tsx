@@ -125,52 +125,55 @@ export function Navbar() {
             {isLoggedIn ? (
               <>
                 <NotificationBell />
-                <Menu shadow="md" width={220} position="bottom-end">
-                  <Menu.Target>
-                    <Avatar
-                      src={currentUser?.profile_picture || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face'}
-                      color="eco-primary"
-                      radius="xl"
-                      size="md"
-                      style={{ cursor: 'pointer', border: '2px solid transparent' }}
-                      className="bg-eco-primary text-white hover:ring-2 hover:ring-eco-primary/50 transition-all"
-                    >
-                      {!currentUser?.profile_picture && <IconUser size={20} />}
-                    </Avatar>
-                  </Menu.Target>
+                {/* Hide profile menu on mobile - use hamburger menu instead */}
+                <div className="hidden sm:block">
+                  <Menu shadow="md" width={220} position="bottom-end">
+                    <Menu.Target>
+                      <Avatar
+                        src={currentUser?.profile_picture || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face'}
+                        color="eco-primary"
+                        radius="xl"
+                        size="md"
+                        style={{ cursor: 'pointer', border: '2px solid transparent' }}
+                        className="bg-eco-primary text-white hover:ring-2 hover:ring-eco-primary/50 transition-all"
+                      >
+                        {!currentUser?.profile_picture && <IconUser size={20} />}
+                      </Avatar>
+                    </Menu.Target>
 
-                  <Menu.Dropdown>
-                    <Menu.Item component={Link} to="/favorites" leftSection={<IconHeart size={16} />}>
-                      {t('nav.userMenu.favorites')}
-                    </Menu.Item>
+                    <Menu.Dropdown>
+                      <Menu.Item component={Link} to="/favorites" leftSection={<IconHeart size={16} />}>
+                        {t('nav.userMenu.favorites')}
+                      </Menu.Item>
 
-                    <Menu.Item component={Link} to="/my-projects" leftSection={<IconFolder size={16} />}>
-                      {t('nav.userMenu.myProjects')}
-                    </Menu.Item>
+                      <Menu.Item component={Link} to="/my-projects" leftSection={<IconFolder size={16} />}>
+                        {t('nav.userMenu.myProjects')}
+                      </Menu.Item>
 
-                    <Menu.Item component={Link} to="/participations" leftSection={<IconCompass size={16} />}>
-                      {t('nav.userMenu.participations')}
-                    </Menu.Item>
+                      <Menu.Item component={Link} to="/participations" leftSection={<IconCompass size={16} />}>
+                        {t('nav.userMenu.participations')}
+                      </Menu.Item>
 
-                    <Menu.Item component={Link} to="/messages" leftSection={<IconMail size={16} />}>
-                      {t('nav.userMenu.messages')}
-                    </Menu.Item>
+                      <Menu.Item component={Link} to="/messages" leftSection={<IconMail size={16} />}>
+                        {t('nav.userMenu.messages')}
+                      </Menu.Item>
 
-                    <Menu.Item component={Link} to="/profile" leftSection={<IconUser size={16} />}>
-                      {t('nav.userMenu.profile')}
-                    </Menu.Item>
+                      <Menu.Item component={Link} to="/profile" leftSection={<IconUser size={16} />}>
+                        {t('nav.userMenu.profile')}
+                      </Menu.Item>
 
-                    <Menu.Item component={Link} to="/settings" leftSection={<IconSettings size={16} />}>
-                      {t('nav.userMenu.settings')}
-                    </Menu.Item>
+                      <Menu.Item component={Link} to="/settings" leftSection={<IconSettings size={16} />}>
+                        {t('nav.userMenu.settings')}
+                      </Menu.Item>
 
-                    <Menu.Divider />
+                      <Menu.Divider />
 
-                    <Menu.Item leftSection={<IconLogout size={16} />} color="red" onClick={handleLogout}>
-                      {t('nav.logout')}
-                    </Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
+                      <Menu.Item leftSection={<IconLogout size={16} />} color="red" onClick={handleLogout}>
+                        {t('nav.logout')}
+                      </Menu.Item>
+                    </Menu.Dropdown>
+                  </Menu>
+                </div>
               </>
             ) : (
               <>
@@ -207,7 +210,7 @@ export function Navbar() {
             component={Link}
             to="/projects"
             variant="filled"
-            color="green"
+            color="eco-primary"
             size="lg"
             radius="xl"
             fullWidth
@@ -221,39 +224,39 @@ export function Navbar() {
             <>
               {/* Only show navbar user menu items, not footer links */}
               <Stack gap="xs">
-                <Anchor component={Link} to="/favorites" onClick={close} className="py-2">
+                <Anchor component={Link} to="/favorites" onClick={close} className="py-2" c="black">
                   <Group gap="xs">
-                    <IconHeart size={20} />
+                    <IconHeart size={20} color="black" />
                     {t('nav.userMenu.favorites')}
                   </Group>
                 </Anchor>
-                <Anchor component={Link} to="/my-projects" onClick={close} className="py-2">
+                <Anchor component={Link} to="/my-projects" onClick={close} className="py-2" c="black">
                   <Group gap="xs">
-                    <IconFolder size={20} />
+                    <IconFolder size={20} color="black" />
                     {t('nav.userMenu.myProjects')}
                   </Group>
                 </Anchor>
-                <Anchor component={Link} to="/participations" onClick={close} className="py-2">
+                <Anchor component={Link} to="/participations" onClick={close} className="py-2" c="black">
                   <Group gap="xs">
-                    <IconCompass size={20} />
+                    <IconCompass size={20} color="black" />
                     {t('nav.userMenu.participations')}
                   </Group>
                 </Anchor>
-                <Anchor component={Link} to="/messages" onClick={close} className="py-2">
+                <Anchor component={Link} to="/messages" onClick={close} className="py-2" c="black">
                   <Group gap="xs">
-                    <IconMail size={20} />
+                    <IconMail size={20} color="black" />
                     {t('nav.userMenu.messages')}
                   </Group>
                 </Anchor>
-                <Anchor component={Link} to="/profile" onClick={close} className="py-2">
+                <Anchor component={Link} to="/profile" onClick={close} className="py-2" c="black">
                   <Group gap="xs">
-                    <IconUser size={20} />
+                    <IconUser size={20} color="black" />
                     {t('nav.userMenu.profile')}
                   </Group>
                 </Anchor>
-                <Anchor component={Link} to="/settings" onClick={close} className="py-2">
+                <Anchor component={Link} to="/settings" onClick={close} className="py-2" c="black">
                   <Group gap="xs">
-                    <IconSettings size={20} />
+                    <IconSettings size={20} color="black" />
                     {t('nav.userMenu.settings')}
                   </Group>
                 </Anchor>
@@ -269,7 +272,7 @@ export function Navbar() {
                 component={Link}
                 to="/login"
                 variant="filled"
-                color="green"
+                color="eco-primary"
                 size="lg"
                 radius="xl"
                 fullWidth

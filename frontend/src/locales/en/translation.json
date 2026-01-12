@@ -8,14 +8,36 @@
     "delete": "Delete",
     "edit": "Edit",
     "search": "Search",
-    "filter": "Filter",
+    "filter": "Filters",
     "submit": "Submit",
     "login": "Log in or Sign up",
     "active": "Active",
     "inactive": "Inactive",
     "back": "Back",
     "day": "day",
-    "by": "by"
+    "by": "by",
+    "continue": "Continue",
+    "apply": "Apply",
+    "clear": "Clear",
+    "reset": "Reset"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "noNew": "No new notifications",
+    "viewAllMessages": "View all messages",
+    "newMessage": "New message",
+    "mockMessage": "Hello! I am very interested in your permaculture project in Lyon."
+  },
+  "favorites": {
+    "addedTitle": "Added to favorites",
+    "addedMessage": "Project added to your favorites",
+    "removedTitle": "Removed from favorites",
+    "removedMessage": "Project removed from your favorites",
+    "errorTitle": "Error",
+    "errorMessage": "Failed to update favorites",
+    "addLabel": "Add to favorites",
+    "removeLabel": "Remove from favorites"
   },
   "nav": {
     "home": "Home",
@@ -202,9 +224,43 @@
       "locations": "Locations",
       "workDetails": "Work Details",
       "maxVolunteers": "Max Volunteers",
-      "applyFilters": "Apply Filters"
+      "applyFilters": "Apply Filters",
+      "whereToGo": "Where are you going?",
+      "searchByLocation": "Search by city, region or country",
+      "locationPlaceholder": "e.g., Brussels, Ardennes...",
+      "flexible": "I'm flexible",
+      "searchEverywhere": "Search everywhere",
+      "whenToGo": "When are you going?",
+      "selectDates": "Select your dates",
+      "skipDates": "Flexible dates",
+      "whatType": "What type of project?",
+      "chooseType": "Choose the project type",
+      "allDescription": "All project types",
+      "natbDescription": "Ecological construction",
+      "permDescription": "Gardens and sustainable agriculture",
+      "search": "Search",
+      "anywhere": "Anywhere",
+      "anyDate": "Any dates",
+      "searchPlaceholder": "Where are you going?",
+      "searching": "Searching...",
+      "noResultsFor": "No results for",
+      "dates": "Dates",
+      "startingFrom": "Starting from",
+      "amenities": "Amenities & Conditions",
+      "wifi": "WiFi included",
+      "family": "Family friendly",
+      "pets": "Pets allowed",
+      "smoking": "Smoking allowed"
     },
-    "helpersMax": "helpers max"
+    "helpersMax": "helpers max",
+    "viewList": "View List",
+    "viewMap": "View Map",
+    "viewGrid": "Grid View",
+    "loadingMap": "Loading map...",
+    "found": "projects found",
+    "foundSingle": "project found",
+    "viewProject": "View Project",
+    "daysPerWeekShort": "d/week"
   },
   "projectDetail": {
     "notFound": "Project not found",
@@ -220,7 +276,9 @@
     "showAllPhotos": "Show all photos",
     "showAllXPhotos": "Show all {{count}} photos",
     "selectDates": "Select your dates",
-    "pickDates": "Arrive - Depart"
+    "pickDates": "Arrival - Departure",
+    "yourHost": "Your host",
+    "reviews": "reviews"
   },
   "createProject": {
     "title": "Create New Project",
@@ -650,12 +708,6 @@
         "a3": "Yes, you can edit your project details at any time from your profile. Make sure to keep the information up-to-date for potential volunteers."
       }
     }
-  },
-  "notifications": {
-    "title": "Notifications",
-    "markAllRead": "Mark all read",
-    "noNew": "No new notifications",
-    "viewAllMessages": "View all messages"
   },
   "footer": {
     "about": {

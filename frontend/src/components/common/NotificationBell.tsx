@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ActionIcon, Menu, Text, Stack, Button, ScrollArea, Group, Box, Indicator } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconBell, IconCheck, IconMessage } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useNotifications } from '../../contexts/NotificationContext';
@@ -15,6 +16,8 @@ export function NotificationBell() {
   const navigate = useNavigate();
   const { unreadCount, notifications, markAsRead, markAllAsRead, refreshNotifications } = useNotifications();
   const [opened, setOpened] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const width = isMobile ? window.innerWidth - 32 : 360;
 
   // Refresh notifications when menu opens
   useEffect(() => {
@@ -41,8 +44,9 @@ export function NotificationBell() {
   return (
     <Menu
       shadow="md"
-      width={360}
-      position="bottom-end"
+      width={width}
+      position={isMobile ? 'bottom' : 'bottom-end'}
+      offset={isMobile ? 0 : 4}
       opened={opened}
       onChange={setOpened}
       withinPortal
@@ -61,7 +65,7 @@ export function NotificationBell() {
         </Indicator>
       </Menu.Target>
 
-      <Menu.Dropdown>
+      <Menu.Dropdown style={isMobile ? { left: '16px', right: '16px', position: 'fixed' } : undefined}>
         <Menu.Label>
           <Group justify="space-between">
             <Text fw={600}>{t('notifications.title')}</Text>
@@ -89,7 +93,7 @@ export function NotificationBell() {
                     whiteSpace: 'normal',
                     height: 'auto',
                     padding: '12px',
-                    backgroundColor: notification.is_read ? 'transparent' : 'var(--mantine-color-blue-0)',
+                    backgroundColor: notification.is_read ? 'transparent' : 'var(--mantine-color-eco-primary-0)',
                   }}
                 >
                   <Group gap="sm" wrap="nowrap" align="flex-start">
@@ -115,14 +119,14 @@ export function NotificationBell() {
                           width: 40,
                           height: 40,
                           borderRadius: '50%',
-                          backgroundColor: 'var(--mantine-color-blue-1)',
+                          backgroundColor: 'var(--mantine-color-eco-primary-1)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           flexShrink: 0,
                         }}
                       >
-                        <IconMessage size={20} color="var(--mantine-color-blue-6)" />
+                        <IconMessage size={20} color="var(--mantine-color-eco-primary-6)" />
                       </Box>
                     )}
                     <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
@@ -142,7 +146,7 @@ export function NotificationBell() {
                           width: 8,
                           height: 8,
                           borderRadius: '50%',
-                          backgroundColor: 'var(--mantine-color-blue-6)',
+                          backgroundColor: 'var(--mantine-color-eco-primary-6)',
                           flexShrink: 0,
                         }}
                       />
@@ -165,7 +169,7 @@ export function NotificationBell() {
           <>
             <Menu.Divider />
             <Menu.Item onClick={() => { navigate('/messages'); setOpened(false); }}>
-              <Text size="sm" fw={500} c="blue" ta="center">
+              <Text size="sm" fw={500} c="eco-primary" ta="center">
                 {t('notifications.viewAllMessages')}
               </Text>
             </Menu.Item>

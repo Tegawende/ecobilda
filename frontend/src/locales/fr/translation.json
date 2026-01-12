@@ -8,14 +8,36 @@
         "delete": "Supprimer",
         "edit": "Modifier",
         "search": "Rechercher",
-        "filter": "Filtrer",
+        "filter": "Filtres",
         "submit": "Soumettre",
         "login": "Se connecter ou s'inscrire",
         "active": "Actif",
         "inactive": "Inactif",
         "back": "Retour",
         "day": "jour",
-        "by": "par"
+        "by": "par",
+        "continue": "Continuer",
+        "apply": "Appliquer",
+        "clear": "Effacer",
+        "reset": "Réinitialiser"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "markAllRead": "Tout marquer comme lu",
+        "noNew": "Aucune nouvelle notification",
+        "viewAllMessages": "Voir tous les messages",
+        "newMessage": "Nouveau message",
+        "mockMessage": "Bonjour ! Je suis très intéressé par votre projet de permaculture à Lyon."
+    },
+    "favorites": {
+        "addedTitle": "Ajouté aux favoris",
+        "addedMessage": "Le projet a été ajouté à vos favoris",
+        "removedTitle": "Retiré des favoris",
+        "removedMessage": "Le projet a été retiré de vos favoris",
+        "errorTitle": "Erreur",
+        "errorMessage": "Impossible de mettre à jour les favoris",
+        "addLabel": "Ajouter aux favoris",
+        "removeLabel": "Retirer des favoris"
     },
     "nav": {
         "home": "Accueil",
@@ -201,9 +223,43 @@
             "locations": "Lieux",
             "workDetails": "Détails du travail",
             "maxVolunteers": "Nombre de volontaires max",
-            "applyFilters": "Appliquer les filtres"
+            "applyFilters": "Appliquer les filtres",
+            "whereToGo": "Où allez-vous ?",
+            "searchByLocation": "Recherchez par ville, région ou pays",
+            "locationPlaceholder": "Ex: Bruxelles, Ardennes...",
+            "flexible": "Je suis flexible",
+            "searchEverywhere": "Rechercher partout",
+            "whenToGo": "Quand partez-vous ?",
+            "selectDates": "Sélectionnez vos dates",
+            "skipDates": "Dates flexibles",
+            "whatType": "Quel type de projet ?",
+            "chooseType": "Choisissez le type de projet",
+            "allDescription": "Tous les types de projets",
+            "natbDescription": "Construction écologique",
+            "permDescription": "Jardins et agriculture durable",
+            "search": "Rechercher",
+            "anywhere": "Partout",
+            "anyDate": "Toutes dates",
+            "searchPlaceholder": "Où allez-vous ?",
+            "searching": "Recherche...",
+            "noResultsFor": "Aucun résultat pour",
+            "dates": "Dates",
+            "startingFrom": "À partir du",
+            "amenities": "Équipements & Conditions",
+            "wifi": "WiFi inclus",
+            "family": "Familles bienvenues",
+            "pets": "Animaux acceptés",
+            "smoking": "Fumeur autorisé"
         },
-        "helpersMax": "volontaires max"
+        "helpersMax": "volontaires max",
+        "viewList": "Voir la liste",
+        "viewMap": "Voir la carte",
+        "viewGrid": "Vue grille",
+        "loadingMap": "Chargement de la carte...",
+        "found": "projets trouvés",
+        "foundSingle": "projet trouvé",
+        "viewProject": "Voir le projet",
+        "daysPerWeekShort": "j/sem"
     },
     "projectDetail": {
         "notFound": "Projet introuvable",
@@ -219,7 +275,9 @@
         "showAllPhotos": "Afficher toutes les photos",
         "showAllXPhotos": "Afficher toutes les {{count}} photos",
         "selectDates": "Sélectionnez vos dates",
-        "pickDates": "Arrivée - Départ"
+        "pickDates": "Arrivée - Départ",
+        "yourHost": "Votre hôte",
+        "reviews": "avis"
     },
     "createProject": {
         "title": "Créer un nouveau projet",
@@ -691,12 +749,6 @@
                 "desc": "Participez à la construction d'un éco-dôme collectif en sacs de terre."
             }
         }
-    },
-    "notifications": {
-        "title": "Notifications",
-        "markAllRead": "Tout marquer comme lu",
-        "noNew": "Aucune nouvelle notification",
-        "viewAllMessages": "Voir tous les messages"
     },
     "footer": {
         "copyright": "© {{year}} Ecobilda. Tous droits réservés.",

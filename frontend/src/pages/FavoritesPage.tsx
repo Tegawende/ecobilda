@@ -20,6 +20,7 @@ import type { Project } from '../types';
 
 import { ProjectCard } from '../components/projects/ProjectCard';
 import { FavoriteButton } from '../components/common/FavoriteButton';
+import { MobileProjectDetailModal } from '../components/projects/MobileProjectDetailModal';
 
 // Reuse ProjectCardList from ProjectsPage for consistency
 function ProjectCardList({ project }: { project: Project }) {
@@ -134,6 +135,8 @@ export function FavoritesPage() {
   const [favorites] = useState<Project[]>(mockFavoriteProjects);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const isLoading = false;
+  // Mobile modal state
+  const [mobileModalProject, setMobileModalProject] = useState<Project | null>(null);
 
   return (
     <Layout>
@@ -155,8 +158,8 @@ export function FavoritesPage() {
               </div>
             </div>
 
-            {/* View Toggle */}
-            <div className="flex gap-1 p-1 bg-white rounded-lg shadow-sm border border-gray-100">
+            {/* View Toggle - Hidden on mobile */}
+            <div className="hidden sm:flex gap-1 p-1 bg-white rounded-lg shadow-sm border border-gray-100">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-600'
@@ -197,6 +200,7 @@ export function FavoritesPage() {
                     key={project.id}
                     project={project}
                     initialFavorite={true}
+                    onMobileClick={setMobileModalProject}
                   />
                 ))}
               </div>
@@ -229,6 +233,14 @@ export function FavoritesPage() {
           )}
         </div>
       </div>
+
+      {/* Mobile Project Detail Modal */}
+      <MobileProjectDetailModal
+        project={mobileModalProject}
+        isOpen={mobileModalProject !== null}
+        onClose={() => setMobileModalProject(null)}
+        initialFavorite={true}
+      />
     </Layout>
   );
 }

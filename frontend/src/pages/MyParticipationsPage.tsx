@@ -128,19 +128,21 @@ function ParticipationCard({ participation }: { participation: Participation }) 
 // Filter Tabs
 function FilterTabs({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
   return (
-    <div className="flex gap-1 p-1 bg-gray-100/80 rounded-xl w-full">
-      {options.map((option) => (
-        <button
-          key={option.value}
-          onClick={() => onChange(option.value)}
-          className={`flex-1 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${value === option.value
-            ? 'bg-white text-eco-primary shadow-sm'
-            : 'text-gray-500 hover:text-gray-700'
-            }`}
-        >
-          {option.label}
-        </button>
-      ))}
+    <div className="flex overflow-x-auto gap-1 p-1 bg-gray-100/80 rounded-xl w-full no-scrollbar">
+      <div className="flex gap-1 min-w-full">
+        {options.map((option) => (
+          <button
+            key={option.value}
+            onClick={() => onChange(option.value)}
+            className={`flex-1 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${value === option.value
+              ? 'bg-white text-eco-primary shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
+              }`}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

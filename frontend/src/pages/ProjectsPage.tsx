@@ -22,6 +22,7 @@ import { FavoriteButton } from '../components/common/FavoriteButton';
 import { mockAllProjects } from '../data/mockData';
 import type { Project } from '../types';
 import { ProjectCard } from '../components/projects/ProjectCard';
+import { MobileProjectDetailModal } from '../components/projects/MobileProjectDetailModal';
 
 // Star Rating Component with percentage fill
 const StarRating = memo(function StarRating({ rating, size = 12 }: { rating: number; size?: number }) {
@@ -76,6 +77,7 @@ interface MapBounds {
 
 interface MapRef {
   flyTo: (lat: number, lng: number) => void;
+  resetView: () => void;
 }
 
 // Check if a project is within map bounds
@@ -226,6 +228,8 @@ export function ProjectsPage() {
   const [isMapUpdating, setIsMapUpdating] = useState(false);
   const mapRef = useRef<MapRef | null>(null);
   const isProgrammaticMove = useRef(false);
+  // Mobile modal state
+  const [mobileModalProject, setMobileModalProject] = useState<Project | null>(null);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
@@ -250,6 +254,14 @@ export function ProjectsPage() {
     isProgrammaticMove.current = true;
     setIsMapUpdating(true);
     mapRef.current?.flyTo(lat, lng);
+  }, []);
+
+  const handleClearFilters = useCallback(() => {
+    setFilters(defaultFilters);
+    // Reset map view to show all projects or default
+    mapRef.current?.resetView();
+    // Also clear programmatic flag
+    isProgrammaticMove.current = true;
   }, []);
 
   const filteredProjects = useMemo(() => {
@@ -290,6 +302,7 @@ export function ProjectsPage() {
           filters={filters}
           onFiltersChange={setFilters}
           onLocationSelect={handleLocationSelect}
+          onClear={handleClearFilters}
         />
 
         <div className="flex-1 flex overflow-hidden">
@@ -299,20 +312,21 @@ export function ProjectsPage() {
 
               <div className="px-4 py-2 flex items-center justify-between">
                 <span className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">
-                  {visibleProjects.length} {visibleProjects.length === 1 ? 'projet trouvé' : 'projets trouvés'}
+                  {visibleProjects.length} {visibleProjects.length === 1 ? t('projects.foundSingle') || 'projet trouvé' : t('projects.found') || 'projets trouvés'}
                 </span>
-                <div className="flex gap-1 p-1 bg-gray-100 rounded-lg">
+                {/* Hide view toggle on mobile - grid only */}
+                <div className="hidden sm:flex gap-1 p-1 bg-gray-100 rounded-lg">
                   <button
                     onClick={() => setViewMode('grid')}
                     className={`p-1.5 rounded transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                    title="Vue grille"
+                    title={t('projects.viewGrid') || 'Vue grille'}
                   >
                     <IconLayoutGrid size={18} />
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
                     className={`p-1.5 rounded transition-all cursor-pointer ${viewMode === 'list' ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                    title="Vue liste"
+                    title={t('projects.viewList') || 'Vue liste'}
                   >
                     <IconList size={18} />
                   </button>
@@ -331,6 +345,7 @@ export function ProjectsPage() {
                         project={project}
                         isHovered={hoveredProject?.id === project.id}
                         onHover={setHoveredProject}
+                        onMobileClick={setMobileModalProject}
                       />
                     ))}
                   </div>
@@ -354,7 +369,7 @@ export function ProjectsPage() {
                   <h3 className="text-lg font-display font-bold text-gray-900 mb-2">{t('projects.noResults')}</h3>
                   <p className="text-gray-500 text-sm max-w-xs mb-4">{t('projects.noResultsDesc')}</p>
                   <button
-                    onClick={() => setFilters(defaultFilters)}
+                    onClick={handleClearFilters}
                     className="px-5 py-2 rounded-full bg-eco-primary text-white text-sm font-semibold hover:bg-eco-primaryDark transition-all cursor-pointer"
                   >
                     {t('projects.clearFilters')}
@@ -368,7 +383,7 @@ export function ProjectsPage() {
             {isMapUpdating && (
               <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
                 <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg">
-                  <span className="text-sm text-gray-600 font-medium">Chargement</span>
+                  <span className="text-sm text-gray-600 font-medium">{t('projects.loadingMap') || 'Chargement'}</span>
                   <div className="flex gap-1">
                     <span className="w-2 h-2 bg-eco-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-2 h-2 bg-eco-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -395,13 +410,20 @@ export function ProjectsPage() {
             className="flex items-center gap-2 px-6 py-3 rounded-full bg-gray-900 text-white font-semibold shadow-lg hover:bg-gray-800 transition-all cursor-pointer"
           >
             {showMap ? (
-              <><IconList size={18} /> Voir la liste</>
+              <><IconList size={18} /> {t('projects.viewList') || 'Voir la liste'}</>
             ) : (
-              <><IconMap size={18} /> Voir la carte</>
+              <><IconMap size={18} /> {t('projects.viewMap') || 'Voir la carte'}</>
             )}
           </button>
         </div>
       </div>
+
+      {/* Mobile Project Detail Modal */}
+      <MobileProjectDetailModal
+        project={mobileModalProject}
+        isOpen={mobileModalProject !== null}
+        onClose={() => setMobileModalProject(null)}
+      />
     </Layout>
   );
 }

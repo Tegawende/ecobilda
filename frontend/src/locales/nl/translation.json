@@ -8,14 +8,39 @@
         "delete": "Verwijderen",
         "edit": "Bewerken",
         "search": "Zoeken",
-        "filter": "Filteren",
+        "filter": "Filters",
         "submit": "Verzenden",
         "login": "Inloggen of registreren",
         "active": "Actief",
         "inactive": "Inactief",
         "back": "Terug",
         "day": "dag",
-        "by": "door"
+        "by": "door",
+        "continue": "Doorgaan",
+        "apply": "Toepassen",
+        "clear": "Wissen",
+        "reset": "Resetten",
+        "pickDates": "Aankomst - Vertrek",
+        "yourHost": "Je gastheer",
+        "reviews": "beoordelingen"
+    },
+    "notifications": {
+        "title": "Notificaties",
+        "markAllRead": "Alles als gelezen markeren",
+        "noNew": "Geen nieuwe notificaties",
+        "viewAllMessages": "Bekijk alle berichten",
+        "newMessage": "Nieuw bericht",
+        "mockMessage": "Hallo! Ik ben erg geïnteresseerd in je permacultuurproject in Lyon."
+    },
+    "favorites": {
+        "addedTitle": "Toegevoegd aan favorieten",
+        "addedMessage": "Project toegevoegd aan je favorieten",
+        "removedTitle": "Verwijderd uit favorieten",
+        "removedMessage": "Project verwijderd uit je favorieten",
+        "errorTitle": "Fout",
+        "errorMessage": "Favorieten konden niet worden bijgewerkt",
+        "addLabel": "Toevoegen aan favorieten",
+        "removeLabel": "Verwijderen uit favorieten"
     },
     "nav": {
         "home": "Home",
@@ -138,12 +163,6 @@
             "countries": "Landen"
         }
     },
-    "notifications": {
-        "title": "Meldingen",
-        "markAllRead": "Alles als gelezen markeren",
-        "noNew": "Geen nieuwe meldingen",
-        "viewAllMessages": "Alle berichten bekijken"
-    },
     "footer": {
         "copyright": "© {{year}} Ecobilda. Alle rechten voorbehouden.",
         "about": {
@@ -198,9 +217,46 @@
             "renovation": "Renovatie",
             "community": "Gemeenschap",
             "categories": "Categorieën",
-            "locations": "Locaties"
+            "locations": "Locaties",
+            "workDetails": "Werkdetails",
+            "maxVolunteers": "Max. vrijwilligers",
+            "applyFilters": "Filters toepassen",
+            "whereToGo": "Waar ga je naartoe?",
+            "searchByLocation": "Zoek op stad, regio of land",
+            "locationPlaceholder": "bijv. Brussel, Ardennen...",
+            "flexible": "Ik ben flexibel",
+            "searchEverywhere": "Overal zoeken",
+            "whenToGo": "Wanneer ga je?",
+            "selectDates": "Selecteer je data",
+            "skipDates": "Flexibele data",
+            "whatType": "Welk type project?",
+            "chooseType": "Kies het projecttype",
+            "allDescription": "Alle projecttypes",
+            "natbDescription": "Ecologische bouw",
+            "permDescription": "Tuinen en duurzame landbouw",
+            "search": "Zoeken",
+            "anywhere": "Overal",
+            "anyDate": "Alle data",
+            "searchPlaceholder": "Waar ga je naartoe?",
+            "searching": "Zoeken...",
+            "noResultsFor": "Geen resultaten voor",
+            "dates": "Data",
+            "startingFrom": "Vanaf",
+            "amenities": "Voorzieningen & Voorwaarden",
+            "wifi": "WiFi inbegrepen",
+            "family": "Familievriendelijk",
+            "pets": "Huisdieren toegestaan",
+            "smoking": "Roken toegestaan"
         },
-        "helpersMax": "vrijwilligers max"
+        "helpersMax": "vrijwilligers max",
+        "viewList": "Lijst bekijken",
+        "viewMap": "Kaart bekijken",
+        "viewGrid": "Rasterweergave",
+        "loadingMap": "Kaart laden...",
+        "found": "projecten gevonden",
+        "foundSingle": "project gevonden",
+        "viewProject": "Project bekijken",
+        "daysPerWeekShort": "d/week"
     },
     "projectDetail": {
         "notFound": "Project niet gevonden",

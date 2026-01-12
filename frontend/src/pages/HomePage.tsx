@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -5,14 +6,18 @@ import {
   IconHammer,
   IconHeartHandshake,
   IconArrowRight,
-  IconMapPin,
   IconUserPlus
 } from '@tabler/icons-react';
 import { Layout } from '../components/common/Layout';
 import { mockUserProjects } from '../data/mockData';
+import { ProjectCard } from '../components/projects/ProjectCard';
+import { MobileProjectDetailModal } from '../components/projects/MobileProjectDetailModal';
+import type { Project } from '../types';
 
 export function HomePage() {
   const { t } = useTranslation();
+  // Mobile modal state
+  const [mobileModalProject, setMobileModalProject] = useState<Project | null>(null);
 
   return (
     <Layout>
@@ -114,59 +119,13 @@ export function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {mockUserProjects.slice(0, 3).map((project) => {
-              const isNatB = project.project_type === 'NATB';
-              const coverImage = project.images?.find(img => img.is_cover)?.image || project.images?.[0]?.image || 'https://images.unsplash.com/photo-1593106578502-27fa8479d060?auto=format&fit=crop&q=80&w=1000';
-
-              return (
-                <Link to={`/projects/${project.id}`} key={project.id} className="block group">
-                  <div className="bg-white rounded-2xl overflow-hidden shadow-soft hover:shadow-float transition-all duration-300 border border-gray-100 h-full flex flex-col">
-                    <div className="h-56 overflow-hidden relative">
-                      <img
-                        src={coverImage}
-                        alt={project.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className={`absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${isNatB ? 'text-eco-primary' : 'text-eco-terracotta'}`}>
-                        {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
-                      </div>
-                    </div>
-                    <div className="p-6 flex flex-col flex-grow">
-                      <h3 className="text-xl font-bold text-gray-900 mb-2 font-display group-hover:text-eco-primary transition-colors line-clamp-1">
-                        {project.title}
-                      </h3>
-                      <div className="flex items-center text-gray-500 text-sm mb-4">
-                        <IconMapPin size={16} className="mr-1 text-eco-terracotta" />
-                        <span className="mr-4 truncate">
-                          {project.address?.city}, {project.address?.country?.name}
-                        </span>
-                        {/* <IconCalendar size={16} className="mr-1 text-eco-terracotta" /> <span>Ongoing</span> */}
-                      </div>
-                      <p className="text-gray-600 text-sm line-clamp-2 mb-4 flex-grow">
-                        {project.description}
-                      </p>
-                      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                        <div className="flex -space-x-2">
-                          <img
-                            src={project.owner?.profile_picture || undefined}
-                            alt={project.owner?.first_name}
-                            className="w-8 h-8 rounded-full border-2 border-white object-cover"
-                          />
-                          {/* Placeholder for other participants */}
-                          {/* <div className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white" /> */}
-                          <div className="w-8 h-8 rounded-full bg-eco-brand-50 border-2 border-white flex items-center justify-center text-xs text-eco-primary font-bold">
-                            +{project.max_helpers}
-                          </div>
-                        </div>
-                        <span className={`font-semibold text-xs px-2.5 py-1 rounded-md uppercase tracking-wide ${project.is_active ? 'bg-eco-brand-50 text-eco-secondary' : 'bg-gray-100 text-gray-400'}`}>
-                          {project.is_active ? 'Open' : 'Closed'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+            {mockUserProjects.slice(0, 3).map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                onMobileClick={setMobileModalProject}
+              />
+            ))}
           </div>
 
           <div className="mt-12 text-center sm:hidden">
@@ -211,6 +170,13 @@ export function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Project Detail Modal */}
+      <MobileProjectDetailModal
+        project={mobileModalProject}
+        isOpen={mobileModalProject !== null}
+        onClose={() => setMobileModalProject(null)}
+      />
     </Layout>
   );
 }

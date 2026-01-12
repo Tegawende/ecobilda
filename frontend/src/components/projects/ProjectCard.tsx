@@ -11,6 +11,8 @@ import {
   IconBabyCarriage,
   IconDog,
   IconEdit,
+  IconChevronLeft,
+  IconChevronRight,
 } from '@tabler/icons-react';
 import { FavoriteButton } from '../common/FavoriteButton';
 import type { Project } from '../../types';
@@ -23,6 +25,8 @@ interface ProjectCardProps {
   showEdit?: boolean;
   onEdit?: (id: number) => void;
   showStatus?: boolean;
+  /** Called on mobile clicks instead of navigation */
+  onMobileClick?: (project: Project) => void;
 }
 
 // Preload images hook for performance
@@ -63,8 +67,8 @@ const CarouselImage = memo(({
     loading="lazy"
     decoding="async"
     className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-out will-change-[opacity,transform] ${isActive
-        ? 'opacity-100 z-[1]'
-        : 'opacity-0 z-0'
+      ? 'opacity-100 z-[1]'
+      : 'opacity-0 z-0'
       } ${isGroupHovered && isActive ? 'scale-105' : 'scale-100'}`}
     style={{
       transitionProperty: 'opacity, transform',
@@ -82,10 +86,19 @@ export function ProjectCard({
   showEdit = false,
   onEdit,
   showStatus = false,
+  onMobileClick,
 }: ProjectCardProps) {
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const { t } = useTranslation();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isCardHovered, setIsCardHovered] = useState(false);
+  const lastClickTime = useState<{ current: number }>({ current: 0 })[0];
 
   const images = project.images && project.images.length > 0
     ? project.images.map(img => img.image)
@@ -97,12 +110,24 @@ export function ProjectCard({
   const nextImage = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Throttle clicks (300ms) to prevent double-skipping or ghost clicks on mobile
+    const now = Date.now();
+    if (now - lastClickTime.current < 300) return;
+    lastClickTime.current = now;
+
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
   }, [images.length]);
 
   const prevImage = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Throttle clicks (300ms)
+    const now = Date.now();
+    if (now - lastClickTime.current < 300) return;
+    lastClickTime.current = now;
+
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   }, [images.length]);
 
@@ -118,12 +143,21 @@ export function ProjectCard({
 
   const isNatB = project.project_type === 'NATB';
 
+  // Handle click - use modal on mobile if callback provided
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    if (isMobile && onMobileClick) {
+      e.preventDefault();
+      onMobileClick(project);
+    }
+  }, [isMobile, onMobileClick, project]);
+
   return (
     <Link
       to={`/projects/${project.id}`}
       className={`block group cursor-pointer transition-all duration-200 ${isHovered ? 'scale-[1.02]' : ''}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
     >
       {/* Optimized Image Carousel with stacked images */}
       <div className="relative rounded-xl overflow-hidden aspect-[4/3] mb-3 bg-gray-100">
@@ -173,20 +207,22 @@ export function ProjectCard({
           </span>
         </div>
 
-        {/* Image Navigation */}
+        {/* Image Navigation - Always visible on mobile, hover on desktop */}
         {images.length > 1 && (
           <>
             <button
+              type="button"
               onClick={prevImage}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white cursor-pointer z-10"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-white cursor-pointer z-10 shadow-sm text-gray-800"
             >
-              ‹
+              <IconChevronLeft size={18} />
             </button>
             <button
+              type="button"
               onClick={nextImage}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white cursor-pointer z-10"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-white cursor-pointer z-10 shadow-sm text-gray-800"
             >
-              ›
+              <IconChevronRight size={18} />
             </button>
 
             {/* Dots */}

@@ -25,6 +25,7 @@ interface ProjectsMapProps {
 
 export interface ProjectsMapRef {
     flyTo: (lat: number, lng: number) => void;
+    resetView: () => void;
 }
 
 export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function ProjectsMap({
@@ -54,7 +55,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
         onMoveStartRef.current = onMoveStart;
     }, [onMoveStart]);
 
-    // Expose flyTo method via ref
+    // Expose flyTo and resetView methods via ref
     useImperativeHandle(ref, () => ({
         flyTo: (lat: number, lng: number) => {
             if (map.current) {
@@ -65,7 +66,35 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
                 });
             }
         },
-    }), []);
+        resetView: () => {
+            if (!map.current) return;
+
+            // If there are projects, fit bounds to them
+            if (projects.length > 0) {
+                const bounds = new mapboxgl.LngLatBounds();
+                let hasValidCoords = false;
+
+                projects.forEach((project) => {
+                    if (project.address?.latitude && project.address?.longitude) {
+                        bounds.extend([project.address.longitude, project.address.latitude]);
+                        hasValidCoords = true;
+                    }
+                });
+
+                if (hasValidCoords) {
+                    map.current.fitBounds(bounds, { padding: 60, maxZoom: 12 });
+                    return;
+                }
+            }
+
+            // Fallback to default Europe view
+            map.current.flyTo({
+                center: [4.5, 48],
+                zoom: 5,
+                duration: 1500,
+            });
+        }
+    }), [projects]);
 
     // Initialize map
     useEffect(() => {
@@ -141,7 +170,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
             el.style.cssText = 'cursor: pointer;';
 
             const isNatB = project.project_type === 'NATB';
-            const bgColor = isNatB ? '#70A771' : '#c3595b';
+            const bgColor = isNatB ? 'var(--color-eco-primary)' : 'var(--color-eco-terracotta)';
 
             // Using SVG icons matching IconHome and IconLeaf from Tabler Icons
             const iconSvg = isNatB
@@ -231,7 +260,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
         });
 
         const isNatB = project.project_type === 'NATB';
-        const badgeColor = isNatB ? '#70A771' : '#c3595b';
+        const badgeColor = isNatB ? 'var(--color-eco-primary)' : 'var(--color-eco-terracotta)';
         const badgeText = isNatB ? t('projects.naturalBuilding') : t('projects.permaculture');
 
         // Icon SVGs for badge - matching IconHome and IconLeaf from Tabler Icons
@@ -305,8 +334,12 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
             
             ${images.length > 1 ? `
             <!-- Navigation Arrows -->
-            <button class="nav-prev" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; opacity: 0; transition: opacity 0.2s;">‹</button>
-            <button class="nav-next" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; opacity: 0; transition: opacity 0.2s;">›</button>
+            <button class="nav-prev" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; color: #1f2937;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button class="nav-next" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; color: #1f2937;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
             
             <!-- Dots -->
             <div class="carousel-dots" style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px;">
@@ -341,11 +374,11 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
               href="/projects/${project.id}" 
               target="_blank"
               rel="noopener noreferrer"
-              style="display: block; padding: 10px 16px; background: #70A771; color: white; text-align: center; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 600; transition: background 0.2s;"
-              onmouseover="this.style.background='#5d9160'"
-              onmouseout="this.style.background='#70A771'"
+              style="display: block; padding: 10px 16px; background: var(--color-eco-primary); color: white; text-align: center; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 600; transition: background 0.2s;"
+              onmouseover="this.style.background='var(--color-eco-primaryDark)'"
+              onmouseout="this.style.background='var(--color-eco-primary)'"
             >
-              Voir le projet
+              ${t('projects.viewProject') || 'Voir le projet'}
             </a>
           </div>
         </div>
@@ -411,8 +444,8 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
                     isFavorite = !isFavorite;
                     const svg = favoriteBtn.querySelector('svg');
                     if (svg) {
-                        svg.setAttribute('fill', isFavorite ? '#c3595b' : 'none');
-                        svg.setAttribute('stroke', isFavorite ? '#c3595b' : '#666');
+                        svg.setAttribute('fill', isFavorite ? 'var(--color-eco-terracotta)' : 'none');
+                        svg.setAttribute('stroke', isFavorite ? 'var(--color-eco-terracotta)' : '#666');
                     }
                     favoriteBtn.style.transform = 'scale(1.1)';
                     setTimeout(() => {

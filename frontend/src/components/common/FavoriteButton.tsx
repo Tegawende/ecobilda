@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ActionIcon, Tooltip, Loader } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
 import {
   IconHeart,
@@ -36,6 +37,7 @@ export function FavoriteButton({
   variant = 'circle',
   initialFavorite = false
 }: FavoriteButtonProps) {
+  const { t } = useTranslation();
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -75,18 +77,18 @@ export function FavoriteButton({
       if (previousState) {
         await favoritesService.removeFavorite(projectId);
         notifications.show({
-          title: 'Removed from favorites',
-          message: 'Project removed from your favorites',
-          color: 'blue',
+          title: t('favorites.removedTitle'),
+          message: t('favorites.removedMessage'),
+          color: 'eco-primary',
           icon: <IconCheck size={18} />,
           position: 'bottom-right',
         });
       } else {
         await favoritesService.addFavorite(projectId);
         notifications.show({
-          title: 'Added to favorites',
-          message: 'Project added to your favorites',
-          color: 'green',
+          title: t('favorites.addedTitle'),
+          message: t('favorites.addedMessage'),
+          color: 'eco-primary',
           icon: <IconCheck size={18} />,
           position: 'bottom-right',
         });
@@ -95,8 +97,8 @@ export function FavoriteButton({
       setIsFavorite(favorites.includes(projectId));
     } catch (error: any) {
       notifications.show({
-        title: 'Error',
-        message: 'Failed to update favorites',
+        title: t('favorites.errorTitle'),
+        message: t('favorites.errorMessage'),
         color: 'red',
         icon: <IconX size={18} />,
         position: 'bottom-right',
@@ -107,7 +109,7 @@ export function FavoriteButton({
     }
   };
 
-  const label = isFavorite ? 'Remove from favorites' : 'Add to favorites';
+  const label = isFavorite ? t('favorites.removeLabel') : t('favorites.addLabel');
 
   if (variant === 'ghost') {
     return (

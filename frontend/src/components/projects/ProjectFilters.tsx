@@ -16,6 +16,7 @@ import {
     IconSearch,
     IconLoader2,
 } from '@tabler/icons-react';
+import { MobileSearchModal } from './MobileSearchModal';
 
 export interface ProjectFiltersState {
     projectType: 'all' | 'NATB' | 'PERM';
@@ -34,6 +35,7 @@ interface ProjectFiltersProps {
     filters: ProjectFiltersState;
     onFiltersChange: (filters: ProjectFiltersState) => void;
     onLocationSelect?: (lat: number, lng: number) => void;
+    onClear?: () => void;
 }
 
 export const defaultFilters: ProjectFiltersState = {
@@ -99,9 +101,11 @@ function Calendar({
     const [tempStart, setTempStart] = useState<Date | null>(selectedStart);
     const [tempEnd, setTempEnd] = useState<Date | null>(selectedEnd);
 
-    const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-        'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-    const dayNames = ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di'];
+    const { t, i18n } = useTranslation();
+    const monthName = new Intl.DateTimeFormat(i18n.language, { month: 'long' }).format(currentMonth);
+    const dayNames = [0, 1, 2, 3, 4, 5, 6].map(d =>
+        new Intl.DateTimeFormat(i18n.language, { weekday: 'short' }).format(new Date(2024, 0, d + 1))
+    );
 
     const getDaysInMonth = (date: Date) => {
         const year = date.getFullYear();
@@ -177,8 +181,8 @@ function Calendar({
                 >
                     <IconChevronLeft size={20} />
                 </button>
-                <span className="font-semibold">
-                    {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+                <span className="font-semibold capitalize">
+                    {monthName} {currentMonth.getFullYear()}
                 </span>
                 <button
                     onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
@@ -224,22 +228,23 @@ function Calendar({
                     onClick={handleClear}
                     className="text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
                 >
-                    Effacer
+                    {t('common.clear')}
                 </button>
                 <button
                     onClick={handleApply}
                     className="px-4 py-1.5 bg-eco-primary text-white text-sm font-semibold rounded-lg hover:bg-eco-primaryDark cursor-pointer"
                 >
-                    Appliquer
+                    {t('common.apply')}
                 </button>
             </div>
         </div>
     );
 }
 
-export function ProjectFilters({ filters, onFiltersChange, onLocationSelect }: ProjectFiltersProps) {
+export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onClear }: ProjectFiltersProps) {
     const { t } = useTranslation();
     const [showModal, setShowModal] = useState(false);
+    const [showMobileSearch, setShowMobileSearch] = useState(false);
     const [tempFilters, setTempFilters] = useState(filters);
     const [locationQuery, setLocationQuery] = useState('');
     const [showLocationDropdown, setShowLocationDropdown] = useState(false);
@@ -346,6 +351,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect }: P
         setTempFilters(defaultFilters);
         setLocationQuery('');
         setLocationSuggestions([]);
+        onClear?.();
     };
 
     const openModal = () => {
@@ -485,15 +491,15 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect }: P
     };
 
     const formatDateRange = () => {
-        if (!filters.dateRange.start && !filters.dateRange.end) return 'Dates';
-        const format = (d: Date) => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+        if (!filters.dateRange.start && !filters.dateRange.end) return t('projects.filters.dates') || 'Dates';
+        const format = (d: Date) => d.toLocaleDateString();
         if (filters.dateRange.start && filters.dateRange.end) {
             return `${format(filters.dateRange.start)} - ${format(filters.dateRange.end)}`;
         }
         if (filters.dateRange.start) {
-            return `À partir du ${format(filters.dateRange.start)}`;
+            return `${t('projects.filters.startingFrom') || 'À partir du'} ${format(filters.dateRange.start)}`;
         }
-        return 'Dates';
+        return t('projects.filters.dates') || 'Dates';
     };
 
     // Get location icon based on type
@@ -506,7 +512,64 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect }: P
 
     return (
         <>
-            <div className="bg-white border-b border-gray-200 sticky top-0 z-20">
+            {/* Mobile Search Bar */}
+            <div className="sm:hidden bg-white border-b border-gray-200 sticky top-0 z-20">
+                <div className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                        {/* Centered Search Input - triggers modal */}
+                        <button
+                            onClick={() => setShowMobileSearch(true)}
+                            className="flex-1 flex items-center gap-3 px-4 py-3 rounded-full border border-gray-300 bg-white shadow-sm hover:shadow-md transition-all cursor-pointer text-left"
+                        >
+                            <IconSearch size={20} className="text-eco-primary" />
+                            <div className="flex-1 min-w-0">
+                                {filters.location || filters.dateRange.start || filters.projectType !== 'all' ? (
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                            {filters.location?.name?.split(',')[0] || t('projects.filters.anywhere') || 'Partout'}
+                                        </p>
+                                        <p className="text-xs text-gray-500 truncate">
+                                            {formatDateRange()}
+                                            {filters.projectType !== 'all' && ` · ${filters.projectType === 'NATB' ? t('projects.naturalBuilding') : t('projects.permaculture')}`}
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-gray-500">{t('projects.filters.searchPlaceholder') || 'Où allez-vous ?'}</p>
+                                )}
+                            </div>
+                        </button>
+
+                        {/* Filter Button */}
+                        <button
+                            onClick={openModal}
+                            className={`p-3 rounded-full border transition-all cursor-pointer ${activeFilterCount > 0
+                                ? 'border-eco-primary bg-eco-primary/10'
+                                : 'border-gray-300 hover:border-gray-400'
+                                }`}
+                        >
+                            <IconFilter size={18} className={activeFilterCount > 0 ? 'text-eco-primary' : 'text-gray-600'} />
+                            {activeFilterCount > 0 && (
+                                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-eco-primary text-white text-[10px] flex items-center justify-center font-bold">
+                                    {activeFilterCount}
+                                </span>
+                            )}
+                        </button>
+
+                        {/* Reset Button */}
+                        {hasActiveFilters && (
+                            <button
+                                onClick={clearAllFilters}
+                                className="p-3 rounded-full border border-gray-300 hover:border-gray-400 cursor-pointer"
+                            >
+                                <IconX size={18} className="text-gray-600" />
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Desktop Filters */}
+            <div className="hidden sm:block bg-white border-b border-gray-200 sticky top-0 z-20">
                 <div className="px-6 py-3">
                     <div className="flex flex-wrap items-center gap-3">
                         {/* Location Input with Mapbox Autocomplete */}
@@ -523,7 +586,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect }: P
                                     value={locationQuery}
                                     onChange={(e) => handleLocationSearch(e.target.value)}
                                     onFocus={() => setShowLocationDropdown(true)}
-                                    placeholder="Où allez-vous ?"
+                                    placeholder={t('projects.filters.searchPlaceholder') || 'Où allez-vous ?'}
                                     className="flex-1 outline-none text-sm bg-transparent"
                                 />
                                 {filters.location && (
@@ -539,7 +602,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect }: P
                                     {isSearching ? (
                                         <div className="px-4 py-3 text-center text-gray-500 text-sm">
                                             <IconLoader2 size={20} className="animate-spin mx-auto mb-2" />
-                                            Recherche...
+                                            {t('projects.filters.searching') || 'Recherche...'}
                                         </div>
                                     ) : (
                                         locationSuggestions.map((feature) => (
@@ -566,7 +629,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect }: P
                                 <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 py-4 px-4 w-full min-w-[280px] z-50">
                                     <div className="text-center text-gray-500 text-sm">
                                         <IconMapPin size={24} className="mx-auto mb-2 text-gray-400" />
-                                        Aucun résultat pour "{locationQuery}"
+                                        {t('projects.filters.noResultsFor') || 'Aucun résultat pour'} "{locationQuery}"
                                     </div>
                                 </div>
                             )}
@@ -593,11 +656,11 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect }: P
                             )}
                         </div>
 
-                        {/* Project Type Pills */}
+                        {/* Project Type Pills - Icons only on mobile, text on desktop */}
                         <div className="flex gap-1 p-1 bg-gray-100 rounded-full">
                             <button
                                 onClick={() => setFilter('projectType', 'all')}
-                                className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all cursor-pointer ${filters.projectType === 'all'
+                                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all cursor-pointer whitespace-nowrap ${filters.projectType === 'all'
                                     ? 'bg-white shadow-sm text-gray-900'
                                     : 'text-gray-600 hover:text-gray-900'
                                     }`}
@@ -606,23 +669,25 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect }: P
                             </button>
                             <button
                                 onClick={() => setFilter('projectType', 'NATB')}
-                                className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-semibold transition-all cursor-pointer ${filters.projectType === 'NATB'
+                                className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 rounded-full text-sm font-semibold transition-all cursor-pointer whitespace-nowrap ${filters.projectType === 'NATB'
                                     ? 'bg-eco-primary text-white shadow-sm'
                                     : 'text-gray-600 hover:text-gray-900'
                                     }`}
+                                title={t('projects.naturalBuilding')}
                             >
-                                <IconHome size={14} />
-                                {t('projects.naturalBuilding')}
+                                <IconHome size={16} />
+                                <span className="hidden sm:inline">{t('projects.naturalBuilding')}</span>
                             </button>
                             <button
                                 onClick={() => setFilter('projectType', 'PERM')}
-                                className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-semibold transition-all cursor-pointer ${filters.projectType === 'PERM'
+                                className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 rounded-full text-sm font-semibold transition-all cursor-pointer whitespace-nowrap ${filters.projectType === 'PERM'
                                     ? 'bg-eco-terracotta text-white shadow-sm'
                                     : 'text-gray-600 hover:text-gray-900'
                                     }`}
+                                title={t('projects.permaculture')}
                             >
-                                <IconLeaf size={14} />
-                                {t('projects.permaculture')}
+                                <IconLeaf size={16} />
+                                <span className="hidden sm:inline">{t('projects.permaculture')}</span>
                             </button>
                         </div>
 
@@ -681,7 +746,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect }: P
                                 onClick={() => setTempFilters(defaultFilters)}
                                 className="text-sm font-semibold text-gray-600 hover:text-gray-900 cursor-pointer"
                             >
-                                Réinitialiser
+                                {t('common.reset')}
                             </button>
                         </div>
 
@@ -689,31 +754,31 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect }: P
                         <div className="p-6 overflow-y-auto max-h-[60vh] space-y-8">
                             {/* Amenities */}
                             <div>
-                                <h3 className="font-semibold text-gray-900 mb-4">Équipements & Conditions</h3>
+                                <h3 className="font-semibold text-gray-900 mb-4">{t('projects.filters.amenities') || 'Équipements & Conditions'}</h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <AmenityToggle
                                         value={tempFilters.internetProvided}
                                         onChange={(val) => setTempFilter('internetProvided', val)}
                                         icon={IconWifi}
-                                        label="WiFi inclus"
+                                        label={t('projects.filters.wifi') || 'WiFi inclus'}
                                     />
                                     <AmenityToggle
                                         value={tempFilters.familyFriendly}
                                         onChange={(val) => setTempFilter('familyFriendly', val)}
                                         icon={IconBabyCarriage}
-                                        label="Familles bienvenues"
+                                        label={t('projects.filters.family') || 'Familles bienvenues'}
                                     />
                                     <AmenityToggle
                                         value={tempFilters.petsAllowed}
                                         onChange={(val) => setTempFilter('petsAllowed', val)}
                                         icon={IconDog}
-                                        label="Animaux acceptés"
+                                        label={t('projects.filters.pets') || 'Animaux acceptés'}
                                     />
                                     <AmenityToggle
                                         value={tempFilters.smokingAllowed}
                                         onChange={(val) => setTempFilter('smokingAllowed', val)}
                                         icon={IconSmoking}
-                                        label="Fumeur autorisé"
+                                        label={t('projects.filters.smoking') || 'Fumeur autorisé'}
                                     />
                                 </div>
                             </div>
@@ -768,6 +833,15 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect }: P
                     </div>
                 </div>
             )}
+
+            {/* Mobile Search Modal (Airbnb-style) */}
+            <MobileSearchModal
+                isOpen={showMobileSearch}
+                onClose={() => setShowMobileSearch(false)}
+                filters={filters}
+                onFiltersChange={onFiltersChange}
+                onLocationSelect={onLocationSelect}
+            />
         </>
     );
 }

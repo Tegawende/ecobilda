@@ -189,7 +189,7 @@ export function SearchResultsPage() {
 
               <Button
                 variant={filters.project_types.includes('PERM') ? 'filled' : 'outline'}
-                color="green"
+                color="eco-primary"
                 size="sm"
                 leftSection={<IconPlant size={16} />}
                 onClick={() => toggleProjectType('PERM')}
@@ -273,7 +273,7 @@ export function SearchResultsPage() {
                   <Checkbox
                     label={
                       <Group gap="xs">
-                        <IconPlant size={16} color="green" />
+                        <IconPlant size={16} color="var(--color-eco-primary)" />
                         <span>Permaculture</span>
                       </Group>
                     }

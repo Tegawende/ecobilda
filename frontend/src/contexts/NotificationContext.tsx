@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ReactNode } from 'react';
 import { notifications as mantineNotifications } from '@mantine/notifications';
 import { useNavigate } from 'react-router-dom';
@@ -23,6 +24,7 @@ interface NotificationProviderProps {
 }
 
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({ children }) => {
+  const { t } = useTranslation();
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isConnected, setIsConnected] = useState(false);
@@ -130,7 +132,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
           mantineNotifications.show({
             title: newNotif.title,
             message: newNotif.message,
-            color: 'blue',
+            color: 'eco-primary',
             autoClose: 5000,
             onClick: () => {
               navigate(newNotif.link_url);
@@ -170,43 +172,61 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     }
   };
 
-  // Initialize connection and fetch data
+  // Initial fetch
   useEffect(() => {
     if (isAuthenticated()) {
       refreshCount();
       refreshNotifications();
       connectWebSocket();
-
-      // Mock a notification for demo purposes (as requested by user)
-      const mockTimeout = setTimeout(() => {
-        const mockNotif: Notification = {
-          id: 9999,
-          recipient: 1,
-          type: 'MESSAGE',
-          title: 'Nouveau message',
-          message: 'Bonjour ! Je suis très intéressé par votre projet de permaculture à Lyon.',
-          link_url: '/messages',
-          is_read: false,
-          read_at: null,
-          created_at: new Date().toISOString(),
-          sender_profile_picture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop',
-        };
-        setNotifications(prev => [mockNotif, ...prev].slice(0, 10));
-        setUnreadCount(prev => prev + 1);
-      }, 3000);
-
-      return () => clearTimeout(mockTimeout);
     }
-
     return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
+      if (wsRef.current) wsRef.current.close();
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
     };
   }, []);
+
+  // Update mock notification translation when language changes
+  useEffect(() => {
+    if (isAuthenticated()) {
+      // Check if we already have the mock notification
+      const hasMock = notifications.some(n => n.id === 9999);
+      if (!hasMock) {
+        // Add mock if not present (only once, managed by verifying ID)
+        const mockTimeout = setTimeout(() => {
+          setNotifications(prev => {
+            if (prev.some(n => n.id === 9999)) return prev;
+            const mockNotif: Notification = {
+              id: 9999,
+              recipient: 1,
+              type: 'MESSAGE',
+              title: t('notifications.newMessage'),
+              message: t('notifications.mockMessage'),
+              link_url: '/messages',
+              is_read: false,
+              read_at: null,
+              created_at: new Date().toISOString(),
+              sender_profile_picture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop',
+            };
+            return [mockNotif, ...prev].slice(0, 10);
+          });
+          setUnreadCount(prev => prev + 1);
+        }, 3000);
+        return () => clearTimeout(mockTimeout);
+      } else {
+        // Update existing mock notification with new translation
+        setNotifications(prev => prev.map(n => {
+          if (n.id === 9999) {
+            return {
+              ...n,
+              title: t('notifications.newMessage'),
+              message: t('notifications.mockMessage'),
+            };
+          }
+          return n;
+        }));
+      }
+    }
+  }, [t, isAuthenticated]);
 
   const value: NotificationContextType = {
     unreadCount,
