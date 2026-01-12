@@ -62,12 +62,19 @@ const Input = ({ label, error, rightSection, description, className, ...props }:
 // Check if email exists in the system (calls real API or mock based on env)
 const checkEmailExists = async (email: string): Promise<boolean> => {
   const useMock = import.meta.env.VITE_USE_MOCK === 'true';
+  const normalizedEmail = email.toLowerCase().trim();
+
+  // Always recognize the mock test email
+  if (normalizedEmail === 'test@test.be') {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return true;
+  }
 
   if (useMock) {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 600));
     // In mock mode, any email with 'test' is considered existing
-    return email.toLowerCase().includes('test');
+    return normalizedEmail.includes('test');
   }
 
   try {
