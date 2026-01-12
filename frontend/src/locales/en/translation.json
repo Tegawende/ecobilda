@@ -19,7 +19,17 @@
     "continue": "Continue",
     "apply": "Apply",
     "clear": "Clear",
-    "reset": "Reset"
+    "reset": "Reset",
+    "show": "Show",
+    "hide": "Hide"
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page Not Found",
+      "description": "Oops! The page you're looking for doesn't exist or has been moved.",
+      "browseProjects": "Browse Projects",
+      "goBack": "Go Back"
+    }
   },
   "notifications": {
     "title": "Notifications",
@@ -260,7 +270,12 @@
     "found": "projects found",
     "foundSingle": "project found",
     "viewProject": "View Project",
-    "daysPerWeekShort": "d/week"
+    "daysPerWeekShort": "d/week",
+    "host": "Host",
+    "wifiIncluded": "WiFi included",
+    "familiesWelcome": "Families welcome",
+    "petsAccepted": "Pets allowed",
+    "viewMode": "View mode"
   },
   "projectDetail": {
     "notFound": "Project not found",

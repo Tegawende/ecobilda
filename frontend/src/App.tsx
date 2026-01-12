@@ -15,6 +15,7 @@ import { MessagesPage } from './pages/MessagesPage';
 import FAQ from './pages/FAQ';
 import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { GuestOnlyRoute } from './components/auth/GuestOnlyRoute';
 import ScrollToTop from './components/common/ScrollToTop';
@@ -104,6 +105,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/* 404 - Catch all unmatched routes */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
   );

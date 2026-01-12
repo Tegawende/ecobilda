@@ -6,6 +6,7 @@ import { MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import { ModalsProvider } from '@mantine/modals'
 import { NotificationProvider } from './contexts/NotificationContext'
+import { ErrorBoundary } from './components/common/ErrorBoundary'
 import { theme } from './theme'
 import './index.css'
 import './i18n'
@@ -22,18 +23,18 @@ if (typeof window !== 'undefined' && (window as any).mapboxgl) {
   // Support both variable names for backward compatibility
   const token = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || import.meta.env.VITE_MAPBOX_TOKEN || '';
   (window as any).mapboxgl.accessToken = token;
-  
+
   // Disable telemetry to prevent CORS errors
   if ((window as any).mapboxgl.config) {
     (window as any).mapboxgl.config.API_URL = 'https://api.mapbox.com';
     // Disable telemetry events
     (window as any).mapboxgl.config.collectResourceTiming = false;
   }
-  
+
   // Override event tracking if available
   if ((window as any).mapboxgl.Evented) {
     const originalEmit = (window as any).mapboxgl.Evented.prototype.emit;
-    (window as any).mapboxgl.Evented.prototype.emit = function(event: string, ...args: any[]) {
+    (window as any).mapboxgl.Evented.prototype.emit = function (event: string, ...args: any[]) {
       // Block telemetry events
       if (event && (event.includes('telemetry') || event.includes('analytics'))) {
         return;
@@ -62,7 +63,9 @@ createRoot(document.getElementById('root')!).render(
         <ModalsProvider>
           <BrowserRouter>
             <NotificationProvider>
-              <App />
+              <ErrorBoundary>
+                <App />
+              </ErrorBoundary>
             </NotificationProvider>
           </BrowserRouter>
         </ModalsProvider>

@@ -299,7 +299,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
         const popup = new mapboxgl.Popup({
             closeButton: false,
             closeOnClick: false,
-            maxWidth: '320px',
+            maxWidth: '280px',
             offset: 25,
             className: 'project-popup'
         })
@@ -307,7 +307,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
             .setHTML(`
         <div id="${popupId}" style="padding: 0; font-family: system-ui, -apple-system, sans-serif; border-radius: 12px; overflow: hidden;">
           <!-- Image Container with Carousel -->
-          <div style="position: relative; width: 100%; height: 180px; overflow: hidden;">
+          <div style="position: relative; width: 100%; height: 160px; overflow: hidden;">
             <div class="carousel-images" style="display: flex; width: ${images.length * 100}%; height: 100%; transition: transform 0.3s ease;">
               ${images.map(img => `<img src="${img}" alt="${project.title}" style="width: ${100 / images.length}%; height: 100%; object-fit: cover; flex-shrink: 0;"/>`).join('')}
             </div>
@@ -488,14 +488,45 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
         });
     }, [hoveredProjectId]);
 
-    // Pan to selected project
+    // Pan to selected project with offset to show popup fully
     useEffect(() => {
         if (selectedProject && map.current && selectedProject.address?.latitude && selectedProject.address?.longitude) {
             showPopup(selectedProject);
+
+            // Calculate offset to shift map center down, so the popup (which opens above marker) is visible
+            // This is a rough estimation, fine-tune as needed.
+            // Positive offset[1] shifts the map "camera" down, effectively moving the map content UP.
+            // Wait, we need the MARKER to be lower on screen.
+            // So we need the map center to be HIGHER (North) than the marker.
+            // So we target a latitude slightly NORTH of the marker.
+
+            // Actually, Mapbox flyTo has an 'offset' option in pixels [x, y].
+            // A positive y offset shifts the center point down relative to the viewport.
+            // To make the marker appear lower, we want the center of the map to be ABOVE the marker.
+            // So we want the viewport center to correspond to a point NORTH of the marker.
+
+            // Let's us pixe-based offset. It moves the 'center' of the view by [x, y] pixels.
+            // If we want more space at the TOP, we need the logical center to be lower in the viewport?
+            // No, we want the marker to be in the bottom half.
+            // flyTo center is where the map will be focused.
+            // We want that 'center' (the marker lat/lng) to be positioned at [0, 100] pixels from the viewport center?
+
+            // Let's try offset: [0, 100]. This moves the center point 100px DOWN from the top? Or 100px relative to center?
+            // Mapbox documentation: "The center of the given bounds usually aligns with the center of the map container.
+            // You can shift this target center by specifying an offset [x, y] in pixels."
+
+            // We want the marker to be `y` pixels BELOW the center of the canvas.
+            // So we should interpret the map center as being `y` pixels ABOVE the marker?
+            // Actually, usually providing a negative Y offset moves the target point UP visually?
+            // Let's try [0, -100] to move the center (marker) UP? No we want marker DOWN.
+            // Let's try [0, 150]. This means "The logical center is 150px below the visual center".
+            // So the marker (logical center) will appear 150px below the middle of the screen. This leaves room above.
+
             map.current.flyTo({
                 center: [selectedProject.address.longitude, selectedProject.address.latitude],
                 zoom: 11,
                 duration: 800,
+                offset: [0, 150] // Moves the execution center down by 150px = Marker appears lower.
             });
         }
     }, [selectedProject]);

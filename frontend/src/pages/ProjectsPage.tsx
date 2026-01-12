@@ -170,24 +170,24 @@ function ProjectCardList({
               <IconClock size={14} />
               {project.hours_per_day}h/{t('common.day')}
             </span>
-            <span>{project.days_per_week}j/semaine</span>
+            <span>{project.days_per_week}{t('projects.daysPerWeekShort')}</span>
           </div>
 
           {/* Amenities */}
           <div className="flex flex-wrap gap-2 mb-3">
             {project.internet_provided && (
               <span className="inline-flex items-center gap-1 px-2 py-1 bg-eco-primary/10 text-eco-primary text-xs rounded-full font-medium">
-                <IconWifi size={12} /> WiFi inclus
+                <IconWifi size={12} aria-hidden="true" /> {t('projects.wifiIncluded')}
               </span>
             )}
             {project.family_friendly && (
               <span className="inline-flex items-center gap-1 px-2 py-1 bg-eco-primary/10 text-eco-primary text-xs rounded-full font-medium">
-                <IconBabyCarriage size={12} /> Familles bienvenues
+                <IconBabyCarriage size={12} aria-hidden="true" /> {t('projects.familiesWelcome')}
               </span>
             )}
             {project.pets_allowed && (
               <span className="inline-flex items-center gap-1 px-2 py-1 bg-eco-primary/10 text-eco-primary text-xs rounded-full font-medium">
-                <IconDog size={12} /> Animaux acceptés
+                <IconDog size={12} aria-hidden="true" /> {t('projects.petsAccepted')}
               </span>
             )}
           </div>
@@ -201,7 +201,7 @@ function ProjectCardList({
                 className="w-8 h-8 rounded-full object-cover"
               />
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Hôte:</span>
+                <span className="text-sm text-gray-600">{t('projects.host')}:</span>
                 <span className="text-sm font-medium text-gray-900">{project.owner.first_name}</span>
               </div>
               {project.owner.average_rating && (
@@ -315,20 +315,22 @@ export function ProjectsPage() {
                   {visibleProjects.length} {visibleProjects.length === 1 ? t('projects.foundSingle') || 'projet trouvé' : t('projects.found') || 'projets trouvés'}
                 </span>
                 {/* Hide view toggle on mobile - grid only */}
-                <div className="hidden sm:flex gap-1 p-1 bg-gray-100 rounded-lg">
+                <div className="hidden sm:flex gap-1 p-1 bg-gray-100 rounded-lg" role="group" aria-label={t('projects.viewMode')}>
                   <button
                     onClick={() => setViewMode('grid')}
                     className={`p-1.5 rounded transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                    title={t('projects.viewGrid') || 'Vue grille'}
+                    aria-label={t('projects.viewGrid') || 'Grid view'}
+                    aria-pressed={viewMode === 'grid'}
                   >
-                    <IconLayoutGrid size={18} />
+                    <IconLayoutGrid size={18} aria-hidden="true" />
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
                     className={`p-1.5 rounded transition-all cursor-pointer ${viewMode === 'list' ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                    title={t('projects.viewList') || 'Vue liste'}
+                    aria-label={t('projects.viewList') || 'List view'}
+                    aria-pressed={viewMode === 'list'}
                   >
-                    <IconList size={18} />
+                    <IconList size={18} aria-hidden="true" />
                   </button>
                 </div>
               </div>

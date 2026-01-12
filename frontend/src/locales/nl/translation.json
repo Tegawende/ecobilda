@@ -22,7 +22,17 @@
         "reset": "Resetten",
         "pickDates": "Aankomst - Vertrek",
         "yourHost": "Je gastheer",
-        "reviews": "beoordelingen"
+        "reviews": "beoordelingen",
+        "show": "Tonen",
+        "hide": "Verbergen"
+    },
+    "errors": {
+        "notFound": {
+            "title": "Pagina niet gevonden",
+            "description": "Oeps! De pagina die je zoekt bestaat niet of is verplaatst.",
+            "browseProjects": "Projecten bekijken",
+            "goBack": "Terug"
+        }
     },
     "notifications": {
         "title": "Notificaties",
@@ -256,7 +266,12 @@
         "found": "projecten gevonden",
         "foundSingle": "project gevonden",
         "viewProject": "Project bekijken",
-        "daysPerWeekShort": "d/week"
+        "daysPerWeekShort": "d/week",
+        "host": "Gastheer",
+        "wifiIncluded": "WiFi inbegrepen",
+        "familiesWelcome": "Gezinnen welkom",
+        "petsAccepted": "Huisdieren toegestaan",
+        "viewMode": "Weergavemodus"
     },
     "projectDetail": {
         "notFound": "Project niet gevonden",
