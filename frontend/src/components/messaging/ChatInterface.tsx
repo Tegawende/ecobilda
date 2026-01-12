@@ -20,6 +20,7 @@ import { profileService } from '../../services/profile';
 import { MessageBubble } from './MessageBubble';
 import { getAuthTokens } from '../../services/api';
 import type { Conversation, Message, User } from '../../types';
+import logger from '../../utils/logger';
 
 interface ChatInterfaceProps {
   conversationId: number;
@@ -65,7 +66,7 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('Chat WebSocket connected');
+        logger.ws('connected', 'Chat');
         setIsConnected(true);
       };
 
@@ -73,7 +74,7 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
         const data = JSON.parse(event.data);
 
         if (data.type === 'connection_established') {
-          console.log('Chat connection established');
+          logger.ws('established', 'Chat connection');
         } else if (data.type === 'new_message' || data.type === 'message_sent') {
           const newMessage = data.message;
 
@@ -89,7 +90,7 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
 
             // Mark as read if it's from the other user
             if (newMessage.sender.id !== currentUser.id) {
-              messagingService.markAsRead(conversation.id).catch(console.error);
+              messagingService.markAsRead(conversation.id).catch(err => logger.error('Mark as read error:', err));
             }
           }
         } else if (data.type === 'typing') {
@@ -105,16 +106,16 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
       };
 
       ws.onerror = (error) => {
-        console.error('Chat WebSocket error:', error);
+        logger.error('Chat WebSocket error:', error);
         setIsConnected(false);
       };
 
       ws.onclose = () => {
-        console.log('Chat WebSocket disconnected');
+        logger.ws('disconnected', 'Chat');
         setIsConnected(false);
       };
     } catch (err) {
-      console.error('Failed to create WebSocket:', err);
+      logger.error('Failed to create Chat WebSocket:', err);
     }
 
     return () => {
@@ -149,7 +150,7 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
       // Mark as read
       await messagingService.markAsRead(conversationId);
     } catch (err) {
-      console.error('Failed to fetch conversation:', err);
+      logger.error('Failed to fetch conversation:', err);
     } finally {
       setIsLoading(false);
     }
@@ -197,7 +198,7 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
         setMessages((prev) => [...prev, newMessage]);
       }
     } catch (err) {
-      console.error('Failed to send message:', err);
+      logger.error('Failed to send message:', err);
       setMessageInput(messageText);
     } finally {
       setIsSending(false);

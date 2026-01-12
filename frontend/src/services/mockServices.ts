@@ -16,6 +16,7 @@ import {
     type Participation,
 } from '../data/mockData';
 import type { User, Project, Review, Conversation, Message, Notification, PaginatedResponse } from '../types';
+import logger from '../utils/logger';
 
 // Simulate network delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -90,12 +91,12 @@ export const mockFavoritesService = {
 
     async addFavorite(projectId: number): Promise<void> {
         await delay(200);
-        console.log('Mock: Added favorite', projectId);
+        logger.debug('Mock: Added favorite', projectId);
     },
 
     async removeFavorite(projectId: number): Promise<void> {
         await delay(200);
-        console.log('Mock: Removed favorite', projectId);
+        logger.debug('Mock: Removed favorite', projectId);
     },
 };
 
@@ -163,12 +164,12 @@ export const mockMessagingService = {
 
     async toggleMute(conversationId: number): Promise<void> {
         await delay(200);
-        console.log('Mock: Toggled mute for conversation', conversationId);
+        logger.debug('Mock: Toggled mute for conversation', conversationId);
     },
 
     async deleteConversation(conversationId: number): Promise<void> {
         await delay(300);
-        console.log('Mock: Deleted conversation', conversationId);
+        logger.debug('Mock: Deleted conversation', conversationId);
     },
 };
 
@@ -181,12 +182,12 @@ export const mockNotificationsService = {
 
     async markAsRead(id: number): Promise<void> {
         await delay(200);
-        console.log('Mock: Marked notification as read', id);
+        logger.debug('Mock: Marked notification as read', id);
     },
 
     async markAllAsRead(): Promise<void> {
         await delay(300);
-        console.log('Mock: Marked all notifications as read');
+        logger.debug('Mock: Marked all notifications as read');
     },
 
     getUnreadCount(): number {

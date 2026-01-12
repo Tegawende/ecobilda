@@ -11,6 +11,7 @@ import {
 } from '@tabler/icons-react';
 import { favoritesService } from '../../services/favorites';
 import { isAuthenticated } from '../../services/api';
+import logger from '../../utils/logger';
 
 interface FavoriteButtonProps {
   projectId: number;
@@ -52,7 +53,7 @@ export function FavoriteButton({
         setIsFavorite(favorites.includes(projectId));
       } catch (error: any) {
         if (error?.response?.status !== 404) {
-          console.error('Failed to check favorite status:', error);
+          logger.error('Failed to check favorite status:', error);
         }
       }
     };

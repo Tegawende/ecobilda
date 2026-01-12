@@ -29,7 +29,22 @@
       "description": "Oops! The page you're looking for doesn't exist or has been moved.",
       "browseProjects": "Browse Projects",
       "goBack": "Go Back"
+    },
+    "generic": {
+      "title": "Something went wrong",
+      "description": "Sorry, something went wrong. Please try again.",
+      "retry": "Try Again",
+      "goHome": "Go Home"
     }
+  },
+  "a11y": {
+    "skipToContent": "Skip to main content",
+    "closeModal": "Close",
+    "previousImage": "Previous image",
+    "nextImage": "Next image",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "loading": "Loading..."
   },
   "notifications": {
     "title": "Notifications",

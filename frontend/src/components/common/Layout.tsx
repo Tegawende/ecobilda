@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { AppShell, Box } from '@mantine/core';
 import { useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 
@@ -11,6 +12,7 @@ interface LayoutProps {
 }
 
 export function Layout({ children, hideFooter = false }: LayoutProps) {
+  const { t } = useTranslation();
   const location = useLocation();
   const isHomePage = location.pathname === '/';
   const [scrolled, setScrolled] = useState(false);
@@ -36,7 +38,7 @@ export function Layout({ children, hideFooter = false }: LayoutProps) {
     <>
       {/* Skip link for keyboard navigation */}
       <a href="#main-content" className="skip-link">
-        Skip to main content
+        {t('a11y.skipToContent', { defaultValue: 'Skip to main content' })}
       </a>
       <AppShell
         header={{ height: isHomePage ? 0 : 64 }}

@@ -9,6 +9,7 @@ import { Layout } from '../components/common/Layout';
 import { mockUserProjects } from '../data/mockData';
 import type { Project } from '../types';
 import { ProjectCard, ProjectCardSkeleton } from '../components/projects/ProjectCard';
+import logger from '../utils/logger';
 
 // Filter Tabs Component
 function FilterTabs({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
@@ -46,7 +47,7 @@ export function MyProjectsPage() {
 
   const handleEdit = (id: number) => {
     // TODO: Navigate to edit page
-    console.log('Edit project:', id);
+    logger.debug('Edit project:', id);
   };
 
   return (

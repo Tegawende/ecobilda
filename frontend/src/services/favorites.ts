@@ -1,4 +1,5 @@
 import api from './api';
+import logger from '../utils/logger';
 
 export const favoritesService = {
   // Get user's favorite projects
@@ -68,7 +69,7 @@ export const favoritesService = {
       const favorites = await this.getFavorites();
       return favorites.includes(projectId);
     } catch (error) {
-      console.error('Failed to check favorite status:', error);
+      logger.error('Failed to check favorite status:', error);
       return false;
     }
   },

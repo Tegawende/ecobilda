@@ -24,6 +24,7 @@ import { messagingService } from '../services/messaging';
 import { profileService } from '../services/profile';
 import { MessageBubble } from '../components/messaging/MessageBubble';
 import type { Conversation, Message, User } from '../types';
+import logger from '../utils/logger';
 
 export function ChatPage() {
   const { id } = useParams<{ id: string }>();
@@ -67,7 +68,7 @@ export function ChatPage() {
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('WebSocket connected');
+        logger.ws('connected', 'Chat');
         setIsConnected(true);
       };
 
@@ -78,7 +79,7 @@ export function ChatPage() {
           setMessages((prev) => [...prev, data.message]);
 
           if (data.message.sender.id !== currentUser.id) {
-            messagingService.markAsRead(conversation.id).catch(console.error);
+            messagingService.markAsRead(conversation.id).catch(err => logger.error('Mark as read error:', err));
           }
         } else if (data.type === 'typing_indicator') {
           if (data.user_id !== currentUser.id) {
@@ -89,16 +90,16 @@ export function ChatPage() {
       };
 
       ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
+        logger.error('Chat WebSocket error:', error);
         setIsConnected(false);
       };
 
       ws.onclose = () => {
-        console.log('WebSocket disconnected');
+        logger.ws('disconnected', 'Chat');
         setIsConnected(false);
       };
     } catch (err) {
-      console.error('Failed to create WebSocket:', err);
+      logger.error('Failed to create Chat WebSocket:', err);
     }
 
     return () => {
@@ -129,7 +130,7 @@ export function ChatPage() {
 
       await messagingService.markAsRead(parseInt(id));
     } catch (err: any) {
-      console.error('Failed to fetch conversation:', err);
+      logger.error('Failed to fetch conversation:', err);
       if (err.response?.status === 404) {
         // If conversation not found, try to create one with the ID as recipient_id
         // This handles the case where someone navigated with a user ID instead of conversation ID
@@ -139,33 +140,33 @@ export function ChatPage() {
           navigate(`/messages/${conversation.id}`, { replace: true });
           // Recursively fetch data with the correct conversation ID
           return;
-      } catch (createErr: any) {
-        console.error('Failed to create conversation:', createErr);
-        // If it's a 400 or 500 error, the conversation might already exist
-        // Try to fetch it again or show a more helpful error message
-        if (createErr.response?.status === 400 || createErr.response?.status === 500) {
-          // The conversation might have been created by another request
-          // Try to fetch conversations list and find the one with this user
-          try {
-            const conversations = await messagingService.getConversations();
-            // Find conversation where the other user is the one we're trying to contact
-            const conversation = conversations.find(
-              (c) => c.user1.id === parseInt(id) || c.user2.id === parseInt(id)
-            );
-            if (conversation) {
-              navigate(`/messages/${conversation.id}`, { replace: true });
-              return;
+        } catch (createErr: any) {
+          logger.error('Failed to create conversation:', createErr);
+          // If it's a 400 or 500 error, the conversation might already exist
+          // Try to fetch it again or show a more helpful error message
+          if (createErr.response?.status === 400 || createErr.response?.status === 500) {
+            // The conversation might have been created by another request
+            // Try to fetch conversations list and find the one with this user
+            try {
+              const conversations = await messagingService.getConversations();
+              // Find conversation where the other user is the one we're trying to contact
+              const conversation = conversations.find(
+                (c) => c.user1.id === parseInt(id) || c.user2.id === parseInt(id)
+              );
+              if (conversation) {
+                navigate(`/messages/${conversation.id}`, { replace: true });
+                return;
+              }
+            } catch (fetchErr) {
+              logger.error('Failed to fetch conversations:', fetchErr);
             }
-          } catch (fetchErr) {
-            console.error('Failed to fetch conversations:', fetchErr);
           }
-        }
-        setError(
-          createErr.response?.data?.detail ||
+          setError(
+            createErr.response?.data?.detail ||
             createErr.response?.data?.recipient_id?.[0] ||
             'Conversation not found and could not be created'
-        );
-      }
+          );
+        }
       } else {
         setError(err.response?.data?.detail || 'Failed to load conversation');
       }
@@ -214,7 +215,7 @@ export function ChatPage() {
         setMessages((prev) => [...prev, newMessage]);
       }
     } catch (err) {
-      console.error('Failed to send message:', err);
+      logger.error('Failed to send message:', err);
       setError('Failed to send message. Please try again.');
       setMessageInput(messageText);
     } finally {

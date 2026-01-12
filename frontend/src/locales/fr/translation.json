@@ -29,7 +29,22 @@
             "description": "Oups ! La page que vous recherchez n'existe pas ou a été déplacée.",
             "browseProjects": "Parcourir les projets",
             "goBack": "Retour"
+        },
+        "generic": {
+            "title": "Une erreur s'est produite",
+            "description": "Désolé, quelque chose s'est mal passé. Veuillez réessayer.",
+            "retry": "Réessayer",
+            "goHome": "Retour à l'accueil"
         }
+    },
+    "a11y": {
+        "skipToContent": "Aller au contenu principal",
+        "closeModal": "Fermer",
+        "previousImage": "Image précédente",
+        "nextImage": "Image suivante",
+        "openMenu": "Ouvrir le menu",
+        "closeMenu": "Fermer le menu",
+        "loading": "Chargement en cours..."
     },
     "notifications": {
         "title": "Notifications",

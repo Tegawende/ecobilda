@@ -17,6 +17,7 @@ import { profileService } from '../../services/profile';
 import { NotificationBell } from './NotificationBell';
 import classes from './Navbar.module.css';
 import type { User } from '../../types';
+import logger from '../../utils/logger';
 
 const links: Array<{ link: string; label: string }> = [];
 
@@ -37,7 +38,7 @@ export function Navbar() {
     if (isLoggedIn) {
       profileService.getProfile()
         .then(user => setCurrentUser(user))
-        .catch(err => console.error('Failed to fetch profile:', err));
+        .catch(err => logger.error('Failed to fetch profile:', err));
     } else {
       setCurrentUser(null);
     }

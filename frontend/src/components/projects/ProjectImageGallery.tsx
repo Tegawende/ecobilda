@@ -26,13 +26,7 @@ export function ProjectImageGallery({ images, title }: ProjectImageGalleryProps)
   const gridImages = images.slice(1, 5); // Always take images 1-4 (4 images total)
   const remainingCount = Math.max(0, images.length - 5);
 
-  // Debug: Log to verify we have the correct number of images
-  console.log('ProjectImageGallery Debug:', {
-    totalImages: images.length,
-    gridImagesCount: gridImages.length,
-    gridImages: gridImages,
-    mainImage: mainImage
-  });
+  // Note: Debug logging removed for production
 
   const openLightbox = (index: number) => {
     setCurrentImageIndex(index);
@@ -109,12 +103,11 @@ export function ProjectImageGallery({ images, title }: ProjectImageGalleryProps)
                         alt={`${title} ${index + 2}`}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         onError={(e) => {
-                          console.error(`Failed to load image at index ${index}:`, image);
                           // Use a reliable fallback image
                           (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop';
                         }}
                         onLoad={() => {
-                          console.log(`Successfully loaded grid image ${index + 1}:`, image);
+                          // Image loaded successfully
                         }}
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />

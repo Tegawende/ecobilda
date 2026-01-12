@@ -13,6 +13,7 @@ import {
 } from '@tabler/icons-react';
 import { Layout } from '../components/common/Layout';
 import { clearAuthTokens } from '../services/api';
+import logger from '../utils/logger';
 
 // Custom Toggle Switch
 const Toggle = ({ checked, onChange, label, description }: { checked: boolean; onChange: (val: boolean) => void; label: string; description?: string }) => (
@@ -101,12 +102,12 @@ export function AccountSettingsPage() {
     e.preventDefault();
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
-    console.log('Saving settings:', settings);
+    logger.debug('Saving settings:', settings);
   };
 
   const handleChangePassword = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Changing password');
+    logger.debug('Changing password');
     setPasswordForm({ current_password: '', new_password: '', confirm_password: '' });
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);

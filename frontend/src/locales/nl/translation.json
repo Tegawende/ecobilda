@@ -32,7 +32,22 @@
             "description": "Oeps! De pagina die je zoekt bestaat niet of is verplaatst.",
             "browseProjects": "Projecten bekijken",
             "goBack": "Terug"
+        },
+        "generic": {
+            "title": "Er is iets misgegaan",
+            "description": "Sorry, er is iets fout gegaan. Probeer het opnieuw.",
+            "retry": "Opnieuw proberen",
+            "goHome": "Naar home"
         }
+    },
+    "a11y": {
+        "skipToContent": "Ga naar hoofdinhoud",
+        "closeModal": "Sluiten",
+        "previousImage": "Vorige afbeelding",
+        "nextImage": "Volgende afbeelding",
+        "openMenu": "Menu openen",
+        "closeMenu": "Menu sluiten",
+        "loading": "Laden..."
     },
     "notifications": {
         "title": "Notificaties",

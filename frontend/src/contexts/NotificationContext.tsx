@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ReactNode } from 'react';
 import { notifications as mantineNotifications } from '@mantine/notifications';
+import logger from '../utils/logger';
 import { useNavigate } from 'react-router-dom';
 import { notificationsService } from '../services/notifications';
 import { getAuthTokens, isAuthenticated } from '../services/api';
@@ -41,7 +42,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       const count = await notificationsService.getUnreadCount();
       setUnreadCount(count);
     } catch (error) {
-      console.error('Error fetching unread count:', error);
+      logger.error('Error fetching unread count:', error);
     }
   };
 
@@ -52,7 +53,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       const notifs = await notificationsService.getNotifications(true, 'MESSAGE');
       setNotifications(notifs.slice(0, 10)); // Show only last 10
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      logger.error('Error fetching notifications:', error);
     }
   };
 
@@ -67,7 +68,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       );
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      logger.error('Error marking notification as read:', error);
     }
   };
 
@@ -82,7 +83,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       );
       setUnreadCount(0);
     } catch (error) {
-      console.error('Error marking all as read:', error);
+      logger.error('Error marking all as read:', error);
     }
   };
 
@@ -107,7 +108,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('Notification WebSocket connected');
+        logger.ws('connected', 'Notification WebSocket');
         setIsConnected(true);
         reconnectAttempts.current = 0;
       };
@@ -116,7 +117,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
         const data = JSON.parse(event.data);
 
         if (data.type === 'connection_established') {
-          console.log('Notification connection established');
+          logger.ws('established', 'Notification connection');
         } else if (data.type === 'unread_count') {
           setUnreadCount(data.count);
         } else if (data.type === 'new_notification') {
@@ -142,17 +143,17 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
           });
         } else if (data.type === 'notification_marked_read') {
           // WebSocket confirmation of mark as read
-          console.log('Notification marked as read:', data.notification_id);
+          logger.debug('Notification marked as read:', data.notification_id);
         }
       };
 
       ws.onerror = (error) => {
-        console.error('Notification WebSocket error:', error);
+        logger.error('Notification WebSocket error:', error);
         setIsConnected(false);
       };
 
       ws.onclose = () => {
-        console.log('Notification WebSocket disconnected');
+        logger.ws('disconnected', 'Notification WebSocket');
         setIsConnected(false);
 
         // Attempt reconnection with exponential backoff
@@ -161,13 +162,13 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
           reconnectAttempts.current += 1;
 
           reconnectTimeoutRef.current = setTimeout(() => {
-            console.log(`Attempting to reconnect... (attempt ${reconnectAttempts.current})`);
+            logger.log(`Attempting to reconnect... (attempt ${reconnectAttempts.current})`);
             connectWebSocket();
           }, delay);
         }
       };
     } catch (error) {
-      console.error('Error creating WebSocket:', error);
+      logger.error('Error creating WebSocket:', error);
       setIsConnected(false);
     }
   };

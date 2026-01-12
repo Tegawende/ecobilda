@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import type { ReactNode, ErrorInfo } from 'react';
 import { IconAlertTriangle, IconRefresh, IconHome } from '@tabler/icons-react';
+import logger from '../../utils/logger';
 
 interface Props {
     children: ReactNode;
@@ -30,10 +31,8 @@ export class ErrorBoundary extends Component<Props, State> {
     componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
         this.setState({ errorInfo });
 
-        // Log error to console in development
-        if (import.meta.env.DEV) {
-            console.error('ErrorBoundary caught an error:', error, errorInfo);
-        }
+        // Log error using the logger utility
+        logger.error('ErrorBoundary caught an error:', error, errorInfo);
 
         // TODO: Log to error reporting service (e.g., Sentry) in production
         // if (import.meta.env.PROD) {
