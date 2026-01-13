@@ -59,8 +59,8 @@ export function NotificationBell() {
           disabled={unreadCount === 0}
           offset={4}
         >
-          <ActionIcon variant="subtle" size="lg" radius="xl" aria-label={t('notifications.title')}>
-            <IconBell size={20} />
+          <ActionIcon variant="subtle" size="xl" radius="xl" aria-label={t('notifications.title')}>
+            <IconBell size={24} />
           </ActionIcon>
         </Indicator>
       </Menu.Target>

@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Container, Title, Text, Paper, Button, Group, Stack, Avatar, Badge, Rating, TextInput, Textarea } from '@mantine/core';
 import {
-  IconStar,
-  IconEdit,
+  IconPencil,
   IconMapPin,
   IconMail,
   IconMessage,
-  IconTools,
-  IconCake,
+  IconHammer,
+  IconGift,
   IconArrowLeft,
   IconLanguage,
   IconUser,
@@ -16,80 +16,51 @@ import { Layout } from '../components/common/Layout';
 import { mockUser, mockReviews } from '../data/mockData';
 import type { Review } from '../types';
 
-// Custom Styled Components matching DESIGN_SYSTEM.md
-const Input = ({ label, error, ...props }: any) => (
-  <div className="flex flex-col gap-1.5">
-    {label && <label className="text-sm font-bold text-gray-700 ml-1">{label}</label>}
-    <input
-      className={`w-full px-4 py-3 rounded-xl border ${error ? 'border-red-500 focus:ring-red-100' : 'border-gray-400 focus:border-black focus:ring-black/10'} focus:outline-none focus:ring-2 transition-all text-gray-900 placeholder-gray-500`}
-      {...props}
-    />
-    {error && <span className="text-xs text-red-600 ml-1">{error}</span>}
-  </div>
-);
-
-const Textarea = ({ label, error, ...props }: any) => (
-  <div className="flex flex-col gap-1.5">
-    {label && <label className="text-sm font-bold text-gray-700 ml-1">{label}</label>}
-    <textarea
-      className={`w-full px-4 py-3 rounded-xl border ${error ? 'border-red-500 focus:ring-red-100' : 'border-gray-400 focus:border-black focus:ring-black/10'} focus:outline-none focus:ring-2 transition-all text-gray-900 placeholder-gray-500 min-h-[120px] resize-none`}
-      {...props}
-    />
-    {error && <span className="text-xs text-red-600 ml-1">{error}</span>}
-  </div>
-);
-
-// Review Card Component
+// Review Card Component using Mantine
 function ReviewCard({ review }: { review: Review }) {
   const { t } = useTranslation();
 
   return (
-    <div className="bg-white rounded-2xl shadow-soft p-6 border border-gray-100">
-      <div className="flex items-start gap-4">
-        <img
-          src={review.writer.profile_picture || undefined}
+    <Paper radius="lg" p="lg" withBorder>
+      <Group align="flex-start" gap="md">
+        <Avatar
+          src={review.writer.profile_picture}
           alt={`${review.writer.first_name} ${review.writer.last_name}`}
-          className="w-12 h-12 rounded-full object-cover border-2 border-eco-primary/20"
+          size="lg"
+          radius="xl"
+          className="border-2 border-eco-primary/20"
         />
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <h4 className="font-bold text-gray-900">
+        <Stack gap="xs" className="flex-1">
+          <Group justify="space-between">
+            <Title order={5}>
               {review.writer.first_name} {review.writer.last_name}
-            </h4>
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <IconStar
-                  key={i}
-                  size={16}
-                  className={i < review.rating ? 'text-eco-terracotta fill-current' : 'text-gray-300'}
-                />
-              ))}
-            </div>
-          </div>
-          <p className="text-sm text-gray-500 mt-0.5">
+            </Title>
+            <Rating value={review.rating} readOnly size="sm" color="eco-terracotta" />
+          </Group>
+          <Text size="sm" c="dimmed">
             {new Date(review.created_at).toLocaleDateString('fr-FR', {
               year: 'numeric',
               month: 'long',
               day: 'numeric',
             })}
-          </p>
-          <p className="text-gray-700 mt-3">{review.feedback}</p>
+          </Text>
+          <Text size="sm">{review.feedback}</Text>
 
           {review.response && (
-            <div className="mt-4 pl-4 border-l-2 border-eco-primary/30 bg-eco-brand-50/30 p-3 rounded-r-lg">
-              <p className="text-sm font-semibold text-eco-primary mb-1">
+            <Paper radius="md" p="sm" bg="var(--mantine-color-eco-primary-light)" className="border-l-2 border-eco-primary">
+              <Text size="sm" fw={600} c="eco-primary" mb={4}>
                 {t('profile.yourResponse') || 'Your response'}
-              </p>
-              <p className="text-gray-600 text-sm">{review.response}</p>
-            </div>
+              </Text>
+              <Text size="sm" c="dimmed">{review.response}</Text>
+            </Paper>
           )}
-        </div>
-      </div>
-    </div>
+        </Stack>
+      </Group>
+    </Paper>
   );
 }
 
-// Edit Profile Form
+// Edit Profile Form using Mantine
 function EditProfileForm({ user, onSave, onCancel }: { user: typeof mockUser; onSave: (data: any) => void; onCancel: () => void }) {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
@@ -104,49 +75,48 @@ function EditProfileForm({ user, onSave, onCancel }: { user: typeof mockUser; on
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-soft p-8 border border-gray-100">
-      <h2 className="text-2xl font-display font-bold text-gray-900 mb-6">
+    <Paper radius="lg" p="xl" withBorder>
+      <Title order={2} className="font-display" mb="lg">
         {t('profile.editProfile') || 'Edit Profile'}
-      </h2>
+      </Title>
 
-      <div className="space-y-5">
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            label={t('auth.firstName') || 'First Name'}
-            value={formData.first_name}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, first_name: e.target.value })}
+      <form onSubmit={handleSubmit}>
+        <Stack gap="md">
+          <Group grow>
+            <TextInput
+              label={t('auth.firstName') || 'First Name'}
+              value={formData.first_name}
+              onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+              radius="lg"
+            />
+            <TextInput
+              label={t('auth.lastName') || 'Last Name'}
+              value={formData.last_name}
+              onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+              radius="lg"
+            />
+          </Group>
+
+          <Textarea
+            label={t('profile.bio') || 'About me'}
+            value={formData.bio}
+            onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+            placeholder={t('profile.bioPlaceholder') || 'Tell others about yourself...'}
+            radius="lg"
+            minRows={4}
           />
-          <Input
-            label={t('auth.lastName') || 'Last Name'}
-            value={formData.last_name}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, last_name: e.target.value })}
-          />
-        </div>
+        </Stack>
 
-        <Textarea
-          label={t('profile.bio') || 'About me'}
-          value={formData.bio}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, bio: e.target.value })}
-          placeholder={t('profile.bioPlaceholder') || 'Tell others about yourself...'}
-        />
-      </div>
-
-      <div className="flex justify-end gap-3 mt-8">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-6 py-2.5 rounded-full border border-gray-300 text-gray-700 font-semibold hover:border-gray-400 transition-colors"
-        >
-          {t('common.cancel') || 'Cancel'}
-        </button>
-        <button
-          type="submit"
-          className="px-6 py-2.5 rounded-full bg-eco-primary text-white font-semibold hover:bg-eco-primaryDark shadow-lg shadow-eco-primary/20 transition-all"
-        >
-          {t('common.save') || 'Save Changes'}
-        </button>
-      </div>
-    </form>
+        <Group justify="flex-end" mt="xl">
+          <Button variant="outline" radius="xl" onClick={onCancel}>
+            {t('common.cancel') || 'Cancel'}
+          </Button>
+          <Button type="submit" radius="xl" color="eco-primary">
+            {t('common.save') || 'Save Changes'}
+          </Button>
+        </Group>
+      </form>
+    </Paper>
   );
 }
 
@@ -165,16 +135,18 @@ export function ProfilePage() {
     return (
       <Layout>
         <div className="bg-stone-50 min-h-screen py-12">
-          <div className="max-w-2xl mx-auto px-6">
-            <button
+          <Container size="sm">
+            <Button
+              variant="subtle"
+              color="gray"
+              leftSection={<IconArrowLeft size={18} />}
               onClick={() => setIsEditing(false)}
-              className="flex items-center gap-2 text-gray-600 hover:text-eco-primary mb-6 transition-colors"
+              mb="md"
             >
-              <IconArrowLeft size={18} />
               {t('profile.backToProfile') || 'Back to Profile'}
-            </button>
+            </Button>
             <EditProfileForm user={user} onSave={handleSave} onCancel={() => setIsEditing(false)} />
-          </div>
+          </Container>
         </div>
       </Layout>
     );
@@ -183,153 +155,155 @@ export function ProfilePage() {
   return (
     <Layout>
       <div className="bg-stone-50 min-h-screen py-12">
-        <div className="max-w-4xl mx-auto px-6">
+        <Container size="md">
           {/* Profile Header Card */}
-          <div className="bg-white rounded-2xl shadow-soft p-8 border border-gray-100 mb-8">
-            <div className="flex flex-col sm:flex-row items-start gap-6">
+          <Paper radius="lg" p="xl" withBorder mb="xl">
+            <Group align="flex-start" gap="lg" wrap="wrap">
               {/* Avatar */}
-              <img
-                src={user.profile_picture || undefined}
+              <Avatar
+                src={user.profile_picture}
                 alt={`${user.first_name} ${user.last_name}`}
-                className="w-24 h-24 rounded-full border-4 border-eco-primary/20 object-cover shadow-md"
+                size={96}
+                radius="xl"
+                className="border-4 border-eco-primary/20"
               />
 
               {/* User Info */}
-              <div className="flex-1">
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <Stack gap="xs" className="flex-1" style={{ minWidth: 200 }}>
+                <Group justify="space-between" wrap="wrap">
                   <div>
-                    <h1 className="text-3xl font-display font-bold text-gray-900">
+                    <Title order={1} className="font-display">
                       {user.first_name} {user.last_name}
-                    </h1>
-                    <p className="text-gray-500 flex items-center gap-2 mt-1">
-                      <IconMail size={16} />
-                      {user.email}
-                    </p>
+                    </Title>
+                    <Group gap="xs" mt={4}>
+                      <IconMail size={16} className="text-gray-500" />
+                      <Text c="dimmed">{user.email}</Text>
+                    </Group>
 
                     {user.review_count > 0 && (
-                      <div className="flex items-center gap-2 mt-3">
-                        <div className="flex items-center gap-1">
-                          <IconStar size={18} className="text-eco-terracotta fill-current" />
-                          <span className="font-bold text-gray-900">{user.average_rating.toFixed(1)}</span>
-                        </div>
-                        <span className="text-gray-500 text-sm">
+                      <Group gap="xs" mt="sm">
+                        <Rating value={user.average_rating} readOnly fractions={2} color="eco-terracotta" />
+                        <Text size="sm" c="dimmed">
                           ({user.review_count} {user.review_count === 1 ? (t('profile.review') || 'review') : (t('profile.reviews') || 'reviews')})
-                        </span>
-                      </div>
+                        </Text>
+                      </Group>
                     )}
                   </div>
 
-                  <button
+                  <Button
+                    variant="outline"
+                    radius="xl"
+                    leftSection={<IconPencil size={18} />}
                     onClick={() => setIsEditing(true)}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-full border border-gray-200 text-gray-700 font-semibold hover:border-eco-primary hover:text-eco-primary transition-all"
                   >
-                    <IconEdit size={18} />
                     {t('profile.editProfile') || 'Edit Profile'}
-                  </button>
-                </div>
-              </div>
-            </div>
+                  </Button>
+                </Group>
+              </Stack>
+            </Group>
 
             {/* Bio */}
             {user.bio && (
-              <div className="mt-8 pt-6 border-t border-gray-100">
-                <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-2">
-                  <IconUser size={16} />
-                  {t('profile.about') || 'About'}
-                </h3>
-                <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{user.bio}</p>
-              </div>
+              <Stack gap="xs" mt="xl" pt="lg" className="border-t border-gray-100">
+                <Group gap="xs">
+                  <IconUser size={16} className="text-gray-500" />
+                  <Text size="sm" fw={700} c="dimmed" tt="uppercase">
+                    {t('profile.about') || 'About'}
+                  </Text>
+                </Group>
+                <Text className="whitespace-pre-wrap">{user.bio}</Text>
+              </Stack>
             )}
 
             {/* Details Grid */}
             <div className="mt-8 pt-6 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Location */}
               {user.address && (
-                <div>
-                  <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                <Stack gap="xs">
+                  <Group gap="xs">
                     <IconMapPin size={16} className="text-eco-terracotta" />
-                    {t('profile.location') || 'Location'}
-                  </h3>
-                  <p className="font-medium text-gray-900">
-                    {user.address.city}, {user.address.country?.name}
-                  </p>
-                </div>
+                    <Text size="sm" fw={700} c="dimmed" tt="uppercase">
+                      {t('profile.location') || 'Location'}
+                    </Text>
+                  </Group>
+                  <Text fw={500}>{user.address.city}, {user.address.country?.name}</Text>
+                </Stack>
               )}
 
               {/* Date of Birth */}
               {user.date_of_birth && (
-                <div>
-                  <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
-                    <IconCake size={16} className="text-eco-terracotta" />
-                    {t('profile.birthday') || 'Birthday'}
-                  </h3>
-                  <p className="font-medium text-gray-900">
+                <Stack gap="xs">
+                  <Group gap="xs">
+                    <IconGift size={16} className="text-eco-terracotta" />
+                    <Text size="sm" fw={700} c="dimmed" tt="uppercase">
+                      {t('profile.birthday') || 'Birthday'}
+                    </Text>
+                  </Group>
+                  <Text fw={500}>
                     {new Date(user.date_of_birth).toLocaleDateString('fr-FR', {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric',
                     })}
-                  </p>
-                </div>
+                  </Text>
+                </Stack>
               )}
 
               {/* Languages */}
               {user.languages && user.languages.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                <Stack gap="xs">
+                  <Group gap="xs">
                     <IconLanguage size={16} className="text-eco-terracotta" />
-                    {t('profile.languages') || 'Languages'}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
+                    <Text size="sm" fw={700} c="dimmed" tt="uppercase">
+                      {t('profile.languages') || 'Languages'}
+                    </Text>
+                  </Group>
+                  <Group gap="xs">
                     {user.languages.map((lang) => (
-                      <span
-                        key={lang.code}
-                        className="px-3 py-1 rounded-full text-xs font-bold bg-eco-brand-50 text-eco-primary border border-eco-primary/20"
-                      >
+                      <Badge key={lang.code} variant="light" color="eco-primary" size="sm">
                         {lang.name}
-                      </span>
+                      </Badge>
                     ))}
-                  </div>
-                </div>
+                  </Group>
+                </Stack>
               )}
 
               {/* Skills */}
               {user.skills && user.skills.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
-                    <IconTools size={16} className="text-eco-terracotta" />
-                    {t('profile.skills') || 'Skills'}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
+                <Stack gap="xs">
+                  <Group gap="xs">
+                    <IconHammer size={16} className="text-eco-terracotta" />
+                    <Text size="sm" fw={700} c="dimmed" tt="uppercase">
+                      {t('profile.skills') || 'Skills'}
+                    </Text>
+                  </Group>
+                  <Group gap="xs">
                     {user.skills.map((skill) => (
-                      <span
-                        key={skill.code}
-                        className="px-3 py-1 rounded-full text-xs font-bold bg-eco-brand-50 text-eco-primary border border-eco-primary/20"
-                      >
+                      <Badge key={skill.code} variant="light" color="eco-primary" size="sm">
                         {skill.icon} {skill.display_name_en}
-                      </span>
+                      </Badge>
                     ))}
-                  </div>
-                </div>
+                  </Group>
+                </Stack>
               )}
             </div>
-          </div>
+          </Paper>
 
           {/* Reviews Section */}
           {reviews.length > 0 && (
-            <div>
-              <h2 className="text-2xl font-display font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <Stack gap="md">
+              <Group gap="sm">
                 <IconMessage size={24} className="text-eco-primary" />
-                {t('profile.reviewsTitle') || 'Reviews'} ({reviews.length})
-              </h2>
-              <div className="space-y-4">
-                {reviews.map((review) => (
-                  <ReviewCard key={review.id} review={review} />
-                ))}
-              </div>
-            </div>
+                <Title order={2} className="font-display">
+                  {t('profile.reviewsTitle') || 'Reviews'} ({reviews.length})
+                </Title>
+              </Group>
+              {reviews.map((review) => (
+                <ReviewCard key={review.id} review={review} />
+              ))}
+            </Stack>
           )}
-        </div>
+        </Container>
       </div>
     </Layout>
   );

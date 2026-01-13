@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ThemeIcon } from '@mantine/core';
 import {
   IconPlant,
   IconHammer,
@@ -32,17 +33,17 @@ export function HomePage() {
         {/* Dark overlay for text readability without losing color */}
         <div className="absolute inset-0 -z-10 bg-black/40" />
 
-        <div className="relative h-full flex flex-col justify-center items-center text-center px-6 lg:px-8 pt-20">
-          <h1 className="text-4xl font-display font-bold tracking-tight text-white sm:text-7xl drop-shadow-xl max-w-4xl">
-            {t('home.hero.title') || "Natural Building Everywhere"}
+        <div className="relative h-full flex flex-col justify-center items-center text-center px-6 lg:px-8 pt-10">
+          <h1 className="text-5xl sm:text-[66px] font-display font-bold text-white drop-shadow-2xl max-w-6xl leading-[1.1]">
+            Natural Building<br />Everywhere
           </h1>
-          <p className="mt-6 text-xl leading-8 text-white font-medium max-w-2xl drop-shadow-md text-shadow">
-            {t('home.hero.subtitle')}
+          <p className="mt-8 text-lg sm:text-2xl text-white font-medium max-w-3xl drop-shadow-lg opacity-90">
+            {t('home.hero.subtitle') || "Connect with eco-construction and permaculture projects worldwide. Learn new skills while contributing to sustainable communities."}
           </p>
-          <div className="mt-10 flex items-center justify-center gap-x-6">
+          <div className="mt-12 flex items-center justify-center gap-x-6">
             <Link
               to="/projects"
-              className="rounded-full bg-eco-primary px-6 py-3 text-base font-bold text-white shadow-lg shadow-black/30 hover:bg-eco-primaryDark hover:scale-105 transition-all duration-300 border border-white/20"
+              className="rounded-full bg-[#67a36f] px-8 py-4 text-base font-bold text-white shadow-xl hover:bg-[#5a8f61] transform hover:-translate-y-1 transition-all duration-300"
             >
               {t('home.hero.browseProjects')}
             </Link>
@@ -53,9 +54,9 @@ export function HomePage() {
       {/* Values / Features Section - Clean White Background */}
       <div className="bg-white py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-display font-bold tracking-tight text-eco-primary sm:text-4xl">
-              {t('home.about.title')}
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="text-4xl sm:text-[42px] font-display font-bold tracking-tight text-eco-primary">
+              {t('home.about.title') || "Welcome to Ecobilda"}
             </h2>
             <p className="mt-6 text-lg leading-8 text-gray-600">
               {t('home.about.intro')}
@@ -64,37 +65,43 @@ export function HomePage() {
           <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
             <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
               <div className="flex flex-col items-center text-center p-6">
-                <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-eco-brand-50 text-eco-primary shadow-sm transform hover:rotate-3 transition-transform">
-                  <IconHammer size={40} stroke={1.5} />
+                <div className="mb-6">
+                  <ThemeIcon size={80} radius="lg" color="eco-primary" variant="light" className="transform hover:rotate-3 transition-transform">
+                    <IconHammer size={40} stroke={1.5} />
+                  </ThemeIcon>
                 </div>
                 <dt className="text-xl font-bold leading-7 text-gray-900 font-display">
                   {t('home.naturalBuilding.title')}
                 </dt>
-                <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
+                <dd className="mt-4 flex flex-auto flex-col text-sm leading-7 text-gray-600">
                   <p className="flex-auto">{t('home.naturalBuilding.content')}</p>
                 </dd>
               </div>
 
               <div className="flex flex-col items-center text-center p-6">
-                <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-eco-brand-50 text-eco-primary shadow-sm transform hover:-rotate-3 transition-transform">
-                  <IconPlant size={40} stroke={1.5} />
+                <div className="mb-6">
+                  <ThemeIcon size={80} radius="lg" color="eco-primary" variant="light" className="transform hover:-rotate-3 transition-transform">
+                    <IconPlant size={40} stroke={1.5} />
+                  </ThemeIcon>
                 </div>
                 <dt className="text-xl font-bold leading-7 text-gray-900 font-display">
                   {t('home.permaculture.title')}
                 </dt>
-                <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
+                <dd className="mt-4 flex flex-auto flex-col text-sm leading-7 text-gray-600">
                   <p className="flex-auto">{t('home.permaculture.content')}</p>
                 </dd>
               </div>
 
               <div className="flex flex-col items-center text-center p-6">
-                <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-eco-brand-50 text-eco-primary shadow-sm transform hover:rotate-3 transition-transform">
-                  <IconHeartHandshake size={40} stroke={1.5} />
+                <div className="mb-6">
+                  <ThemeIcon size={80} radius="lg" color="eco-primary" variant="light" className="transform hover:rotate-3 transition-transform">
+                    <IconHeartHandshake size={40} stroke={1.5} />
+                  </ThemeIcon>
                 </div>
                 <dt className="text-xl font-bold leading-7 text-gray-900 font-display">
                   {t('home.community.title')}
                 </dt>
-                <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
+                <dd className="mt-4 flex flex-auto flex-col text-sm leading-7 text-gray-600">
                   <p className="flex-auto">{t('home.community.content')}</p>
                 </dd>
               </div>
@@ -103,9 +110,9 @@ export function HomePage() {
         </div>
       </div>
 
-      {/* Featured Projects - Light background */}
+      {/* Featured Projects - Light background with MORE margins */}
       <div className="bg-stone-50 py-24 sm:py-32 border-t border-stone-100">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl px-6 lg:px-8">
           <div className="flex justify-between items-end mb-12">
             <div>
               <h2 className="text-3xl font-display font-bold tracking-tight text-eco-primary sm:text-4xl">
@@ -147,22 +154,22 @@ export function HomePage() {
           </h2>
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 text-center mb-12">
             <div className="mx-auto flex max-w-xs flex-col gap-y-2 p-4">
-              <dt className="text-base leading-7 text-eco-cream/80 font-medium uppercase tracking-wider">{t('home.stats.participants') || "Participants"}</dt>
-              <dd className="order-first text-5xl font-bold tracking-tight text-white mb-2">2,500+</dd>
+              <dt className="text-sm leading-7 text-eco-cream/80 font-medium uppercase tracking-wider">{t('home.stats.participants') || "Participants"}</dt>
+              <dd className="order-first text-[45px] font-bold tracking-tight text-white mb-2">2,500+</dd>
             </div>
             <div className="mx-auto flex max-w-xs flex-col gap-y-2 p-4">
-              <dt className="text-base leading-7 text-eco-cream/80 font-medium uppercase tracking-wider">{t('home.stats.projects') || "Projets réalisés"}</dt>
-              <dd className="order-first text-5xl font-bold tracking-tight text-white mb-2">150+</dd>
+              <dt className="text-sm leading-7 text-eco-cream/80 font-medium uppercase tracking-wider">{t('home.stats.projects') || "Projets réalisés"}</dt>
+              <dd className="order-first text-[45px] font-bold tracking-tight text-white mb-2">150+</dd>
             </div>
             <div className="mx-auto flex max-w-xs flex-col gap-y-2 p-4">
-              <dt className="text-base leading-7 text-eco-cream/80 font-medium uppercase tracking-wider">{t('home.stats.countries') || "Pays"}</dt>
-              <dd className="order-first text-5xl font-bold tracking-tight text-white mb-2">12</dd>
+              <dt className="text-sm leading-7 text-eco-cream/80 font-medium uppercase tracking-wider">{t('home.stats.countries') || "Pays"}</dt>
+              <dd className="order-first text-[45px] font-bold tracking-tight text-white mb-2">12</dd>
             </div>
           </div>
           <div className="flex justify-center">
             <Link
               to="/register"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-sm font-bold text-eco-terracotta shadow-lg hover:bg-eco-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-all transform hover:-translate-y-1"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-bold text-eco-terracotta shadow-lg hover:bg-eco-cream transition-all transform hover:-translate-y-1"
             >
               <IconUserPlus size={20} />
               {t('home.community.joinBtn') || "Devenir membre (Gratuit)"}

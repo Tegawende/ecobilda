@@ -85,7 +85,7 @@ async function searchMapboxLocations(query: string): Promise<MapboxFeature[]> {
     }
 }
 
-// Simple Calendar Component
+// Dual-Month Calendar Component (Airbnb-style)
 function Calendar({
     selectedStart,
     selectedEnd,
@@ -97,16 +97,31 @@ function Calendar({
     onSelect: (start: Date | null, end: Date | null) => void;
     onClose: () => void;
 }) {
-    const [currentMonth, setCurrentMonth] = useState(new Date());
+    const [baseMonth, setBaseMonth] = useState(() => {
+        // Start with the month of selectedStart, or current month
+        if (selectedStart) {
+            return new Date(selectedStart.getFullYear(), selectedStart.getMonth(), 1);
+        }
+        return new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    });
     const [selectingEnd, setSelectingEnd] = useState(false);
     const [tempStart, setTempStart] = useState<Date | null>(selectedStart);
     const [tempEnd, setTempEnd] = useState<Date | null>(selectedEnd);
+    const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
 
     const { t, i18n } = useTranslation();
-    const monthName = new Intl.DateTimeFormat(i18n.language, { month: 'long' }).format(currentMonth);
+
+    // Get day names starting with Sunday (like Airbnb)
     const dayNames = [0, 1, 2, 3, 4, 5, 6].map(d =>
-        new Intl.DateTimeFormat(i18n.language, { weekday: 'short' }).format(new Date(2024, 0, d + 1))
+        new Intl.DateTimeFormat(i18n.language, { weekday: 'narrow' }).format(new Date(2024, 0, d)) // Jan 2024 starts on Monday, so d=0 is Sunday
     );
+
+    // Calculate the second month
+    const secondMonth = new Date(baseMonth.getFullYear(), baseMonth.getMonth() + 1, 1);
+
+    const getMonthName = (date: Date) => {
+        return new Intl.DateTimeFormat(i18n.language, { month: 'long', year: 'numeric' }).format(date);
+    };
 
     const getDaysInMonth = (date: Date) => {
         const year = date.getFullYear();
@@ -115,8 +130,8 @@ function Calendar({
         const lastDay = new Date(year, month + 1, 0);
         const days: (Date | null)[] = [];
 
-        // Add empty days for the first week
-        const startDay = (firstDay.getDay() + 6) % 7; // Monday = 0
+        // Add empty days for the first week (Sunday = 0)
+        const startDay = firstDay.getDay();
         for (let i = 0; i < startDay; i++) {
             days.push(null);
         }
@@ -130,14 +145,38 @@ function Calendar({
     };
 
     const isInRange = (date: Date) => {
-        if (!tempStart || !tempEnd) return false;
-        return date >= tempStart && date <= tempEnd;
+        if (!tempStart) return false;
+
+        // If we're selecting end date and hovering, show preview range
+        if (selectingEnd && hoveredDate) {
+            const rangeEnd = hoveredDate >= tempStart ? hoveredDate : tempStart;
+            const actualStart = hoveredDate >= tempStart ? tempStart : hoveredDate;
+            return date > actualStart && date < rangeEnd;
+        }
+
+        if (!tempEnd) return false;
+        return date > tempStart && date < tempEnd;
+    };
+
+    const isRangeStart = (date: Date) => {
+        if (!tempStart) return false;
+        return date.toDateString() === tempStart.toDateString();
+    };
+
+    const isRangeEnd = (date: Date) => {
+        if (selectingEnd && hoveredDate && tempStart) {
+            const endDate = hoveredDate >= tempStart ? hoveredDate : tempStart;
+            const startDate = hoveredDate >= tempStart ? tempStart : hoveredDate;
+            if (date.toDateString() === endDate.toDateString() && endDate.toDateString() !== startDate.toDateString()) {
+                return true;
+            }
+        }
+        if (!tempEnd) return false;
+        return date.toDateString() === tempEnd.toDateString();
     };
 
     const isSelected = (date: Date) => {
-        if (tempStart && date.toDateString() === tempStart.toDateString()) return true;
-        if (tempEnd && date.toDateString() === tempEnd.toDateString()) return true;
-        return false;
+        return isRangeStart(date) || isRangeEnd(date);
     };
 
     const handleDayClick = (date: Date) => {
@@ -149,10 +188,16 @@ function Calendar({
             if (date < tempStart) {
                 setTempStart(date);
                 setTempEnd(tempStart);
+            } else if (date.toDateString() === tempStart.toDateString()) {
+                // Clicking same date - reset
+                setTempStart(date);
+                setTempEnd(null);
+                setSelectingEnd(true);
             } else {
                 setTempEnd(date);
             }
             setSelectingEnd(false);
+            setHoveredDate(null);
         }
     };
 
@@ -164,83 +209,207 @@ function Calendar({
     const handleClear = () => {
         setTempStart(null);
         setTempEnd(null);
+        setSelectingEnd(false);
         onSelect(null, null);
         onClose();
     };
 
-    const days = getDaysInMonth(currentMonth);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Check if we can go to previous month (not before current month)
+    const canGoPrev = baseMonth > new Date(today.getFullYear(), today.getMonth(), 1);
+
+    // Render a single month
+    const renderMonth = (monthDate: Date) => {
+        const days = getDaysInMonth(monthDate);
+
+        return (
+            <div className="flex-1 min-w-[280px]">
+                {/* Month name */}
+                <div className="text-center mb-4">
+                    <span className="font-semibold text-gray-900 capitalize">
+                        {getMonthName(monthDate)}
+                    </span>
+                </div>
+
+                {/* Day names */}
+                <div className="grid grid-cols-7 mb-1">
+                    {dayNames.map((day, idx) => (
+                        <div key={idx} className="text-center text-xs text-gray-500 font-medium py-2">
+                            {day}
+                        </div>
+                    ))}
+                </div>
+
+                {/* Days grid */}
+                <div className="grid grid-cols-7">
+                    {days.map((date, idx) => {
+                        const isPast = date && date < today;
+                        const isStart = date && isRangeStart(date);
+                        const isEnd = date && isRangeEnd(date);
+                        const inRange = date && isInRange(date);
+                        const selected = date && isSelected(date);
+
+                        return (
+                            <div
+                                key={idx}
+                                className={`relative h-10 flex items-center justify-center
+                                    ${inRange ? 'bg-gray-100' : ''}
+                                    ${isStart && (tempEnd || (selectingEnd && hoveredDate)) ? 'bg-gradient-to-r from-transparent via-gray-100 to-gray-100 rounded-l-full' : ''}
+                                    ${isEnd && tempStart && (!isStart || tempEnd) ? 'bg-gradient-to-l from-transparent via-gray-100 to-gray-100 rounded-r-full' : ''}
+                                `}
+                            >
+                                {date && (
+                                    <button
+                                        onClick={() => handleDayClick(date)}
+                                        onMouseEnter={() => selectingEnd && setHoveredDate(date)}
+                                        onMouseLeave={() => setHoveredDate(null)}
+                                        disabled={!!isPast}
+                                        className={`w-10 h-10 rounded-full text-sm font-medium flex items-center justify-center transition-all
+                                            ${isPast ? 'text-gray-300 cursor-not-allowed line-through' : 'cursor-pointer'}
+                                            ${!isPast && !selected ? 'hover:bg-gray-200' : ''}
+                                            ${selected ? 'bg-gray-900 text-white hover:bg-gray-800' : ''}
+                                            ${inRange && !selected ? '' : ''}
+                                            ${date.toDateString() === today.toDateString() && !selected ? 'font-bold' : ''}
+                                        `}
+                                    >
+                                        {date.getDate()}
+                                    </button>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    };
+
     return (
-        <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 z-50 w-[320px]">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4">
+        <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 z-50" style={{ width: '640px' }}>
+            {/* Navigation Header */}
+            <div className="flex items-center justify-between mb-2">
                 <button
-                    onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-                    className="p-1 hover:bg-gray-100 rounded-full cursor-pointer"
+                    onClick={() => setBaseMonth(new Date(baseMonth.getFullYear(), baseMonth.getMonth() - 1, 1))}
+                    disabled={!canGoPrev}
+                    className={`p-2 rounded-full transition-colors ${canGoPrev ? 'hover:bg-gray-100 cursor-pointer' : 'opacity-30 cursor-not-allowed'}`}
                 >
                     <IconChevronLeft size={20} />
                 </button>
-                <span className="font-semibold capitalize">
-                    {monthName} {currentMonth.getFullYear()}
-                </span>
+                <div className="flex-1" />
                 <button
-                    onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-                    className="p-1 hover:bg-gray-100 rounded-full cursor-pointer"
+                    onClick={() => setBaseMonth(new Date(baseMonth.getFullYear(), baseMonth.getMonth() + 1, 1))}
+                    className="p-2 hover:bg-gray-100 rounded-full cursor-pointer"
                 >
                     <IconChevronRight size={20} />
                 </button>
             </div>
 
-            {/* Day names */}
-            <div className="grid grid-cols-7 gap-1 mb-2">
-                {dayNames.map((day) => (
-                    <div key={day} className="text-center text-xs text-gray-500 font-medium py-1">
-                        {day}
-                    </div>
-                ))}
-            </div>
-
-            {/* Days grid */}
-            <div className="grid grid-cols-7 gap-1">
-                {days.map((date, idx) => (
-                    <div key={idx} className="aspect-square">
-                        {date && (
-                            <button
-                                onClick={() => handleDayClick(date)}
-                                disabled={date < today}
-                                className={`w-full h-full rounded-full text-sm flex items-center justify-center transition-all cursor-pointer
-                  ${date < today ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-gray-100'}
-                  ${isSelected(date) ? 'bg-eco-primary text-white hover:bg-eco-primaryDark' : ''}
-                  ${isInRange(date) && !isSelected(date) ? 'bg-eco-primary/20' : ''}
-                `}
-                            >
-                                {date.getDate()}
-                            </button>
-                        )}
-                    </div>
-                ))}
+            {/* Two months side by side */}
+            <div className="flex gap-8">
+                {renderMonth(baseMonth)}
+                {renderMonth(secondMonth)}
             </div>
 
             {/* Footer */}
-            <div className="flex justify-between mt-4 pt-4 border-t border-gray-100">
+            <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
                 <button
                     onClick={handleClear}
-                    className="text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
+                    className="text-sm font-medium text-gray-600 hover:text-gray-900 underline cursor-pointer"
                 >
                     {t('common.clear')}
                 </button>
-                <button
-                    onClick={handleApply}
-                    className="px-4 py-1.5 bg-eco-primary text-white text-sm font-semibold rounded-lg hover:bg-eco-primaryDark cursor-pointer"
-                >
-                    {t('common.apply')}
-                </button>
+                <div className="flex gap-3">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900 cursor-pointer"
+                    >
+                        {t('common.cancel')}
+                    </button>
+                    <button
+                        onClick={handleApply}
+                        className="px-5 py-2 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
+                    >
+                        {t('common.apply')}
+                    </button>
+                </div>
             </div>
         </div>
     );
 }
+
+// Toggle button for amenities (simple on/off)
+const AmenityToggle = ({
+    value,
+    onChange,
+    icon: Icon,
+    label,
+}: {
+    value: boolean;
+    onChange: (val: boolean) => void;
+    icon: React.ElementType;
+    label: string;
+}) => (
+    <button
+        onClick={() => onChange(!value)}
+        className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer w-full ${value
+            ? 'border-eco-primary bg-eco-primary/10'
+            : 'border-gray-200 hover:border-gray-300'
+            }`}
+    >
+        <Icon size={24} className={value ? 'text-eco-primary' : 'text-gray-400'} />
+        <span className="text-sm font-medium text-gray-700 flex-1 text-left">{label}</span>
+        <div className={`w-10 h-6 rounded-full transition-all ${value ? 'bg-eco-primary' : 'bg-gray-300'}`}>
+            <div className={`w-5 h-5 rounded-full bg-white shadow-sm transform transition-all mt-0.5 ${value ? 'translate-x-4.5 ml-0.5' : 'translate-x-0.5'}`} />
+        </div>
+    </button>
+);
+
+// Mantine Range slider component
+const RangeInput = ({
+    label,
+    value,
+    onChange,
+    min,
+    max,
+    unit,
+}: {
+    label: string;
+    value: [number, number];
+    onChange: (val: [number, number]) => void;
+    min: number;
+    max: number;
+    unit: string;
+}) => {
+    return (
+        <div className="space-y-3">
+            <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-700">{label}</span>
+                <span className="text-sm text-gray-500">
+                    {value[0]} - {value[1]} {unit}
+                </span>
+            </div>
+            <RangeSlider
+                value={value}
+                onChange={onChange}
+                min={min}
+                max={max}
+                step={1}
+                minRange={1}
+                color="eco-primary"
+                size="md"
+                styles={{
+                    track: { height: 8 },
+                    thumb: {
+                        height: 18,
+                        width: 18,
+                        borderWidth: 2,
+                    },
+                }}
+            />
+        </div>
+    );
+};
 
 export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onClear }: ProjectFiltersProps) {
     const { t } = useTranslation();
@@ -369,78 +538,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
         setTempFilters({ ...tempFilters, [key]: value });
     };
 
-    // Toggle button for amenities (simple on/off)
-    const AmenityToggle = ({
-        value,
-        onChange,
-        icon: Icon,
-        label,
-    }: {
-        value: boolean;
-        onChange: (val: boolean) => void;
-        icon: React.ElementType;
-        label: string;
-    }) => (
-        <button
-            onClick={() => onChange(!value)}
-            className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer w-full ${value
-                ? 'border-eco-primary bg-eco-primary/10'
-                : 'border-gray-200 hover:border-gray-300'
-                }`}
-        >
-            <Icon size={24} className={value ? 'text-eco-primary' : 'text-gray-400'} />
-            <span className="text-sm font-medium text-gray-700 flex-1 text-left">{label}</span>
-            <div className={`w-10 h-6 rounded-full transition-all ${value ? 'bg-eco-primary' : 'bg-gray-300'}`}>
-                <div className={`w-5 h-5 rounded-full bg-white shadow-sm transform transition-all mt-0.5 ${value ? 'translate-x-4.5 ml-0.5' : 'translate-x-0.5'}`} />
-            </div>
-        </button>
-    );
 
-    // Mantine Range slider component
-    const RangeInput = ({
-        label,
-        value,
-        onChange,
-        min,
-        max,
-        unit,
-    }: {
-        label: string;
-        value: [number, number];
-        onChange: (val: [number, number]) => void;
-        min: number;
-        max: number;
-        unit: string;
-    }) => {
-        return (
-            <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                    <span className="font-medium text-gray-700">{label}</span>
-                    <span className="text-sm text-gray-500">
-                        {value[0]} - {value[1]} {unit}
-                    </span>
-                </div>
-                <RangeSlider
-                    value={value}
-                    onChange={onChange}
-                    min={min}
-                    max={max}
-                    step={1}
-                    minRange={1}
-                    color="eco-primary"
-                    size="md"
-                    styles={{
-                        track: { height: 8 },
-                        thumb: {
-                            height: 18,
-                            width: 18,
-                            borderWidth: 2,
-                        },
-                    }}
-                />
-            </div>
-        );
-    };
 
     const formatDateRange = () => {
         if (!filters.dateRange.start && !filters.dateRange.end) return t('projects.filters.dates') || 'Dates';

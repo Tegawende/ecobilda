@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { IconBrandTwitter, IconBrandInstagram, IconWorld } from '@tabler/icons-react';
+import { IconBrandTwitter, IconBrandInstagram, IconBrandFacebook, IconWorld } from '@tabler/icons-react';
 
 export function Footer() {
   const { t, i18n } = useTranslation();
@@ -45,6 +45,9 @@ export function Footer() {
           <div className="lg:col-span-2">
 
             <div className="flex gap-2">
+              <a href="https://www.facebook.com/Ecobilda/" target="_blank" rel="noopener noreferrer" className="p-2 text-gray-400 hover:text-eco-primary transition-colors">
+                <IconBrandFacebook size={20} stroke={1.5} />
+              </a>
               <a href="https://twitter.com/Ecobilda" target="_blank" rel="noopener noreferrer" className="p-2 text-gray-400 hover:text-eco-primary transition-colors">
                 <IconBrandTwitter size={20} stroke={1.5} />
               </a>

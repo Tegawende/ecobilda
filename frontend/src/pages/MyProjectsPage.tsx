@@ -14,12 +14,12 @@ import logger from '../utils/logger';
 // Filter Tabs Component
 function FilterTabs({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
   return (
-    <div className="flex gap-1 p-1 bg-gray-100/80 rounded-xl w-full">
+    <div className="flex bg-gray-100/80 rounded-xl w-full p-1">
       {options.map((option) => (
         <button
           key={option.value}
           onClick={() => onChange(option.value)}
-          className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${value === option.value
+          className={`flex-1 px-4 py-3 rounded-lg text-sm font-bold transition-all cursor-pointer whitespace-nowrap text-center ${value === option.value
             ? 'bg-white text-eco-primary shadow-sm'
             : 'text-gray-500 hover:text-gray-700'
             }`}
