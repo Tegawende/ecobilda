@@ -49,30 +49,20 @@ function useImagePreloader(images: string[]) {
   return loadedImages;
 }
 
-// Memoized image component to prevent unnecessary re-renders
+// Memoized image component for carousel slide
 const CarouselImage = memo(({
   src,
   alt,
-  isActive,
-  isGroupHovered
 }: {
   src: string;
   alt: string;
-  isActive: boolean;
-  isGroupHovered?: boolean;
 }) => (
   <img
     src={src}
     alt={alt}
     loading="lazy"
     decoding="async"
-    className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-out will-change-[opacity,transform] ${isActive
-      ? 'opacity-100 z-[1]'
-      : 'opacity-0 z-0'
-      } ${isGroupHovered && isActive ? 'scale-105' : 'scale-100'}`}
-    style={{
-      transitionProperty: 'opacity, transform',
-    }}
+    className="w-full h-full object-cover flex-shrink-0"
   />
 ));
 
@@ -97,7 +87,6 @@ export function ProjectCard({
   }, []);
   const { t } = useTranslation();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isCardHovered, setIsCardHovered] = useState(false);
   const lastClickTime = useState<{ current: number }>({ current: 0 })[0];
 
   const images = project.images && project.images.length > 0
@@ -116,7 +105,8 @@ export function ProjectCard({
     if (now - lastClickTime.current < 300) return;
     lastClickTime.current = now;
 
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    // Finite navigation - don't go past last image
+    setCurrentImageIndex((prev) => Math.min(prev + 1, images.length - 1));
   }, [images.length]);
 
   const prevImage = useCallback((e: React.MouseEvent) => {
@@ -128,16 +118,15 @@ export function ProjectCard({
     if (now - lastClickTime.current < 300) return;
     lastClickTime.current = now;
 
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    // Finite navigation - don't go before first image
+    setCurrentImageIndex((prev) => Math.max(prev - 1, 0));
   }, [images.length]);
 
   const handleMouseEnter = useCallback(() => {
-    setIsCardHovered(true);
     onHover?.(project);
   }, [onHover, project]);
 
   const handleMouseLeave = useCallback(() => {
-    setIsCardHovered(false);
     onHover?.(null);
   }, [onHover]);
 
@@ -159,18 +148,21 @@ export function ProjectCard({
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
     >
-      {/* Optimized Image Carousel with stacked images */}
+      {/* Sliding Image Carousel */}
       <div className="relative rounded-xl overflow-hidden aspect-[4/3] mb-3 bg-gray-100">
-        {/* Stack all images - only the active one is visible via opacity */}
-        {images.map((imageSrc, idx) => (
-          <CarouselImage
-            key={imageSrc}
-            src={imageSrc}
-            alt={`${project.title} - Image ${idx + 1}`}
-            isActive={idx === currentImageIndex}
-            isGroupHovered={isCardHovered}
-          />
-        ))}
+        {/* Horizontal image strip with slide animation */}
+        <div
+          className="flex h-full transition-transform duration-300 ease-out"
+          style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+        >
+          {images.map((imageSrc, idx) => (
+            <CarouselImage
+              key={imageSrc}
+              src={imageSrc}
+              alt={`${project.title} - Image ${idx + 1}`}
+            />
+          ))}
+        </div>
 
         {/* Favorite Button (Hidden if showEdit is true) */}
         {!showEdit && (
@@ -207,23 +199,29 @@ export function ProjectCard({
           </span>
         </div>
 
-        {/* Image Navigation - Always visible on mobile, hover on desktop */}
+        {/* Image Navigation - Show only when not at boundary */}
         {images.length > 1 && (
           <>
-            <button
-              type="button"
-              onClick={prevImage}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-white cursor-pointer z-10 shadow-sm text-gray-800"
-            >
-              <IconChevronLeft size={18} />
-            </button>
-            <button
-              type="button"
-              onClick={nextImage}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-white cursor-pointer z-10 shadow-sm text-gray-800"
-            >
-              <IconChevronRight size={18} />
-            </button>
+            {/* Previous button - hidden on first image */}
+            {currentImageIndex > 0 && (
+              <button
+                type="button"
+                onClick={prevImage}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-white cursor-pointer z-10 shadow-sm text-gray-800"
+              >
+                <IconChevronLeft size={18} />
+              </button>
+            )}
+            {/* Next button - hidden on last image */}
+            {currentImageIndex < images.length - 1 && (
+              <button
+                type="button"
+                onClick={nextImage}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-white cursor-pointer z-10 shadow-sm text-gray-800"
+              >
+                <IconChevronRight size={18} />
+              </button>
+            )}
 
             {/* Dots */}
             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">

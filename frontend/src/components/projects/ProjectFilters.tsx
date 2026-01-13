@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { RangeSlider } from '@mantine/core';
 import {
     IconFilter,
     IconX,
@@ -395,7 +396,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
         </button>
     );
 
-    // Range slider component
+    // Mantine Range slider component
     const RangeInput = ({
         label,
         value,
@@ -411,24 +412,6 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
         max: number;
         unit: string;
     }) => {
-        const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const newMin = parseInt(e.target.value);
-            if (newMin <= value[1]) {
-                onChange([newMin, value[1]]);
-            }
-        };
-
-        const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const newMax = parseInt(e.target.value);
-            if (newMax >= value[0]) {
-                onChange([value[0], newMax]);
-            }
-        };
-
-        // Calculate percentage positions for visual track
-        const minPercent = ((value[0] - min) / (max - min)) * 100;
-        const maxPercent = ((value[1] - min) / (max - min)) * 100;
-
         return (
             <div className="space-y-3">
                 <div className="flex justify-between items-center">
@@ -437,55 +420,24 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
                         {value[0]} - {value[1]} {unit}
                     </span>
                 </div>
-                <div className="relative" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                    {/* Visual track background */}
-                    <div className="absolute h-2 bg-gray-200 rounded-full w-full top-1/2 -translate-y-1/2" />
-                    {/* Active range track */}
-                    <div
-                        className="absolute h-2 bg-eco-primary rounded-full top-1/2 -translate-y-1/2"
-                        style={{
-                            left: `${minPercent}%`,
-                            width: `${maxPercent - minPercent}%`,
-                        }}
-                    />
-                    {/* Min slider - higher z-index when on left side */}
-                    <input
-                        type="range"
-                        min={min}
-                        max={max}
-                        value={value[0]}
-                        onChange={handleMinChange}
-                        className="absolute w-full h-4 opacity-0 cursor-pointer top-1/2 -translate-y-1/2"
-                        style={{
-                            zIndex: minPercent < 50 ? 15 : 5,
-                            WebkitAppearance: 'none',
-                            appearance: 'none',
-                        }}
-                    />
-                    {/* Max slider - higher z-index when on right side */}
-                    <input
-                        type="range"
-                        min={min}
-                        max={max}
-                        value={value[1]}
-                        onChange={handleMaxChange}
-                        className="absolute w-full h-4 opacity-0 cursor-pointer top-1/2 -translate-y-1/2"
-                        style={{
-                            zIndex: maxPercent > 50 ? 15 : 5,
-                            WebkitAppearance: 'none',
-                            appearance: 'none',
-                        }}
-                    />
-                    {/* Thumb indicators */}
-                    <div
-                        className="absolute w-4 h-4 bg-eco-primary rounded-full border-2 border-white shadow-md top-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none"
-                        style={{ left: `${minPercent}%`, zIndex: 20 }}
-                    />
-                    <div
-                        className="absolute w-4 h-4 bg-eco-primary rounded-full border-2 border-white shadow-md top-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none"
-                        style={{ left: `${maxPercent}%`, zIndex: 20 }}
-                    />
-                </div>
+                <RangeSlider
+                    value={value}
+                    onChange={onChange}
+                    min={min}
+                    max={max}
+                    step={1}
+                    minRange={1}
+                    color="eco-primary"
+                    size="md"
+                    styles={{
+                        track: { height: 8 },
+                        thumb: {
+                            height: 18,
+                            width: 18,
+                            borderWidth: 2,
+                        },
+                    }}
+                />
             </div>
         );
     };

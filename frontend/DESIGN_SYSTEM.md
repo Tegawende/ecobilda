@@ -3,10 +3,14 @@
 This document serves as the **single source of truth** for the visual design and UI components of the Ecobilda platform. It is intended to be used by developers and AI assistants to ensure consistency across all pages.
 
 > [!IMPORTANT]
+> **Component Library**: We use **Mantine v7** as our primary component library. Use Mantine components (Button, TextInput, Select, Modal, RangeSlider, etc.) whenever possible for consistency and accessibility.
+
+> [!IMPORTANT]
 > **Design Consistency Rule**: Before creating or adding new graphic elements or components on any page:
-> 1.  **Check THIS DOCUMENT** first (Rules & Components sections).
-> 2.  **If not defined here**, check if a similar element exists on the **Home Page** or **Registration Page** and use it as inspiration.
-> 3.  **Do not invent** new styles if a defining pattern is already established.
+> 1.  **Check if a Mantine component exists** for the use case.
+> 2.  **Check THIS DOCUMENT** (Rules & Components sections).
+> 3.  **If not defined here**, check if a similar element exists on the **Home Page** or **Registration Page** and use it as inspiration.
+> 4.  **Do not invent** new styles if a defining pattern is already established.
 
 ## 1. Core Colors
 Defined in `index.css` / Tailwind Config.
