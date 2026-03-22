@@ -3,15 +3,15 @@ import type { Project, PaginatedResponse } from '../types';
 
 export interface ProjectFilters {
   keyword?: string;
-  skills?: string;  // Backend expects comma-separated string
-  countries?: string;  // Backend expects comma-separated string
+  skills?: string;
+  countries?: string;
   available_from?: string;
-  internet?: string;  // Backend expects 'true'/'false' string
+  internet?: string;
   family_friendly?: string;
   pets_allowed?: string;
   smoking_allowed?: string;
   project_type?: 'PERM' | 'NATB';
-  exclude_own?: boolean;  // Exclude user's own projects from results
+  exclude_own?: boolean;
   page?: number;
 }
 
@@ -53,29 +53,23 @@ export const projectsService = {
 
   // Upload project image
   async uploadImage(projectId: number, file: File, isCover = false): Promise<void> {
-    // Get presigned URL
-    const presignResponse = await api.post(`/projects/${projectId}/upload-image/`, {
-      filename: file.name,
-      is_cover: isCover,
-    });
-
-    const { upload_url, fields } = presignResponse.data;
-
-    // Upload directly to S3
     const formData = new FormData();
-    Object.entries(fields).forEach(([key, value]) => {
-      formData.append(key, value as string);
-    });
-    formData.append('file', file);
+    formData.append('image', file);
+    formData.append('is_cover', String(isCover));
 
-    await fetch(upload_url, {
-      method: 'POST',
-      body: formData,
+    await api.post(`/projects/${projectId}/upload-image/`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
 
   // Flag project (community moderation)
   async flagProject(id: number, reason: string): Promise<void> {
     await api.post(`/projects/${id}/flag/`, { reason });
+  },
+
+  // Get user's own projects
+  async getMyProjects(): Promise<Project[]> {
+    const response = await api.get('/projects/my-projects/');
+    return response.data.results || response.data;
   },
 };

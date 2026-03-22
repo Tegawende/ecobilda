@@ -8,8 +8,8 @@ export interface UpdateProfileData {
   date_of_birth?: string;
   phone_number?: string;
   profile_picture?: File;
-  languages?: number[]; // Language IDs
-  skills?: string[]; // Skill codes
+  languages?: string[];
+  skills?: string[];
   address?: {
     city?: string;
     postal_code?: string;
@@ -33,14 +33,12 @@ export const profileService = {
       if (key === 'profile_picture' && value instanceof File) {
         formData.append('profile_picture', value);
       } else if (key === 'address' && typeof value === 'object') {
-        // Flatten address object
-        Object.entries(value).forEach(([addrKey, addrValue]) => {
+        Object.entries(value as Record<string, string>).forEach(([addrKey, addrValue]) => {
           if (addrValue !== undefined) {
             formData.append(`address.${addrKey}`, String(addrValue));
           }
         });
       } else if (Array.isArray(value)) {
-        // Handle arrays (languages, skills)
         value.forEach((item) => formData.append(key, String(item)));
       } else if (value !== undefined) {
         formData.append(key, String(value));

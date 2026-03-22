@@ -1,6 +1,8 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { useForm } from '@mantine/form';
-import { useTranslation } from 'react-i18next';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   Stack,
   Title,
@@ -23,9 +25,9 @@ import {
   IconSmoking,
   IconStar
 } from '@tabler/icons-react';
-import { skillsService } from '../../services/skills';
-import type { ProjectFormData } from '../../pages/CreateProjectPage';
-import type { Skill } from '../../types';
+import { skillsService } from '@/services/skills';
+import type { ProjectFormData } from '@/app/[locale]/(protected)/create-project/CreateProjectClient';
+import type { Skill } from '@/types';
 
 interface Step3FormData {
   skills: string[];
@@ -43,7 +45,12 @@ interface ProjectFormStep3Props {
 }
 
 export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectFormStep3Props) {
-  const { t } = useTranslation();
+  const t = useTranslations();
+  const locale = useLocale();
+  const getSkillName = (skill: Skill) => {
+    const key = `display_name_${locale}` as keyof Skill;
+    return (skill[key] as string) || skill.display_name_en;
+  };
   const [allSkills, setAllSkills] = useState<Skill[]>([]);
   const [isLoadingSkills, setIsLoadingSkills] = useState(true);
 
@@ -153,7 +160,7 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
                       <Group wrap="nowrap" align="flex-start">
                         <Text size="xl">{skill.icon}</Text>
                         <Text fw={500} size="sm" style={{ flex: 1 }}>
-                          {skill.display_name_en}
+                          {getSkillName(skill)}
                         </Text>
                         {isSelected && (
                           <ThemeIcon color="eco-terracotta" variant="light" size="sm">

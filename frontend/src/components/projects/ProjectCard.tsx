@@ -1,6 +1,9 @@
+'use client';
+
 import { useState, useEffect, useCallback, memo } from 'react';
-import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
+import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import {
   IconMapPin,
   IconUsers,
@@ -15,7 +18,7 @@ import {
   IconChevronRight,
 } from '@tabler/icons-react';
 import { FavoriteButton } from '../common/FavoriteButton';
-import type { Project } from '../../types';
+import type { Project } from '@/types';
 
 interface ProjectCardProps {
   project: Project;
@@ -29,26 +32,6 @@ interface ProjectCardProps {
   onMobileClick?: (project: Project) => void;
 }
 
-// Preload images hook for performance
-function useImagePreloader(images: string[]) {
-  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    // Preload all images in background
-    images.forEach((src) => {
-      if (!loadedImages.has(src)) {
-        const img = new Image();
-        img.onload = () => {
-          setLoadedImages((prev) => new Set(prev).add(src));
-        };
-        img.src = src;
-      }
-    });
-  }, [images]);
-
-  return loadedImages;
-}
-
 // Memoized image component for carousel slide
 const CarouselImage = memo(({
   src,
@@ -57,13 +40,15 @@ const CarouselImage = memo(({
   src: string;
   alt: string;
 }) => (
-  <img
-    src={src}
-    alt={alt}
-    loading="lazy"
-    decoding="async"
-    className="w-full h-full object-cover flex-shrink-0"
-  />
+  <div className="relative w-full h-full flex-shrink-0">
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      className="object-cover"
+    />
+  </div>
 ));
 
 CarouselImage.displayName = 'CarouselImage';
@@ -85,16 +70,13 @@ export function ProjectCard({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const lastClickTime = useState<{ current: number }>({ current: 0 })[0];
 
   const images = project.images && project.images.length > 0
     ? project.images.map(img => img.image)
     : ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'];
-
-  // Preload all images for instant switching
-  useImagePreloader(images);
 
   const nextImage = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -141,8 +123,7 @@ export function ProjectCard({
   }, [isMobile, onMobileClick, project]);
 
   return (
-    <Link
-      to={`/projects/${project.id}`}
+    <Link href={`/projects/${project.id}`}
       className={`block group cursor-pointer transition-all duration-200 ${isHovered ? 'scale-[1.02]' : ''}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

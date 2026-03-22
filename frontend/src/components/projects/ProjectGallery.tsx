@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import {
   Box,
@@ -13,7 +15,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconPhoto, IconChevronLeft, IconChevronRight, IconX } from '@tabler/icons-react';
-import type { ProjectImage } from '../../types';
+import type { ProjectImage } from '@/types';
 
 interface ProjectGalleryProps {
   images: ProjectImage[];

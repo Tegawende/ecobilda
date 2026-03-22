@@ -166,6 +166,11 @@
     "emailInfo": "We'll email you trip confirmations and receipts.",
     "nameDesc": "Make sure this matches the name on your government ID.",
     "dobDesc": "To sign up, you need to be at least 18. Your birthday won't be shared with other people who use Ecobilda.",
+    "dobDay": "Day",
+    "dobMonth": "Month",
+    "dobYear": "Year",
+    "dobInvalidDate": "This date does not exist.",
+    "dobMonths": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     "marketingOptOut": "I don't want to receive marketing messages from Ecobilda.",
     "agreementText": "By selecting Agree and continue, I agree to Ecobilda's Terms of Service, Payments Terms of Service, and Nondiscrimination Policy and acknowledge the Privacy Policy.",
     "loginTitle": "Welcome back!",
@@ -204,6 +209,28 @@
       "birthDateRequired": "Date of birth required",
       "ageRequirement": "You must be at least 18 years old",
       "terms": "You must accept the terms"
+    },
+    "registrationSuccess": {
+      "title": "Check your email",
+      "message": "We sent a verification link to",
+      "spamNote": "If you don't see the email, check your spam folder.",
+      "backToLogin": "Back to login"
+    },
+    "verification": {
+      "verifying": "Verifying...",
+      "success": "Your email has been verified successfully.",
+      "successTitle": "Email verified!",
+      "error": "Could not verify your email. The link may be invalid.",
+      "errorTitle": "Verification error",
+      "expired": "This verification link has expired.",
+      "expiredTitle": "Link expired",
+      "goToLogin": "Log in",
+      "resendEmail": "Resend verification email",
+      "emailSent": "A new verification email has been sent!",
+      "alreadyVerified": "Your email has already been verified.",
+      "alreadyVerifiedTitle": "Already verified",
+      "noToken": "Missing verification token.",
+      "redirecting": "Redirecting in {seconds}s..."
     }
   },
   "projects": {
@@ -214,6 +241,7 @@
     "noResults": "No projects found",
     "noResultsDesc": "Try adjusting your filters or search terms to find what you're looking for.",
     "clearFilters": "Clear all filters",
+    "clearSkills": "Clear skills",
     "spotsLeft": "{{count}} spots left",
     "full": "Full",
     "createProject": "Create Project",
@@ -250,6 +278,7 @@
       "workDetails": "Work Details",
       "maxVolunteers": "Max Volunteers",
       "applyFilters": "Apply Filters",
+      "showResults": "Show {count} projects",
       "whereToGo": "Where are you going?",
       "searchByLocation": "Search by city, region or country",
       "locationPlaceholder": "e.g., Brussels, Ardennes...",
@@ -417,14 +446,14 @@
       "year": "Year:",
       "monthsSelected": "{{count}} month(s) selected for {{year}}",
       "images": "Project Images (Optional)",
-      "imagesDescription": "Add photos of your project, workspace, accommodation, and surroundings. First image will be the cover photo. (Max 10 images)",
+      "imagesDescription": "Upload images for your project. Use the arrow buttons to reorder them. The first image will be the cover.",
       "uploadButton": "Click to upload images",
       "uploadHint": "PNG, JPG up to 10MB each",
       "cover": "Cover",
       "imagesUploaded": "{{count}} / 10 images uploaded",
       "maxImagesAlert": "Maximum 10 images allowed",
       "reviewTitle": "✨ Review Your Project",
-      "reviewProject": "<strong>{{type}}</strong> project",
+      "reviewProject": "{{type}} project",
       "reviewTitleLabel": "Title: {{title}}",
       "reviewLocation": "Location: {{city}}, {{country}}",
       "reviewWork": "Work: {{hours}}h/day, {{days}} days/week, max {{max}} volunteers",
@@ -535,7 +564,14 @@
     "review": "review",
     "reviews": "reviews",
     "reviewsTitle": "Reviews",
-    "yourResponse": "Your response"
+    "yourResponse": "Your response",
+    "title": "My Profile",
+    "subtitle": "Your personal information",
+    "noBio": "No bio yet",
+    "noLocation": "Not specified",
+    "noBirthday": "Not specified",
+    "noLanguages": "Not specified",
+    "noSkills": "No skills selected"
   },
   "settings": {
     "title": "Account Settings",
@@ -565,7 +601,9 @@
     "dangerZone": "Danger Zone",
     "deleteWarning": "Once you delete your account, there is no going back. Please be certain.",
     "deleteAccount": "Delete Account",
-    "deleteConfirm": "Are you sure you want to delete your account? This action cannot be undone."
+    "deleteConfirm": "Are you sure you want to delete your account? This action cannot be undone.",
+    "deleteConfirmWord": "DELETE",
+    "deleteTypeConfirm": "To confirm, type {word} below."
   },
   "messaging": {
     "inbox": "Inbox",

@@ -1,25 +1,55 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { ActionIcon, Menu, Text, Stack, Button, ScrollArea, Group, Box, Indicator } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconBell, IconCheck, IconMessage } from '@tabler/icons-react';
-import { useTranslation } from 'react-i18next';
-import { useNotifications } from '../../contexts/NotificationContext';
-import { isAuthenticated } from '../../services/api';
-import { useNavigate } from 'react-router-dom';
+import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/navigation';
+import { isAuthenticated } from '@/services/api';
+import { notificationsService } from '@/services/notifications';
+import type { Notification } from '@/types';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 
 export function NotificationBell() {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { unreadCount, notifications, markAsRead, markAllAsRead, refreshNotifications } = useNotifications();
+  const t = useTranslations();
+  const router = useRouter();
   const [opened, setOpened] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const isMobile = useMediaQuery('(max-width: 768px)');
-  const width = isMobile ? window.innerWidth - 32 : 360;
+  const width = isMobile ? (typeof window !== 'undefined' ? window.innerWidth - 32 : 360) : 360;
 
-  // Refresh notifications when menu opens
+  const refreshCount = async () => {
+    if (!isAuthenticated()) return;
+    try {
+      const count = await notificationsService.getUnreadCount();
+      setUnreadCount(count);
+    } catch {
+      // silently fail
+    }
+  };
+
+  const refreshNotifications = async () => {
+    if (!isAuthenticated()) return;
+    try {
+      const notifs = await notificationsService.getNotifications(true);
+      setNotifications(notifs.slice(0, 10));
+    } catch {
+      // silently fail
+    }
+  };
+
+  useEffect(() => {
+    refreshCount();
+    refreshNotifications();
+    const interval = setInterval(refreshCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     if (opened && isAuthenticated()) {
       refreshNotifications();
@@ -28,15 +58,26 @@ export function NotificationBell() {
 
   const handleNotificationClick = async (notificationId: number, linkUrl: string, isRead: boolean) => {
     if (!isRead) {
-      await markAsRead(notificationId);
+      try {
+        await notificationsService.markAsRead(notificationId);
+        setNotifications(prev => prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n));
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      } catch {
+        // silently fail
+      }
     }
-
-    navigate(linkUrl);
+    router.push(linkUrl as any);
     setOpened(false);
   };
 
   const handleMarkAllRead = async () => {
-    await markAllAsRead();
+    try {
+      await notificationsService.markAllAsRead();
+      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      setUnreadCount(0);
+    } catch {
+      // silently fail
+    }
   };
 
   if (!isAuthenticated()) return null;
@@ -168,7 +209,7 @@ export function NotificationBell() {
         {notifications.length > 0 && (
           <>
             <Menu.Divider />
-            <Menu.Item onClick={() => { navigate('/messages'); setOpened(false); }}>
+            <Menu.Item onClick={() => { router.push('/messages'); setOpened(false); }}>
               <Text size="sm" fw={500} c="eco-primary" ta="center">
                 {t('notifications.viewAllMessages')}
               </Text>
@@ -179,5 +220,3 @@ export function NotificationBell() {
     </Menu>
   );
 }
-
-

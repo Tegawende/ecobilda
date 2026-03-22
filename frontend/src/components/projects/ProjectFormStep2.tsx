@@ -1,5 +1,7 @@
+'use client';
+
 import { useForm } from '@mantine/form';
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
 import {
   Stack,
   Title,
@@ -21,7 +23,7 @@ import {
   IconToolsKitchen2,
   IconBulb,
 } from '@tabler/icons-react';
-import type { ProjectFormData } from '../../pages/CreateProjectPage';
+import type { ProjectFormData } from '@/app/[locale]/(protected)/create-project/CreateProjectClient';
 
 interface Step2FormData {
   city: string;
@@ -42,7 +44,7 @@ interface ProjectFormStep2Props {
 }
 
 export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectFormStep2Props) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const form = useForm<Step2FormData>({
     initialValues: {
       city: data.address.city || '',

@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { useForm } from '@mantine/form';
 import {
@@ -13,7 +15,7 @@ import {
   List,
 } from '@mantine/core';
 import { IconInfoCircle, IconStar } from '@tabler/icons-react';
-import type { User } from '../../types';
+import type { User } from '@/types';
 
 interface ReviewFormData {
   rating: number;

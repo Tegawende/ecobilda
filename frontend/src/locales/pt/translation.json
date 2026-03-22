@@ -57,6 +57,30 @@
             "settings": "Definições da conta"
         }
     },
+    "auth": {
+        "registrationSuccess": {
+            "title": "Verifique o seu e-mail",
+            "message": "Enviámos um link de verificação para",
+            "spamNote": "Se não vir o e-mail, verifique a pasta de spam.",
+            "backToLogin": "Voltar ao login"
+        },
+        "verification": {
+            "verifying": "A verificar...",
+            "success": "O seu e-mail foi verificado com sucesso.",
+            "successTitle": "E-mail verificado!",
+            "error": "Não foi possível verificar o seu e-mail. O link pode ser inválido.",
+            "errorTitle": "Erro de verificação",
+            "expired": "Este link de verificação expirou.",
+            "expiredTitle": "Link expirado",
+            "goToLogin": "Entrar",
+            "resendEmail": "Reenviar e-mail de verificação",
+            "emailSent": "Um novo e-mail de verificação foi enviado!",
+            "alreadyVerified": "O seu e-mail já foi verificado.",
+            "alreadyVerifiedTitle": "Já verificado",
+            "noToken": "Token de verificação em falta.",
+            "redirecting": "A redirecionar em {seconds}s..."
+        }
+    },
     "home": {
         "hero": {
             "title": "Construção Natural em Todo o Lado",
@@ -124,6 +148,7 @@
         "noResults": "Nenhum projeto encontrado",
         "noResultsDesc": "Tente ajustar os seus filtros ou termos de pesquisa para encontrar o que procura.",
         "clearFilters": "Limpar todos os filtros",
+    "clearSkills": "Limpar competências",
         "spotsLeft": "{{count}} lugares restantes",
         "full": "Completo",
         "createProject": "Criar projeto",
@@ -272,14 +297,14 @@
             "year": "Ano:",
             "monthsSelected": "{{count}} mês(es) selecionado(s) para {{year}}",
             "images": "Imagens do projeto (Opcional)",
-            "imagesDescription": "Adicione fotos do seu projeto, espaço de trabalho, alojamento e arredores. A primeira imagem será a foto de capa. (Máx. 10 imagens)",
+            "imagesDescription": "Carregue imagens do seu projeto. Use os botões de setas para reordená-las. A primeira imagem será a capa.",
             "uploadButton": "Clique para carregar imagens",
             "uploadHint": "PNG, JPG até 10MB cada",
             "cover": "Capa",
             "imagesUploaded": "{{count}} / 10 imagens carregadas",
             "maxImagesAlert": "Máximo de 10 imagens permitidas",
             "reviewTitle": "✨ Revise o seu projeto",
-            "reviewProject": "Projeto <strong>{{type}}</strong>",
+            "reviewProject": "Projeto {{type}}",
             "reviewTitleLabel": "Título: {{title}}",
             "reviewLocation": "Localização: {{city}}, {{country}}",
             "reviewWork": "Trabalho: {{hours}}h/dia, {{days}} dias/semana, máx. {{max}} voluntários",

@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useRef } from 'react';
 import { Box, Center, Stack, Text } from '@mantine/core';
 import { IconMap } from '@tabler/icons-react';

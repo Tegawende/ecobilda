@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
 import { IconX, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 
 interface ProjectImageGalleryProps {
@@ -8,7 +10,7 @@ interface ProjectImageGalleryProps {
 }
 
 export function ProjectImageGallery({ images, title }: ProjectImageGalleryProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 

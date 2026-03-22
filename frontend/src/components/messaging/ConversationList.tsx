@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import {
   Box,
@@ -18,7 +20,7 @@ import {
 } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import type { Conversation } from '../../types';
+import type { Conversation } from '@/types';
 
 dayjs.extend(relativeTime);
 

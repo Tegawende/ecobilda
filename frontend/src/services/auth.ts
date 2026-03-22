@@ -1,5 +1,15 @@
 import api, { setAuthTokens, clearAuthTokens } from './api';
-import type { LoginCredentials, RegisterData, AuthTokens, User } from '../types';
+import type { LoginCredentials, AuthTokens, User } from '../types';
+
+export interface RegisterData {
+  email: string;
+  password: string;
+  password_confirm: string;
+  first_name: string;
+  last_name: string;
+  date_of_birth: string;
+  locale?: string;
+}
 
 export const authService = {
   // Email/Password authentication
@@ -10,11 +20,9 @@ export const authService = {
     return { tokens, user };
   },
 
-  async register(data: RegisterData): Promise<{ tokens: AuthTokens; user: User }> {
+  async register(data: RegisterData): Promise<{ message: string; email: string }> {
     const response = await api.post('/auth/register/', data);
-    const { tokens, user } = response.data;
-    setAuthTokens(tokens);
-    return { tokens, user };
+    return response.data;
   },
 
   async logout(): Promise<void> {
@@ -28,15 +36,6 @@ export const authService = {
   // Google OAuth
   async googleLogin(credential: string): Promise<{ tokens: AuthTokens; user: User }> {
     const response = await api.post('/auth/google/', { credential });
-    const { access, refresh, user } = response.data;
-    const tokens = { access, refresh };
-    setAuthTokens(tokens);
-    return { tokens, user };
-  },
-
-  // Apple OAuth
-  async appleLogin(credential: string): Promise<{ tokens: AuthTokens; user: User }> {
-    const response = await api.post('/auth/apple/', { credential });
     const { access, refresh, user } = response.data;
     const tokens = { access, refresh };
     setAuthTokens(tokens);
@@ -59,5 +58,25 @@ export const authService = {
       token,
       password: newPassword,
     });
+  },
+
+  // Email verification
+  async verifyEmail(token: string) {
+    return api.post('/auth/verify-email/', { token });
+  },
+
+  async sendVerificationEmail(): Promise<void> {
+    await api.post('/auth/send-verification-email/');
+  },
+
+  // Check if email exists
+  async checkEmail(email: string): Promise<{ exists: boolean }> {
+    const response = await api.post('/auth/check-email/', { email });
+    return response.data;
+  },
+
+  // Change password
+  async changePassword(data: { current_password: string; new_password: string; confirm_password: string }): Promise<void> {
+    await api.post('/auth/change-password/', data);
   },
 };

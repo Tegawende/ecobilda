@@ -1,11 +1,13 @@
+'use client';
+
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import type { Project } from '../../types';
+import type { Project } from '@/types';
 
 // Set Mapbox token from env
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
+mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 
 interface MapBounds {
     north: number;
@@ -16,6 +18,7 @@ interface MapBounds {
 
 interface ProjectsMapProps {
     projects: Project[];
+    allProjects?: Project[];
     selectedProject: Project | null;
     onProjectSelect: (project: Project | null) => void;
     onBoundsChange?: (bounds: MapBounds) => void;
@@ -30,13 +33,14 @@ export interface ProjectsMapRef {
 
 export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function ProjectsMap({
     projects,
+    allProjects,
     selectedProject,
     onProjectSelect,
     onBoundsChange,
     onMoveStart,
     hoveredProjectId,
 }, ref) {
-    const { t } = useTranslation();
+    const t = useTranslations();
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<mapboxgl.Map | null>(null);
     const markersRef = useRef<{ [key: number]: { marker: mapboxgl.Marker; element: HTMLDivElement } }>({});

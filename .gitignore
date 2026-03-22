@@ -86,3 +86,18 @@ celerybeat.pid
 *.tmp
 *.temp
 .cache/
+
+# Session extraction (temporary recovery data)
+extraction_output/
+session_extracts/
+session_extraction.json
+extract_sessions.py
+
+# Mobile app (not ready)
+mobile/
+
+# Legacy frontend (reference only)
+frontend-old/
+
+# Next.js build
+frontend/.next/

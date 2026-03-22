@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import {
   Paper,
@@ -10,7 +12,7 @@ import {
   Box,
 } from '@mantine/core';
 import { IconMessageCircle } from '@tabler/icons-react';
-import type { Review, User } from '../../types';
+import type { Review, User } from '@/types';
 
 interface ReviewCardProps {
   review: Review;

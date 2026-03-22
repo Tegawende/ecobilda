@@ -158,6 +158,30 @@
             "submit": "Bericht verzenden"
         }
     },
+    "auth": {
+        "registrationSuccess": {
+            "title": "Controleer je e-mail",
+            "message": "We hebben een verificatielink gestuurd naar",
+            "spamNote": "Als je de e-mail niet ziet, controleer dan je spammap.",
+            "backToLogin": "Terug naar inloggen"
+        },
+        "verification": {
+            "verifying": "Verifiëren...",
+            "success": "Je e-mail is succesvol geverifieerd.",
+            "successTitle": "E-mail geverifieerd!",
+            "error": "Je e-mail kon niet worden geverifieerd. De link is mogelijk ongeldig.",
+            "errorTitle": "Verificatiefout",
+            "expired": "Deze verificatielink is verlopen.",
+            "expiredTitle": "Link verlopen",
+            "goToLogin": "Inloggen",
+            "resendEmail": "Verificatie-e-mail opnieuw versturen",
+            "emailSent": "Er is een nieuwe verificatie-e-mail verzonden!",
+            "alreadyVerified": "Je e-mail is al geverifieerd.",
+            "alreadyVerifiedTitle": "Reeds geverifieerd",
+            "noToken": "Verificatietoken ontbreekt.",
+            "redirecting": "Doorverwijzen in {seconds}s..."
+        }
+    },
     "home": {
         "hero": {
             "title": "Natuurlijk Bouwen Overal",
@@ -219,6 +243,7 @@
         "noResults": "Geen projecten gevonden",
         "noResultsDesc": "Probeer uw filters of zoektermen aan te passen om te vinden wat u zoekt.",
         "clearFilters": "Alle filters wissen",
+    "clearSkills": "Vaardigheden wissen",
         "spotsLeft": "{{count}} plaatsen over",
         "full": "Vol",
         "createProject": "Project aanmaken",
@@ -246,6 +271,7 @@
             "workDetails": "Werkdetails",
             "maxVolunteers": "Max. vrijwilligers",
             "applyFilters": "Filters toepassen",
+      "showResults": "{count} projecten tonen",
             "whereToGo": "Waar ga je naartoe?",
             "searchByLocation": "Zoek op stad, regio of land",
             "locationPlaceholder": "bijv. Brussel, Ardennen...",
@@ -409,14 +435,14 @@
             "year": "Jaar:",
             "monthsSelected": "{{count}} maand(en) geselecteerd voor {{year}}",
             "images": "Projectafbeeldingen (Optioneel)",
-            "imagesDescription": "Voeg foto's toe van je project, werkruimte, accommodatie en omgeving. Eerste afbeelding wordt de omslagfoto. (Max. 10 afbeeldingen)",
+            "imagesDescription": "Upload afbeeldingen voor je project. Gebruik de pijlknoppen om ze te herordenen. De eerste afbeelding wordt de omslag.",
             "uploadButton": "Klik om afbeeldingen te uploaden",
             "uploadHint": "PNG, JPG tot 10MB elk",
             "cover": "Omslag",
             "imagesUploaded": "{{count}} / 10 afbeeldingen geüpload",
             "maxImagesAlert": "Maximaal 10 afbeeldingen toegestaan",
             "reviewTitle": "✨ Bekijk je project",
-            "reviewProject": "<strong>{{type}}</strong> project",
+            "reviewProject": "{{type}} project",
             "reviewTitleLabel": "Titel: {{title}}",
             "reviewLocation": "Locatie: {{city}}, {{country}}",
             "reviewWork": "Werk: {{hours}}u/dag, {{days}} dagen/week, max. {{max}} vrijwilligers",

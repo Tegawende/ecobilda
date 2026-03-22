@@ -7,7 +7,7 @@ export const notificationsService = {
     const params: Record<string, string> = {};
     if (unreadOnly) params.unread_only = 'true';
     if (type) params.type = type;
-    
+
     const response = await api.get('/notifications/', { params });
     return response.data.results || response.data;
   },
@@ -30,5 +30,3 @@ export const notificationsService = {
     return response.data;
   },
 };
-
-

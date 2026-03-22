@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslations, useLocale } from 'next-intl';
 import {
     IconArrowLeft,
     IconSearch,
@@ -15,7 +17,7 @@ import {
 import type { ProjectFiltersState } from './ProjectFilters';
 
 // Mapbox Geocoding
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || '';
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 
 interface MapboxFeature {
     id: string;
@@ -57,7 +59,8 @@ export function MobileSearchModal({
     onFiltersChange,
     onLocationSelect,
 }: MobileSearchModalProps) {
-    const { t, i18n } = useTranslation();
+    const t = useTranslations();
+    const locale = useLocale();
     const [step, setStep] = useState<Step>('location');
     const [tempFilters, setTempFilters] = useState(filters);
     const [locationQuery, setLocationQuery] = useState(filters.location?.name || '');
@@ -95,7 +98,7 @@ export function MobileSearchModal({
         }
         setIsSearching(true);
         debounceRef.current = setTimeout(async () => {
-            const results = await searchMapboxLocations(query, i18n.language);
+            const results = await searchMapboxLocations(query, locale);
             setLocationSuggestions(results);
             setIsSearching(false);
         }, 300);
@@ -122,9 +125,9 @@ export function MobileSearchModal({
 
 
     // Calendar logic
-    const monthName = new Intl.DateTimeFormat(i18n.language, { month: 'long' }).format(currentMonth);
+    const monthName = new Intl.DateTimeFormat(locale, { month: 'long' }).format(currentMonth);
     const dayNames = [0, 1, 2, 3, 4, 5, 6].map(d =>
-        new Intl.DateTimeFormat(i18n.language, { weekday: 'short' }).format(new Date(2024, 0, d + 1))
+        new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(new Date(2024, 0, d + 1))
     );
 
     const formatDate = (date: Date) => {

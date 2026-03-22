@@ -1,0 +1,145 @@
+# ---- Production Docker Compose ----
+
+services:
+  # PostgreSQL Database (internal only, no port exposed)
+  db:
+    image: postgres:15-alpine
+    container_name: ecobilda-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-ecobilda}
+      POSTGRES_USER: ${DB_USER:-ecobilda}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-ecobilda}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  # Redis (internal only)
+  redis:
+    image: redis:7-alpine
+    container_name: ecobilda-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  # Django Backend (Daphne ASGI for WebSocket support)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: ecobilda-backend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    env_file:
+      - .env.prod
+    environment:
+      - DB_HOST=db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    volumes:
+      - media_data:/app/media
+      - static_data:/app/staticfiles
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/skills/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - internal
+
+  # Celery Worker
+  celery:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: ecobilda-celery
+    restart: unless-stopped
+    command: celery -A config worker -l info --concurrency=2
+    env_file:
+      - .env.prod
+    environment:
+      - DB_HOST=db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    volumes:
+      - media_data:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+
+  # Celery Beat (scheduled tasks)
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: ecobilda-celery-beat
+    restart: unless-stopped
+    command: celery -A config beat -l info
+    env_file:
+      - .env.prod
+    environment:
+      - DB_HOST=db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: https://api.ecobilda.org/api
+        NEXT_PUBLIC_MAPBOX_TOKEN: ${NEXT_PUBLIC_MAPBOX_TOKEN}
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
+        NEXT_PUBLIC_APP_NAME: Ecobilda
+        NEXT_PUBLIC_DEFAULT_LANGUAGE: en
+    container_name: ecobilda-frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks:
+      - internal
+
+volumes:
+  postgres_data:
+  redis_data:
+  media_data:
+  static_data:
+
+networks:
+  internal:
+    driver: bridge

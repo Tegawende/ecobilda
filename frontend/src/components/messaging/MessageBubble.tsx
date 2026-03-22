@@ -1,6 +1,8 @@
+'use client';
+
 import { Box, Group, Avatar, Text } from '@mantine/core';
 import dayjs from 'dayjs';
-import type { Message } from '../../types';
+import type { Message } from '@/types';
 
 interface MessageBubbleProps {
   message: Message;

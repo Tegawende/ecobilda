@@ -1,7 +1,9 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import { Link } from '@/i18n/navigation';
 import { Box, Group, Avatar, Text, Badge } from '@mantine/core';
 import { IconVolume3, IconMapPin } from '@tabler/icons-react';
-import type { Conversation, User } from '../../types';
+import type { Conversation, User } from '@/types';
 
 interface ConversationCardProps {
   conversation: Conversation;
@@ -136,8 +138,7 @@ export function ConversationCard({ conversation, currentUserId, onClick }: Conve
 
   return (
     <Box
-      component={Link}
-      to={`/messages/${conversation.id}`}
+      component={Link} href={`/messages/${conversation.id}`}
       p="md"
       bg={unreadCount > 0 ? 'blue.0' : 'white'}
       style={commonStyle}

@@ -1,5 +1,9 @@
+'use client';
+
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocale } from 'next-intl';
+import { useRouter } from '@/i18n/navigation';
+import { getSkillIcon } from '@/lib/skillIcons';
 import {
   Box,
   Stack,
@@ -17,8 +21,8 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import { modals } from '@mantine/modals';
-import { messagingService } from '../../services/messaging';
-import type { Conversation } from '../../types';
+import { messagingService } from '@/services/messaging';
+import type { Conversation } from '@/types';
 import dayjs from 'dayjs';
 
 interface ConversationDetailsProps {
@@ -34,7 +38,8 @@ export function ConversationDetails({
   onMuteToggle,
   onDelete,
 }: ConversationDetailsProps) {
-  const navigate = useNavigate();
+  const router = useRouter();
+  const locale = useLocale();
   const [isTogglingMute, setIsTogglingMute] = useState(false);
 
   // Determine the other user
@@ -78,7 +83,7 @@ export function ConversationDetails({
           if (onDelete) {
             onDelete();
           }
-          navigate('/messages');
+          router.push('/messages');
         } catch (error) {
           console.error('Failed to delete conversation:', error);
         }
@@ -134,7 +139,7 @@ export function ConversationDetails({
 
           <Button
             variant="outline"
-            onClick={() => navigate(`/profile/${otherUser.id}`)}
+            onClick={() => router.push(`/profile/${otherUser.id}`)}
             fullWidth
           >
             View full profile
@@ -173,11 +178,15 @@ export function ConversationDetails({
                 Skills
               </Text>
               <Group gap="xs">
-                {otherUser.skills.slice(0, 5).map((skill, index) => (
-                  <Badge key={skill.code || index} variant="light" size="sm">
-                    {skill.display_name_en || skill.code}
-                  </Badge>
-                ))}
+                {otherUser.skills.slice(0, 5).map((skill, index) => {
+                  const key = `display_name_${locale}` as keyof typeof skill;
+                  const SkillIcon = getSkillIcon(skill.icon);
+                  return (
+                    <Badge key={skill.code || index} variant="light" size="sm" leftSection={<SkillIcon size={12} />}>
+                      {(skill[key] as string) || skill.display_name_en || skill.code}
+                    </Badge>
+                  );
+                })}
                 {otherUser.skills.length > 5 && (
                   <Badge variant="light" size="sm" c="dimmed">
                     +{otherUser.skills.length - 5} more

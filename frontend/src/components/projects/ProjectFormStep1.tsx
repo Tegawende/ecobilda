@@ -1,5 +1,7 @@
+'use client';
+
 import { useForm } from '@mantine/form';
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
 import {
   Stack,
   Title,
@@ -14,7 +16,7 @@ import {
   List,
 } from '@mantine/core';
 import { IconPlant, IconHammer, IconBulb } from '@tabler/icons-react';
-import type { ProjectFormData } from '../../pages/CreateProjectPage';
+import type { ProjectFormData } from '@/app/[locale]/(protected)/create-project/CreateProjectClient';
 
 interface Step1FormData {
   title: string;
@@ -29,7 +31,7 @@ interface ProjectFormStep1Props {
 }
 
 export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Props) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const form = useForm<Step1FormData>({
     initialValues: {
       title: data.title || '',
@@ -134,11 +136,12 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
           minRows={8}
           {...form.getInputProps('description')}
           description={
-            <Group justify="space-between" mt="xs">
-              <Text size="sm" c="dimmed">
+            <span style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'var(--mantine-spacing-xs)' }}>
+              <Text component="span" size="sm" c="dimmed">
                 {t('createProject.step1.projectDescriptionHint')}
               </Text>
               <Text
+                component="span"
                 size="sm"
                 c={
                   descriptionLength < 50 || descriptionLength > 2000
@@ -148,7 +151,7 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
               >
                 {t('createProject.step1.projectDescriptionCounter', { count: descriptionLength })}
               </Text>
-            </Group>
+            </span>
           }
         />
 

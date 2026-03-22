@@ -1,5 +1,11 @@
+'use client';
+
 import { useState, useRef, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslations, useLocale } from 'next-intl';
+import type { Skill } from '@/types';
+import { skillsService } from '@/services/skills';
+import logger from '@/lib/logger';
+import { getSkillIcon } from '@/lib/skillIcons';
 import { RangeSlider } from '@mantine/core';
 import {
     IconFilter,
@@ -30,6 +36,7 @@ export interface ProjectFiltersState {
     familyFriendly: boolean;
     petsAllowed: boolean;
     smokingAllowed: boolean;
+    skills: string[];
 }
 
 interface ProjectFiltersProps {
@@ -37,6 +44,8 @@ interface ProjectFiltersProps {
     onFiltersChange: (filters: ProjectFiltersState) => void;
     onLocationSelect?: (lat: number, lng: number) => void;
     onClear?: () => void;
+    resultCount?: number;
+    getFilteredCount?: (filters: ProjectFiltersState) => number;
 }
 
 export const defaultFilters: ProjectFiltersState = {
@@ -50,10 +59,11 @@ export const defaultFilters: ProjectFiltersState = {
     familyFriendly: false,
     petsAllowed: false,
     smokingAllowed: false,
+    skills: [],
 };
 
 // Get Mapbox token from environment
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || '';
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 
 // Mapbox Geocoding API search
 interface MapboxFeature {
@@ -109,18 +119,19 @@ function Calendar({
     const [tempEnd, setTempEnd] = useState<Date | null>(selectedEnd);
     const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
 
-    const { t, i18n } = useTranslation();
+    const t = useTranslations();
+    const locale = useLocale();
 
     // Get day names starting with Sunday (like Airbnb)
     const dayNames = [0, 1, 2, 3, 4, 5, 6].map(d =>
-        new Intl.DateTimeFormat(i18n.language, { weekday: 'narrow' }).format(new Date(2024, 0, d)) // Jan 2024 starts on Monday, so d=0 is Sunday
+        new Intl.DateTimeFormat(locale, { weekday: 'narrow' }).format(new Date(2024, 0, d)) // Jan 2024 starts on Monday, so d=0 is Sunday
     );
 
     // Calculate the second month
     const secondMonth = new Date(baseMonth.getFullYear(), baseMonth.getMonth() + 1, 1);
 
     const getMonthName = (date: Date) => {
-        return new Intl.DateTimeFormat(i18n.language, { month: 'long', year: 'numeric' }).format(date);
+        return new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(date);
     };
 
     const getDaysInMonth = (date: Date) => {
@@ -411,8 +422,13 @@ const RangeInput = ({
     );
 };
 
-export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onClear }: ProjectFiltersProps) {
-    const { t } = useTranslation();
+export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onClear, resultCount, getFilteredCount }: ProjectFiltersProps) {
+    const t = useTranslations();
+    const locale = useLocale();
+    const getSkillName = (skill: Skill) => {
+        const key = `display_name_${locale}` as keyof Skill;
+        return (skill[key] as string) || skill.display_name_en;
+    };
     const [showModal, setShowModal] = useState(false);
     const [showMobileSearch, setShowMobileSearch] = useState(false);
     const [tempFilters, setTempFilters] = useState(filters);
@@ -421,9 +437,58 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
     const [showCalendar, setShowCalendar] = useState(false);
     const [locationSuggestions, setLocationSuggestions] = useState<MapboxFeature[]>([]);
     const [isSearching, setIsSearching] = useState(false);
+    const [allSkills, setAllSkills] = useState<Skill[]>([]);
     const locationRef = useRef<HTMLDivElement>(null);
     const calendarRef = useRef<HTMLDivElement>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Fetch skills
+    useEffect(() => {
+        const fetchSkills = async () => {
+            try {
+                const skills = await skillsService.getSkills();
+                const arr = Array.isArray(skills) ? skills : (skills as any).results || [];
+                setAllSkills(arr);
+            } catch (err) {
+                logger.error('Failed to fetch skills:', err);
+            }
+        };
+        fetchSkills();
+    }, []);
+
+    // Filter visible skills based on project type
+    const visibleSkills = allSkills.filter(s => {
+        if (filters.projectType === 'NATB') return s.category === 'NATB';
+        if (filters.projectType === 'PERM') return s.category === 'PERM';
+        return true; // 'all' shows all skills
+    });
+
+    // When project type changes, remove skills that are no longer visible
+    useEffect(() => {
+        if (filters.skills.length > 0) {
+            const visibleCodes = visibleSkills.map(s => s.code);
+            const validSkills = filters.skills.filter(code => visibleCodes.includes(code));
+            if (validSkills.length !== filters.skills.length) {
+                onFiltersChange({ ...filters, skills: validSkills });
+            }
+        }
+    }, [filters.projectType]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const toggleSkillFilter = (code: string) => {
+        const current = filters.skills;
+        const updated = current.includes(code)
+            ? current.filter(c => c !== code)
+            : [...current, code];
+        onFiltersChange({ ...filters, skills: updated });
+    };
+
+    const toggleTempSkill = (code: string) => {
+        const current = tempFilters.skills;
+        const updated = current.includes(code)
+            ? current.filter(c => c !== code)
+            : [...current, code];
+        setTempFilters({ ...tempFilters, skills: updated });
+    };
 
     // Close dropdowns on outside click
     useEffect(() => {
@@ -505,6 +570,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
         if (filters.hoursPerDay[0] > 1 || filters.hoursPerDay[1] < 10) count++;
         if (filters.daysPerWeek[0] > 1 || filters.daysPerWeek[1] < 7) count++;
         if (filters.maxHelpers[0] > 1 || filters.maxHelpers[1] < 30) count++;
+        if (filters.skills.length > 0) count++;
         return count;
     };
 
@@ -514,6 +580,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
         filters.projectType !== 'all' ||
         filters.location !== null ||
         filters.dateRange.start !== null ||
+        filters.skills.length > 0 ||
         activeFilterCount > 0;
 
     const clearAllFilters = () => {
@@ -563,7 +630,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
     return (
         <>
             {/* Mobile Search Bar */}
-            <div className="sm:hidden bg-white border-b border-gray-200 sticky top-0 z-20">
+            <div className="sm:hidden bg-white border-b border-gray-200 sticky top-[64px] z-20">
                 <div className="px-4 py-3">
                     <div className="flex items-center gap-3">
                         {/* Centered Search Input - triggers modal */}
@@ -619,7 +686,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
             </div>
 
             {/* Desktop Filters */}
-            <div className="hidden sm:block bg-white border-b border-gray-200 sticky top-0 z-20">
+            <div className="hidden sm:block bg-white border-b border-gray-200 sticky top-[64px] z-20">
                 <div className="px-6 py-3">
                     <div className="flex flex-wrap items-center gap-3">
                         {/* Location Input with Mapbox Autocomplete */}
@@ -769,12 +836,14 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
                             </button>
                         )}
                     </div>
+
+
                 </div>
             </div>
 
             {/* Filter Modal */}
             {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center">
                     {/* Backdrop */}
                     <div
                         className="absolute inset-0 bg-black/50"
@@ -833,6 +902,69 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
                                 </div>
                             </div>
 
+                            {/* Skills */}
+                            {allSkills.length > 0 && (
+                                <div>
+                                    <h3 className="font-semibold text-gray-900 mb-4">{t('profile.skills') || 'Skills'}</h3>
+
+                                    {/* Natural Building */}
+                                    <div className="mb-3">
+                                        <div className="flex items-center gap-1.5 mb-2">
+                                            <IconHome size={14} className="text-gray-500" />
+                                            <span className="text-sm font-medium text-gray-500">{t('projects.naturalBuilding')}</span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {allSkills.filter(s => s.category === 'NATB').map(skill => {
+                                                const SkillIcon = getSkillIcon(skill.icon);
+                                                const isActive = tempFilters.skills.includes(skill.code);
+                                                return (
+                                                    <button
+                                                        key={skill.code}
+                                                        onClick={() => toggleTempSkill(skill.code)}
+                                                        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer border-2 ${
+                                                            isActive
+                                                                ? 'border-eco-primary bg-eco-primary/10 text-eco-primary'
+                                                                : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                                                        }`}
+                                                    >
+                                                        <SkillIcon size={16} />
+                                                        {getSkillName(skill)}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* Permaculture */}
+                                    <div>
+                                        <div className="flex items-center gap-1.5 mb-2">
+                                            <IconLeaf size={14} className="text-gray-500" />
+                                            <span className="text-sm font-medium text-gray-500">{t('projects.permaculture')}</span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {allSkills.filter(s => s.category === 'PERM').map(skill => {
+                                                const SkillIcon = getSkillIcon(skill.icon);
+                                                const isActive = tempFilters.skills.includes(skill.code);
+                                                return (
+                                                    <button
+                                                        key={skill.code}
+                                                        onClick={() => toggleTempSkill(skill.code)}
+                                                        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer border-2 ${
+                                                            isActive
+                                                                ? 'border-eco-terracotta bg-eco-terracotta/10 text-eco-terracotta'
+                                                                : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                                                        }`}
+                                                    >
+                                                        <SkillIcon size={16} />
+                                                        {getSkillName(skill)}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Work Details */}
                             <div>
                                 <h3 className="font-semibold text-gray-900 mb-4">{t('projects.filters.workDetails')}</h3>
@@ -868,16 +1000,23 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
                         {/* Footer */}
                         <div className="flex items-center justify-between p-4 border-t border-gray-200 bg-gray-50">
                             <button
-                                onClick={() => setShowModal(false)}
-                                className="px-6 py-2.5 text-sm font-semibold text-gray-700 hover:text-gray-900 cursor-pointer"
+                                onClick={() => {
+                                    setTempFilters(defaultFilters);
+                                }}
+                                className="text-sm font-semibold text-gray-600 hover:text-gray-900 underline cursor-pointer"
                             >
-                                {t('common.cancel')}
+                                {t('common.reset')}
                             </button>
                             <button
                                 onClick={applyFilters}
-                                className="px-6 py-2.5 bg-eco-primary text-white font-semibold rounded-lg hover:bg-eco-primaryDark transition-all cursor-pointer"
+                                className="px-6 py-2.5 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-all cursor-pointer"
                             >
-                                {t('projects.filters.applyFilters')}
+                                {getFilteredCount
+                                    ? t('projects.filters.showResults', { count: getFilteredCount(tempFilters) })
+                                    : resultCount !== undefined
+                                        ? t('projects.filters.showResults', { count: resultCount })
+                                        : t('projects.filters.applyFilters')
+                                }
                             </button>
                         </div>
                     </div>

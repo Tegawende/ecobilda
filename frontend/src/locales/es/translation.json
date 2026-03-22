@@ -40,6 +40,30 @@
     "closeMenu": "Cerrar menú",
     "loading": "Cargando..."
   },
+  "auth": {
+    "registrationSuccess": {
+      "title": "Revisa tu correo",
+      "message": "Hemos enviado un enlace de verificación a",
+      "spamNote": "Si no ves el correo, revisa tu carpeta de spam.",
+      "backToLogin": "Volver al inicio de sesión"
+    },
+    "verification": {
+      "verifying": "Verificando...",
+      "success": "Tu correo ha sido verificado correctamente.",
+      "successTitle": "Correo verificado!",
+      "error": "No se pudo verificar tu correo. El enlace puede ser inválido.",
+      "errorTitle": "Error de verificación",
+      "expired": "Este enlace de verificación ha expirado.",
+      "expiredTitle": "Enlace expirado",
+      "goToLogin": "Iniciar sesión",
+      "resendEmail": "Reenviar correo de verificación",
+      "emailSent": "Se ha enviado un nuevo correo de verificación!",
+      "alreadyVerified": "Tu correo ya ha sido verificado.",
+      "alreadyVerifiedTitle": "Ya verificado",
+      "noToken": "Falta el token de verificación.",
+      "redirecting": "Redirigiendo en {seconds}s..."
+    }
+  },
   "nav": {
     "home": "Inicio",
     "projects": "Proyectos",
@@ -124,6 +148,7 @@
     "noResults": "No se encontraron proyectos",
     "noResultsDesc": "Intente ajustar sus filtros o términos de búsqueda para encontrar lo que busca.",
     "clearFilters": "Limpiar todos los filtros",
+    "clearSkills": "Limpiar competencias",
     "spotsLeft": "{{count}} plazas restantes",
     "full": "Completo",
     "createProject": "Crear proyecto",
@@ -272,14 +297,14 @@
       "year": "Año:",
       "monthsSelected": "{{count}} mes(es) seleccionado(s) para {{year}}",
       "images": "Imágenes del proyecto (Opcional)",
-      "imagesDescription": "Añade fotos de tu proyecto, espacio de trabajo, alojamiento y alrededores. La primera imagen será la foto de portada. (Máx. 10 imágenes)",
+      "imagesDescription": "Sube imágenes de tu proyecto. Usa los botones de flechas para reordenarlas. La primera imagen será la portada.",
       "uploadButton": "Haz clic para subir imágenes",
       "uploadHint": "PNG, JPG hasta 10MB cada una",
       "cover": "Portada",
       "imagesUploaded": "{{count}} / 10 imágenes subidas",
       "maxImagesAlert": "Máximo 10 imágenes permitidas",
       "reviewTitle": "✨ Revisa tu proyecto",
-      "reviewProject": "Proyecto <strong>{{type}}</strong>",
+      "reviewProject": "Proyecto {{type}}",
       "reviewTitleLabel": "Título: {{title}}",
       "reviewLocation": "Ubicación: {{city}}, {{country}}",
       "reviewWork": "Trabajo: {{hours}}h/día, {{days}} días/semana, máx. {{max}} voluntarios",
@@ -386,7 +411,16 @@
     "review": "reseña",
     "reviews": "reseñas",
     "reviewsTitle": "Reseñas",
-    "yourResponse": "Tu respuesta"
+    "yourResponse": "Tu respuesta",
+    "title": "Mi Perfil",
+    "subtitle": "Tu información personal",
+    "noBio": "Sin biografía",
+    "noLocation": "No especificado",
+    "noBirthday": "No especificado",
+    "noLanguages": "No especificado",
+    "noSkills": "Sin competencias seleccionadas",
+    "yearsOld": "años",
+    "yearsOld": "años"
   },
   "settings": {
     "title": "Configuración de cuenta",

@@ -36,4 +36,11 @@ export const theme = createTheme({
   headings: {
     fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   },
+  components: {
+    Avatar: {
+      defaultProps: {
+        imageProps: { referrerPolicy: 'no-referrer' },
+      },
+    },
+  },
 });

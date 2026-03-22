@@ -1,5 +1,7 @@
+'use client';
+
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
 import {
   Stack,
   Title,
@@ -23,8 +25,10 @@ import {
   IconX,
   IconSparkles,
   IconCheck,
+  IconArrowLeft,
+  IconArrowRight,
 } from '@tabler/icons-react';
-import type { ProjectFormData } from '../../pages/CreateProjectPage';
+import type { ProjectFormData } from '@/app/[locale]/(protected)/create-project/CreateProjectClient';
 
 interface ProjectFormStep4Props {
   data: ProjectFormData;
@@ -41,7 +45,7 @@ export function ProjectFormStep4({
   onBack,
   isSubmitting,
 }: ProjectFormStep4Props) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [images, setImages] = useState<File[]>(data.images);
@@ -136,6 +140,17 @@ export function ProjectFormStep4({
 
     // Revoke URL to free memory
     URL.revokeObjectURL(previewUrls[index]);
+  };
+
+  const moveImage = (from: number, to: number) => {
+    if (to < 0 || to >= images.length) return;
+    const newImages = [...images];
+    const newPreviews = [...previewUrls];
+    [newImages[from], newImages[to]] = [newImages[to], newImages[from]];
+    [newPreviews[from], newPreviews[to]] = [newPreviews[to], newPreviews[from]];
+    setImages(newImages);
+    setPreviewUrls(newPreviews);
+    onUpdate({ images: newImages });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -260,25 +275,43 @@ export function ProjectFormStep4({
                     height={120}
                     fit="cover"
                   />
-                  {index === 0 && (
-                    <Badge
-                      color="eco-terracotta"
-                      style={{ position: 'absolute', top: 8, left: 8 }}
-                    >
-                      {t('createProject.step4.cover')}
-                    </Badge>
-                  )}
+                  <Badge
+                    color="gray"
+                    variant="filled"
+                    style={{ position: 'absolute', top: 8, left: 8 }}
+                  >
+                    {index + 1}
+                  </Badge>
                   <ActionIcon
                     color="red"
                     variant="filled"
+                    size="sm"
                     style={{ position: 'absolute', top: 8, right: 8 }}
                     onClick={() => removeImage(index)}
                   >
-                    <IconX size={16} />
+                    <IconX size={14} />
                   </ActionIcon>
-                  <Text size="xs" c="dimmed" p="xs" truncate>
-                    {image.name}
-                  </Text>
+                  <Group gap={4} p="xs" justify="space-between">
+                    <ActionIcon
+                      variant="subtle"
+                      size="sm"
+                      disabled={index === 0}
+                      onClick={() => moveImage(index, index - 1)}
+                    >
+                      <IconArrowLeft size={14} />
+                    </ActionIcon>
+                    <Text size="xs" c="dimmed" truncate style={{ flex: 1, textAlign: 'center' }}>
+                      {image.name}
+                    </Text>
+                    <ActionIcon
+                      variant="subtle"
+                      size="sm"
+                      disabled={index === images.length - 1}
+                      onClick={() => moveImage(index, index + 1)}
+                    >
+                      <IconArrowRight size={14} />
+                    </ActionIcon>
+                  </Group>
                 </Card>
               ))}
             </SimpleGrid>

@@ -8,6 +8,7 @@ export interface User {
   gender: 'M' | 'F' | 'O' | 'P';
   bio: string;
   profile_picture: string | null;
+  profile_picture_url: string | null;
   address: Address;
   languages: Language[];
   skills: Skill[];
@@ -50,6 +51,8 @@ export interface Skill {
   display_name_fr: string;
   display_name_es: string;
   display_name_de: string;
+  display_name_nl: string;
+  display_name_pt: string;
   icon: string;
 }
 
@@ -60,6 +63,7 @@ export interface Project {
   title: string;
   description: string;
   project_type: 'PERM' | 'NATB';
+  status: 'PENDING' | 'ACTIVE' | 'REJECTED';
   address: Address;
   hours_per_day: number;
   days_per_week: number;
@@ -72,10 +76,12 @@ export interface Project {
   smoking_allowed: boolean;
   is_free: boolean;
   skills: Skill[];
+  languages: Language[];
   is_active: boolean;
   flagged_count: number;
   created_at: string;
   updated_at: string;
+  validated_at: string | null;
   images: ProjectImage[];
   availabilities: Availability[];
 }
@@ -111,6 +117,7 @@ export interface Conversation {
   id: number;
   user1: User;
   user2: User;
+  participation_request?: number;
   last_message_text: string;
   last_message_at: string;
   unread_count_user1: number;
@@ -163,9 +170,11 @@ export interface LoginCredentials {
 export interface RegisterData {
   email: string;
   password: string;
+  password_confirm: string;
   first_name: string;
   last_name: string;
   date_of_birth: string;
+  locale?: string;
 }
 
 export interface AuthTokens {

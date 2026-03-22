@@ -1,7 +1,9 @@
+'use client';
+
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ActionIcon, Tooltip, Loader } from '@mantine/core';
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/navigation';
 import { notifications } from '@mantine/notifications';
 import {
   IconHeart,
@@ -9,9 +11,8 @@ import {
   IconCheck,
   IconX,
 } from '@tabler/icons-react';
-import { favoritesService } from '../../services/favorites';
-import { isAuthenticated } from '../../services/api';
-import logger from '../../utils/logger';
+import { favoritesService } from '@/services/favorites';
+import { isAuthenticated } from '@/services/api';
 
 interface FavoriteButtonProps {
   projectId: number;
@@ -38,10 +39,10 @@ export function FavoriteButton({
   variant = 'circle',
   initialFavorite = false
 }: FavoriteButtonProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
   const isLoggedIn = isAuthenticated();
 
   useEffect(() => {
@@ -51,10 +52,8 @@ export function FavoriteButton({
       try {
         const favorites = await favoritesService.getFavorites();
         setIsFavorite(favorites.includes(projectId));
-      } catch (error: any) {
-        if (error?.response?.status !== 404) {
-          logger.error('Failed to check favorite status:', error);
-        }
+      } catch {
+        // silently fail
       }
     };
 
@@ -66,7 +65,7 @@ export function FavoriteButton({
     e.stopPropagation();
 
     if (!isLoggedIn) {
-      navigate('/login');
+      router.push('/login');
       return;
     }
 
@@ -96,7 +95,7 @@ export function FavoriteButton({
       }
       const favorites = await favoritesService.getFavorites();
       setIsFavorite(favorites.includes(projectId));
-    } catch (error: any) {
+    } catch {
       notifications.show({
         title: t('favorites.errorTitle'),
         message: t('favorites.errorMessage'),

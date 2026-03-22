@@ -1,5 +1,7 @@
+'use client';
+
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from '@/i18n/navigation';
 import {
   Paper,
   TextInput,
@@ -20,7 +22,7 @@ interface SearchParams {
 }
 
 export function SearchBar() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [searchParams, setSearchParams] = useState<SearchParams>({
     location: '',
     dateRange: null,
@@ -38,7 +40,7 @@ export function SearchBar() {
       params.set('end_date', dayjs(searchParams.dateRange[1]).format('YYYY-MM-DD'));
     }
 
-    navigate(`/search?${params.toString()}`);
+    router.push(`/search?${params.toString()}`);
   };
 
   return (

@@ -1,8 +1,10 @@
+'use client';
+
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from '@/i18n/navigation';
 import { Center, Stack, Text, Box } from '@mantine/core';
 import { IconMap } from '@tabler/icons-react';
-import type { Project } from '../../types';
+import type { Project } from '@/types';
 
 interface InteractiveMapProps {
   projects: Project[];
@@ -14,7 +16,7 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
   const mapRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
   const onBoundsChangeRef = useRef(onBoundsChange);
-  const navigate = useNavigate();
+  const router = useRouter();
   const [isMapReady, setIsMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
@@ -205,7 +207,7 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
 
           // Navigate to project on marker click
           el.addEventListener('click', () => {
-            navigate(`/projects/${project.id}`);
+            router.push(`/projects/${project.id}`);
           });
 
           markersRef.current.push(marker);
@@ -237,7 +239,7 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
     } catch (error) {
       console.error('Error updating markers:', error);
     }
-  }, [projects, isMapReady, navigate]);
+  }, [projects, isMapReady, router]);
 
   const mapboxAvailable = typeof window !== 'undefined' && (window as any).mapboxgl;
 

@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
 import {
     IconArrowLeft,
     IconMapPin,
@@ -17,7 +19,7 @@ import {
     IconChevronRight,
 } from '@tabler/icons-react';
 import { FavoriteButton } from '../common/FavoriteButton';
-import type { Project } from '../../types';
+import type { Project } from '@/types';
 import { DatePickerInput } from '@mantine/dates';
 
 interface MobileProjectDetailModalProps {
@@ -33,7 +35,7 @@ export function MobileProjectDetailModal({
     onClose,
     initialFavorite = false,
 }: MobileProjectDetailModalProps) {
-    const { t } = useTranslation();
+    const t = useTranslations();
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [dates, setDates] = useState<[Date | null, Date | null]>([null, null]);
 

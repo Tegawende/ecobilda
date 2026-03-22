@@ -1,30 +1,54 @@
-# 🚀 Ecobilda API Endpoints
+# Ecobilda API Endpoints
 
-Documentation complète de tous les endpoints API disponibles.
+Complete reference for all available API endpoints.
 
-**Base URL**: `http://localhost:8000/api/`
+**Base URL:** `http://localhost:8000/api/`
+**WebSocket URL:** `ws://localhost:8000/ws/`
 
----
-
-## 📋 Table des matières
-
-1. [Authentication](#authentication)
-2. [Users & Profile](#users--profile)
-3. [Skills](#skills)
-4. [Projects](#projects)
-
----
-
-## 🔐 Authentication
-
-### Register
-Créer un nouveau compte utilisateur.
-
-```http
-POST /api/auth/register/
+All authenticated endpoints require the header:
+```
+Authorization: Bearer {access_token}
 ```
 
-**Body**:
+---
+
+## Table of Contents
+
+1. [Authentication](#authentication)
+2. [Users and Profile](#users-and-profile)
+3. [Projects](#projects)
+4. [Messaging (Conversations and Messages)](#messaging)
+5. [Reviews](#reviews)
+6. [Notifications](#notifications)
+7. [Favorites](#favorites)
+8. [Skills](#skills)
+9. [WebSocket Endpoints](#websocket-endpoints)
+10. [Django Admin](#django-admin)
+11. [General Notes](#general-notes)
+
+---
+
+## Authentication
+
+All auth endpoints are under `/api/auth/`.
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| POST | `/api/auth/register/` | Register a new user account | No |
+| POST | `/api/auth/login/` | Login with email and password | No |
+| POST | `/api/auth/logout/` | Logout (blacklist refresh token) | Yes |
+| GET | `/api/auth/me/` | Get current authenticated user | Yes |
+| POST | `/api/auth/token/` | Obtain JWT token pair (alternative to login) | No |
+| POST | `/api/auth/token/refresh/` | Refresh an access token | No |
+| POST | `/api/auth/password-reset/` | Request password reset email | No |
+| POST | `/api/auth/password-reset/confirm/` | Confirm password reset with token | No |
+| POST | `/api/auth/change-password/` | Change password (authenticated user) | Yes |
+| POST | `/api/auth/google/` | Google OAuth login (placeholder, returns 501) | No |
+| POST | `/api/auth/apple/` | Apple OAuth login (placeholder, returns 501) | No |
+
+### POST /api/auth/register/
+
+**Body:**
 ```json
 {
   "email": "user@example.com",
@@ -36,35 +60,18 @@ POST /api/auth/register/
 }
 ```
 
-**Response** (201):
+**Response (201):**
 ```json
 {
-  "user": {
-    "id": 1,
-    "email": "user@example.com",
-    "first_name": "John",
-    "last_name": "Doe",
-    "full_name": "John Doe",
-    ...
-  },
-  "tokens": {
-    "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-    "access": "eyJ0eXAiOiJKV1QiLCJhbGc..."
-  },
+  "user": { "id": 1, "email": "user@example.com", "first_name": "John", "..." },
+  "tokens": { "refresh": "...", "access": "..." },
   "message": "Registration successful. Welcome to Ecobilda!"
 }
 ```
 
----
+### POST /api/auth/login/
 
-### Login
-Se connecter avec email/mot de passe.
-
-```http
-POST /api/auth/login/
-```
-
-**Body**:
+**Body:**
 ```json
 {
   "email": "user@example.com",
@@ -72,119 +79,54 @@ POST /api/auth/login/
 }
 ```
 
-**Response** (200):
+**Response (200):**
 ```json
 {
-  "user": { ... },
-  "tokens": {
-    "refresh": "...",
-    "access": "..."
-  },
+  "user": { "..." },
+  "tokens": { "refresh": "...", "access": "..." },
   "message": "Login successful."
 }
 ```
 
----
+### POST /api/auth/logout/
 
-### JWT Token (Alternative)
-Obtenir tokens JWT via l'endpoint standard.
-
-```http
-POST /api/auth/token/
-```
-
-**Body**:
-```json
-{
-  "email": "user@example.com",
-  "password": "securepassword"
-}
-```
-
----
-
-### Refresh Token
-Renouveler l'access token.
-
-```http
-POST /api/auth/token/refresh/
-```
-
-**Body**:
+**Body:**
 ```json
 {
   "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc..."
 }
 ```
 
-**Response** (200):
+### POST /api/auth/token/refresh/
+
+**Body:**
+```json
+{
+  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+}
+```
+
+**Response (200):**
 ```json
 {
   "access": "eyJ0eXAiOiJKV1QiLCJhbGc..."
 }
 ```
 
----
+### POST /api/auth/password-reset/
 
-### Logout
-Se déconnecter (blacklist refresh token).
-
-```http
-POST /api/auth/logout/
-```
-
-**Headers**:
-```
-Authorization: Bearer {access_token}
-```
-
-**Body**:
-```json
-{
-  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc..."
-}
-```
-
----
-
-### Current User
-Obtenir les informations de l'utilisateur connecté.
-
-```http
-GET /api/auth/me/
-```
-
-**Headers**:
-```
-Authorization: Bearer {access_token}
-```
-
----
-
-### Password Reset Request
-Demander un lien de réinitialisation de mot de passe.
-
-```http
-POST /api/auth/password-reset/
-```
-
-**Body**:
+**Body:**
 ```json
 {
   "email": "user@example.com"
 }
 ```
 
----
+Always returns 200 regardless of whether the email exists (prevents enumeration).
 
-### Password Reset Confirm
-Confirmer la réinitialisation avec le token.
+### POST /api/auth/password-reset/confirm/
 
-```http
-POST /api/auth/password-reset/confirm/
-```
-
-**Body**:
+**Body:**
 ```json
 {
   "token": "uid-token",
@@ -193,21 +135,9 @@ POST /api/auth/password-reset/confirm/
 }
 ```
 
----
+### POST /api/auth/change-password/
 
-### Change Password
-Changer son mot de passe (utilisateur connecté).
-
-```http
-POST /api/auth/change-password/
-```
-
-**Headers**:
-```
-Authorization: Bearer {access_token}
-```
-
-**Body**:
+**Body:**
 ```json
 {
   "old_password": "currentpassword",
@@ -216,59 +146,34 @@ Authorization: Bearer {access_token}
 }
 ```
 
----
-
-## 👤 Users & Profile
-
-### List Public Users
-Obtenir la liste des utilisateurs (infos publiques uniquement).
-
-```http
-GET /api/users/
-```
-
-**Query Parameters**:
-- `skills`: Filtrer par compétences (ex: `?skills=carpentry,cobbuilding`)
+**Response (200):** Returns new JWT tokens after password change.
 
 ---
 
-### Get Public User
-Obtenir les infos publiques d'un utilisateur.
+## Users and Profile
 
-```http
-GET /api/users/{id}/
-```
+### Public Users (read-only)
 
----
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/api/users/` | List all active users (public info) | No |
+| GET | `/api/users/{id}/` | Get public profile of a specific user | No |
+| GET | `/api/users/{id}/reviews/` | Get reviews for a user (stub, returns empty) | No |
 
-### Get Own Profile
-Obtenir son propre profil complet.
+**Query parameters for GET /api/users/:**
+- `skills` -- Comma-separated skill codes (e.g., `?skills=carpentry,cobbuilding`)
 
-```http
-GET /api/profile/
-```
+### Own Profile (authenticated)
 
-**Headers**:
-```
-Authorization: Bearer {access_token}
-```
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/api/profile/` | Get own full profile | Yes |
+| PUT | `/api/profile/{id}/` | Full update of own profile | Yes |
+| PATCH | `/api/profile/{id}/` | Partial update of own profile | Yes |
+| POST | `/api/profile/upload_picture/` | Upload profile picture (multipart/form-data) | Yes |
+| GET | `/api/profile/stats/` | Get own statistics | Yes |
 
----
-
-### Update Profile
-Mettre à jour son profil.
-
-```http
-PUT /api/profile/
-PATCH /api/profile/
-```
-
-**Headers**:
-```
-Authorization: Bearer {access_token}
-```
-
-**Body** (example):
+**Body for PUT/PATCH /api/profile/{id}/:**
 ```json
 {
   "first_name": "John",
@@ -288,40 +193,7 @@ Authorization: Bearer {access_token}
 }
 ```
 
----
-
-### Upload Profile Picture
-Télécharger une photo de profil.
-
-```http
-POST /api/profile/upload_picture/
-```
-
-**Headers**:
-```
-Authorization: Bearer {access_token}
-```
-
-**Body** (multipart/form-data):
-```
-file: [image file]
-```
-
----
-
-### Get Profile Stats
-Obtenir ses statistiques.
-
-```http
-GET /api/profile/stats/
-```
-
-**Headers**:
-```
-Authorization: Bearer {access_token}
-```
-
-**Response** (200):
+**Response for GET /api/profile/stats/ (200):**
 ```json
 {
   "projects_count": 3,
@@ -334,224 +206,41 @@ Authorization: Bearer {access_token}
 
 ---
 
-## 🎨 Skills
+## Projects
 
-### List Skills
-Obtenir toutes les compétences (16 skills pré-chargées).
+All project endpoints are under `/api/projects/`. Uses a DRF DefaultRouter.
 
-```http
-GET /api/skills/
-```
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/api/projects/` | List projects with advanced filtering | No |
+| POST | `/api/projects/` | Create a new project | Yes |
+| GET | `/api/projects/{id}/` | Get full project details | No |
+| PUT | `/api/projects/{id}/` | Full update of a project (owner only) | Yes |
+| PATCH | `/api/projects/{id}/` | Partial update of a project (owner only) | Yes |
+| DELETE | `/api/projects/{id}/` | Delete a project (owner only) | Yes |
+| GET | `/api/projects/{id}/availabilities/` | Get project availabilities | No |
+| POST | `/api/projects/{id}/set_availabilities/` | Set project availabilities (owner only) | Yes |
+| GET | `/api/projects/map_data/` | Get map-optimized project data | No |
+| POST | `/api/projects/{id}/flag/` | Flag a project for moderation | Yes |
 
-**Query Parameters**:
-- `lang`: Langue des noms (en, fr, es, de) - ex: `?lang=fr`
-- `category`: Filtrer par catégorie (PERM, NATB) - ex: `?category=PERM`
+### Query Parameters for GET /api/projects/
 
-**Response** (200):
-```json
-[
-  {
-    "code": "carpentry",
-    "category": "NATB",
-    "display_name": "Carpentry",
-    "icon": "🔨"
-  },
-  {
-    "code": "garden_maintenance",
-    "category": "PERM",
-    "display_name": "Garden maintenance",
-    "icon": "🌿"
-  },
-  ...
-]
-```
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `keyword` | string | Search in title and description |
+| `skills` | string | Comma-separated skill codes (e.g., `carpentry,cobbuilding`) |
+| `countries` | string | Comma-separated country codes (e.g., `FR,ES,DE`) |
+| `project_type` | string | `PERM` (permaculture) or `NATB` (natural building) |
+| `internet` | boolean | Filter projects with internet |
+| `family_friendly` | boolean | Filter family-friendly projects |
+| `pets_allowed` | boolean | Filter projects that allow pets |
+| `smoking_allowed` | boolean | Filter projects that allow smoking |
+| `available_from` | date | Date in YYYY-MM-DD format for availability filtering |
+| `exclude_own` | boolean | Exclude current user's own projects from results |
 
----
+### POST /api/projects/
 
-### Get Skill
-Obtenir une compétence spécifique.
-
-```http
-GET /api/skills/{code}/
-```
-
-**Example**:
-```http
-GET /api/skills/carpentry/?lang=fr
-```
-
-**Response** (200):
-```json
-{
-  "code": "carpentry",
-  "category": "NATB",
-  "display_name": "Charpenterie",
-  "icon": "🔨"
-}
-```
-
----
-
-## 🏗️ Projects
-
-### List Projects
-Obtenir la liste des projets avec filtres avancés.
-
-```http
-GET /api/projects/
-```
-
-**Query Parameters**:
-- `keyword`: Recherche dans titre et description
-- `skills`: Compétences (comma-separated) - ex: `carpentry,cobbuilding`
-- `countries`: Pays (comma-separated) - ex: `FR,ES,DE`
-- `project_type`: Type de projet (PERM ou NATB)
-- `internet`: true/false
-- `family_friendly`: true/false
-- `pets_allowed`: true/false
-- `smoking_allowed`: true/false
-- `available_from`: Date de disponibilité (YYYY-MM-DD)
-
-**Example**:
-```http
-GET /api/projects/?skills=carpentry&countries=FR&available_from=2024-06-01&internet=true
-```
-
-**Response** (200):
-```json
-{
-  "count": 15,
-  "next": "http://localhost:8000/api/projects/?page=2",
-  "previous": null,
-  "results": [
-    {
-      "id": 1,
-      "title": "Eco-Construction Project in Provence",
-      "description": "Build a strawbale house...",
-      "project_type": "NATB",
-      "owner": {
-        "id": 5,
-        "first_name": "Marie",
-        "last_name": "Dupont",
-        "profile_picture": "...",
-        "average_rating": 4.8
-      },
-      "city": "Avignon",
-      "country": "France",
-      "country_code": "FR",
-      "hours_per_day": 6,
-      "days_per_week": 5,
-      "max_helpers": 3,
-      "internet_provided": true,
-      "family_friendly": true,
-      "pets_allowed": false,
-      "smoking_allowed": false,
-      "skills": [
-        {"code": "carpentry", "icon": "🔨"},
-        {"code": "strawbale_building", "icon": "🌾"}
-      ],
-      "cover_image": "http://localhost:8000/media/projects/...",
-      "location_display": "Avignon, France",
-      "created_at": "2024-01-15T10:30:00Z"
-    },
-    ...
-  ]
-}
-```
-
----
-
-### Get Project
-Obtenir un projet spécifique (détails complets).
-
-```http
-GET /api/projects/{id}/
-```
-
-**Response** (200):
-```json
-{
-  "id": 1,
-  "title": "Eco-Construction Project in Provence",
-  "description": "Full description...",
-  "project_type": "NATB",
-  "owner": { ... },
-  "address": {
-    "city": "Avignon",
-    "postal_code": "84000",
-    "country": { "code": "FR", "name": "France" },
-    "latitude": 43.9493,
-    "longitude": 4.8055,
-    "formatted_address": "Avignon, France"
-  },
-  "skills": [
-    {
-      "code": "carpentry",
-      "category": "NATB",
-      "display_name": "Carpentry",
-      "icon": "🔨"
-    }
-  ],
-  "hours_per_day": 6,
-  "days_per_week": 5,
-  "max_helpers": 3,
-  "accommodation_details": "Shared room in main house...",
-  "food_details": "3 vegetarian meals per day...",
-  "internet_provided": true,
-  "family_friendly": true,
-  "pets_allowed": false,
-  "smoking_allowed": false,
-  "availabilities": [
-    {
-      "year": 2024,
-      "january": false,
-      "february": false,
-      "march": true,
-      "april": true,
-      "may": true,
-      "june": true,
-      "july": true,
-      "august": true,
-      "september": true,
-      "october": false,
-      "november": false,
-      "december": false,
-      "available_months": ["March", "April", "May", "June", "July", "August", "September"]
-    }
-  ],
-  "images": [
-    {
-      "id": 1,
-      "image": "http://localhost:8000/media/projects/...",
-      "order": 0,
-      "is_cover": true
-    },
-    ...
-  ],
-  "location_display": "Avignon, France",
-  "is_visible": true,
-  "is_active": true,
-  "flagged_count": 0,
-  "created_at": "2024-01-15T10:30:00Z",
-  "updated_at": "2024-12-20T15:00:00Z"
-}
-```
-
----
-
-### Create Project
-Créer un nouveau projet.
-
-```http
-POST /api/projects/
-```
-
-**Headers**:
-```
-Authorization: Bearer {access_token}
-```
-
-**Body**:
+**Body:**
 ```json
 {
   "title": "Permaculture Farm in Brittany",
@@ -578,92 +267,15 @@ Authorization: Bearer {access_token}
 }
 ```
 
-**Response** (201):
-```json
-{
-  "id": 15,
-  "title": "Permaculture Farm in Brittany",
-  ...
-}
-```
+### POST /api/projects/{id}/set_availabilities/
 
----
-
-### Update Project
-Mettre à jour un projet (propriétaire uniquement).
-
-```http
-PUT /api/projects/{id}/
-PATCH /api/projects/{id}/
-```
-
-**Headers**:
-```
-Authorization: Bearer {access_token}
-```
-
----
-
-### Delete Project
-Supprimer un projet (propriétaire uniquement).
-
-```http
-DELETE /api/projects/{id}/
-```
-
-**Headers**:
-```
-Authorization: Bearer {access_token}
-```
-
----
-
-### Get Project Availabilities
-Obtenir les disponibilités d'un projet.
-
-```http
-GET /api/projects/{id}/availabilities/
-```
-
-**Response** (200):
+**Body:**
 ```json
 [
-  {
-    "year": 2024,
-    "january": false,
-    "february": false,
-    "march": true,
-    ...
-    "available_months": ["March", "April", "May"]
-  },
   {
     "year": 2025,
-    ...
-  }
-]
-```
-
----
-
-### Set Project Availabilities
-Définir les disponibilités d'un projet (propriétaire uniquement).
-
-```http
-POST /api/projects/{id}/set_availabilities/
-```
-
-**Headers**:
-```
-Authorization: Bearer {access_token}
-```
-
-**Body**:
-```json
-[
-  {
-    "year": 2024,
-    "january": false,
-    "february": false,
+    "january": true,
+    "february": true,
     "march": true,
     "april": true,
     "may": true,
@@ -674,28 +286,15 @@ Authorization: Bearer {access_token}
     "october": false,
     "november": false,
     "december": false
-  },
-  {
-    "year": 2025,
-    "january": true,
-    "february": true,
-    ...
   }
 ]
 ```
 
----
+### GET /api/projects/map_data/
 
-### Map Data
-Obtenir les données optimisées pour affichage sur carte.
+Accepts the same query parameters as the list endpoint. Returns minimal data optimized for map markers.
 
-```http
-GET /api/projects/map_data/
-```
-
-**Query Parameters**: Mêmes filtres que `/api/projects/`
-
-**Response** (200):
+**Response (200):**
 ```json
 [
   {
@@ -706,26 +305,15 @@ GET /api/projects/map_data/
     "longitude": 4.8055,
     "cover_image": "http://localhost:8000/media/projects/...",
     "project_type": "NATB"
-  },
-  ...
+  }
 ]
 ```
 
----
+### POST /api/projects/{id}/flag/
 
-### Flag Project
-Signaler un projet (modération communautaire).
+Cannot flag your own project. After 3 flags, the project becomes invisible.
 
-```http
-POST /api/projects/{id}/flag/
-```
-
-**Headers**:
-```
-Authorization: Bearer {access_token}
-```
-
-**Response** (200):
+**Response (200):**
 ```json
 {
   "message": "Project flagged successfully.",
@@ -734,155 +322,359 @@ Authorization: Bearer {access_token}
 }
 ```
 
-**Note**: Après 3 signalements, `is_visible` devient `false`.
+---
+
+## Messaging
+
+Conversations and messages are under `/api/conversations/` and `/api/messages/`.
+
+NOTE: Users cannot send messages freely. A participation request must be accepted before a conversation is created. See the business logic section in CLAUDE.md.
+
+### Conversations
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/api/conversations/` | List all conversations for current user | Yes |
+| POST | `/api/conversations/` | Create or get existing conversation with a recipient | Yes |
+| GET | `/api/conversations/{id}/` | Get a specific conversation | Yes |
+| DELETE | `/api/conversations/{id}/` | Delete a conversation (participant only) | Yes |
+| POST | `/api/conversations/{id}/mark-as-read/` | Mark conversation as read | Yes |
+| POST | `/api/conversations/{id}/toggle-mute/` | Mute or unmute conversation | Yes |
+| GET | `/api/conversations/{id}/messages/` | Get all messages in a conversation (marks as read) | Yes |
+| POST | `/api/conversations/{id}/send-message/` | Send a message in a conversation | Yes |
+
+PUT and PATCH on conversations are not allowed (returns 405).
+
+### POST /api/conversations/
+
+**Body:**
+```json
+{
+  "recipient_id": 42
+}
+```
+
+Returns existing conversation if one exists, or creates a new one.
+
+### POST /api/conversations/{id}/toggle-mute/
+
+**Body:**
+```json
+{
+  "muted": true
+}
+```
+
+### POST /api/conversations/{id}/send-message/
+
+**Body:**
+```json
+{
+  "body": "Hello! I am interested in your project."
+}
+```
+
+Creates the message, updates conversation metadata, creates an in-app notification for the recipient, and triggers an async email notification (with 24-hour anti-spam cooldown).
+
+**Response (201):** Returns the serialized message object.
+
+### Messages (read-only)
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/api/messages/{id}/` | Get a specific message (participant only) | Yes |
+
+Messages are created via `POST /api/conversations/{id}/send-message/`, not via the messages endpoint directly. The list action on `/api/messages/` is available but the preferred way to get messages is via `GET /api/conversations/{id}/messages/`.
 
 ---
 
-## 🧪 Testing with curl
+## Reviews
 
-### Example 1: Register and Login
+All review endpoints are under `/api/reviews/`. Uses a DRF DefaultRouter.
 
-```bash
-# Register
-curl -X POST http://localhost:8000/api/auth/register/ \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "test@example.com",
-    "password": "testpassword",
-    "password_confirm": "testpassword",
-    "first_name": "Test",
-    "last_name": "User",
-    "date_of_birth": "1995-05-15"
-  }'
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/api/reviews/` | List reviews written by current user | Yes |
+| POST | `/api/reviews/` | Create a new review | Yes |
+| GET | `/api/reviews/{id}/` | Get a specific review | Yes |
+| DELETE | `/api/reviews/{id}/` | Delete a review (writer only, if no response) | Yes |
+| PATCH | `/api/reviews/{id}/add-response/` | Add a response to a review (receiver only, once) | Yes |
+| GET | `/api/reviews/eligibility/{user_id}/` | Check if current user can review another user | Yes |
+| GET | `/api/reviews/user/{user_id}/` | Get all reviews received by a specific user | Yes |
 
-# Login
-curl -X POST http://localhost:8000/api/auth/login/ \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "test@example.com",
-    "password": "testpassword"
-  }'
+PUT and PATCH on reviews are not allowed (returns 405). Use the `add-response` action instead.
+
+### POST /api/reviews/
+
+**Body:**
+```json
+{
+  "receiver_id": 42,
+  "rating": 5,
+  "feedback": "Great host, very welcoming and knowledgeable."
+}
+```
+
+Validates eligibility before creation. Both users must have exchanged messages in the last 180 days.
+
+### PATCH /api/reviews/{id}/add-response/
+
+**Body:**
+```json
+{
+  "response": "Thank you for the kind words!"
+}
+```
+
+Only the review receiver can add a response, and only once.
+
+### GET /api/reviews/eligibility/{user_id}/
+
+**Response (200):**
+```json
+{
+  "eligible": true,
+  "reason": "You can review this user.",
+  "conversation_id": 7
+}
 ```
 
 ---
 
-### Example 2: Get Skills
+## Notifications
 
-```bash
-# All skills
-curl http://localhost:8000/api/skills/
+All notification endpoints are under `/api/notifications/`. Read-only ViewSet with custom actions.
 
-# French translation
-curl http://localhost:8000/api/skills/?lang=fr
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/api/notifications/` | List all notifications for current user | Yes |
+| GET | `/api/notifications/{id}/` | Get a specific notification | Yes |
+| POST | `/api/notifications/{id}/mark-as-read/` | Mark a notification as read | Yes |
+| POST | `/api/notifications/mark-all-read/` | Mark all notifications as read | Yes |
+| GET | `/api/notifications/unread-count/` | Get count of unread notifications | Yes |
 
-# Only Permaculture skills
-curl http://localhost:8000/api/skills/?category=PERM
+### Query Parameters for GET /api/notifications/
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `unread_only` | boolean | Only return unread notifications (`true`/`false`) |
+| `type` | string | Filter by notification type |
+
+### GET /api/notifications/unread-count/
+
+**Response (200):**
+```json
+{
+  "count": 5
+}
+```
+
+### POST /api/notifications/mark-all-read/
+
+**Response (200):**
+```json
+{
+  "detail": "Marked 5 notification(s) as read.",
+  "updated_count": 5
+}
 ```
 
 ---
 
-### Example 3: Search Projects
+## Favorites
 
-```bash
-# All projects
-curl http://localhost:8000/api/projects/
+All favorite endpoints are under `/api/favorites/`.
 
-# Projects in France with carpentry skill
-curl "http://localhost:8000/api/projects/?countries=FR&skills=carpentry"
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/api/favorites/` | List favorite project IDs for current user | Yes |
+| POST | `/api/favorites/` | Add a project to favorites | Yes |
+| DELETE | `/api/favorites/{id}/` | Remove a favorite by favorite ID | Yes |
+| DELETE | `/api/favorites/by-project/{project_id}/` | Remove a favorite by project ID | Yes |
 
-# Projects available in June 2024 with internet
-curl "http://localhost:8000/api/projects/?available_from=2024-06-01&internet=true"
+### GET /api/favorites/
 
-# Map data for filtered projects
-curl "http://localhost:8000/api/projects/map_data/?countries=FR,ES"
+Returns an array of project IDs (not full objects):
+```json
+[1, 5, 12, 23]
+```
+
+### POST /api/favorites/
+
+**Body:**
+```json
+{
+  "project": 42
+}
+```
+
+Cannot favorite your own project. Returns 400 if already favorited.
+
+**Response (201):**
+```json
+{
+  "id": 1,
+  "project": 42,
+  "user": 7,
+  "created_at": "2025-03-22T10:00:00Z"
+}
 ```
 
 ---
 
-### Example 4: Create Project
+## Skills
 
-```bash
-# Get access token first (from login response)
-ACCESS_TOKEN="your_access_token_here"
+All skill endpoints are under `/api/skills/`. Read-only (skills are fixture data).
 
-# Create project
-curl -X POST http://localhost:8000/api/auth/register/ \
-  -H "Authorization: Bearer $ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Natural Building Workshop",
-    "description": "Learn cob building techniques",
-    "project_type": "NATB",
-    "address": {
-      "city": "Lyon",
-      "postal_code": "69001",
-      "country_code": "FR",
-      "latitude": 45.7640,
-      "longitude": 4.8357,
-      "formatted_address": "Lyon, France"
-    },
-    "skill_codes": ["cob_building", "earthen_plaster"],
-    "hours_per_day": 6,
-    "days_per_week": 5,
-    "max_helpers": 4,
-    "accommodation_details": "Camping on site",
-    "food_details": "Communal meals",
-    "internet_provided": true,
-    "family_friendly": false,
-    "pets_allowed": false,
-    "smoking_allowed": false
-  }'
-```
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/api/skills/` | List all 16 skills | No |
+| GET | `/api/skills/{code}/` | Get a specific skill by code | No |
+
+### Query Parameters for GET /api/skills/
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `lang` | string | Language code for translated display names (`en`, `fr`, `es`, `de`) |
+| `category` | string | Filter by category: `PERM` (permaculture) or `NATB` (natural building) |
+
+### Skill Codes Reference
+
+**Permaculture (PERM):** `garden_maintenance`, `grafting`, `pruning`, `harvesting`, `composting`, `weeding`, `propagating`, `seeds_harvesting`
+
+**Natural Building (NATB):** `carpentry`, `masonry`, `strawbale_building`, `cob_building`, `earthen_plaster`, `lime_plaster`, `hempcrete`, `tadelakt_plaster`
 
 ---
 
-## 📝 Notes
+## WebSocket Endpoints
+
+WebSocket connections require JWT authentication via query parameter: `?token={access_token}`
+
+### Chat WebSocket
+
+```
+ws://localhost:8000/ws/chat/?token={access_token}
+```
+
+Joins the user's personal group (`user_{id}`) for receiving messages.
+
+**Client-to-server events:**
+
+| Event Type | Payload | Description |
+|------------|---------|-------------|
+| `send_message` | `{ "conversation_id": 123, "body": "Hello!" }` | Send a message |
+| `typing` | `{ "conversation_id": 123 }` | Notify that user is typing |
+| `stop_typing` | `{ "conversation_id": 123 }` | Notify that user stopped typing |
+
+**Server-to-client events:**
+
+| Event Type | Description |
+|------------|-------------|
+| `connection_established` | Sent on successful connection |
+| `message_sent` | Confirmation that your message was sent |
+| `new_message` | A new message from another user |
+| `typing` | Another user is typing |
+| `stop_typing` | Another user stopped typing |
+| `error` | Error message |
+
+### Notifications WebSocket
+
+```
+ws://localhost:8000/ws/notifications/?token={access_token}
+```
+
+Joins the user's notification group (`notifications_user_{id}`).
+
+**Client-to-server events:**
+
+| Event Type | Payload | Description |
+|------------|---------|-------------|
+| `mark_notification_read` | `{ "notification_id": 123 }` | Mark a notification as read |
+
+**Server-to-client events:**
+
+| Event Type | Description |
+|------------|-------------|
+| `connection_established` | Sent on successful connection |
+| `unread_count` | Current unread notification count (sent on connect and after updates) |
+| `new_notification` | A new notification received |
+| `notification_marked_read` | Confirmation that notification was marked as read |
+| `error` | Error message |
+
+---
+
+## Django Admin
+
+```
+http://localhost:8000/admin/
+```
+
+Standard Django admin interface. Requires a superuser account (create with `python manage.py createsuperuser`).
+
+---
+
+## General Notes
 
 ### Authentication
-Toutes les requêtes authentifiées nécessitent le header:
+
+All authenticated requests require the header:
 ```
 Authorization: Bearer {access_token}
 ```
 
+Access tokens are obtained via `/api/auth/login/`, `/api/auth/register/`, or `/api/auth/token/`. When an access token expires, use `/api/auth/token/refresh/` with the refresh token.
+
 ### Pagination
-Les listes utilisent la pagination par défaut (20 items par page):
+
+List endpoints use DRF default pagination (page-based):
 ```
 ?page=2
 ```
 
-### Error Responses
+### Error Response Format
+
 ```json
 {
-  "error": "Error message",
-  "detail": "Detailed error description"
+  "detail": "Error description"
 }
 ```
 
-### Status Codes
-- `200`: OK
-- `201`: Created
-- `400`: Bad Request
-- `401`: Unauthorized
-- `403`: Forbidden
-- `404`: Not Found
-- `500`: Internal Server Error
+Or for validation errors:
+```json
+{
+  "field_name": ["Error message for this field."]
+}
+```
 
----
+### HTTP Status Codes
 
-## 🚀 Next Steps
+| Code | Meaning |
+|------|---------|
+| 200 | OK |
+| 201 | Created |
+| 204 | No Content (successful delete) |
+| 400 | Bad Request (validation error) |
+| 401 | Unauthorized (missing or invalid token) |
+| 403 | Forbidden (insufficient permissions) |
+| 404 | Not Found |
+| 405 | Method Not Allowed |
+| 501 | Not Implemented (placeholder endpoints) |
 
-1. **Démarrer le serveur backend**:
-   ```bash
-   cd backend
-   python manage.py runserver
-   ```
+### Apps Not Yet Exposed via API
 
-2. **Tester avec Postman ou curl**
+The following apps exist in the backend codebase but do not have URL routing configured yet:
 
-3. **Connecter le frontend React** aux endpoints
+- **Participations** (`backend/apps/participations/`) -- Participation request management (pending implementation)
+- **Reports** (`backend/apps/reports/`) -- Project and review flagging (pending implementation)
+- **Searches** (`backend/apps/searches/`) -- Saved searches (pending implementation)
+- **Emails** (`backend/apps/emails/`) -- Internal transactional email service (no public API)
+- **Core** (`backend/apps/core/`) -- Reference data models (Country, Language, Address) -- no public endpoints
 
-4. **Phase suivante**: WebSocket pour messagerie temps réel
+### Media Files
 
----
+In development, media files (profile pictures, project images) are served at:
+```
+http://localhost:8000/media/...
+```
 
-**Documentation générée le**: 25 Décembre 2024
+This requires `DEBUG=True`. In production, Nginx should serve the `/media/` path.

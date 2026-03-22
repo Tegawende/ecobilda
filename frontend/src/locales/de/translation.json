@@ -70,7 +70,29 @@
     "appleLogin": "Mit Apple fortfahren",
     "forgotPassword": "Passwort vergessen?",
     "noAccount": "Noch kein Konto?",
-    "hasAccount": "Bereits ein Konto?"
+    "hasAccount": "Bereits ein Konto?",
+    "registrationSuccess": {
+      "title": "Überprüfen Sie Ihre E-Mail",
+      "message": "Wir haben einen Bestätigungslink gesendet an",
+      "spamNote": "Wenn Sie die E-Mail nicht sehen, überprüfen Sie Ihren Spam-Ordner.",
+      "backToLogin": "Zurück zur Anmeldung"
+    },
+    "verification": {
+      "verifying": "Überprüfung...",
+      "success": "Ihre E-Mail wurde erfolgreich verifiziert.",
+      "successTitle": "E-Mail verifiziert!",
+      "error": "Ihre E-Mail konnte nicht verifiziert werden. Der Link ist möglicherweise ungültig.",
+      "errorTitle": "Verifizierungsfehler",
+      "expired": "Dieser Bestätigungslink ist abgelaufen.",
+      "expiredTitle": "Link abgelaufen",
+      "goToLogin": "Anmelden",
+      "resendEmail": "Bestätigungs-E-Mail erneut senden",
+      "emailSent": "Eine neue Bestätigungs-E-Mail wurde gesendet!",
+      "alreadyVerified": "Ihre E-Mail wurde bereits verifiziert.",
+      "alreadyVerifiedTitle": "Bereits verifiziert",
+      "noToken": "Bestätigungstoken fehlt.",
+      "redirecting": "Weiterleitung in {seconds}s..."
+    }
   },
   "projects": {
     "title": "Projekte",
@@ -80,6 +102,7 @@
     "noResults": "Keine Projekte gefunden",
     "noResultsDesc": "Versuchen Sie, Ihre Filter oder Suchbegriffe anzupassen, um zu finden, wonach Sie suchen.",
     "clearFilters": "Alle Filter löschen",
+    "clearSkills": "Fähigkeiten löschen",
     "spotsLeft": "{{count}} Plätze übrig",
     "full": "Voll",
     "createProject": "Projekt erstellen",
@@ -241,14 +264,14 @@
       "year": "Jahr:",
       "monthsSelected": "{{count}} Monat(e) ausgewählt für {{year}}",
       "images": "Projektbilder (Optional)",
-      "imagesDescription": "Fügen Sie Fotos Ihres Projekts, Arbeitsplatzes, Unterkunft und Umgebung hinzu. Das erste Bild wird das Titelbild. (Max. 10 Bilder)",
+      "imagesDescription": "Laden Sie Bilder für Ihr Projekt hoch. Verwenden Sie die Pfeiltasten, um sie neu anzuordnen. Das erste Bild wird das Titelbild.",
       "uploadButton": "Klicken Sie, um Bilder hochzuladen",
       "uploadHint": "PNG, JPG bis zu 10MB jeweils",
       "cover": "Titelbild",
       "imagesUploaded": "{{count}} / 10 Bilder hochgeladen",
       "maxImagesAlert": "Maximal 10 Bilder erlaubt",
       "reviewTitle": "✨ Überprüfen Sie Ihr Projekt",
-      "reviewProject": "<strong>{{type}}</strong> Projekt",
+      "reviewProject": "{{type}} Projekt",
       "reviewTitleLabel": "Titel: {{title}}",
       "reviewLocation": "Standort: {{city}}, {{country}}",
       "reviewWork": "Arbeit: {{hours}}h/Tag, {{days}} Tage/Woche, max. {{max}} Freiwillige",
@@ -355,7 +378,14 @@
     "review": "Bewertung",
     "reviews": "Bewertungen",
     "reviewsTitle": "Bewertungen",
-    "yourResponse": "Ihre Antwort"
+    "yourResponse": "Ihre Antwort",
+    "title": "Mein Profil",
+    "subtitle": "Ihre persönlichen Informationen",
+    "noBio": "Noch keine Bio",
+    "noLocation": "Nicht angegeben",
+    "noBirthday": "Nicht angegeben",
+    "noLanguages": "Nicht angegeben",
+    "noSkills": "Keine Fähigkeiten ausgewählt"
   },
   "settings": {
     "title": "Kontoeinstellungen",
@@ -385,7 +415,9 @@
     "dangerZone": "Gefahrenzone",
     "deleteWarning": "Sobald Sie Ihr Konto löschen, gibt es kein Zurück. Bitte seien Sie sicher.",
     "deleteAccount": "Konto löschen",
-    "deleteConfirm": "Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
+    "deleteConfirm": "Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "deleteConfirmWord": "LÖSCHEN",
+    "deleteTypeConfirm": "Zur Bestätigung geben Sie {word} unten ein."
   },
   "messaging": {
     "inbox": "Posteingang",

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { AuthTokens } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api';
 
 // Create axios instance
 const api = axios.create({
@@ -51,7 +51,9 @@ api.interceptors.response.use(
         } catch (refreshError) {
           // Refresh failed, logout user
           clearAuthTokens();
-          window.location.href = '/login';
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
           return Promise.reject(refreshError);
         }
       }
@@ -63,15 +65,18 @@ api.interceptors.response.use(
 
 // Token management helpers
 export const getAuthTokens = (): AuthTokens | null => {
+  if (typeof window === 'undefined') return null;
   const tokens = localStorage.getItem('auth_tokens');
   return tokens ? JSON.parse(tokens) : null;
 };
 
 export const setAuthTokens = (tokens: AuthTokens): void => {
+  if (typeof window === 'undefined') return;
   localStorage.setItem('auth_tokens', JSON.stringify(tokens));
 };
 
 export const clearAuthTokens = (): void => {
+  if (typeof window === 'undefined') return;
   localStorage.removeItem('auth_tokens');
 };
 

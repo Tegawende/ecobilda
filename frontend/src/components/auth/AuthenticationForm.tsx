@@ -1,10 +1,12 @@
+'use client';
+
 
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useRouter } from '@/i18n/navigation';
 import { useForm } from '@mantine/form';
-import { useTranslation } from 'react-i18next';
-import { authService } from '../../services/auth';
-import { mockAuthService } from '../../services/mockServices';
+import { useTranslations, useLocale } from 'next-intl';
+import { authService } from '@/services/auth';
+import { DateOfBirthSelect } from '@/components/common/DateOfBirthSelect';
 
 interface LoginFormData {
   email: string;
@@ -16,7 +18,9 @@ interface RegisterFormData {
   password: string;
   first_name: string;
   last_name: string;
-  date_of_birth: Date | null;
+  dob_day: string;
+  dob_month: string;
+  dob_year: string;
   terms: boolean;
 }
 
@@ -61,7 +65,7 @@ const Input = ({ label, error, rightSection, description, className, ...props }:
 
 // Check if email exists in the system (calls real API or mock based on env)
 const checkEmailExists = async (email: string): Promise<boolean> => {
-  const useMock = import.meta.env.VITE_USE_MOCK === 'true';
+  const useMock = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
   const normalizedEmail = email.toLowerCase().trim();
 
   // Always recognize the mock test email
@@ -91,11 +95,13 @@ const checkEmailExists = async (email: string): Promise<boolean> => {
 };
 
 export function AuthenticationForm({ initialType: _initialType = 'login' }: AuthenticationFormProps) {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
+  const t = useTranslations();
+  const locale = useLocale();
+  const router = useRouter();
 
   // Steps: 'email' -> 'login' OR 'register'
-  const [step, setStep] = useState<'email' | 'login' | 'register'>('email');
+  const [step, setStep] = useState<'email' | 'login' | 'register' | 'verification-sent'>('email');
+  const [submittedEmail, setSubmittedEmail] = useState('');
   const [email, setEmail] = useState(''); // Shared email state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -125,12 +131,13 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
       password: '',
       first_name: '',
       last_name: '',
-      date_of_birth: null,
+      dob_day: '',
+      dob_month: '',
+      dob_year: '',
       terms: false,
     },
     validate: {
       password: (val) => {
-        // 8 chars, 1 number or symbol
         const regex = /^(?=.*[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
         if (!regex.test(val)) return t('auth.validation.passwordComplexity');
         if (val.toLowerCase().includes(email.split('@')[0].toLowerCase())) return "Password can't contain email";
@@ -138,15 +145,16 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
       },
       first_name: (val) => (val.length >= 2 ? null : t('auth.validation.firstName')),
       last_name: (val) => (val.length >= 2 ? null : t('auth.validation.lastName')),
-      date_of_birth: (val) => {
-        if (!val) return t('auth.validation.birthDateRequired');
-        const birthDate = new Date(val);
+      dob_year: (val, values) => {
+        if (!val || !values.dob_month || !values.dob_day) return t('auth.validation.birthDateRequired');
+        const year = parseInt(val);
+        const month = parseInt(values.dob_month);
+        const day = parseInt(values.dob_day);
+        const birthDate = new Date(year, month - 1, day);
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
         const m = today.getMonth() - birthDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-          age--;
-        }
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
         return age >= 18 ? null : t('auth.validation.ageRequirement');
       },
       terms: (val) => (val ? null : t('auth.validation.terms')),
@@ -177,16 +185,8 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
     setIsLoading(true);
     setError(null);
     try {
-      // Check if this is the mock test user
-      if (mockAuthService.isMockUser(data.email)) {
-        const result = await mockAuthService.mockLogin();
-        localStorage.setItem('auth_tokens', JSON.stringify(result.tokens));
-        localStorage.setItem('mock_user', JSON.stringify(result.user));
-        navigate('/projects');
-      } else {
-        await authService.login(data);
-        navigate('/projects');
-      }
+      await authService.login(data);
+      router.push('/projects');
     } catch (err: any) {
       setError(t('auth.errorLogin'));
     } finally {
@@ -204,13 +204,16 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
         password_confirm: data.password,
         first_name: data.first_name,
         last_name: data.last_name,
-        date_of_birth: data.date_of_birth
-          ? `${data.date_of_birth.getFullYear()}-${String(data.date_of_birth.getMonth() + 1).padStart(2, '0')}-${String(data.date_of_birth.getDate()).padStart(2, '0')}`
+        date_of_birth: data.dob_year && data.dob_month && data.dob_day
+          ? `${data.dob_year}-${data.dob_month.padStart(2, '0')}-${data.dob_day.padStart(2, '0')}`
           : '',
         terms: data.terms,
+        locale,
       };
       await authService.register(registerData as any);
-      navigate('/dashboard');
+      setSubmittedEmail(data.email);
+      setStep('verification-sent');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err: any) {
       setError(t('auth.errorRegister'));
     } finally {
@@ -227,6 +230,7 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
   return (
     <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-stone-100 relative max-w-md mx-auto">
       {/* Header Section */}
+      {step !== 'verification-sent' && (
       <div className="border-b border-gray-200 pb-4 mb-6 flex items-center relative">
         {(step === 'login' || step === 'register') && (
           <button
@@ -245,6 +249,7 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
           {step === 'register' && t('auth.finishSignup')}
         </h1>
       </div>
+      )}
 
       <div className="mb-6">
         {step === 'email' && <h2 className="text-2xl font-semibold text-gray-800 mb-6">{t('auth.welcome')}</h2>}
@@ -295,12 +300,6 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
               <span className="flex-1 text-center">{t('auth.googleLogin')}</span>
             </button>
 
-            <button className="flex items-center justify-between px-4 py-3 border border-gray-400 rounded-lg hover:bg-gray-50 hover:border-black transition-all text-sm font-semibold text-gray-800 group cursor-pointer w-full relative h-12">
-              <div className="absolute left-4">
-                <img src="/images/128px-Apple_logo_black.svg.png" alt="Apple" width={20} height={20} className="object-contain" />
-              </div>
-              <span className="flex-1 text-center">{t('auth.appleLogin')}</span>
-            </button>
           </div>
         </>
       )}
@@ -341,7 +340,7 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
           </button>
 
           <div className="text-center mt-2">
-            <Link to="/forgot-password" className="text-sm font-semibold text-gray-800 hover:underline decoration-1 underline-offset-2">
+            <Link href="/forgot-password" className="text-sm font-semibold text-gray-800 hover:underline decoration-1 underline-offset-2">
               {t('auth.forgotPassword')}
             </Link>
           </div>
@@ -367,14 +366,11 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
             {/* Helper text removed */}
           </div>
 
-          <Input
-            label={t('auth.dateOfBirth')}
-            type="date"
-            {...registerForm.getInputProps('date_of_birth')}
-            value={registerForm.values.date_of_birth ? registerForm.values.date_of_birth.toISOString().split('T')[0] : ''}
-            onChange={(e: any) => registerForm.setFieldValue('date_of_birth', e.target.valueAsDate)}
-            error={registerForm.errors.date_of_birth}
-            description={t('auth.dobDesc')}
+          <DateOfBirthSelect
+            values={{ dob_day: registerForm.values.dob_day, dob_month: registerForm.values.dob_month, dob_year: registerForm.values.dob_year }}
+            onChange={(field, value) => registerForm.setFieldValue(field, value)}
+            error={registerForm.errors.dob_year as string}
+            variant="auth"
           />
 
           <Input
@@ -390,13 +386,35 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
           />
 
           <p className="text-xs text-gray-500 leading-snug">
-            By selecting <strong>{t('auth.agreeAndContinue')}</strong>, I agree to Ecobilda's <Link to="/terms" className="text-blue-600 underline">Terms of Service</Link> and acknowledge the <Link to="/privacy" className="text-blue-600 underline">Privacy Policy</Link>.
+            By selecting <strong>{t('auth.agreeAndContinue')}</strong>, I agree to Ecobilda's <Link href="/terms" className="text-blue-600 underline">Terms of Service</Link> and acknowledge the <Link href="/privacy" className="text-blue-600 underline">Privacy Policy</Link>.
           </p>
 
           <button type="submit" disabled={isLoading} className="w-full bg-eco-primary hover:bg-eco-primaryDark text-white font-bold py-3.5 rounded-lg shadow-sm transition-all mt-2 disabled:opacity-70 text-base">
             {isLoading ? t('auth.registering') : t('auth.agreeAndContinue')}
           </button>
         </form>
+      )}
+
+      {step === 'verification-sent' && (
+        <div className="text-center py-4">
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-green-600">
+                <rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+              </svg>
+            </div>
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">{t('auth.registrationSuccess.title')}</h2>
+          <p className="text-gray-600 mb-2">{t('auth.registrationSuccess.message')}</p>
+          <p className="text-sm font-medium text-gray-800 mb-4">{submittedEmail}</p>
+          <p className="text-xs text-gray-500 mb-8">{t('auth.registrationSuccess.spamNote')}</p>
+          <button
+            onClick={resetFlow}
+            className="w-full bg-eco-primary hover:bg-eco-primaryDark text-white font-bold py-3.5 rounded-lg shadow-sm transition-all"
+          >
+            {t('auth.registrationSuccess.backToLogin')}
+          </button>
+        </div>
       )}
     </div>
   );
