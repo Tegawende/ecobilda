@@ -116,7 +116,7 @@ function ProjectCardList({ project }: { project: Project }) {
                 </Text>
                 {project.owner.average_rating && (
                   <Group gap={4}>
-                    <Text size="xs" fw={600} c="yellow">{project.owner.average_rating.toFixed(1)}</Text>
+                    <Text size="xs" fw={600} c="yellow">{Number(project.owner.average_rating || 0).toFixed(1)}</Text>
                     <IconStar size={12} className="text-yellow-500 fill-yellow-500" />
                   </Group>
                 )}
@@ -223,7 +223,7 @@ export function FavoritesClient() {
                 <Button
                   component={Link} href="/projects"
                   radius="xl"
-                  size="lg"
+                  size="md"
                   color="eco-primary"
                 >
                   {t('favorites.browseProjects') || 'Browse Projects'}

@@ -100,6 +100,14 @@ class User(AbstractUser):
     # Skills (Many-to-Many, defined in skills app)
     # skills = ManyToManyField to Skill model (will be added via related_name)
 
+    # Profile picture URL (from Google OAuth)
+    profile_picture_url = models.CharField(max_length=500, default='', blank=True)
+
+    # Email Verification
+    email_verified = models.BooleanField(default=False)
+    email_verification_token = models.CharField(max_length=64, default='', blank=True)
+    email_verification_sent_at = models.DateTimeField(null=True, blank=True)
+
     # Notification Settings
     email_notifications = models.BooleanField(
         default=True,

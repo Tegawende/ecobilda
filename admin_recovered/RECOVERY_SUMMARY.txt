@@ -1,0 +1,75 @@
+ADMIN PANEL RECOVERY SUMMARY
+================================================================================
+
+Total files recovered: 27
+
+admin/package.json: 1694 chars
+admin/src/App.tsx: 2768 chars
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+admin/src/components/Layout.tsx: 4436 chars
+admin/src/components/ui/button.tsx: 1845 chars
+admin/src/components/ui/select.tsx: 5636 chars
+admin/src/components/ui/toast.tsx: 4930 chars
+admin/src/components/ui/toaster.tsx: 776 chars
+admin/src/hooks/useAuth.tsx: 2065 chars
+  WARNING: Edit could not be verified
+admin/src/hooks/useToast.ts: 3717 chars
+admin/src/i18n.ts: 806 chars
+  WARNING: Edit could not be verified
+admin/src/index.css: 1545 chars
+admin/src/lib/utils.ts: 577 chars
+admin/src/locales/de/translation.json: 8198 chars
+admin/src/locales/en/translation.json: 10530 chars
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+admin/src/locales/es/translation.json: 8160 chars
+admin/src/locales/fr/translation.json: 11474 chars
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+admin/src/locales/pt/translation.json: 8118 chars
+admin/src/main.tsx: 717 chars
+admin/src/pages/DashboardPage.tsx: 17237 chars
+  WARNING: Edit could not be verified
+admin/src/pages/LoginPage.tsx: 3179 chars
+admin/src/pages/ProjectsPage.tsx: 27764 chars
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+admin/src/pages/ReportsPage.tsx: 14286 chars
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+admin/src/pages/UsersPage.tsx: 27469 chars
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+  WARNING: Edit could not be verified
+admin/src/services/api.ts: 7680 chars
+admin/src/vite-env.d.ts: 38 chars
+admin/tailwind.config.js: 2211 chars
+admin/tsconfig.json: 629 chars
+
+
+Edits applied:
+  admin/package.json: 1 edits
+  admin/src/App.tsx: 2 edits
+  admin/src/components/Layout.tsx: 1 edits
+  admin/src/hooks/useAuth.tsx: 1 edits
+  admin/src/i18n.ts: 1 edits
+  admin/src/locales/en/translation.json: 6 edits
+  admin/src/locales/fr/translation.json: 5 edits
+  admin/src/pages/DashboardPage.tsx: 2 edits
+  admin/src/pages/ProjectsPage.tsx: 12 edits
+  admin/src/pages/ReportsPage.tsx: 8 edits
+  admin/src/pages/UsersPage.tsx: 11 edits

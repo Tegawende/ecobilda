@@ -34,12 +34,11 @@ export const authService = {
   },
 
   // Google OAuth
-  async googleLogin(credential: string): Promise<{ tokens: AuthTokens; user: User }> {
-    const response = await api.post('/auth/google/', { credential });
-    const { access, refresh, user } = response.data;
-    const tokens = { access, refresh };
+  async googleLogin(accessToken: string): Promise<{ tokens: AuthTokens; user: User; created: boolean }> {
+    const response = await api.post('/auth/google/', { access_token: accessToken });
+    const { tokens, user, created } = response.data;
     setAuthTokens(tokens);
-    return { tokens, user };
+    return { tokens, user, created };
   },
 
   // Get current user

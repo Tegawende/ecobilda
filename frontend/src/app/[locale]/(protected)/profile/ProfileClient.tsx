@@ -1,22 +1,41 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
-import { Container, Title, Text, Paper, Button, Group, Stack, Avatar, Badge, Rating, TextInput, Textarea } from '@mantine/core';
+import { useSearchParams } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
+import { Container, Title, Text, Paper, Button, Group, Stack, Avatar, Badge, Rating, TextInput, Textarea, ThemeIcon, Alert } from '@mantine/core';
 import {
   IconPencil,
   IconMapPin,
   IconMail,
   IconMessage,
   IconHammer,
+  IconLeaf,
   IconGift,
   IconArrowLeft,
   IconLanguage,
   IconUser,
+  IconAlertCircle,
 } from '@tabler/icons-react';
 import { getSkillIcon } from '@/lib/skillIcons';
 import { Layout } from '@/components/common/Layout';
-import type { Review } from '@/types';
+import { EditProfileForm } from '@/components/profile/EditProfileForm';
+import type { Review, Skill } from '@/types';
+
+function getSkillDisplayName(skill: Skill, locale: string): string {
+  const key = `display_name_${locale}` as keyof Skill;
+  return (skill[key] as string) || skill.display_name_en;
+}
+
+function getLocalizedLanguageName(code: string, locale: string): string {
+  try {
+    const displayNames = new Intl.DisplayNames([locale], { type: 'language' });
+    const name = displayNames.of(code);
+    return name ? name.charAt(0).toUpperCase() + name.slice(1) : code;
+  } catch {
+    return code;
+  }
+}
 
 // Review Card Component using Mantine
 function ReviewCard({ review }: { review: Review }) {
@@ -62,69 +81,13 @@ function ReviewCard({ review }: { review: Review }) {
   );
 }
 
-// Edit Profile Form using Mantine
-function EditProfileForm({ user, onSave, onCancel }: { user: any; onSave: (data: any) => void; onCancel: () => void }) {
-  const t = useTranslations();
-  const [formData, setFormData] = useState({
-    first_name: user.first_name,
-    last_name: user.last_name,
-    bio: user.bio,
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(formData);
-  };
-
-  return (
-    <Paper radius="lg" p="xl" withBorder>
-      <Title order={2} className="font-display" mb="lg">
-        {t('profile.editProfile') || 'Edit Profile'}
-      </Title>
-
-      <form onSubmit={handleSubmit}>
-        <Stack gap="md">
-          <Group grow>
-            <TextInput
-              label={t('auth.firstName') || 'First Name'}
-              value={formData.first_name}
-              onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-              radius="lg"
-            />
-            <TextInput
-              label={t('auth.lastName') || 'Last Name'}
-              value={formData.last_name}
-              onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-              radius="lg"
-            />
-          </Group>
-
-          <Textarea
-            label={t('profile.bio') || 'About me'}
-            value={formData.bio}
-            onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-            placeholder={t('profile.bioPlaceholder') || 'Tell others about yourself...'}
-            radius="lg"
-            minRows={4}
-          />
-        </Stack>
-
-        <Group justify="flex-end" mt="xl">
-          <Button variant="outline" radius="xl" onClick={onCancel}>
-            {t('common.cancel') || 'Cancel'}
-          </Button>
-          <Button type="submit" radius="xl" color="eco-primary">
-            {t('common.save') || 'Save Changes'}
-          </Button>
-        </Group>
-      </form>
-    </Paper>
-  );
-}
+// EditProfileForm imported from @/components/profile/EditProfileForm
 
 export function ProfileClient() {
   const t = useTranslations();
-  const [isEditing, setIsEditing] = useState(false);
+  const locale = useLocale();
+  const searchParams = useSearchParams();
+  const [isEditing, setIsEditing] = useState(searchParams?.get('edit') === '1');
   const [user, setUser] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -142,6 +105,30 @@ export function ProfileClient() {
     setUser({ ...user, ...data });
     setIsEditing(false);
   };
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="bg-stone-50 min-h-screen py-12 flex items-center justify-center">
+          <div className="animate-pulse text-gray-400">Loading...</div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error || !user) {
+    return (
+      <Layout>
+        <div className="bg-stone-50 min-h-screen py-12">
+          <Container size="sm">
+            <Alert icon={<IconAlertCircle size={16} />} color="red" title={t('common.error') || 'Error'}>
+              {error || t('profile.loadError') || 'Could not load profile'}
+            </Alert>
+          </Container>
+        </div>
+      </Layout>
+    );
+  }
 
   if (isEditing) {
     return (
@@ -168,6 +155,21 @@ export function ProfileClient() {
     <Layout>
       <div className="bg-stone-50 min-h-screen py-12">
         <Container size="md">
+          {/* Header */}
+          <Group gap="md" mb="xl">
+            <ThemeIcon size={48} radius="md" color="eco-primary" variant="light">
+              <IconUser size={28} />
+            </ThemeIcon>
+            <Stack gap={4}>
+              <Title order={1} className="font-display">
+                {t('profile.title') || 'My Profile'}
+              </Title>
+              <Text c="dimmed">
+                {t('profile.subtitle') || 'Your personal information'}
+              </Text>
+            </Stack>
+          </Group>
+
           {/* Profile Header Card */}
           <Paper radius="lg" p="xl" withBorder mb="xl">
             <Group align="flex-start" gap="lg" wrap="wrap">
@@ -215,17 +217,15 @@ export function ProfileClient() {
             </Group>
 
             {/* Bio */}
-            {user.bio && (
-              <Stack gap="xs" mt="xl" pt="lg" className="border-t border-gray-100">
-                <Group gap="xs">
-                  <IconUser size={16} className="text-gray-500" />
-                  <Text size="sm" fw={700} c="dimmed" tt="uppercase">
-                    {t('profile.about') || 'About'}
-                  </Text>
-                </Group>
-                <Text className="whitespace-pre-wrap">{user.bio}</Text>
-              </Stack>
-            )}
+            <Stack gap="xs" mt="xl" pt="lg" className="border-t border-gray-100">
+              <Group gap="xs">
+                <IconUser size={16} className="text-gray-500" />
+                <Text size="sm" fw={700} c="dimmed" tt="uppercase">
+                  {t('profile.about') || 'About'}
+                </Text>
+              </Group>
+              <Text className="whitespace-pre-wrap">{user.bio || t('profile.noBio') || 'No bio yet'}</Text>
+            </Stack>
 
             {/* Details Grid */}
             <div className="mt-8 pt-6 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -273,28 +273,53 @@ export function ProfileClient() {
                   <Group gap="xs">
                     {user.languages.map((lang: any) => (
                       <Badge key={lang.code} variant="light" color="eco-primary" size="sm">
-                        {lang.name}
+                        {getLocalizedLanguageName(lang.code, locale)}
                       </Badge>
                     ))}
                   </Group>
                 </Stack>
               )}
 
-              {/* Skills */}
-              {user.skills && user.skills.length > 0 && (
+              {/* Skills - Natural Building */}
+              {user.skills && user.skills.filter((s: any) => s.category === 'NATB').length > 0 && (
                 <Stack gap="xs">
                   <Group gap="xs">
                     <IconHammer size={16} className="text-eco-terracotta" />
                     <Text size="sm" fw={700} c="dimmed" tt="uppercase">
-                      {t('profile.skills') || 'Skills'}
+                      {t('projects.naturalBuilding') || 'Natural Building'}
                     </Text>
                   </Group>
                   <Group gap="xs">
-                    {user.skills.map((skill: any) => (
-                      <Badge key={skill.code} variant="light" color="eco-primary" size="sm">
-                        {skill.icon} {skill.display_name_en}
-                      </Badge>
-                    ))}
+                    {user.skills.filter((s: any) => s.category === 'NATB').map((skill: any) => {
+                      const SkillIcon = getSkillIcon(skill.icon);
+                      return (
+                        <Badge key={skill.code} variant="light" color="eco-primary" size="sm" leftSection={<SkillIcon size={14} />}>
+                          {getSkillDisplayName(skill, locale)}
+                        </Badge>
+                      );
+                    })}
+                  </Group>
+                </Stack>
+              )}
+
+              {/* Skills - Permaculture */}
+              {user.skills && user.skills.filter((s: any) => s.category === 'PERM').length > 0 && (
+                <Stack gap="xs">
+                  <Group gap="xs">
+                    <IconLeaf size={16} className="text-eco-terracotta" />
+                    <Text size="sm" fw={700} c="dimmed" tt="uppercase">
+                      {t('projects.permaculture') || 'Permaculture'}
+                    </Text>
+                  </Group>
+                  <Group gap="xs">
+                    {user.skills.filter((s: any) => s.category === 'PERM').map((skill: any) => {
+                      const SkillIcon = getSkillIcon(skill.icon);
+                      return (
+                        <Badge key={skill.code} variant="light" color="eco-terracotta" size="sm" leftSection={<SkillIcon size={14} />}>
+                          {getSkillDisplayName(skill, locale)}
+                        </Badge>
+                      );
+                    })}
                   </Group>
                 </Stack>
               )}

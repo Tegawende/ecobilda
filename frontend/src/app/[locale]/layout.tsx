@@ -8,6 +8,7 @@ import { Notifications } from '@mantine/notifications';
 import { theme } from '@/theme';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
+import { GoogleOAuthWrapper } from '@/providers/GoogleOAuthWrapper';
 import '@mantine/core/styles.css';
 import '@mantine/carousel/styles.css';
 import '@mantine/dates/styles.css';
@@ -37,7 +38,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
-        <ColorSchemeScript />
+        {/* ColorSchemeScript removed - causes script warning in Next.js 16 */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
@@ -51,11 +52,13 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <MantineProvider theme={theme}>
             <Notifications position="top-right" />
-            <QueryProvider>
-              <AuthProvider>
-                {children}
-              </AuthProvider>
-            </QueryProvider>
+            <GoogleOAuthWrapper>
+              <QueryProvider>
+                <AuthProvider>
+                  {children}
+                </AuthProvider>
+              </QueryProvider>
+            </GoogleOAuthWrapper>
           </MantineProvider>
         </NextIntlClientProvider>
       </body>

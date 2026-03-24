@@ -18,7 +18,6 @@ import {
   Avatar,
   Text,
   Skeleton,
-
   Combobox,
   useCombobox,
   InputBase,
@@ -38,7 +37,7 @@ import {
   IconSearch,
 } from '@tabler/icons-react';
 import { profileService } from '@/services/profile';
-import { DateOfBirthSelect, validateDateOfBirth } from '../common/DateOfBirthSelect';
+import { DateOfBirthSelect, validateDateOfBirth } from '@/components/common/DateOfBirthSelect';
 import { skillsService } from '@/services/skills';
 import { languagesService } from '@/services/languages';
 import { getSkillIcon } from '@/lib/skillIcons';
@@ -106,7 +105,7 @@ interface ProfileFormData {
 
 interface EditProfileFormProps {
   user: User;
-  onSuccess: (user: User) => void;
+  onSave: (user: User) => void;
   onCancel: () => void;
 }
 
@@ -115,7 +114,7 @@ function getSkillDisplayName(skill: Skill, locale: string): string {
   return (skill[key] as string) || skill.display_name_en;
 }
 
-export function EditProfileForm({ user, onSuccess, onCancel }: EditProfileFormProps) {
+export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps) {
   const locale = useLocale();
   const t = useTranslations();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -170,7 +169,7 @@ export function EditProfileForm({ user, onSuccess, onCancel }: EditProfileFormPr
       last_name: (value) => (value.length >= 2 ? null : t('profile.edit.lastNameError')),
       bio: (value) => (value.length <= 1000 ? null : t('profile.edit.bioError')),
       dob_year: (val, values) => {
-        if (!values.dob_day && !values.dob_month && !val) return null; // optional if empty
+        if (!values.dob_day && !values.dob_month && !val) return null;
         return validateDateOfBirth(values.dob_day, values.dob_month, val, t);
       },
     },
@@ -227,12 +226,11 @@ export function EditProfileForm({ user, onSuccess, onCancel }: EditProfileFormPr
         const langs = await languagesService.getLanguages();
         const displayNames = new Intl.DisplayNames([locale], { type: 'language' });
         setAvailableLanguages(
-          langs.map(l => {
+          langs.map((l: any) => {
             const localized = displayNames.of(l.code);
-            // Capitalize first letter
             const label = localized ? localized.charAt(0).toUpperCase() + localized.slice(1) : l.name;
             return { value: l.code, label };
-          }).sort((a, b) => a.label.localeCompare(b.label, locale))
+          }).sort((a: any, b: any) => a.label.localeCompare(b.label, locale))
         );
       } catch (error) {
         logger.error('Failed to fetch languages:', error);
@@ -240,7 +238,7 @@ export function EditProfileForm({ user, onSuccess, onCancel }: EditProfileFormPr
     };
     fetchSkills();
     fetchLanguages();
-  }, []);
+  }, [locale]);
 
   const toggleSkill = (skillCode: string) => {
     const currentSkills = form.values.skills;
@@ -297,7 +295,7 @@ export function EditProfileForm({ user, onSuccess, onCancel }: EditProfileFormPr
       }
 
       const updatedUser = await profileService.updateProfile(updateData);
-      onSuccess(updatedUser);
+      onSave(updatedUser);
     } catch (err: any) {
       logger.error('Failed to update profile:', err);
       const errorMessage =
@@ -367,7 +365,12 @@ export function EditProfileForm({ user, onSuccess, onCancel }: EditProfileFormPr
               {t('profile.edit.profilePicture')}
             </Text>
             <Group>
-              <Avatar src={previewUrl} size={96} radius="xl">
+              <Avatar
+                src={previewUrl}
+                size={96}
+                radius="xl"
+                imageProps={{ referrerPolicy: 'no-referrer' }}
+              >
                 <IconUser size={48} />
               </Avatar>
               <div>
@@ -447,22 +450,20 @@ export function EditProfileForm({ user, onSuccess, onCancel }: EditProfileFormPr
                 />
               </Combobox.Target>
 
-              <Combobox.Dropdown>
-                <Combobox.Options>
-                  {cityResults.length > 0 ? (
-                    cityResults.map((result, index) => (
+              {cityResults.length > 0 && (
+                <Combobox.Dropdown>
+                  <Combobox.Options>
+                    {cityResults.map((result, index) => (
                       <Combobox.Option key={`${result.label}-${index}`} value={result.label}>
                         <Group gap="xs">
                           <IconMapPin size={14} className="text-eco-terracotta" />
                           <Text size="sm">{result.label}</Text>
                         </Group>
                       </Combobox.Option>
-                    ))
-                  ) : citySearch.length >= 2 && !isSearchingCity ? (
-                    <Combobox.Empty>{t('profile.edit.noResults')}</Combobox.Empty>
-                  ) : null}
-                </Combobox.Options>
-              </Combobox.Dropdown>
+                    ))}
+                  </Combobox.Options>
+                </Combobox.Dropdown>
+              )}
             </Combobox>
           </div>
 
@@ -539,7 +540,7 @@ export function EditProfileForm({ user, onSuccess, onCancel }: EditProfileFormPr
               loading={isSubmitting}
               leftSection={<IconDeviceFloppy size={18} />}
             >
-              {t('profile.edit.saveChanges')}
+              {t('common.save')}
             </Button>
           </Group>
         </Stack>

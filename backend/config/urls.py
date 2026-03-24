@@ -12,6 +12,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # API endpoints (order matters - more specific first)
+    path('api/admin/', include('apps.administration.urls')),
     path('api/auth/', include('apps.authentication.urls')),
     path('api/projects/', include('apps.projects.urls')),
     path('api/reviews/', include('apps.reviews.urls')),

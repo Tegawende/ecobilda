@@ -5,6 +5,9 @@ Handles login, registration, and token operations.
 Based on: Controllers/AccountController.cs
 """
 
+import secrets
+from django.utils import timezone
+
 from rest_framework import status, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -56,20 +59,28 @@ class RegisterView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
-        # Generate JWT tokens for auto-login after registration
-        refresh = RefreshToken.for_user(user)
+        # Generate email verification token
+        token = secrets.token_urlsafe(32)
+        user.email_verification_token = token
+        user.email_verified = False
+        user.email_verification_sent_at = timezone.now()
+        user.save(update_fields=['email_verification_token', 'email_verified', 'email_verification_sent_at'])
 
-        # Send welcome email (optional)
-        # TODO: Implement with Celery in production
-        # send_welcome_email.delay(user.id)
+        # Build verification link
+        verify_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
+
+        # Send verification email
+        send_mail(
+            subject='Verify your Ecobilda account',
+            message=f'Welcome to Ecobilda! Please verify your email by clicking this link: {verify_url}',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=True,
+        )
 
         return Response({
-            'user': UserSerializer(user).data,
-            'tokens': {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            },
-            'message': 'Registration successful. Welcome to Ecobilda!'
+            'message': 'Registration successful. Please check your email to verify your account.',
+            'email': user.email,
         }, status=status.HTTP_201_CREATED)
 
 
@@ -94,7 +105,7 @@ class LoginView(APIView):
         refresh = RefreshToken.for_user(user)
 
         return Response({
-            'user': UserSerializer(user).data,
+            'user': UserSerializer(user, context={'request': request}).data,
             'tokens': {
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
@@ -258,12 +269,149 @@ def google_login_view(request):
     Google OAuth login.
 
     POST /api/auth/google/
+    Body: { "access_token": "..." }
 
-    TODO: Implement with django-allauth in Phase 5
+    Uses the Google access token to get user info from Google API,
+    creates or retrieves the user, and returns JWT tokens.
     """
-    return Response({
-        'error': 'Google OAuth not yet implemented. Coming in Phase 5.'
-    }, status=status.HTTP_501_NOT_IMPLEMENTED)
+    import requests as http_requests
+    import logging
+    logger = logging.getLogger(__name__)
+
+    access_token = request.data.get('access_token')
+    if not access_token:
+        return Response(
+            {'error': 'access_token is required.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        # Verify token with Google and get user info
+        google_userinfo_url = 'https://www.googleapis.com/oauth2/v3/userinfo'
+        headers = {'Authorization': f'Bearer {access_token}'}
+        userinfo_response = http_requests.get(google_userinfo_url, headers=headers, timeout=5)
+
+        if userinfo_response.status_code != 200:
+            return Response(
+                {'error': 'Invalid Google access token.'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        userinfo = userinfo_response.json()
+
+        email = userinfo.get('email')
+        if not email:
+            return Response(
+                {'error': 'Email not provided by Google.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        first_name = userinfo.get('given_name', '')
+        last_name = userinfo.get('family_name', '')
+        picture_url = userinfo.get('picture', '')
+
+        logger.info(f"[Google OAuth] Email: {email}, picture: {picture_url[:50] if picture_url else 'none'}")
+
+        user, created = User.objects.get_or_create(
+            email__iexact=email,
+            defaults={
+                'email': email.lower(),
+                'first_name': first_name,
+                'last_name': last_name,
+                'is_active': True,
+                'email_verified': True,
+            }
+        )
+
+        if created:
+            user.set_unusable_password()
+            user.save()
+        else:
+            if not user.email_verified:
+                user.email_verified = True
+                user.save(update_fields=['email_verified'])
+
+        # Save Google profile picture as profile_picture_url if user has no picture
+        if picture_url and not user.profile_picture:
+            # Store the higher-res version of the Google photo
+            hi_res_url = picture_url.replace('=s96-c', '=s400-c')
+            # Use profile_picture_url if field exists, otherwise skip
+            if hasattr(user, 'profile_picture_url'):
+                user.profile_picture_url = hi_res_url
+                user.save(update_fields=['profile_picture_url'])
+
+        # For returning users with incomplete profile, signal the frontend
+        profile_incomplete = not user.date_of_birth
+
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            'user': UserSerializer(user, context={'request': request}).data,
+            'tokens': {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            },
+            'message': 'Google login successful.',
+            'created': created or profile_incomplete,
+        }, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        logger.error(f"[Google OAuth] Error: {e}")
+        return Response(
+            {'error': 'Google authentication failed.'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_email_view(request):
+    """
+    Verify email address with token.
+
+    POST /api/auth/verify-email/
+    Body: { "token": "..." }
+    """
+    token = request.data.get('token')
+    if not token:
+        return Response({'error': 'Token is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = User.objects.get(email_verification_token=token)
+        user.email_verified = True
+        user.email_verification_token = ''
+        user.save(update_fields=['email_verified', 'email_verification_token'])
+
+        # Auto-login after verification
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            'message': 'Email verified successfully.',
+            'user': UserSerializer(user, context={'request': request}).data,
+            'tokens': {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            },
+        }, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'error': 'Invalid or expired token.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def check_email_view(request):
+    """
+    Check if an email already exists.
+
+    POST /api/auth/check-email/
+    Body: { "email": "..." }
+    """
+    email = request.data.get('email', '').strip().lower()
+    if not email:
+        return Response({'error': 'Email is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    exists = User.objects.filter(email__iexact=email).exists()
+    return Response({'exists': exists}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])

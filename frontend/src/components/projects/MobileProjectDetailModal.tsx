@@ -256,7 +256,7 @@ export function MobileProjectDetailModal({
                                     </h3>
                                     <div className="flex items-center text-sm text-gray-500">
                                         <IconStar size={16} className="text-yellow-500 mr-1" />
-                                        {project.owner.average_rating?.toFixed(1)} ({project.owner.review_count} {t('projectDetail.reviews') || 'avis'})
+                                        {Number(project.owner.average_rating || 0).toFixed(1)} ({project.owner.review_count} {t('projectDetail.reviews') || 'avis'})
                                     </div>
                                 </div>
                             </div>

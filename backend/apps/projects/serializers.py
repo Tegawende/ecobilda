@@ -65,6 +65,7 @@ class ProjectListSerializer(serializers.ModelSerializer):
     country = serializers.CharField(source='address.country.name', read_only=True)
     country_code = serializers.CharField(source='address.country.code', read_only=True)
     skills = SkillSimpleSerializer(many=True, read_only=True)
+    images = ProjectImageSerializer(many=True, read_only=True)
     cover_image = serializers.SerializerMethodField()
     location_display = serializers.ReadOnlyField()
     # Add address object with coordinates for map markers
@@ -77,7 +78,7 @@ class ProjectListSerializer(serializers.ModelSerializer):
             'owner', 'city', 'country', 'country_code', 'address',
             'hours_per_day', 'days_per_week', 'max_helpers',
             'internet_provided', 'family_friendly', 'pets_allowed', 'smoking_allowed',
-            'skills', 'cover_image', 'location_display',
+            'skills', 'images', 'cover_image', 'location_display',
             'is_active', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']

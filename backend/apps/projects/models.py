@@ -101,6 +101,19 @@ class Project(models.Model):
         help_text="Number of times this project has been flagged"
     )
 
+    # Admin validation
+    status = models.CharField(
+        max_length=20,
+        choices=[('PENDING', 'Pending'), ('ACTIVE', 'Active'), ('REJECTED', 'Rejected')],
+        default='ACTIVE'
+    )
+    rejection_reason = models.TextField(default='', blank=True)
+    validated_at = models.DateTimeField(null=True, blank=True)
+    validated_by = models.ForeignKey(
+        'users.User', null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='validated_projects'
+    )
+
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

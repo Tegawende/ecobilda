@@ -69,6 +69,7 @@ class UserSerializer(serializers.ModelSerializer):
     )
     skills = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
+    profile_picture = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -78,16 +79,29 @@ class UserSerializer(serializers.ModelSerializer):
             'address', 'languages', 'language_codes', 'skills',
             'email_notifications', 'newsletter', 'in_app_notifications',
             'notification_language', 'average_rating', 'review_count',
+            'is_staff', 'is_superuser',
             'date_joined', 'last_login'
         ]
         read_only_fields = [
             'id', 'email', 'average_rating', 'review_count',
+            'is_staff', 'is_superuser',
             'date_joined', 'last_login'
         ]
 
     def get_full_name(self, obj):
         """Return user's full name."""
         return f"{obj.first_name} {obj.last_name}"
+
+    def get_profile_picture(self, obj):
+        """Return profile picture URL: uploaded file or Google picture URL."""
+        if obj.profile_picture:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.profile_picture.url)
+            return obj.profile_picture.url
+        if hasattr(obj, 'profile_picture_url') and obj.profile_picture_url:
+            return obj.profile_picture_url
+        return None
 
     def get_skills(self, obj):
         """Return user's skills with display names."""
@@ -133,6 +147,18 @@ class UserPublicSerializer(serializers.ModelSerializer):
     address_country = serializers.CharField(source='address.country.name', read_only=True)
     skills = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
+    profile_picture = serializers.SerializerMethodField()
+
+    def get_profile_picture(self, obj):
+        """Return profile picture URL: uploaded file or Google picture URL."""
+        if obj.profile_picture:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.profile_picture.url)
+            return obj.profile_picture.url
+        if hasattr(obj, 'profile_picture_url') and obj.profile_picture_url:
+            return obj.profile_picture_url
+        return None
 
     class Meta:
         model = User

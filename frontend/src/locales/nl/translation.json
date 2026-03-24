@@ -58,14 +58,20 @@
         "mockMessage": "Hallo! Ik ben erg geïnteresseerd in je permacultuurproject in Lyon."
     },
     "favorites": {
-        "addedTitle": "Toegevoegd aan favorieten",
-        "addedMessage": "Project toegevoegd aan je favorieten",
-        "removedTitle": "Verwijderd uit favorieten",
-        "removedMessage": "Project verwijderd uit je favorieten",
-        "errorTitle": "Fout",
-        "errorMessage": "Favorieten konden niet worden bijgewerkt",
+        "title": "Mijn favorieten",
+        "subtitle": "Projecten die u heeft opgeslagen",
+        "remove": "Uit favorieten verwijderen",
+        "noFavorites": "Nog geen favorieten",
+        "noFavoritesDesc": "Begin met het verkennen van projecten en sla de projecten op die u leuk vindt!",
+        "browseProjects": "Projecten doorbladeren",
         "addLabel": "Toevoegen aan favorieten",
-        "removeLabel": "Verwijderen uit favorieten"
+        "addedMessage": "Project toegevoegd aan uw favorieten",
+        "addedTitle": "Toegevoegd aan favorieten",
+        "errorMessage": "Favorieten konden niet worden bijgewerkt",
+        "errorTitle": "Fout",
+        "removeLabel": "Verwijderen uit favorieten",
+        "removedMessage": "Project verwijderd uit uw favorieten",
+        "removedTitle": "Verwijderd uit favorieten"
     },
     "nav": {
         "home": "Home",
@@ -180,40 +186,129 @@
             "alreadyVerifiedTitle": "Reeds geverifieerd",
             "noToken": "Verificatietoken ontbreekt.",
             "redirecting": "Doorverwijzen in {seconds}s..."
-        }
+        },
+        "agreeAndContinue": "Akkoord en doorgaan",
+        "backToLogin": "Terug naar inloggen",
+        "contactInfo": "Contactgegevens",
+        "continue": "Doorgaan",
+        "dateOfBirth": "Geboortedatum",
+        "dobDay": "Dag",
+        "dobDesc": "Om je aan te melden moet je minstens 18 jaar oud zijn.",
+        "dobInvalidDate": "Deze datum bestaat niet.",
+        "dobMonth": "Maand",
+        "dobYear": "Jaar",
+        "dobMonths": [
+            "Januari",
+            "Februari",
+            "Maart",
+            "April",
+            "Mei",
+            "Juni",
+            "Juli",
+            "Augustus",
+            "September",
+            "Oktober",
+            "November",
+            "December"
+        ],
+        "errorLogin": "Inloggen mislukt. Controleer uw gegevens.",
+        "errorRegister": "Registratie mislukt. Probeer het opnieuw.",
+        "finishSignup": "Registratie afronden",
+        "firstName": "Voornaam",
+        "forgotPassword": "Wachtwoord vergeten?",
+        "forgotPasswordDesc": "Voer uw e-mail in en we sturen u een link om uw wachtwoord te resetten.",
+        "googleLogin": "Doorgaan met Google",
+        "lastName": "Achternaam",
+        "legalName": "Wettelijke naam",
+        "loggingIn": "Inloggen...",
+        "login": "Inloggen",
+        "loginOrSignup": "Inloggen of registreren",
+        "password": "Wachtwoord",
+        "registering": "Account aanmaken...",
+        "resetEmailSent": "E-mail verzonden!",
+        "resetEmailSentDesc": "Controleer uw inbox voor een resetlink.",
+        "resetPasswordError": "E-mail kon niet worden verzonden. Probeer het opnieuw.",
+        "sendResetLink": "Link verzenden",
+        "validation": {
+            "ageRequirement": "U moet minstens 18 jaar oud zijn",
+            "birthDateRequired": "Geboortedatum vereist",
+            "email": "Ongeldig e-mailadres",
+            "firstName": "Voornaam moet minstens 2 tekens bevatten",
+            "lastName": "Achternaam moet minstens 2 tekens bevatten",
+            "password": "Wachtwoord moet minstens 8 tekens bevatten",
+            "passwordComplexity": "Min. 8 tekens en 1 cijfer of symbool",
+            "terms": "U moet de voorwaarden accepteren"
+        },
+        "welcome": "Welkom bij Ecobilda"
     },
     "home": {
         "hero": {
             "title": "Natuurlijk Bouwen Overal",
-            "subtitle": "Vrijwilligers verbinden met natuurlijke bouw- en permacultuurprojecten wereldwijd.",
-            "browseProjects": "Bekijk Projecten"
+            "subtitle": "Verbind met eco-bouw- en permacultuurprojecten wereldwijd. Leer nieuwe vaardigheden terwijl je bijdraagt aan duurzame gemeenschappen.",
+            "browseProjects": "Bekijk Projecten",
+            "register": "Aan de slag"
         },
         "about": {
-            "title": "Onze Waarden",
-            "intro": "Wij geloven in duurzaam leven en het delen van kennis."
+            "title": "Welkom bij Ecobilda",
+            "intro": "Ecobilda is gewijd aan natuurlijk bouwen en permacultuur, maar vooral aan menselijke connecties. Een platform om te reizen, te ontmoeten en te leren."
         },
         "naturalBuilding": {
             "title": "Natuurlijk Bouwen",
-            "content": "Leer ecologisch bouwen met aarde, stro en steen."
+            "content": "Leer door te doen. Bouw ecologische en duurzame woningen met lokale materialen zoals aarde, stro en hout."
         },
         "permaculture": {
             "title": "Permacultuur",
-            "content": "Creëer veerkrachtige systemen in harmonie met de natuur."
+            "content": "Creëer veerkrachtige systemen. Groei in harmonie met de natuur door haar ecosystemen te observeren en na te bootsen."
         },
         "community": {
             "title": "Gemeenschap",
-            "content": "Ontmoet gepassioneerde mensen en deel oude wijsheid.",
-            "joinTitle": "Word lid van de gemeenschap",
-            "joinBtn": "Word Gratis Lid"
+            "content": "Ontmoet gepassioneerde mensen. Deel levensmomenten, kennis en maaltijden. Het menselijke avontuur staat centraal."
         },
-        "stats": {
-            "participants": "Deelnemers",
-            "projects": "Projecten",
-            "countries": "Landen"
+        "howItWorks": {
+            "title": "Hoe het werkt",
+            "subtitle": "Drie eenvoudige stappen om je eco-bouwavontuur te beginnen.",
+            "step1": {
+                "title": "Projecten bekijken",
+                "desc": "Ontdek eco-bouw- en permacultuurprojecten over de hele wereld. Filter op locatie, vaardigheden en beschikbaarheid."
+            },
+            "step2": {
+                "title": "Aanmelden om deel te nemen",
+                "desc": "Stuur een motivatiebericht naar de gastheer waarin je uitlegt waarom je wilt meedoen. Toon je enthousiasme en leergierigheid."
+            },
+            "step3": {
+                "title": "Leren en bijdragen",
+                "desc": "Eenmaal geaccepteerd, verwerf je praktische vaardigheden terwijl je helpt duurzame projecten te bouwen. Een levensveranderende ervaring wacht op je."
+            }
+        },
+        "forHosts": {
+            "title": "Bent u een projectgastheer?",
+            "desc": "Publiceer uw eco-bouw- of permacultuurproject en vind gemotiveerde vrijwilligers van over de hele wereld. Ecobilda maakt het eenvoudig om aanmeldingen te beheren en met deelnemers te communiceren.",
+            "cta": "Maak uw project aan",
+            "benefit1": "Bereik een wereldwijde gemeenschap van vrijwilligers met passie voor duurzaamheid en natuurlijk bouwen.",
+            "benefit2": "Beheer deelnameverzoeken eenvoudig en chat rechtstreeks met geaccepteerde vrijwilligers.",
+            "benefit3": "Het is volledig gratis. Geen kosten, geen commissies, geen verborgen kosten."
+        },
+        "faq": {
+            "title": "Veelgestelde Vragen",
+            "q1": "Is Ecobilda gratis?",
+            "a1": "Ja, Ecobilda is volledig gratis voor zowel vrijwilligers als projectgastheren. Geen kosten, abonnementen of verborgen kosten.",
+            "q2": "Welke soorten projecten kan ik vinden?",
+            "a2": "Ecobilda richt zich op twee hoofdgebieden: natuurlijk bouwen (strobouw, leem, aardepleister, houtbewerking, etc.) en permacultuur (tuinontwerp, compostering, oogst, etc.).",
+            "q3": "Hoe lang duren de verblijven?",
+            "a3": "De duur is flexibel en varieert per project. Sommige duren een paar dagen, andere meerdere weken of zelfs maanden. Elke aanbieding vermeldt de verwachte duur.",
+            "q4": "Heb ik ervaring nodig?",
+            "a4": "Helemaal niet! De meeste projecten verwelkomen beginners en bieden training op locatie. Het hele doel is leren door te doen, naast ervaren gastheren.",
+            "q5": "Hoe accepteert de gastheer mij?",
+            "a5": "Je stuurt een deelnameverzoek met een motivatiebericht. De gastheer bekijkt je profiel en bericht en accepteert of weigert. Eenmaal geaccepteerd kun je direct chatten om details te regelen."
+        },
+        "cta": {
+            "title": "Klaar om je avontuur te beginnen?",
+            "subtitle": "Sluit je vandaag nog aan bij onze gemeenschap van eco-bouwers en permacultuurliefhebbers.",
+            "button": "Gratis registreren"
         }
     },
     "footer": {
-        "copyright": "© {{year}} Ecobilda. Alle rechten voorbehouden.",
+        "copyright": "© {year} Ecobilda. Alle rechten voorbehouden.",
         "about": {
             "title": "Over ons",
             "us": "Over ons",
@@ -227,10 +322,9 @@
             "forHosts": "Voor Gastheren"
         },
         "legal": {
-            "title": "Juridisch & Ondersteuning"
+            "title": "Juridisch"
         },
         "links": {
-            "support": "Steun ons",
             "terms": "Voorwaarden",
             "privacy": "Privacy"
         }
@@ -238,13 +332,13 @@
     "projects": {
         "title": "Projecten",
         "explore": "Projecten verkennen",
-        "found": "{{count}} projecten gevonden",
+        "found": "projecten gevonden",
         "searchPlaceholder": "Zoek projecten of locaties...",
         "noResults": "Geen projecten gevonden",
         "noResultsDesc": "Probeer uw filters of zoektermen aan te passen om te vinden wat u zoekt.",
         "clearFilters": "Alle filters wissen",
-    "clearSkills": "Vaardigheden wissen",
-        "spotsLeft": "{{count}} plaatsen over",
+        "clearSkills": "Vaardigheden wissen",
+        "spotsLeft": "{count} plaatsen over",
         "full": "Vol",
         "createProject": "Project aanmaken",
         "projectType": "Projecttype",
@@ -271,7 +365,7 @@
             "workDetails": "Werkdetails",
             "maxVolunteers": "Max. vrijwilligers",
             "applyFilters": "Filters toepassen",
-      "showResults": "{count} projecten tonen",
+            "showResults": "{count} projecten tonen",
             "whereToGo": "Waar ga je naartoe?",
             "searchByLocation": "Zoek op stad, regio of land",
             "locationPlaceholder": "bijv. Brussel, Ardennen...",
@@ -304,7 +398,6 @@
         "viewMap": "Kaart bekijken",
         "viewGrid": "Rasterweergave",
         "loadingMap": "Kaart laden...",
-        "found": "projecten gevonden",
         "foundSingle": "project gevonden",
         "viewProject": "Project bekijken",
         "daysPerWeekShort": "d/week",
@@ -312,7 +405,11 @@
         "wifiIncluded": "WiFi inbegrepen",
         "familiesWelcome": "Gezinnen welkom",
         "petsAccepted": "Huisdieren toegestaan",
-        "viewMode": "Weergavemodus"
+        "viewMode": "Weergavemodus",
+        "daysPerWeek": "Dagen per week",
+        "hoursPerDay": "Uren per dag",
+        "reviews": "beoordelingen",
+        "yourHost": "Je gastheer"
     },
     "projectDetail": {
         "notFound": "Project niet gevonden",
@@ -322,17 +419,23 @@
         "status": "Status",
         "startDate": "Startdatum",
         "volunteers": "Vrijwilligers",
-        "volunteersNeeded": "{{count}} nodig",
+        "volunteersNeeded": "{count} nodig",
         "apply": "Solliciteren",
         "freeForMembers": "Gratis voor leden.",
         "showAllPhotos": "Alle foto's tonen",
-        "showAllXPhotos": "Alle {{count}} foto's tonen"
+        "showAllXPhotos": "Alle {count} foto's tonen",
+        "availability": "Beschikbaarheid",
+        "languages": "Talen",
+        "pickDates": "Aankomst - Vertrek",
+        "reviews": "beoordelingen",
+        "selectDates": "Selecteer uw datums",
+        "yourHost": "Uw gastgever"
     },
     "createProject": {
         "title": "Nieuw project aanmaken",
         "subtitle": "Deel je eco-bouw of permacultuur project met de gemeenschap",
-        "step": "Stap {{current}} van {{total}}",
-        "complete": "{{percent}}% voltooid",
+        "step": "Stap {current} van {total}",
+        "complete": "{percent}% voltooid",
         "steps": {
             "basicInfo": "Basisinformatie",
             "locationWork": "Locatie & Werkdetails",
@@ -356,7 +459,7 @@
             "projectDescription": "Projectbeschrijving *",
             "projectDescriptionPlaceholder": "Beschrijf je project in detail. Inclusief:\n• Wat vrijwilligers zullen doen\n• Wat ze zullen leren\n• De missie en waarden van je project\n• Dagelijkse routine en sfeer\n• Alles anders dat je project uniek maakt",
             "projectDescriptionHint": "Wees gedetailleerd en authentiek. Dit is je kans om de juiste mensen aan te trekken!",
-            "projectDescriptionCounter": "{{count}} / 2000",
+            "projectDescriptionCounter": "{count} / 2000",
             "tipsTitle": "💡 Tips voor een geweldige beschrijving:",
             "tip1": "Wees specifiek over dagelijkse taken en leermogelijkheden",
             "tip2": "Vermeld je waarden en wat je project speciaal maakt",
@@ -408,9 +511,9 @@
         "step3": {
             "title": "Vaardigheden & Voorzieningen",
             "description": "Selecteer de vaardigheden die vrijwilligers zullen gebruiken en de voorzieningen die je biedt.",
-            "skillsTitle": "{{type}} Vaardigheden *",
+            "skillsTitle": "{type} Vaardigheden *",
             "skillsDescription": "Selecteer alle vaardigheden waarmee vrijwilligers zullen werken. Kies er minimaal één.",
-            "selected": "Geselecteerd: {{count}} vaardigheid(en)",
+            "selected": "Geselecteerd: {count} vaardigheid(en)",
             "amenities": "Voorzieningen",
             "amenitiesDescription": "Selecteer de voorzieningen en voorkeuren voor je project.",
             "internetProvided": "Internet beschikbaar",
@@ -433,21 +536,21 @@
             "availability": "Beschikbaarheid (Optioneel)",
             "availabilityDescription": "Selecteer de maanden waarin je vrijwilligers kunt ontvangen. Je kunt dit overslaan en later toevoegen.",
             "year": "Jaar:",
-            "monthsSelected": "{{count}} maand(en) geselecteerd voor {{year}}",
+            "monthsSelected": "{count} maand(en) geselecteerd voor {year}",
             "images": "Projectafbeeldingen (Optioneel)",
             "imagesDescription": "Upload afbeeldingen voor je project. Gebruik de pijlknoppen om ze te herordenen. De eerste afbeelding wordt de omslag.",
             "uploadButton": "Klik om afbeeldingen te uploaden",
             "uploadHint": "PNG, JPG tot 10MB elk",
             "cover": "Omslag",
-            "imagesUploaded": "{{count}} / 10 afbeeldingen geüpload",
+            "imagesUploaded": "{count} / 10 afbeeldingen geüpload",
             "maxImagesAlert": "Maximaal 10 afbeeldingen toegestaan",
             "reviewTitle": "✨ Bekijk je project",
-            "reviewProject": "{{type}} project",
-            "reviewTitleLabel": "Titel: {{title}}",
-            "reviewLocation": "Locatie: {{city}}, {{country}}",
-            "reviewWork": "Werk: {{hours}}u/dag, {{days}} dagen/week, max. {{max}} vrijwilligers",
-            "reviewSkills": "Vaardigheden: {{count}} geselecteerd",
-            "reviewImages": "Afbeeldingen: {{count}} geüpload",
+            "reviewProject": "{type} project",
+            "reviewTitleLabel": "Titel: {title}",
+            "reviewLocation": "Locatie: {city}, {country}",
+            "reviewWork": "Werk: {hours}u/dag, {days} dagen/week, max. {max} vrijwilligers",
+            "reviewSkills": "Vaardigheden: {count} geselecteerd",
+            "reviewImages": "Afbeeldingen: {count} geüpload",
             "reviewNotSet": "(niet ingesteld)",
             "back": "← Terug",
             "create": "Project aanmaken",
@@ -469,7 +572,7 @@
         }
     },
     "dashboard": {
-        "welcome": "Welkom terug, {{name}}!",
+        "welcome": "Welkom terug, {name}!",
         "stats": {
             "projects": "Mijn projecten",
             "rating": "Beoordeling",
@@ -512,7 +615,12 @@
         "createNew": "Nieuw project aanmaken",
         "noProjects": "Nog geen projecten",
         "noProjectsDesc": "U heeft nog geen projecten aangemaakt. Maak uw eerste project aan en maak contact met vrijwilligers!",
-        "createFirst": "Maak uw eerste project aan"
+        "createFirst": "Maak uw eerste project aan",
+        "fetchError": "Projecten konden niet worden geladen. Probeer het opnieuw.",
+        "noActive": "Geen actieve projecten",
+        "noActiveDesc": "U heeft momenteel geen actieve projecten.",
+        "noPast": "Geen afgelopen projecten",
+        "noPastDesc": "U heeft nog geen afgelopen projecten."
     },
     "participations": {
         "title": "Mijn deelnames",
@@ -526,15 +634,22 @@
         "viewProject": "Project bekijken",
         "noParticipations": "Nog geen deelnames",
         "noParticipationsDesc": "Begin met het verkennen van projecten en solliciteer om deel te nemen!",
-        "browseProjects": "Projecten doorbladeren"
-    },
-    "favorites": {
-        "title": "Mijn favorieten",
-        "subtitle": "Projecten die u heeft opgeslagen",
-        "remove": "Uit favorieten verwijderen",
-        "noFavorites": "Nog geen favorieten",
-        "noFavoritesDesc": "Begin met het verkennen van projecten en sla de projecten op die u leuk vindt!",
-        "browseProjects": "Projecten doorbladeren"
+        "browseProjects": "Projecten doorbladeren",
+        "applyDesc": "Stuur een deelnameverzoek naar de gastgever.",
+        "applyTitle": "Solliciteren voor dit project",
+        "cancelled": "Geannuleerd",
+        "endDate": "Einddatum",
+        "expired": "Verlopen",
+        "fetchError": "Deelnames konden niet worden geladen. Probeer het opnieuw.",
+        "host": "Gastgever",
+        "hostResponse": "Reactie van gastgever",
+        "motivation": "Motivatie",
+        "motivationPlaceholder": "Leg aan de gastgever uit waarom u aan dit project wilt deelnemen...",
+        "requestError": "Verzoek kon niet worden verzonden. Probeer het opnieuw.",
+        "requestSent": "Verzoek verzonden!",
+        "requestSentDesc": "De gastgever zal uw verzoek bekijken en u antwoorden.",
+        "sendRequest": "Verzoek verzenden",
+        "startDate": "Startdatum"
     },
     "profile": {
         "editProfile": "Profiel bewerken",
@@ -549,7 +664,29 @@
         "review": "beoordeling",
         "reviews": "beoordelingen",
         "reviewsTitle": "Beoordelingen",
-        "yourResponse": "Uw reactie"
+        "yourResponse": "Uw reactie",
+        "edit": {
+            "bioError": "Bio mag maximaal 500 tekens lang zijn",
+            "changePhoto": "Foto wijzigen",
+            "characters": "tekens",
+            "city": "Stad",
+            "cityPlaceholder": "bijv. Brussel",
+            "firstName": "Voornaam",
+            "firstNameError": "Voornaam is verplicht",
+            "imageHint": "JPG, PNG tot 5MB",
+            "imageTooLarge": "Afbeelding is te groot. Maximaal 5MB.",
+            "invalidImage": "Ongeldig afbeeldingsformaat. Gebruik JPG of PNG.",
+            "languagesPlaceholder": "Selecteer talen",
+            "lastName": "Achternaam",
+            "lastNameError": "Achternaam is verplicht",
+            "noResults": "Geen resultaten",
+            "profilePicture": "Profielfoto",
+            "saveChanges": "Wijzigingen opslaan",
+            "skillsHint": "Selecteer vaardigheden die u heeft of wilt leren",
+            "skillsSelected": "{count} vaardigheden geselecteerd",
+            "updateFailed": "Profiel kon niet worden bijgewerkt. Probeer het opnieuw.",
+            "yourSkills": "Uw vaardigheden"
+        }
     },
     "settings": {
         "title": "Accountinstellingen",
@@ -580,5 +717,319 @@
         "deleteWarning": "Zodra u uw account verwijdert, is er geen weg terug. Wees alstublieft zeker.",
         "deleteAccount": "Account verwijderen",
         "deleteConfirm": "Weet u zeker dat u uw account wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt."
+    },
+    "faq": {
+        "cantFindAnswer": "Kunt u het antwoord niet vinden? Ons team helpt u graag.",
+        "categories": {
+            "forHosts": {
+                "a1": "Klik na het inloggen op \"Project aanmaken\" en vul de details in.",
+                "a2": "U kunt het maximale aantal vrijwilligers opgeven bij het aanmaken van uw project.",
+                "a3": "Ja, u kunt uw projectdetails op elk moment bewerken.",
+                "q1": "Hoe maak ik een project aan?",
+                "q2": "Hoeveel vrijwilligers kan ik ontvangen?",
+                "q3": "Kan ik mijn project bewerken na publicatie?",
+                "title": "Voor gastgevers"
+            },
+            "forVolunteers": {
+                "a1": "Gebruik de Projectenpagina om beschikbare mogelijkheden te bekijken.",
+                "a2": "Elk project heeft andere vereisten. Bekijk de projectdetails.",
+                "a3": "Ja! Na een project kunnen vrijwilligers en gastgevers beoordelingen achterlaten.",
+                "q1": "Hoe vind ik projecten?",
+                "q2": "Wat moet ik meenemen?",
+                "q3": "Kan ik een beoordeling achterlaten?",
+                "title": "Voor vrijwilligers"
+            },
+            "gettingStarted": {
+                "a1": "Ecobilda is een platform dat vrijwilligers verbindt met ecobouw- en permacultuurprojecten.",
+                "a2": "Klik op \"Registreren\", vul uw gegevens in en begin met bladeren.",
+                "a3": "Ja, een account aanmaken en projecten bekijken is helemaal gratis.",
+                "q1": "Wat is Ecobilda?",
+                "q2": "Hoe maak ik een account aan?",
+                "q3": "Is Ecobilda gratis?",
+                "title": "Aan de slag"
+            }
+        },
+        "contactSupport": "Contact opnemen",
+        "noResults": "Geen vragen gevonden voor \"{term}\"",
+        "searchPlaceholder": "Antwoorden zoeken...",
+        "stillHaveQuestions": "Nog vragen?",
+        "subtitle": "Vind antwoorden op veelgestelde vragen over Ecobilda",
+        "title": "Veelgestelde vragen"
+    },
+    "forHosts": {
+        "create": {
+            "desc": "Beschrijf uw project en wat vrijwilligers zullen leren.",
+            "title": "Maak uw project aan"
+        },
+        "cta": "Begin met hosten",
+        "receive": {
+            "desc": "Ontvang vrijwilligers en deel uw kennis.",
+            "title": "Ontvang vrijwilligers"
+        },
+        "subtitle": "Deel uw ecobouw- of permacultuurproject en ontvang gepassioneerde vrijwilligers.",
+        "title": "Voor gastgevers",
+        "trust": {
+            "desc": "Bouw vertrouwen op met beoordelingen en geverifieerde profielen.",
+            "title": "Bouw vertrouwen"
+        }
+    },
+    "forVolunteers": {
+        "cta": "Vind een project",
+        "find": {
+            "desc": "Ontdek natuurbouw- en permacultuurprojecten wereldwijd.",
+            "title": "Vind projecten"
+        },
+        "learn": {
+            "desc": "Doe praktische ervaring op in ecobouw en permacultuur.",
+            "title": "Leer nieuwe vaardigheden"
+        },
+        "subtitle": "Reis de wereld rond en leer duurzame bouw- en permacultuurtechnieken.",
+        "title": "Voor vrijwilligers",
+        "travel": {
+            "desc": "Ontdek nieuwe plekken en draag bij aan zinvolle projecten.",
+            "title": "Reis en ontdek"
+        }
+    },
+    "howItWorks": {
+        "step1": {
+            "desc": "Maak uw gratis account aan en vul uw profiel in.",
+            "title": "Registreer"
+        },
+        "step2": {
+            "desc": "Ontdek ecobouw- en permacultuurprojecten wereldwijd.",
+            "title": "Blader door projecten"
+        },
+        "step3": {
+            "desc": "Stuur een deelnameverzoek en maak contact met uw gastgever.",
+            "title": "Solliciteer en verbind"
+        },
+        "step4": {
+            "desc": "Leer nieuwe vaardigheden en laat een beoordeling achter.",
+            "title": "Neem deel en beoordeel"
+        },
+        "subtitle": "Beginnen met Ecobilda is eenvoudig",
+        "title": "Hoe het werkt"
+    },
+    "messaging": {
+        "delete": "Gesprek verwijderen",
+        "mute": "Meldingen dempen",
+        "noConversations": "Nog geen gesprekken",
+        "placeholder": "Typ uw bericht...",
+        "selectConversation": "Selecteer een gesprek",
+        "selectConversationDesc": "Kies uit uw bestaande gesprekken",
+        "title": "Berichten",
+        "unmute": "Meldingen inschakelen",
+        "viewProfile": "Profiel bekijken",
+        "inbox": "Inbox",
+        "newMessage": "Nieuw bericht",
+        "sendMessage": "Bericht versturen",
+        "noMessages": "Nog geen berichten",
+        "typeMessage": "Typ een bericht...",
+        "conversationOptions": "Opties"
+    },
+    "privacy": {
+        "title": "Privacybeleid",
+        "lastUpdated": "Laatst bijgewerkt: maart 2026",
+        "intro": "Bij Ecobilda zetten we ons in voor de bescherming van uw privacy en persoonlijke gegevens. Dit Privacybeleid legt uit hoe we uw informatie verzamelen, gebruiken, opslaan en beschermen wanneer u ons platform gebruikt. We voldoen aan de Algemene Verordening Gegevensbescherming (AVG) en andere toepasselijke wetgeving inzake gegevensbescherming.",
+        "dataCollection": {
+            "title": "1. Gegevens die we verzamelen",
+            "desc": "We verzamelen verschillende soorten informatie om onze diensten te leveren en te verbeteren:",
+            "accountData": {
+                "title": "Accountinformatie",
+                "desc": "Bij het aanmaken van uw account verzamelen we uw voor- en achternaam, e-mailadres, geboortedatum, profielfoto (optioneel), gesproken talen, bio/beschrijving, land van verblijf en vaardigheden. Als u zich registreert via Google OAuth, ontvangen we uw naam, e-mailadres en profielfoto van Google."
+            },
+            "projectData": {
+                "title": "Project- en activiteitsgegevens",
+                "desc": "We verzamelen projectbeschrijvingen, foto's, locaties (adres en coördinaten), beschikbaarheidsdata, deelnameverzoeken en hun status, berichten tussen gebruikers, beoordelingen en ratings, meldingen en gemarkeerde inhoud, en opgeslagen zoekopdrachten en favorieten."
+            },
+            "technicalData": {
+                "title": "Technische gegevens",
+                "desc": "We verzamelen automatisch uw IP-adres, browsertype en -versie, apparaatinformatie, bezochte pagina's en tijdsduur, verwijzende website, en cookies en vergelijkbare technologieën (zie sectie Cookies)."
+            }
+        },
+        "dataUse": {
+            "title": "2. Hoe we uw gegevens gebruiken",
+            "desc": "We gebruiken de verzamelde gegevens voor de volgende doeleinden:",
+            "purpose1": "Het aanmaken en beheren van uw account en het verifiëren van uw identiteit.",
+            "purpose2": "Het verbinden van vrijwilligers met projectgastgevers en het faciliteren van deelnameverzoeken.",
+            "purpose3": "Het mogelijk maken van communicatie tussen gebruikers na acceptatie van een deelnameverzoek.",
+            "purpose4": "Het verzenden van transactionele meldingen (deelname-updates, nieuwe berichten, beoordelingsherinneringen).",
+            "purpose5": "Het handhaven van platformbeveiliging, fraudepreventie en naleving van onze Gebruiksvoorwaarden.",
+            "purpose6": "Het verbeteren en optimaliseren van ons platform, functies en gebruikerservaring."
+        },
+        "legalBasis": {
+            "title": "3. Rechtsgrond voor verwerking",
+            "desc": "We verwerken uw persoonsgegevens op basis van: (a) uw toestemming, gegeven bij het aanmaken van uw account en het accepteren van onze voorwaarden; (b) de uitvoering van een overeenkomst, aangezien verwerking noodzakelijk is om onze diensten te leveren; (c) onze gerechtvaardigde belangen, zoals platformbeveiliging, fraudepreventie en serviceverbetering; (d) wettelijke verplichtingen, wanneer we wettelijk verplicht zijn gegevens te verwerken."
+        },
+        "sharing": {
+            "title": "4. Gegevens delen",
+            "desc": "We kunnen uw gegevens delen in de volgende beperkte omstandigheden:",
+            "case1": "Met andere gebruikers: uw openbare profielinformatie, projectdetails en beoordelingen zijn zichtbaar voor andere platformgebruikers. Berichten worden alleen gedeeld met gespreksdeelnemers.",
+            "case2": "Met dienstverleners: we gebruiken externe diensten voor hosting (Hetzner), e-mailverzending, kaartdiensten (Mapbox) en authenticatie (Google OAuth). Deze dienstverleners verwerken gegevens alleen namens ons en onder strikte contractuele verplichtingen.",
+            "case3": "Om juridische redenen: we kunnen gegevens openbaar maken als de wet, een rechterlijk bevel of een overheidsverzoek dit vereist, of om de rechten, veiligheid of eigendom van Ecobilda of haar gebruikers te beschermen.",
+            "noSell": "We verkopen uw persoonsgegevens nooit aan derden voor reclame- of marketingdoeleinden."
+        },
+        "cookies": {
+            "title": "5. Cookies",
+            "desc": "Ecobilda gebruikt uitsluitend essentiële cookies die nodig zijn voor het functioneren van het platform (authenticatietokens, sessiebeheer, taalvoorkeuren). We gebruiken geen reclame- of trackingcookies. Voor strikt noodzakelijke cookies is onder de AVG geen toestemmingsbanner vereist."
+        },
+        "dataProtection": {
+            "title": "6. Gegevensbeveiliging",
+            "desc": "We implementeren passende technische en organisatorische maatregelen om uw persoonsgegevens te beschermen, waaronder versleutelde gegevensoverdracht (HTTPS/TLS), veilige wachtwoord-hashing, JWT-gebaseerde authenticatie met tokenverloop, toegangscontroles en rolgebaseerde machtigingen, en regelmatige beveiligingsbeoordelingen. Hoewel we ernaar streven uw gegevens te beschermen, is geen enkele transmissiemethode via internet 100% veilig en kunnen we geen absolute beveiliging garanderen."
+        },
+        "retention": {
+            "title": "7. Gegevensbewaring",
+            "desc": "We bewaren uw persoonsgegevens zolang uw account actief is of zolang nodig is om onze diensten te leveren. Als u uw account verwijdert, zullen we uw persoonsgegevens binnen 30 dagen verwijderen, tenzij bewaring wettelijk verplicht is of noodzakelijk is voor gerechtvaardigde zakelijke doeleinden (zoals geschilbeslechting of handhaving van onze overeenkomsten). Berichten in gesprekken kunnen worden geanonimiseerd in plaats van verwijderd om de integriteit van de gegevens van de andere deelnemer te bewaren. Beoordelingen kunnen in geanonimiseerde vorm worden bewaard."
+        },
+        "rights": {
+            "title": "8. Uw rechten",
+            "desc": "Op grond van de AVG heeft u de volgende rechten met betrekking tot uw persoonsgegevens:",
+            "access": "Recht van inzage: u kunt een kopie opvragen van de persoonsgegevens die we over u bewaren.",
+            "rectification": "Recht op rectificatie: u kunt uw gegevens bijwerken of corrigeren via uw profielinstellingen of door contact met ons op te nemen.",
+            "erasure": "Recht op wissing: u kunt verzoeken om verwijdering van uw account en persoonsgegevens.",
+            "portability": "Recht op gegevensoverdraagbaarheid: u kunt uw gegevens opvragen in een gestructureerd, machineleesbaar formaat.",
+            "restriction": "Recht op beperking: u kunt verzoeken dat we de verwerking van uw gegevens in bepaalde omstandigheden beperken.",
+            "objection": "Recht van bezwaar: u kunt bezwaar maken tegen gegevensverwerking op basis van onze gerechtvaardigde belangen.",
+            "howTo": "Om een van deze rechten uit te oefenen, neem contact met ons op via contact@ecobilda.com. We zullen uw verzoek binnen 30 dagen beantwoorden. U heeft ook het recht om een klacht in te dienen bij uw lokale toezichthoudende autoriteit voor gegevensbescherming."
+        },
+        "children": {
+            "title": "9. Privacy van minderjarigen",
+            "desc": "Ecobilda is niet bedoeld voor kinderen jonger dan 18 jaar. We verzamelen niet bewust persoonsgegevens van kinderen jonger dan 18 jaar. Als we ontdekken dat we persoonsgegevens hebben verzameld van een kind jonger dan 18 jaar zonder ouderlijke toestemming, zullen we stappen ondernemen om die informatie onmiddellijk te verwijderen."
+        },
+        "international": {
+            "title": "10. Internationale gegevensoverdrachten",
+            "desc": "Uw gegevens worden opgeslagen op servers in de Europese Unie (Hetzner, Duitsland). Als gegevens buiten de EU/EER moeten worden overgedragen, zorgen we ervoor dat passende waarborgen aanwezig zijn, zoals de door de Europese Commissie goedgekeurde Standaardcontractbepalingen."
+        },
+        "changes": {
+            "title": "11. Wijzigingen in dit beleid",
+            "desc": "We kunnen dit Privacybeleid van tijd tot tijd bijwerken. We zullen u op de hoogte stellen van belangrijke wijzigingen via e-mail of via een prominente melding op het platform. Uw voortgezet gebruik van Ecobilda na het plaatsen van wijzigingen vormt uw aanvaarding van het bijgewerkte beleid. We raden u aan dit beleid regelmatig te raadplegen."
+        },
+        "contact": {
+            "title": "12. Contact",
+            "desc": "Als u vragen of opmerkingen heeft over dit Privacybeleid of onze gegevenspraktijken, neem dan contact met ons op via contact@ecobilda.com."
+        }
+    },
+    "reports": {
+        "details": "Aanvullende details",
+        "reason": "Reden van melding",
+        "reasons": {
+            "inappropriate": "Ongepaste inhoud",
+            "misleading": "Misleidende informatie",
+            "other": "Overig",
+            "spam": "Spam"
+        },
+        "submit": "Melding versturen",
+        "submitError": "Melding kon niet worden verzonden. Probeer het opnieuw.",
+        "submitted": "Melding verzonden",
+        "submittedDesc": "Bedankt voor uw melding. Ons team zal het binnenkort beoordelen.",
+        "title": "Melden"
+    },
+    "terms": {
+        "title": "Gebruiksvoorwaarden",
+        "lastUpdated": "Laatst bijgewerkt: maart 2026",
+        "intro": "Welkom bij Ecobilda. Deze Gebruiksvoorwaarden regelen uw toegang tot en gebruik van het Ecobilda-platform, dat gastgevers van ecobouw- en permacultuurprojecten verbindt met vrijwilligers. Door een account aan te maken of onze diensten te gebruiken, stemt u in met deze voorwaarden.",
+        "acceptance": {
+            "title": "1. Aanvaarding van de voorwaarden",
+            "desc": "Door Ecobilda te openen of te gebruiken, bevestigt u dat u deze Gebruiksvoorwaarden en ons Privacybeleid hebt gelezen, begrepen en ermee instemt gebonden te zijn. Als u het niet eens bent met enig deel van deze voorwaarden, mag u het platform niet gebruiken."
+        },
+        "description": {
+            "title": "2. Platformbeschrijving",
+            "desc": "Ecobilda is een online platform dat verbindingen faciliteert tussen gastgevers die ecobouw- en permacultuurprojecten beheren en vrijwilligers die willen leren en bijdragen. Ecobilda treedt uitsluitend op als tussenpersoon en is geen partij bij enige overeenkomst tussen gastgevers en vrijwilligers. Wij houden geen toezicht op, leiden of controleren de projecten die op het platform staan."
+        },
+        "eligibility": {
+            "title": "3. Geschiktheid",
+            "desc": "U moet minimaal 18 jaar oud zijn om een account aan te maken bij Ecobilda. Door u te registreren, verklaart en garandeert u dat u aan deze leeftijdsvereiste voldoet en dat de informatie die u verstrekt nauwkeurig en volledig is. Gebruikers jonger dan 18 jaar mogen alleen deelnemen aan projecten onder direct toezicht van een ouder of wettelijke voogd met een actief Ecobilda-account."
+        },
+        "accounts": {
+            "title": "4. Gebruikersaccounts",
+            "desc": "U bent verantwoordelijk voor het handhaven van de vertrouwelijkheid van uw inloggegevens en voor alle activiteiten onder uw account. U moet nauwkeurige, actuele en volledige informatie verstrekken bij registratie en uw profiel up-to-date houden. U moet ons onmiddellijk op de hoogte stellen van ongeautoriseerd gebruik van uw account. Ecobilda behoudt zich het recht voor om accounts met valse of misleidende informatie op te schorten of te beëindigen."
+        },
+        "use": {
+            "title": "5. Aanvaardbaar gebruik",
+            "desc": "Bij het gebruik van Ecobilda stemt u in met de volgende regels:",
+            "rule1": "Gebruik het platform alleen voor het beoogde doel: het verbinden van gastgevers en vrijwilligers voor ecobouw- en permacultuurprojecten.",
+            "rule2": "Verstrek waarheidsgetrouwe en nauwkeurige informatie in uw profiel, projectvermeldingen en communicatie.",
+            "rule3": "Behandel alle gebruikers met respect en onthoud u van intimidatie, discriminatie of beledigend gedrag.",
+            "rule4": "Gebruik het platform niet voor commerciële werving, reclame of activiteiten die geen verband houden met het delen van vaardigheden en vrijwilligerswerk.",
+            "rule5": "Probeer geen platformfuncties te omzeilen, beoordelingen te manipuleren, meerdere accounts aan te maken of fraude te plegen."
+        },
+        "hosts": {
+            "title": "6. Verantwoordelijkheden van gastgevers",
+            "desc": "Gastgevers zijn verantwoordelijk voor het verstrekken van nauwkeurige beschrijvingen van hun projecten, inclusief het type werk, vereiste vaardigheden, accommodatievoorwaarden en beschikbaarheidsperioden. Gastgevers moeten een veilige werkomgeving voor vrijwilligers garanderen en voldoen aan alle toepasselijke lokale wet- en regelgeving. Gastgevers verbinden zich ertoe deelnameverzoeken tijdig te accepteren of af te wijzen en duidelijk te communiceren met geaccepteerde vrijwilligers."
+        },
+        "volunteers": {
+            "title": "7. Verantwoordelijkheden van vrijwilligers",
+            "desc": "Vrijwilligers zijn verantwoordelijk voor het verstrekken van nauwkeurige informatie in hun deelnameverzoeken, inclusief hun vaardigheden, beschikbaarheid en motivaties. Vrijwilligers verbinden zich ertoe geaccepteerde deelname-overeenkomsten na te komen en afgesproken taken met redelijke zorg uit te voeren. Vrijwilligers dienen gastgevers zo vroeg mogelijk te informeren over wijzigingen in hun plannen. Ecobilda is geen werkgever; vrijwilligers nemen deel uit eigen vrije wil en er bestaat geen arbeidsrelatie tussen vrijwilligers en gastgevers of Ecobilda."
+        },
+        "content": {
+            "title": "8. Door gebruikers gegenereerde inhoud",
+            "desc": "U behoudt het eigendom van inhoud die u op Ecobilda plaatst (projectbeschrijvingen, foto's, berichten, beoordelingen). Door inhoud te plaatsen, verleent u Ecobilda een niet-exclusieve, wereldwijde, royaltyvrije licentie om die inhoud te gebruiken, weer te geven en te verspreiden in verband met de exploitatie van het platform. U bent als enige verantwoordelijk voor de inhoud die u plaatst en garandeert dat deze geen inbreuk maakt op rechten van derden, geen illegaal materiaal bevat en niet in strijd is met deze voorwaarden."
+        },
+        "messaging": {
+            "title": "9. Berichten en communicatie",
+            "desc": "Het berichtensysteem op Ecobilda is pas beschikbaar nadat een deelnameverzoek door een gastgever is geaccepteerd. Deze maatregel is bedoeld om spam te voorkomen en zinvolle uitwisselingen te garanderen. Gebruikers mogen het berichtensysteem niet gebruiken om ongewenste commerciële berichten te verzenden, ongepaste inhoud te delen of zich schuldig te maken aan intimidatie. Ecobilda behoudt zich het recht voor om berichten te monitoren op naleving van deze voorwaarden."
+        },
+        "reviews": {
+            "title": "10. Beoordelingen",
+            "desc": "Na een deelname-ervaring kunnen zowel gastgevers als vrijwilligers beoordelingen achterlaten. Beoordelingen worden pas gepubliceerd wanneer beide partijen hun beoordeling hebben ingediend of na een deadline van 30 dagen, afhankelijk van wat het eerst komt. Dit garandeert eerlijke en onbevooroordeelde feedback. Beoordelingen moeten eerlijk, relevant voor de ervaring en respectvol zijn. Ecobilda behoudt zich het recht voor om beoordelingen te verwijderen die deze richtlijnen schenden of die frauduleus blijken te zijn."
+        },
+        "ip": {
+            "title": "11. Intellectueel eigendom",
+            "desc": "De naam Ecobilda, het logo, het websiteontwerp en alle bijbehorende inhoud, software en technologie zijn eigendom van Ecobilda en worden beschermd door wetgeving inzake intellectueel eigendom. U mag Ecobilda-materialen niet kopiëren, wijzigen, verspreiden of afgeleide werken maken zonder onze voorafgaande schriftelijke toestemming."
+        },
+        "termination": {
+            "title": "12. Accountbeëindiging",
+            "desc": "U kunt uw account op elk moment verwijderen via uw accountinstellingen. Ecobilda behoudt zich het recht voor om accounts die deze voorwaarden schenden, frauduleuze activiteiten uitvoeren of gemeld worden voor ongepast gedrag, na onderzoek op te schorten of permanent te beëindigen. Bij beëindiging vervalt uw recht om het platform te gebruiken onmiddellijk. We kunnen bepaalde gegevens bewaren zoals wettelijk vereist of voor gerechtvaardigde zakelijke doeleinden."
+        },
+        "liability": {
+            "title": "13. Beperking van aansprakelijkheid",
+            "desc": "Ecobilda dient als platform dat gastgevers en vrijwilligers verbindt en garandeert niet de kwaliteit, veiligheid of wettigheid van vermelde projecten. Wij zijn niet verantwoordelijk voor het gedrag van gebruikers, de nauwkeurigheid van projectvermeldingen of schade als gevolg van interacties tussen gebruikers. Ecobilda wordt geleverd \"zoals het is\" en \"voor zover beschikbaar\". Voor zover wettelijk toegestaan, wijst Ecobilda alle garanties af en is niet aansprakelijk voor indirecte, incidentele, speciale of gevolgschade die voortvloeit uit uw gebruik van het platform."
+        },
+        "indemnification": {
+            "title": "14. Vrijwaring",
+            "desc": "U stemt ermee in Ecobilda, haar oprichters, medewerkers en agenten te vrijwaren van alle claims, schade, verliezen of kosten (inclusief juridische kosten) die voortvloeien uit uw gebruik van het platform, uw schending van deze voorwaarden of uw schending van rechten van derden."
+        },
+        "modifications": {
+            "title": "15. Wijzigingen van de voorwaarden",
+            "desc": "Ecobilda behoudt zich het recht voor om deze Gebruiksvoorwaarden op elk moment te wijzigen. We zullen gebruikers op de hoogte stellen van belangrijke wijzigingen via e-mail of via een melding op het platform. Uw voortgezet gebruik van het platform na dergelijke wijzigingen vormt uw aanvaarding van de gewijzigde voorwaarden. We raden u aan deze voorwaarden regelmatig te raadplegen."
+        },
+        "governing": {
+            "title": "16. Toepasselijk recht",
+            "desc": "Deze Gebruiksvoorwaarden worden beheerst door en geïnterpreteerd in overeenstemming met de wetten van België. Geschillen die voortvloeien uit of verband houden met deze voorwaarden of uw gebruik van het platform vallen onder de exclusieve bevoegdheid van de rechtbanken van Brussel, België."
+        },
+        "contact": {
+            "title": "17. Contact",
+            "desc": "Als u vragen heeft over deze Gebruiksvoorwaarden, neem dan contact met ons op via contact@ecobilda.com."
+        }
+    },
+    "skills": {
+        "permaculture": {
+            "gardenMaintenance": "Tuinonderhoud",
+            "grafting": "Enten",
+            "pruning": "Snoeien",
+            "harvesting": "Oogsten",
+            "composting": "Composteren",
+            "weeding": "Wieden",
+            "propagating": "Vermeerderen",
+            "seedsHarvesting": "Zaad oogsten"
+        },
+        "naturalBuilding": {
+            "carpentry": "Timmerwerk",
+            "masonry": "Metselwerk",
+            "strawbaleBuilding": "Strobouw",
+            "cobBuilding": "Leembouw",
+            "earthenPlaster": "Leempleister",
+            "limePlaster": "Kalkpleister",
+            "hempcrete": "Hennepbeton",
+            "tadelaktPlaster": "Tadelakt pleister"
+        }
+    },
+    "reviews": {
+        "title": "Beoordelingen",
+        "writeReview": "Schrijf een beoordeling",
+        "rating": "Beoordeling",
+        "feedback": "Feedback",
+        "response": "Reactie",
+        "noReviews": "Nog geen beoordelingen"
     }
 }

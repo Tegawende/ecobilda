@@ -76,7 +76,17 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         """Return single profile instead of list"""
+        # Handle PATCH/PUT on /api/profile/ (without pk)
+        if request.method in ('PATCH', 'PUT'):
+            return self._update_profile(request, partial=(request.method == 'PATCH'))
         serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
+
+    def _update_profile(self, request, partial=True):
+        """Update the authenticated user's profile."""
+        serializer = self.get_serializer(request.user, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data)
 
     @action(detail=False, methods=['post'])

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import { Container, Title, Text, Paper, Button, Group, Stack, ThemeIcon, Switch, Select, PasswordInput, Notification } from '@mantine/core';
+import { Container, Title, Text, Paper, Button, Group, Stack, ThemeIcon, Switch, Select, TextInput, Notification, Alert, Modal } from '@mantine/core';
 import {
   IconSettings,
   IconBell,
@@ -34,7 +34,13 @@ export function SettingsClient() {
     confirm_password: '',
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,11 +57,20 @@ export function SettingsClient() {
     setTimeout(() => setSaveSuccess(false), 3000);
   };
 
-  const handleDeleteAccount = () => {
-    if (confirm(t('settings.deleteConfirm') || 'Are you sure you want to delete your account? This action cannot be undone.')) {
+  const deleteConfirmWord = t('settings.deleteConfirmWord') || 'DELETE';
+
+  const handleDeleteAccount = async () => {
+    try {
+      setIsDeleting(true);
+      // TODO: Call API to delete account
       clearAuthTokens();
       localStorage.removeItem('mock_user');
+      setDeleteModalOpen(false);
       router.push('/');
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete account');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -183,23 +198,32 @@ export function SettingsClient() {
 
               <form onSubmit={handleChangePassword}>
                 <Stack gap="md">
-                  <PasswordInput
+                  <TextInput
                     label={t('settings.currentPassword') || 'Current Password'}
+                    type={showPassword ? 'text' : 'password'}
                     value={passwordForm.current_password}
                     onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })}
                     radius="lg"
                   />
-                  <PasswordInput
+                  <TextInput
                     label={t('settings.newPassword') || 'New Password'}
+                    type={showPassword ? 'text' : 'password'}
                     value={passwordForm.new_password}
                     onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
                     radius="lg"
                   />
-                  <PasswordInput
+                  <TextInput
                     label={t('settings.confirmPassword') || 'Confirm New Password'}
+                    type={showPassword ? 'text' : 'password'}
                     value={passwordForm.confirm_password}
                     onChange={(e) => setPasswordForm({ ...passwordForm, confirm_password: e.target.value })}
                     radius="lg"
+                  />
+                  <Switch
+                    label={t('settings.showPassword') || 'Show passwords'}
+                    checked={showPassword}
+                    onChange={(e) => setShowPassword(e.currentTarget.checked)}
+                    size="sm"
                   />
                 </Stack>
                 <Group justify="flex-end" mt="lg">
@@ -225,11 +249,46 @@ export function SettingsClient() {
                 variant="outline"
                 color="red"
                 radius="xl"
-                onClick={handleDeleteAccount}
+                onClick={() => setDeleteModalOpen(true)}
               >
                 {t('settings.deleteAccount') || 'Delete Account'}
               </Button>
             </Paper>
+
+            {/* Delete Account Confirmation Modal */}
+            <Modal
+              opened={deleteModalOpen}
+              onClose={() => { setDeleteModalOpen(false); setDeleteConfirmText(''); }}
+              title={t('settings.deleteAccount') || 'Delete Account'}
+              centered
+            >
+              <Stack gap="md">
+                <Alert color="red" variant="light">
+                  {t('settings.deleteConfirm') || 'Are you sure you want to delete your account? This action cannot be undone.'}
+                </Alert>
+                <Text size="sm">
+                  {t('settings.deleteConfirmInstruction') || `Type "${deleteConfirmWord}" to confirm:`}
+                </Text>
+                <TextInput
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder={deleteConfirmWord}
+                />
+                <Group justify="flex-end">
+                  <Button variant="default" onClick={() => { setDeleteModalOpen(false); setDeleteConfirmText(''); }}>
+                    {t('common.cancel') || 'Cancel'}
+                  </Button>
+                  <Button
+                    color="red"
+                    onClick={handleDeleteAccount}
+                    loading={isDeleting}
+                    disabled={deleteConfirmText !== deleteConfirmWord}
+                  >
+                    {t('settings.deleteAccount') || 'Delete Account'}
+                  </Button>
+                </Group>
+              </Stack>
+            </Modal>
           </Stack>
         </Container>
       </div>

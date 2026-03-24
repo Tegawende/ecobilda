@@ -6,7 +6,7 @@ import type { Skill } from '@/types';
 import { skillsService } from '@/services/skills';
 import logger from '@/lib/logger';
 import { getSkillIcon } from '@/lib/skillIcons';
-import { RangeSlider } from '@mantine/core';
+
 import {
     IconFilter,
     IconX,
@@ -376,14 +376,39 @@ const AmenityToggle = ({
     </button>
 );
 
-// Mantine Range slider component
-const RangeInput = ({
+// Stepper button for increment/decrement
+const StepperButton = ({
+    onClick,
+    disabled,
+    children,
+}: {
+    onClick: () => void;
+    disabled: boolean;
+    children: React.ReactNode;
+}) => (
+    <button
+        onClick={onClick}
+        disabled={disabled}
+        className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all text-sm font-medium ${
+            disabled
+                ? 'border-gray-200 text-gray-300 cursor-not-allowed'
+                : 'border-gray-400 text-gray-600 hover:border-gray-900 hover:text-gray-900 cursor-pointer'
+        }`}
+    >
+        {children}
+    </button>
+);
+
+// Range stepper component (Airbnb-style min/max with +/- buttons)
+const RangeStepper = ({
     label,
     value,
     onChange,
     min,
     max,
     unit,
+    minLabel,
+    maxLabel,
 }: {
     label: string;
     value: [number, number];
@@ -391,33 +416,48 @@ const RangeInput = ({
     min: number;
     max: number;
     unit: string;
+    minLabel: string;
+    maxLabel: string;
 }) => {
+    const decMin = () => {
+        if (value[0] > min) onChange([value[0] - 1, value[1]]);
+    };
+    const incMin = () => {
+        if (value[0] < value[1]) onChange([value[0] + 1, value[1]]);
+    };
+    const decMax = () => {
+        if (value[1] > value[0]) onChange([value[0], value[1] - 1]);
+    };
+    const incMax = () => {
+        if (value[1] < max) onChange([value[0], value[1] + 1]);
+    };
+
     return (
         <div className="space-y-3">
-            <div className="flex justify-between items-center">
-                <span className="font-medium text-gray-700">{label}</span>
-                <span className="text-sm text-gray-500">
-                    {value[0]} - {value[1]} {unit}
-                </span>
+            <span className="font-medium text-gray-700">{label}</span>
+            <div className="flex items-center justify-between gap-4">
+                {/* Min stepper */}
+                <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-500 w-8">{minLabel}</span>
+                    <StepperButton onClick={decMin} disabled={value[0] <= min}>-</StepperButton>
+                    <span className="w-10 text-center font-semibold text-gray-900 tabular-nums">
+                        {value[0]}{unit}
+                    </span>
+                    <StepperButton onClick={incMin} disabled={value[0] >= value[1]}>+</StepperButton>
+                </div>
+
+                <span className="text-gray-300">-</span>
+
+                {/* Max stepper */}
+                <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-500 w-8">{maxLabel}</span>
+                    <StepperButton onClick={decMax} disabled={value[1] <= value[0]}>-</StepperButton>
+                    <span className="w-10 text-center font-semibold text-gray-900 tabular-nums">
+                        {value[1]}{unit}
+                    </span>
+                    <StepperButton onClick={incMax} disabled={value[1] >= max}>+</StepperButton>
+                </div>
             </div>
-            <RangeSlider
-                value={value}
-                onChange={onChange}
-                min={min}
-                max={max}
-                step={1}
-                minRange={1}
-                color="eco-primary"
-                size="md"
-                styles={{
-                    track: { height: 8 },
-                    thumb: {
-                        height: 18,
-                        width: 18,
-                        borderWidth: 2,
-                    },
-                }}
-            />
         </div>
     );
 };
@@ -965,36 +1005,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
                                 </div>
                             )}
 
-                            {/* Work Details */}
-                            <div>
-                                <h3 className="font-semibold text-gray-900 mb-4">{t('projects.filters.workDetails')}</h3>
-                                <div className="space-y-6">
-                                    <RangeInput
-                                        label={t('projects.hoursPerDay')}
-                                        value={tempFilters.hoursPerDay}
-                                        onChange={(val) => setTempFilter('hoursPerDay', val)}
-                                        min={1}
-                                        max={10}
-                                        unit="h"
-                                    />
-                                    <RangeInput
-                                        label={t('projects.daysPerWeek')}
-                                        value={tempFilters.daysPerWeek}
-                                        onChange={(val) => setTempFilter('daysPerWeek', val)}
-                                        min={1}
-                                        max={7}
-                                        unit="j"
-                                    />
-                                    <RangeInput
-                                        label={t('projects.filters.maxVolunteers')}
-                                        value={tempFilters.maxHelpers}
-                                        onChange={(val) => setTempFilter('maxHelpers', val)}
-                                        min={1}
-                                        max={30}
-                                        unit=""
-                                    />
-                                </div>
-                            </div>
+                            {/* Work Details removed for MVP */}
                         </div>
 
                         {/* Footer */}

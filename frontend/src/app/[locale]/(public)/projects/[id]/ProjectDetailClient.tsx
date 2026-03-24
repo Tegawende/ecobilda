@@ -258,7 +258,7 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                       </h3>
                       <div className="flex items-center text-sm text-gray-500">
                         <IconStar size={16} className="text-yellow-500 mr-1" />
-                        {project.owner.average_rating?.toFixed(1)} ({project.owner.review_count} avis)
+                        {Number(project.owner.average_rating || 0).toFixed(1)} ({project.owner.review_count} avis)
                       </div>
                     </div>
                   </div>

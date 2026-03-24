@@ -215,6 +215,19 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = AvailabilitySerializer(project.availabilities.all(), many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'], url_path='my-projects', permission_classes=[IsAuthenticated])
+    def my_projects(self, request):
+        """
+        Get current user's projects (all statuses).
+
+        GET /api/projects/my-projects/
+        """
+        queryset = Project.objects.filter(owner=request.user).select_related(
+            'address', 'address__country'
+        ).prefetch_related('skills', 'images').order_by('-created_at')
+        serializer = ProjectListSerializer(queryset, many=True, context={'request': request})
+        return Response({'results': serializer.data})
+
     @action(detail=False, methods=['get'])
     def map_data(self, request):
         """

@@ -9,7 +9,7 @@ export interface UpdateProfileData {
   phone_number?: string;
   profile_picture?: File;
   languages?: string[];
-  skills?: string[];
+  skill_codes?: string[];
   address?: {
     city?: string;
     postal_code?: string;

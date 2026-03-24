@@ -26,6 +26,7 @@ import {
   IconAlertCircle,
 } from '@tabler/icons-react';
 import { participationsService, type ParticipationRequest } from '@/services/participations';
+import { Layout } from '@/components/common/Layout';
 
 type DisplayStatus = 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled' | 'expired';
 
@@ -178,6 +179,7 @@ export function MyParticipationsClient() {
   });
 
   return (
+    <Layout>
     <div className="bg-stone-50 min-h-screen py-12">
       <Container size="lg">
         {/* Header */}
@@ -244,5 +246,6 @@ export function MyParticipationsClient() {
         )}
       </Container>
     </div>
+    </Layout>
   );
 }

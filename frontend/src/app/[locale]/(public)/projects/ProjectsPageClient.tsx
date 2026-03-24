@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback, useRef, memo } from 'react';
+import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import {
@@ -27,7 +28,8 @@ import { ProjectCard } from '@/components/projects/ProjectCard';
 import { MobileProjectDetailModal } from '@/components/projects/MobileProjectDetailModal';
 
 // Star Rating Component with percentage fill
-const StarRating = memo(function StarRating({ rating, size = 12 }: { rating: number; size?: number }) {
+const StarRating = memo(function StarRating({ rating: rawRating, size = 12 }: { rating: number | string; size?: number }) {
+  const rating = Number(rawRating) || 0;
   const fullStars = Math.floor(rating);
   const partialFill = (rating - fullStars) * 100;
 
@@ -139,7 +141,7 @@ function ProjectCardList({
             <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${isNatB ? 'bg-eco-primary text-white' : 'bg-eco-terracotta text-white'
               }`}>
               {isNatB ? <IconHome size={10} /> : <IconLeaf size={10} />}
-              {isNatB ? 'Construction' : 'Permaculture'}
+              {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
             </span>
           </div>
         </div>
@@ -195,19 +197,32 @@ function ProjectCardList({
 
           {/* host info */}
           {project.owner && (
-            <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
-              <img
-                src={project.owner.profile_picture || undefined}
-                alt={project.owner.first_name}
-                className="w-8 h-8 rounded-full object-cover"
-              />
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">{t('projects.host')}:</span>
-                <span className="text-sm font-medium text-gray-900">{project.owner.first_name}</span>
+            <div className="pt-3 border-t border-gray-100">
+              {/* Label removed per user request */}
+              <div className="flex items-center gap-3">
+                {project.owner.profile_picture ? (
+                  <Image
+                    src={project.owner.profile_picture}
+                    alt={project.owner.first_name}
+                    width={40}
+                    height={40}
+                    className="rounded-full object-cover flex-shrink-0"
+                    referrerPolicy="no-referrer"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <IconUsers size={18} className="text-gray-400" />
+                  </div>
+                )}
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-gray-900">{project.owner.first_name} {project.owner.last_name?.charAt(0)}.</span>
+                  <div className="flex items-center gap-1">
+                    <IconStar size={13} className="text-yellow-400 fill-yellow-400" />
+                    <span className="text-xs text-gray-500">{Number(project.owner.average_rating || 0).toFixed(1)} ({project.owner.review_count || 0} {t('projects.reviews')})</span>
+                  </div>
+                </div>
               </div>
-              {project.owner.average_rating && (
-                <StarRating rating={project.owner.average_rating} size={14} />
-              )}
             </div>
           )}
         </div>
@@ -217,10 +232,13 @@ function ProjectCardList({
 }
 
 
+const ITEMS_PER_PAGE = 18;
+
 export function ProjectsPageClient() {
   const t = useTranslations();
   const { data: projects } = useProjects();
   const [filters, setFilters] = useState<ProjectFiltersState>(defaultFilters);
+  const [currentPage, setCurrentPage] = useState(1);
   const [hoveredProject, setHoveredProject] = useState<Project | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [mapBounds, setMapBounds] = useState<MapBounds | null>(null);
@@ -266,38 +284,68 @@ export function ProjectsPageClient() {
     isProgrammaticMove.current = true;
   }, []);
 
-  const filteredProjects = useMemo(() => {
-    return (projects || []).filter((project) => {
-      if (filters.projectType !== 'all' && project.project_type !== filters.projectType) {
+  const applyClientFilters = useCallback((projectList: Project[], f: ProjectFiltersState) => {
+    return projectList.filter((project) => {
+      // Project type
+      if (f.projectType !== 'all' && project.project_type !== f.projectType) {
         return false;
       }
-      if (filters.location) {
-        const locationName = filters.location.name.toLowerCase();
+      // Location
+      if (f.location) {
+        const locationName = f.location.name.toLowerCase();
         const projectCity = project.address?.city?.toLowerCase() || '';
         const matchesLocation = locationName.includes(projectCity) || projectCity.includes(locationName.split(',')[0].toLowerCase());
         if (!matchesLocation) return false;
       }
-      if (filters.internetProvided && !project.internet_provided) return false;
-      if (filters.familyFriendly && !project.family_friendly) return false;
-      if (filters.petsAllowed && !project.pets_allowed) return false;
-      if (filters.smokingAllowed && !project.smoking_allowed) return false;
-      if (project.hours_per_day < filters.hoursPerDay[0] || project.hours_per_day > filters.hoursPerDay[1]) return false;
-      if (project.days_per_week < filters.daysPerWeek[0] || project.days_per_week > filters.daysPerWeek[1]) return false;
+      // Amenities
+      if (f.internetProvided && !project.internet_provided) return false;
+      if (f.familyFriendly && !project.family_friendly) return false;
+      if (f.petsAllowed && !project.pets_allowed) return false;
+      if (f.smokingAllowed && !project.smoking_allowed) return false;
+      // Work details
+      if (project.hours_per_day < f.hoursPerDay[0] || project.hours_per_day > f.hoursPerDay[1]) return false;
+      if (project.days_per_week < f.daysPerWeek[0] || project.days_per_week > f.daysPerWeek[1]) return false;
 
-      if (filters.maxHelpers[0] !== 1 || filters.maxHelpers[1] !== 20) {
-        if (project.max_helpers < filters.maxHelpers[0] || project.max_helpers > filters.maxHelpers[1]) return false;
+      if (f.maxHelpers[0] !== 1 || f.maxHelpers[1] !== 30) {
+        if (project.max_helpers < f.maxHelpers[0] || project.max_helpers > f.maxHelpers[1]) return false;
       }
 
+      // Skills
+      if (f.skills.length > 0) {
+        const projectSkillCodes = (project.skills || []).map((s: any) => typeof s === 'string' ? s : s.code);
+        const hasMatchingSkill = f.skills.some(code => projectSkillCodes.includes(code));
+        if (!hasMatchingSkill) return false;
+      }
 
       return true;
     });
-  }, [filters]);
+  }, []);
+
+  const filteredProjects = useMemo(() => {
+    return applyClientFilters(projects || [], filters);
+  }, [projects, filters, applyClientFilters]);
+
+  const getFilteredCount = useCallback((tempFilters: ProjectFiltersState) => {
+    return applyClientFilters(projects || [], tempFilters).length;
+  }, [projects, applyClientFilters]);
 
   // Filter by map bounds for visible projects
   const visibleProjects = useMemo(() => {
     if (!mapBounds) return filteredProjects;
     return filteredProjects.filter(p => isProjectInBounds(p, mapBounds));
   }, [filteredProjects, mapBounds]);
+
+  // Reset page when filters or visible projects change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters, visibleProjects.length]);
+
+  // Paginated projects
+  const totalPages = Math.ceil(visibleProjects.length / ITEMS_PER_PAGE);
+  const paginatedProjects = visibleProjects.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <Layout hideFooter>
@@ -307,6 +355,8 @@ export function ProjectsPageClient() {
           onFiltersChange={setFilters}
           onLocationSelect={handleLocationSelect}
           onClear={handleClearFilters}
+          resultCount={visibleProjects.length}
+          getFilteredCount={getFilteredCount}
         />
 
         <div className="flex-1 flex overflow-hidden">
@@ -343,30 +393,55 @@ export function ProjectsPageClient() {
             {/* Scrollable Project List */}
             <div className="flex-1 overflow-y-auto">
               {visibleProjects.length > 0 ? (
-                viewMode === 'grid' ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 p-4">
-                    {visibleProjects.map((project) => (
-                      <ProjectCard
-                        key={project.id}
-                        project={project}
-                        isHovered={hoveredProject?.id === project.id}
-                        onHover={setHoveredProject}
-                        onMobileClick={setMobileModalProject}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div>
-                    {visibleProjects.map((project) => (
-                      <ProjectCardList
-                        key={project.id}
-                        project={project}
-                        isHovered={hoveredProject?.id === project.id}
-                        onHover={setHoveredProject}
-                      />
-                    ))}
-                  </div>
-                )
+                <>
+                  {viewMode === 'grid' ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 p-4">
+                      {paginatedProjects.map((project) => (
+                        <ProjectCard
+                          key={project.id}
+                          project={project}
+                          isHovered={hoveredProject?.id === project.id}
+                          onHover={setHoveredProject}
+                          onMobileClick={setMobileModalProject}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div>
+                      {paginatedProjects.map((project) => (
+                        <ProjectCardList
+                          key={project.id}
+                          project={project}
+                          isHovered={hoveredProject?.id === project.id}
+                          onHover={setHoveredProject}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex justify-center items-center gap-2 py-4 border-t border-gray-100">
+                      <button
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors cursor-pointer"
+                      >
+                        {t('common.previous') || 'Previous'}
+                      </button>
+                      <span className="text-sm text-gray-600">
+                        {currentPage} / {totalPages}
+                      </span>
+                      <button
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors cursor-pointer"
+                      >
+                        {t('common.next') || 'Next'}
+                      </button>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center py-16 px-6">
                   <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
@@ -400,7 +475,7 @@ export function ProjectsPageClient() {
             )}
             <ProjectsMap
               ref={mapRef}
-              projects={visibleProjects}
+              projects={filteredProjects}
               allProjects={filteredProjects}
               selectedProject={selectedProject}
               onProjectSelect={setSelectedProject}

@@ -20,6 +20,7 @@ import { IconFolder, IconPlus, IconAlertCircle } from '@tabler/icons-react';
 import type { Project } from '@/types';
 import { ProjectCard, ProjectCardSkeleton } from '@/components/projects/ProjectCard';
 import { projectsService } from '@/services/projects';
+import { Layout } from '@/components/common/Layout';
 
 function FilterTabs({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
   return (
@@ -78,6 +79,7 @@ export function MyProjectsClient() {
   };
 
   return (
+    <Layout>
     <div className="bg-stone-50 min-h-screen py-12">
       <Container size="xl">
         {/* Header */}
@@ -172,5 +174,6 @@ export function MyProjectsClient() {
         )}
       </Container>
     </div>
+    </Layout>
   );
 }

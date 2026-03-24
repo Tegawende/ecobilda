@@ -28,9 +28,8 @@ export function Footer() {
       ],
     },
     {
-      title: t('footer.legal.title') || 'Legal & Support',
+      title: t('footer.legal.title') || 'Legal',
       links: [
-        { label: t('footer.links.support') || 'Support Us', link: '#' },
         { label: t('footer.links.terms') || 'Terms', link: '/terms' },
         { label: t('footer.links.privacy') || 'Privacy', link: '/privacy' },
       ],
@@ -81,7 +80,7 @@ export function Footer() {
 
         <div className="border-t border-gray-100 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-400">
-            {t('footer.copyright', { year: currentYear }) || `(c) ${currentYear} Ecobilda. All rights reserved.`}
+            {t('footer.copyright', { year: currentYear })}
           </p>
 
           <div className="relative">

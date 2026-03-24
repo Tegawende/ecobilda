@@ -38,9 +38,7 @@ export function Layout({ children, hideFooter = false }: LayoutProps) {
 
   return (
     <>
-      <a href="#main-content" className="skip-link">
-        {t('a11y.skipToContent') || 'Skip to main content'}
-      </a>
+      {/* Skip link removed - was causing visual issues */}
       <AppShell
         header={{ height: isHomePage ? 0 : 64 }}
       >

@@ -5,8 +5,13 @@ import { useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useForm } from '@mantine/form';
 import { useTranslations, useLocale } from 'next-intl';
+import { useGoogleLogin } from '@react-oauth/google';
 import { authService } from '@/services/auth';
+import { profileService } from '@/services/profile';
+import { setAuthTokens } from '@/services/api';
+import { useAuth } from '@/providers/AuthProvider';
 import { DateOfBirthSelect } from '@/components/common/DateOfBirthSelect';
+import { IconEye, IconEyeOff } from '@tabler/icons-react';
 
 interface LoginFormData {
   email: string;
@@ -82,13 +87,8 @@ const checkEmailExists = async (email: string): Promise<boolean> => {
   }
 
   try {
-    // TODO: Call actual API endpoint to check email existence
-    // const response = await authService.checkEmail(email);
-    // return response.exists;
-
-    // For now, return false to always show registration
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return false;
+    const response = await authService.checkEmail(email);
+    return response.exists;
   } catch {
     return false;
   }
@@ -99,19 +99,22 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
   const locale = useLocale();
   const router = useRouter();
 
-  // Steps: 'email' -> 'login' OR 'register'
-  const [step, setStep] = useState<'email' | 'login' | 'register' | 'verification-sent'>('email');
+  const { refreshUser } = useAuth();
+
+  // Steps: 'email' -> 'login' OR 'register' OR 'google-register'
+  const [step, setStep] = useState<'email' | 'login' | 'register' | 'google-register' | 'verification-sent'>('email');
   const [submittedEmail, setSubmittedEmail] = useState('');
   const [email, setEmail] = useState(''); // Shared email state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [googleAuthData, setGoogleAuthData] = useState<{ tokens: any; user: any } | null>(null);
 
   // Form for the initial email step
   const emailForm = useForm({
     initialValues: { email: '' },
     validate: {
-      email: (val) => (/^\S+@\S+$/.test(val) ? null : t('auth.validation.email')),
+      email: (val) => (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) ? null : t('auth.validation.email')),
     },
   });
 
@@ -134,13 +137,14 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
       dob_day: '',
       dob_month: '',
       dob_year: '',
-      terms: false,
+      terms: true,
     },
     validate: {
       password: (val) => {
+        // Skip password validation for Google register (no password needed)
+        if (step === 'google-register') return null;
         const regex = /^(?=.*[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
         if (!regex.test(val)) return t('auth.validation.passwordComplexity');
-        if (val.toLowerCase().includes(email.split('@')[0].toLowerCase())) return "Password can't contain email";
         return null;
       },
       first_name: (val) => (val.length >= 2 ? null : t('auth.validation.firstName')),
@@ -157,7 +161,11 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
         if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
         return age >= 18 ? null : t('auth.validation.ageRequirement');
       },
-      terms: (val) => (val ? null : t('auth.validation.terms')),
+      terms: (val) => {
+        // Skip terms validation for Google register
+        if (step === 'google-register') return null;
+        return val ? null : t('auth.validation.terms');
+      },
     },
   });
 
@@ -221,18 +229,76 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
     }
   };
 
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const { tokens, user, created } = await authService.googleLogin(tokenResponse.access_token);
+        if (created) {
+          // New Google user: show "finish signing up" form
+          setGoogleAuthData({ tokens, user });
+          setStep('google-register');
+          // Pre-fill name from Google
+          registerForm.setFieldValue('first_name', user.first_name || '');
+          registerForm.setFieldValue('last_name', user.last_name || '');
+          setEmail(user.email);
+        } else {
+          // Existing user: login directly
+          setAuthTokens(tokens);
+          await refreshUser();
+          router.push('/projects');
+        }
+      } catch (err: any) {
+        setError(t('auth.errorLogin'));
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    onError: () => {
+      setError(t('auth.errorLogin'));
+    },
+  });
+
+  const handleGoogleRegister = async (values: any) => {
+    if (!googleAuthData) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Store tokens first
+      setAuthTokens(googleAuthData.tokens);
+      // Build date of birth string
+      const dobString = values.dob_year && values.dob_month && values.dob_day
+        ? `${values.dob_year}-${values.dob_month.padStart(2, '0')}-${values.dob_day.padStart(2, '0')}`
+        : undefined;
+      // Update profile with additional info
+      await profileService.updateProfile({
+        first_name: values.first_name,
+        last_name: values.last_name,
+        date_of_birth: dobString,
+      });
+      await refreshUser();
+      router.push('/projects');
+    } catch (err: any) {
+      setError(t('auth.errorRegister'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const resetFlow = () => {
     setStep('email');
     setError(null);
     setShowPassword(false);
+    setGoogleAuthData(null);
   };
 
   return (
-    <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-stone-100 relative max-w-md mx-auto">
+    <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-stone-100 relative w-full mx-auto" style={{ maxWidth: 450 }}>
       {/* Header Section */}
       {step !== 'verification-sent' && (
       <div className="border-b border-gray-200 pb-4 mb-6 flex items-center relative">
-        {(step === 'login' || step === 'register') && (
+        {(step === 'login' || step === 'register' || step === 'google-register') && (
           <button
             onClick={resetFlow}
             className="absolute left-0 p-2 -ml-2 rounded-full hover:bg-gray-100 text-gray-800 transition-colors"
@@ -247,6 +313,7 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
           {step === 'email' && t('auth.loginOrSignup')}
           {step === 'login' && t('auth.login')}
           {step === 'register' && t('auth.finishSignup')}
+          {step === 'google-register' && t('auth.finishSignup')}
         </h1>
       </div>
       )}
@@ -288,7 +355,10 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
           </div>
 
           <div className="flex flex-col gap-3">
-            <button className="flex items-center justify-between px-4 py-3 border border-gray-400 rounded-lg hover:bg-gray-50 hover:border-black transition-all text-sm font-semibold text-gray-800 group cursor-pointer w-full relative h-12">
+            <button
+              onClick={() => googleLogin()}
+              className="flex items-center justify-between px-4 py-3 border border-gray-400 rounded-lg hover:bg-gray-50 hover:border-black transition-all text-sm font-semibold text-gray-800 cursor-pointer w-full relative h-12"
+            >
               <div className="absolute left-4">
                 <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -299,7 +369,6 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
               </div>
               <span className="flex-1 text-center">{t('auth.googleLogin')}</span>
             </button>
-
           </div>
         </>
       )}
@@ -325,8 +394,8 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
             type={showPassword ? "text" : "password"}
             {...loginForm.getInputProps('password')}
             rightSection={
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="focus:outline-none">
-                {showPassword ? t('common.hide', { defaultValue: 'Hide' }) : t('common.show', { defaultValue: 'Show' })}
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="focus:outline-none text-gray-500 hover:text-gray-700">
+                {showPassword ? <IconEyeOff size={18} /> : <IconEye size={18} />}
               </button>
             }
           />
@@ -379,8 +448,8 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
             type={showPassword ? "text" : "password"}
             {...registerForm.getInputProps('password')}
             rightSection={
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="focus:outline-none">
-                {showPassword ? t('common.hide', { defaultValue: 'Hide' }) : t('common.show', { defaultValue: 'Show' })}
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="focus:outline-none text-gray-500 hover:text-gray-700">
+                {showPassword ? <IconEyeOff size={18} /> : <IconEye size={18} />}
               </button>
             }
           />
@@ -388,6 +457,37 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
           <p className="text-xs text-gray-500 leading-snug">
             By selecting <strong>{t('auth.agreeAndContinue')}</strong>, I agree to Ecobilda's <Link href="/terms" className="text-blue-600 underline">Terms of Service</Link> and acknowledge the <Link href="/privacy" className="text-blue-600 underline">Privacy Policy</Link>.
           </p>
+
+          <button type="submit" disabled={isLoading} className="w-full bg-eco-primary hover:bg-eco-primaryDark text-white font-bold py-3.5 rounded-lg shadow-sm transition-all mt-2 disabled:opacity-70 text-base">
+            {isLoading ? t('auth.registering') : t('auth.agreeAndContinue')}
+          </button>
+        </form>
+      )}
+
+      {step === 'google-register' && (
+        <form onSubmit={registerForm.onSubmit(handleGoogleRegister)} className="flex flex-col gap-5">
+          {/* Email (read-only) */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-gray-600 font-bold ml-1">{t('auth.contactInfo')}</label>
+            <div className="px-4 py-3 rounded-xl border border-gray-400 text-gray-500 text-base bg-gray-50">
+              {email}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-gray-600 font-bold ml-1">{t('auth.legalName')}</label>
+            <div className="grid grid-cols-2 gap-2">
+              <Input placeholder={t('auth.firstName')} {...registerForm.getInputProps('first_name')} className="w-full px-4 py-3 rounded-lg border border-gray-400 focus:border-black focus:ring-2 focus:ring-black outline-none transition-all text-gray-900 placeholder-gray-500" />
+              <Input placeholder={t('auth.lastName')} {...registerForm.getInputProps('last_name')} className="w-full px-4 py-3 rounded-lg border border-gray-400 focus:border-black focus:ring-2 focus:ring-black outline-none transition-all text-gray-900 placeholder-gray-500" />
+            </div>
+          </div>
+
+          <DateOfBirthSelect
+            values={{ dob_day: registerForm.values.dob_day, dob_month: registerForm.values.dob_month, dob_year: registerForm.values.dob_year }}
+            onChange={(field, value) => registerForm.setFieldValue(field, value)}
+            error={registerForm.errors.dob_year as string}
+            variant="auth"
+          />
 
           <button type="submit" disabled={isLoading} className="w-full bg-eco-primary hover:bg-eco-primaryDark text-white font-bold py-3.5 rounded-lg shadow-sm transition-all mt-2 disabled:opacity-70 text-base">
             {isLoading ? t('auth.registering') : t('auth.agreeAndContinue')}

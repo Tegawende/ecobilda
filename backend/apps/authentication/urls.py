@@ -15,6 +15,8 @@ from .views import (
     current_user_view,
     google_login_view,
     apple_login_view,
+    verify_email_view,
+    check_email_view,
 )
 
 app_name = 'authentication'
@@ -36,6 +38,10 @@ urlpatterns = [
     path('password-reset/', PasswordResetRequestView.as_view(), name='password_reset'),
     path('password-reset/confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),
+
+    # Email verification
+    path('verify-email/', verify_email_view, name='verify_email'),
+    path('check-email/', check_email_view, name='check_email'),
 
     # OAuth (placeholders for Phase 5)
     path('google/', google_login_view, name='google_login'),

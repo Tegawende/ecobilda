@@ -59,6 +59,18 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
         onMoveStartRef.current = onMoveStart;
     }, [onMoveStart]);
 
+    // Refs for latest data
+    const projectsRef = useRef(projects);
+    const allProjectsRef = useRef(allProjects);
+
+    useEffect(() => {
+        projectsRef.current = projects;
+    }, [projects]);
+
+    useEffect(() => {
+        allProjectsRef.current = allProjects;
+    }, [allProjects]);
+
     // Expose flyTo and resetView methods via ref
     useImperativeHandle(ref, () => ({
         flyTo: (lat: number, lng: number) => {
@@ -73,12 +85,14 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
         resetView: () => {
             if (!map.current) return;
 
+            const currentProjects = allProjectsRef.current || projectsRef.current;
+
             // If there are projects, fit bounds to them
-            if (projects.length > 0) {
+            if (currentProjects && currentProjects.length > 0) {
                 const bounds = new mapboxgl.LngLatBounds();
                 let hasValidCoords = false;
 
-                projects.forEach((project) => {
+                currentProjects.forEach((project) => {
                     if (project.address?.latitude && project.address?.longitude) {
                         bounds.extend([project.address.longitude, project.address.latitude]);
                         hasValidCoords = true;
@@ -98,7 +112,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
                 duration: 1500,
             });
         }
-    }), [projects]);
+    }), []);
 
     // Initialize map
     useEffect(() => {
@@ -225,13 +239,18 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
 
             markersRef.current[project.id] = { marker, element: el };
         });
+    }, [projects, isMapLoaded, onProjectSelect]);
 
-        // Fit bounds to show all markers if there are any
-        if (projects.length > 0) {
+    // Fit bounds when the full project set changes (filter changes, not viewport panning)
+    useEffect(() => {
+        if (!map.current || !isMapLoaded) return;
+
+        const boundsSource = allProjects || projects;
+        if (boundsSource.length > 0) {
             const bounds = new mapboxgl.LngLatBounds();
             let hasValidCoords = false;
 
-            projects.forEach((project) => {
+            boundsSource.forEach((project) => {
                 if (project.address?.latitude && project.address?.longitude) {
                     bounds.extend([project.address.longitude, project.address.latitude]);
                     hasValidCoords = true;
@@ -242,7 +261,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
                 map.current.fitBounds(bounds, { padding: 60, maxZoom: 12 });
             }
         }
-    }, [projects, isMapLoaded, onProjectSelect]);
+    }, [allProjects, isMapLoaded]);
 
     // Show popup for project
     const showPopup = (project: Project) => {
