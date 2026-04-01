@@ -53,12 +53,12 @@ def send_message_notification(message_id):
         # Determine receiver (the other user in conversation)
         if conversation.user1.id == sender.id:
             receiver = conversation.user2
-            last_notif_field = 'last_email_notif_user2'
-            last_notif_value = conversation.last_email_notif_user2
+            last_notif_field = 'last_email_sent_to_user2'
+            last_notif_value = conversation.last_email_sent_to_user2
         else:
             receiver = conversation.user1
-            last_notif_field = 'last_email_notif_user1'
-            last_notif_value = conversation.last_email_notif_user1
+            last_notif_field = 'last_email_sent_to_user1'
+            last_notif_value = conversation.last_email_sent_to_user1
 
         # Check if receiver wants email notifications
         if not receiver.email_notifications:
@@ -85,7 +85,8 @@ def send_message_notification(message_id):
             'message_preview': message.body[:200],
             'message_full': message.body,
             'conversation_url': f"{settings.FRONTEND_URL}/messages/{conversation.id}",
-            'unsubscribe_url': f"{settings.FRONTEND_URL}/profile/settings",
+            'unsubscribe_url': f"{settings.FRONTEND_URL}/settings",
+            'frontend_url': settings.FRONTEND_URL,
         }
 
         # Render HTML email
@@ -102,7 +103,7 @@ def send_message_notification(message_id):
 
         # Send email
         send_mail(
-            subject=f"New message from {sender.first_name} on Ecobilda",
+            subject=f"Ecobilda - Nouveau message de {sender.first_name}",
             message=plain_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[receiver.email],
@@ -169,6 +170,7 @@ def send_review_notification(review_id):
             'rating': review.rating,
             'feedback': review.feedback,
             'profile_url': f"{settings.FRONTEND_URL}/profile",
+            'frontend_url': settings.FRONTEND_URL,
         }
 
         # Render email
@@ -184,7 +186,7 @@ def send_review_notification(review_id):
 
         # Send
         send_mail(
-            subject=f"{writer.first_name} left you a review on Ecobilda",
+            subject=f"Ecobilda - Nouvel avis de {writer.first_name}",
             message=plain_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[receiver.email],
@@ -242,6 +244,7 @@ def send_review_response_notification(review_id):
             'original_feedback': review.feedback,
             'response': review.response,
             'profile_url': f"{settings.FRONTEND_URL}/users/{receiver.id}",
+            'frontend_url': settings.FRONTEND_URL,
         }
 
         # Render email
@@ -257,7 +260,7 @@ def send_review_response_notification(review_id):
 
         # Send
         send_mail(
-            subject=f"{receiver.first_name} responded to your review on Ecobilda",
+            subject=f"Ecobilda - {receiver.first_name} a r\u00e9pondu \u00e0 votre avis",
             message=plain_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[writer.email],

@@ -1,22 +1,19 @@
-Ecobilda - New Message
+Ecobilda - Nouveau message
 
-Hi {{ receiver_name }},
+Bonjour {{ receiver_name }},
 
-You have a new message from {{ sender_name }}!
+Vous avez recu un nouveau message de {{ sender_name }} sur Ecobilda.
 
 ---
 {{ message_preview }}{% if message_preview|length >= 200 %}...{% endif %}
 ---
 
-Read the full message and reply here:
+Lire le message complet et repondre :
 {{ conversation_url }}
 
-This is an automated notification. You're receiving this because you have message notifications enabled on Ecobilda.
+Ceci est une notification automatique. Vous recevez cet email car vous avez active les notifications par email sur Ecobilda.
 
 ---
+Gerer mes notifications : {{ unsubscribe_url }}
 
-Settings: {{ unsubscribe_url }}
-
-Don't want to receive these emails? You can turn off message notifications in your profile settings.
-
-© 2024 Ecobilda. All rights reserved.
+(c) 2026 Ecobilda. Tous droits reserves.

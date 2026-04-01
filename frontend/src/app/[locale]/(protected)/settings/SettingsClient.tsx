@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import { Container, Title, Text, Paper, Button, Group, Stack, ThemeIcon, Switch, Select, TextInput, Notification, Alert, Modal } from '@mantine/core';
+import { Container, Title, Text, Paper, Button, Group, Stack, ThemeIcon, Switch, Select, TextInput, PasswordInput, Notification, Alert, Modal } from '@mantine/core';
 import {
   IconSettings,
   IconBell,
@@ -34,7 +34,6 @@ export function SettingsClient() {
     confirm_password: '',
   });
 
-  const [showPassword, setShowPassword] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
@@ -198,32 +197,23 @@ export function SettingsClient() {
 
               <form onSubmit={handleChangePassword}>
                 <Stack gap="md">
-                  <TextInput
+                  <PasswordInput
                     label={t('settings.currentPassword') || 'Current Password'}
-                    type={showPassword ? 'text' : 'password'}
                     value={passwordForm.current_password}
                     onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })}
                     radius="lg"
                   />
-                  <TextInput
+                  <PasswordInput
                     label={t('settings.newPassword') || 'New Password'}
-                    type={showPassword ? 'text' : 'password'}
                     value={passwordForm.new_password}
                     onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
                     radius="lg"
                   />
-                  <TextInput
+                  <PasswordInput
                     label={t('settings.confirmPassword') || 'Confirm New Password'}
-                    type={showPassword ? 'text' : 'password'}
                     value={passwordForm.confirm_password}
                     onChange={(e) => setPasswordForm({ ...passwordForm, confirm_password: e.target.value })}
                     radius="lg"
-                  />
-                  <Switch
-                    label={t('settings.showPassword') || 'Show passwords'}
-                    checked={showPassword}
-                    onChange={(e) => setShowPassword(e.currentTarget.checked)}
-                    size="sm"
                   />
                 </Stack>
                 <Group justify="flex-end" mt="lg">

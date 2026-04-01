@@ -1,0 +1,246 @@
+'use client';
+
+import { useState } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
+import { useRouter } from '@/i18n/navigation';
+import { getSkillIcon } from '@/lib/skillIcons';
+import {
+  Box,
+  Stack,
+  Avatar,
+  Text,
+  Button,
+  Group,
+  Badge,
+} from '@mantine/core';
+import {
+  IconMapPin,
+  IconCalendar,
+  IconVolume,
+  IconVolumeOff,
+  IconTrash,
+} from '@tabler/icons-react';
+import { modals } from '@mantine/modals';
+import { messagingService } from '@/services/messaging';
+import type { Conversation } from '@/types';
+import dayjs from 'dayjs';
+
+interface ConversationDetailsProps {
+  conversation: Conversation;
+  currentUserId: number;
+  onMuteToggle?: () => void;
+  onDelete?: () => void;
+}
+
+export function ConversationDetails({
+  conversation,
+  currentUserId,
+  onMuteToggle,
+  onDelete,
+}: ConversationDetailsProps) {
+  const t = useTranslations();
+  const router = useRouter();
+  const locale = useLocale();
+  const [isTogglingMute, setIsTogglingMute] = useState(false);
+
+  // Determine the other user
+  const otherUser =
+    currentUserId === conversation.user1.id
+      ? conversation.user2
+      : conversation.user1;
+
+  const isMuted =
+    currentUserId === conversation.user1.id
+      ? conversation.user1_muted
+      : conversation.user2_muted;
+
+  const handleToggleMute = async () => {
+    setIsTogglingMute(true);
+    try {
+      await messagingService.toggleMute(conversation.id);
+      if (onMuteToggle) {
+        onMuteToggle();
+      }
+    } catch (error) {
+      console.error('Failed to toggle mute:', error);
+    } finally {
+      setIsTogglingMute(false);
+    }
+  };
+
+  const handleDelete = () => {
+    modals.openConfirmModal({
+      title: t('messaging.deleteConfirm'),
+      children: (
+        <Text size="sm">
+          {t('messaging.deleteConfirmText')}
+        </Text>
+      ),
+      labels: { confirm: t('common.delete'), cancel: t('common.cancel') },
+      confirmProps: { color: 'red' },
+      onConfirm: async () => {
+        try {
+          await messagingService.deleteConversation(conversation.id);
+          if (onDelete) {
+            onDelete();
+          }
+          router.push('/messages');
+        } catch (error) {
+          console.error('Failed to delete conversation:', error);
+        }
+      },
+    });
+  };
+
+  return (
+    <Box
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        backgroundColor: 'white',
+        borderLeft: '1px solid #e0e0e0',
+      }}
+    >
+      {/* Header */}
+      <Box p="lg" style={{ borderBottom: '1px solid #e0e0e0' }}>
+        <Text fw={700} size="lg">
+          {t('messaging.details')}
+        </Text>
+      </Box>
+
+      {/* Profile Section */}
+      <Box p="lg" style={{ textAlign: 'center', borderBottom: '1px solid #e0e0e0' }}>
+        <Stack align="center" gap="md">
+          <Avatar
+            src={otherUser.profile_picture}
+            size={120}
+            radius="xl"
+            color="blue"
+          >
+            {!otherUser.profile_picture &&
+              `${otherUser.first_name[0]}${otherUser.last_name[0]}`}
+          </Avatar>
+
+          <Box>
+            <Text fw={700} size="lg">
+              {otherUser.first_name} {otherUser.last_name}
+            </Text>
+
+            {otherUser.address && (
+              <Group justify="center" gap="xs" mt="xs">
+                <IconMapPin size={14} color="var(--mantine-color-gray-6)" />
+                <Text size="sm" c="dimmed">
+                  {otherUser.address.city}
+                  {otherUser.address.country && `, ${otherUser.address.country.name}`}
+                </Text>
+              </Group>
+            )}
+          </Box>
+
+          <Button
+            variant="outline"
+            onClick={() => router.push(`/profile/${otherUser.id}`)}
+            fullWidth
+          >
+            {t('messaging.viewFullProfile')}
+          </Button>
+        </Stack>
+      </Box>
+
+      {/* User Info Section */}
+      <Box p="lg" style={{ borderBottom: '1px solid #e0e0e0' }}>
+        <Stack gap="md">
+          <Box>
+            <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb="xs">
+              {t('messaging.about')}
+            </Text>
+
+            {otherUser.bio && (
+              <Text size="sm" mb="sm">
+                {otherUser.bio}
+              </Text>
+            )}
+
+            <Stack gap="xs">
+              <Group gap="xs">
+                <IconCalendar size={16} color="var(--mantine-color-gray-6)" />
+                <Text size="sm" c="dimmed">
+                  {t('messaging.memberSince', { date: dayjs().format('MMM YYYY') })}
+                </Text>
+              </Group>
+            </Stack>
+          </Box>
+
+          {/* Skills */}
+          {otherUser.skills && otherUser.skills.length > 0 && (
+            <Box>
+              <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb="xs">
+                {t('messaging.skills')}
+              </Text>
+              <Group gap="xs">
+                {otherUser.skills.slice(0, 5).map((skill, index) => {
+                  const key = `display_name_${locale}` as keyof typeof skill;
+                  const SkillIcon = getSkillIcon(skill.icon);
+                  return (
+                    <Badge key={skill.code || index} variant="light" size="sm" leftSection={<SkillIcon size={12} />}>
+                      {(skill[key] as string) || skill.display_name_en || skill.code}
+                    </Badge>
+                  );
+                })}
+                {otherUser.skills.length > 5 && (
+                  <Badge variant="light" size="sm" c="dimmed">
+                    {t('messaging.more', { count: otherUser.skills.length - 5 })}
+                  </Badge>
+                )}
+              </Group>
+            </Box>
+          )}
+
+          {/* Languages */}
+          {otherUser.languages && otherUser.languages.length > 0 && (
+            <Box>
+              <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb="xs">
+                {t('messaging.languages')}
+              </Text>
+              <Group gap="xs">
+                {otherUser.languages.map((language, index) => (
+                  <Badge key={language.code || index} variant="outline" size="sm">
+                    {language.name}
+                  </Badge>
+                ))}
+              </Group>
+            </Box>
+          )}
+        </Stack>
+      </Box>
+
+      {/* Actions Section */}
+      <Box p="lg" style={{ marginTop: 'auto' }}>
+        <Stack gap="sm">
+          <Button
+            variant="outline"
+            leftSection={
+              isMuted ? <IconVolume size={16} /> : <IconVolumeOff size={16} />
+            }
+            onClick={handleToggleMute}
+            loading={isTogglingMute}
+            fullWidth
+          >
+            {isMuted ? t('messaging.unmuteConversation') : t('messaging.muteConversation')}
+          </Button>
+
+          <Button
+            variant="outline"
+            color="red"
+            leftSection={<IconTrash size={16} />}
+            onClick={handleDelete}
+            fullWidth
+          >
+            {t('messaging.deleteConversation')}
+          </Button>
+        </Stack>
+      </Box>
+    </Box>
+  );
+}

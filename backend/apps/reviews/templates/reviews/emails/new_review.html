@@ -1,0 +1,43 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Nouvel avis - Ecobilda{% endblock %}
+
+{% block content %}
+<h1>Vous avez re&ccedil;u un avis</h1>
+
+<p>Bonjour {{ receiver_name }},</p>
+
+<p>
+    <strong>{{ writer_name }}</strong> vous a laiss&eacute; un avis sur Ecobilda !
+</p>
+
+<div class="message-box">
+    <div class="rating">{{ rating }}/5</div>
+    <p>{{ feedback }}</p>
+</div>
+
+<p>Consultez votre profil pour voir cet avis :</p>
+
+<!-- CTA Button -->
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td align="center" class="button-td">
+            <!--[if mso]>
+            <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="{{ profile_url }}" style="height:48px;v-text-anchor:middle;width:220px;" arcsize="17%" fillcolor="#70A771">
+            <center style="color:#ffffff;font-size:15px;font-weight:600;">Voir mon profil</center>
+            </v:roundrect>
+            <![endif]-->
+            <!--[if !mso]><!-->
+            <a href="{{ profile_url }}" class="button">Voir mon profil</a>
+            <!--<![endif]-->
+        </td>
+    </tr>
+</table>
+
+<p class="text-small">
+    Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :
+</p>
+<p class="fallback-url">{{ profile_url }}</p>
+
+<p class="closing">&Agrave; bient&ocirc;t sur Ecobilda !</p>
+{% endblock %}

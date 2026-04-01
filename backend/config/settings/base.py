@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'apps.messaging',
     'apps.reviews',
     'apps.notifications',
+    'apps.emails',
     'apps.favorites',
     'apps.administration',
 ]
@@ -159,14 +160,6 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
-
-# Frontend URL (for password reset emails, etc.)
-FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173')
-
-# Email Configuration
-EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@ecobilda.org')
 
 
 # Default primary key field type
@@ -316,7 +309,12 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@ecobilda.org')
 
 # Frontend URL (for email links)
-FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173')
+FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:3000')
+
+# Microsoft Graph API (for Graph email backend)
+MS_GRAPH_TENANT_ID = config('MS_GRAPH_TENANT_ID', default='')
+MS_GRAPH_CLIENT_ID = config('MS_GRAPH_CLIENT_ID', default='')
+MS_GRAPH_CLIENT_SECRET = config('MS_GRAPH_CLIENT_SECRET', default='')
 
 
 # AWS S3 Configuration (Media Storage)

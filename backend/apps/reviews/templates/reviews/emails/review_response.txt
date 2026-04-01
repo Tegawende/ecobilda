@@ -1,0 +1,21 @@
+Ecobilda - Reponse a votre avis
+
+Bonjour {{ writer_name }},
+
+{{ receiver_name }} a repondu a l'avis que vous lui avez laisse sur Ecobilda.
+
+---
+Votre avis :
+{{ original_feedback }}
+
+Sa reponse :
+{{ response }}
+---
+
+Voir le profil :
+{{ profile_url }}
+
+A bientot sur Ecobilda !
+
+---
+(c) 2026 Ecobilda. Tous droits reserves.

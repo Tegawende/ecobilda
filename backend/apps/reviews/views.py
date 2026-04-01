@@ -113,6 +113,20 @@ class ReviewViewSet(viewsets.ModelViewSet):
         receiver.average_rating = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
         receiver.save(update_fields=['review_count', 'average_rating'])
 
+        # Create in-app notification
+        from apps.notifications.models import Notification, NotificationType
+        Notification.objects.create(
+            recipient=receiver,
+            type=NotificationType.REVIEW,
+            title=f'New review from {request.user.first_name} {request.user.last_name}',
+            message=f'{review.rating}/5 - {review.feedback[:200]}' + ('...' if len(review.feedback) > 200 else ''),
+            link_url=f'/profile',
+        )
+
+        # Send email notification (async via Celery)
+        from apps.messaging.tasks import send_review_notification
+        send_review_notification.delay(review.id)
+
         # Return full review with nested data
         return Response(
             ReviewSerializer(review, context={'request': request}).data,
@@ -190,6 +204,20 @@ class ReviewViewSet(viewsets.ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         review = serializer.save()
+
+        # Create in-app notification for the review writer
+        from apps.notifications.models import Notification, NotificationType
+        Notification.objects.create(
+            recipient=review.writer,
+            type=NotificationType.REVIEW,
+            title=f'{review.receiver.first_name} {review.receiver.last_name} responded to your review',
+            message=review.response[:200] + ('...' if len(review.response) > 200 else ''),
+            link_url=f'/users/{review.receiver.id}',
+        )
+
+        # Send email notification (async via Celery)
+        from apps.messaging.tasks import send_review_response_notification
+        send_review_response_notification.delay(review.id)
 
         return Response(
             ReviewSerializer(review, context={'request': request}).data

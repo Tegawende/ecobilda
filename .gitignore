@@ -100,4 +100,4 @@ mobile/
 frontend-old/
 
 # Next.js build
-frontend/.next/
+.next/

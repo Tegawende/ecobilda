@@ -21,6 +21,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.core.mail import send_mail
 from django.conf import settings
+from django.template.loader import render_to_string
 
 from .serializers import (
     CustomTokenObtainPairSerializer,
@@ -70,13 +71,25 @@ class RegisterView(generics.CreateAPIView):
         verify_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
 
         # Send verification email
-        send_mail(
-            subject='Verify your Ecobilda account',
-            message=f'Welcome to Ecobilda! Please verify your email by clicking this link: {verify_url}',
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email],
-            fail_silently=True,
-        )
+        try:
+            email_context = {
+                'user_name': user.first_name or user.email,
+                'verify_url': verify_url,
+                'frontend_url': settings.FRONTEND_URL,
+            }
+            html_message = render_to_string('emails/auth/verify_email.html', email_context)
+            plain_message = render_to_string('emails/auth/verify_email.txt', email_context)
+            send_mail(
+                subject='Ecobilda - V\u00e9rification de votre adresse email',
+                message=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error("Failed to send verification email to %s: %s", user.email, str(e))
 
         return Response({
             'message': 'Registration successful. Please check your email to verify your account.',
@@ -163,12 +176,20 @@ class PasswordResetRequestView(APIView):
             # In production, this should be the frontend URL
             reset_url = f"{settings.FRONTEND_URL}/reset-password/{uid}/{token}/"
 
-            # Send email (TODO: use Celery in production)
+            # Send password reset email
+            email_context = {
+                'user_name': user.first_name or user.email,
+                'reset_url': reset_url,
+                'frontend_url': settings.FRONTEND_URL,
+            }
+            html_message = render_to_string('emails/auth/password_reset.html', email_context)
+            plain_message = render_to_string('emails/auth/password_reset.txt', email_context)
             send_mail(
-                subject='Reset Your Ecobilda Password',
-                message=f'Click the link to reset your password: {reset_url}',
+                subject='Ecobilda - R\u00e9initialisation de mot de passe',
+                message=plain_message,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[user.email],
+                html_message=html_message,
                 fail_silently=False,
             )
         except User.DoesNotExist:
@@ -327,9 +348,20 @@ def google_login_view(request):
             user.set_unusable_password()
             user.save()
         else:
+            # Existing user logging in via Google: verify email if needed
+            update_fields = []
             if not user.email_verified:
                 user.email_verified = True
-                user.save(update_fields=['email_verified'])
+                update_fields.append('email_verified')
+            # Update name from Google if user has no first/last name
+            if not user.first_name and first_name:
+                user.first_name = first_name
+                update_fields.append('first_name')
+            if not user.last_name and last_name:
+                user.last_name = last_name
+                update_fields.append('last_name')
+            if update_fields:
+                user.save(update_fields=update_fields)
 
         # Save Google profile picture as profile_picture_url if user has no picture
         if picture_url and not user.profile_picture:
@@ -401,7 +433,7 @@ def verify_email_view(request):
 @permission_classes([AllowAny])
 def check_email_view(request):
     """
-    Check if an email already exists.
+    Check if an email already exists and how the account was created.
 
     POST /api/auth/check-email/
     Body: { "email": "..." }
@@ -410,8 +442,17 @@ def check_email_view(request):
     if not email:
         return Response({'error': 'Email is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    exists = User.objects.filter(email__iexact=email).exists()
-    return Response({'exists': exists}, status=status.HTTP_200_OK)
+    try:
+        user = User.objects.get(email__iexact=email)
+        return Response({
+            'exists': True,
+            'has_password': user.has_usable_password(),
+        }, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({
+            'exists': False,
+            'has_password': False,
+        }, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])

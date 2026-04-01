@@ -24,8 +24,9 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-# Email backend (console for development)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Email backend: use Graph backend from .env if configured, otherwise console
+# To test real email sending in dev, set EMAIL_BACKEND in .env
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Less strict CORS for development
 CORS_ALLOW_ALL_ORIGINS = True
