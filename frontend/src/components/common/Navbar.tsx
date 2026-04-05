@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
-import { Burger, Group, Menu, Avatar, Drawer, Stack, Divider, Anchor, Button } from '@mantine/core';
+import { Burger, Group, Menu, Avatar, Drawer, Stack, Divider, Anchor, Button, Container } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconUser,
@@ -56,8 +56,8 @@ export function Navbar() {
         : 'bg-white/95 backdrop-blur-md shadow-sm'
         }`}
     >
-      <div className="h-full mx-auto px-3 sm:px-5 lg:px-8">
-        <div className="flex justify-between items-center h-full">
+      <Container size="xl" h="100%" px={{ base: 'xs', sm: 'sm', lg: 'lg' }}>
+        <Group justify="space-between" h="100%">
           <Link
             href={isAuthenticated ? '/projects' : '/'}
             className="flex items-center no-underline gap-2 z-50 relative"
@@ -86,7 +86,7 @@ export function Navbar() {
                   <Menu shadow="md" width={220} position="bottom-end">
                     <Menu.Target>
                       <Avatar
-                        src={user?.profile_picture || null}
+                        src={user?.profilePictureUrl || user?.profilePicture || null}
                         radius="xl"
                         size={40}
                         style={{ cursor: 'pointer', border: '2px solid transparent' }}
@@ -146,18 +146,18 @@ export function Navbar() {
               <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" color={isTransparent ? 'white' : 'black'} />
             </div>
           </Group>
-        </div>
-      </div>
+        </Group>
+      </Container>
 
       {/* Mobile Drawer */}
       <Drawer opened={opened} onClose={close} title="" withCloseButton={false} padding="md" size="md">
         <Stack gap="md">
-          <div className="flex justify-between items-center mb-6">
+          <Group justify="space-between" mb="lg">
             <Link href="/" onClick={close}>
               <img src="/images/logo-black.png" alt="Ecobilda" className="h-10 w-auto object-contain" />
             </Link>
             <Burger opened={opened} onClick={toggle} size="sm" />
-          </div>
+          </Group>
 
           <Button
             component={Link}

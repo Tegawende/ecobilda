@@ -13,6 +13,7 @@ import {
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { IconSearch } from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import type { DateValue } from '@mantine/dates';
 
@@ -22,6 +23,7 @@ interface SearchParams {
 }
 
 export function SearchBar() {
+  const t = useTranslations();
   const router = useRouter();
   const [searchParams, setSearchParams] = useState<SearchParams>({
     location: '',
@@ -65,10 +67,10 @@ export function SearchBar() {
           style={{ flex: '1 1 55%', minWidth: 220 }}
         >
           <Text size="xs" fw={600} c="dimmed" mb={2}>
-            Location
+            {t('search.location')}
           </Text>
           <TextInput
-            placeholder="Where are you going?"
+            placeholder={t('search.whereTo')}
             variant="unstyled"
             value={searchParams.location}
             onChange={(e) => setSearchParams({ ...searchParams, location: e.currentTarget.value })}
@@ -95,11 +97,11 @@ export function SearchBar() {
           style={{ flex: '1 1 35%', minWidth: 200 }}
         >
           <Text size="xs" fw={600} c="dimmed" mb={2}>
-            Dates
+            {t('search.dates')}
           </Text>
           <DatePickerInput
             type="range"
-            placeholder="Add dates"
+            placeholder={t('search.addDates')}
             variant="unstyled"
             value={searchParams.dateRange || undefined}
             onChange={(value) => setSearchParams({ ...searchParams, dateRange: value || null })}
@@ -130,7 +132,7 @@ export function SearchBar() {
             height: 'calc(100% - 12px)',
           }}
         >
-          Search
+          {t('search.search')}
         </Button>
       </Group>
     </Paper>

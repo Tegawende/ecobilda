@@ -165,7 +165,7 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
       // Add new markers
       projects.forEach(project => {
         if (!project.address?.latitude || !project.address?.longitude) {
-          console.warn(`Project ${project.id} missing coordinates:`, {
+          console.warn(`Project ${project._id} missing coordinates:`, {
             hasAddress: !!project.address,
             latitude: project.address?.latitude,
             longitude: project.address?.longitude,
@@ -180,8 +180,8 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
           el.style.height = '40px';
           el.style.borderRadius = '50%';
           el.style.cursor = 'pointer';
-          el.style.backgroundImage = project.images?.[0]?.image
-            ? `url(${project.images[0].image})`
+          el.style.backgroundImage = project.images?.[0]?.url
+            ? `url(${project.images[0].url})`
             : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
           el.style.backgroundSize = 'cover';
           el.style.backgroundPosition = 'center';
@@ -195,10 +195,10 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
                 <div style="padding: 8px; min-width: 200px;">
                   <h3 style="font-weight: bold; margin-bottom: 4px;">${project.title}</h3>
                   <p style="color: #666; font-size: 14px; margin-bottom: 8px;">
-                    ${project.address.city}, ${project.address.country.name}
+                    ${project.address?.city ?? ''}, ${project.address?.country?.name ?? ''}
                   </p>
                   <p style="font-size: 12px; color: #888;">
-                    ${project.project_type === 'PERM' ? 'Permaculture' : 'Natural Building'}
+                    ${project.projectType === 'PERM' ? 'Permaculture' : 'Natural Building'}
                   </p>
                 </div>
               `)
@@ -207,12 +207,12 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
 
           // Navigate to project on marker click
           el.addEventListener('click', () => {
-            router.push(`/projects/${project.id}`);
+            router.push(`/projects/${project._id}`);
           });
 
           markersRef.current.push(marker);
         } catch (error) {
-          console.warn('Error adding marker for project:', project.id, error);
+          console.warn('Error adding marker for project:', project._id, error);
         }
       });
 

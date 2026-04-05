@@ -28,8 +28,8 @@ export function ProjectGallery({ images, title }: ProjectGalleryProps) {
 
   // Sort images: cover first, then by order
   const sortedImages = [...images].sort((a, b) => {
-    if (a.is_cover) return -1;
-    if (b.is_cover) return 1;
+    if (a.order === 0) return -1;
+    if (b.order === 0) return 1;
     return a.order - b.order;
   });
 
@@ -77,7 +77,7 @@ export function ProjectGallery({ images, title }: ProjectGalleryProps) {
           onClick={() => handleImageClick(0)}
         >
           <Image
-            src={sortedImages[0].image}
+            src={sortedImages[0].url}
             alt={`${title} - Main`}
             h="100%"
             fit="cover"
@@ -88,7 +88,7 @@ export function ProjectGallery({ images, title }: ProjectGalleryProps) {
         {/* Thumbnail Grid */}
         {sortedImages.slice(1, 5).map((image, index) => (
           <Box
-            key={image.id}
+            key={image._id}
             pos="relative"
             style={{
               cursor: 'pointer',
@@ -98,7 +98,7 @@ export function ProjectGallery({ images, title }: ProjectGalleryProps) {
             onClick={() => handleImageClick(index + 1)}
           >
             <Image
-              src={image.image}
+              src={image.url}
               alt={`${title} - ${index + 2}`}
               h="100%"
               fit="cover"
@@ -191,7 +191,7 @@ export function ProjectGallery({ images, title }: ProjectGalleryProps) {
           {/* Main Image */}
           <Center h="calc(100vh - 100px)" p="md">
             <Image
-              src={sortedImages[selectedImageIndex].image}
+              src={sortedImages[selectedImageIndex].url}
               alt={`${title} - ${selectedImageIndex + 1}`}
               fit="contain"
               mah="85vh"
@@ -216,7 +216,7 @@ export function ProjectGallery({ images, title }: ProjectGalleryProps) {
             >
               {sortedImages.map((image, index) => (
                 <UnstyledButton
-                  key={image.id}
+                  key={image._id}
                   onClick={() => setSelectedImageIndex(index)}
                   style={{
                     width: 64,
@@ -229,7 +229,7 @@ export function ProjectGallery({ images, title }: ProjectGalleryProps) {
                     transition: 'all 0.2s',
                   }}
                 >
-                  <Image src={image.image} alt={`Thumbnail ${index + 1}`} h={64} w={64} fit="cover" />
+                  <Image src={image.url} alt={`Thumbnail ${index + 1}`} h={64} w={64} fit="cover" />
                 </UnstyledButton>
               ))}
             </Group>

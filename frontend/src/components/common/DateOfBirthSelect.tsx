@@ -1,6 +1,8 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { NativeSelect, SimpleGrid, Stack, Text, Group } from '@mantine/core';
+import { IconAlertCircle } from '@tabler/icons-react';
 
 /** Returns max days for a given month (1-12) and year */
 function getDaysInMonth(month: number, year: number): number {
@@ -47,65 +49,72 @@ export function DateOfBirthSelect({ values, onChange, error, variant = 'auth' }:
 
   const displayError = error;
 
-  const selectClass = (hasError: boolean) =>
-    variant === 'auth'
-      ? `w-full px-2 py-3 rounded-lg border ${hasError ? 'border-red-500' : 'border-gray-400'} focus:border-black focus:ring-1 focus:ring-black/10 outline-none transition-all text-gray-900 bg-white appearance-none cursor-pointer`
-      : `w-full px-2 py-[9px] rounded-md border ${hasError ? 'border-red-500' : 'border-[#ced4da]'} focus:border-[#228be6] focus:ring-1 focus:ring-[#228be6]/20 outline-none transition-all text-gray-900 bg-white appearance-none cursor-pointer text-sm`;
+  const selectSize = variant === 'auth' ? 'md' : 'sm';
+  const selectRadius = variant === 'auth' ? 'md' : 'sm';
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <label className={variant === 'auth' ? 'text-xs text-gray-600 font-bold ml-1' : 'text-sm font-medium text-gray-900'}>
+    <Stack gap={6}>
+      <Text
+        size={variant === 'auth' ? 'xs' : 'sm'}
+        fw={variant === 'auth' ? 700 : 500}
+        c={variant === 'auth' ? 'dimmed' : 'dark'}
+        ml={variant === 'auth' ? 4 : 0}
+      >
         {t('auth.dateOfBirth')}
-      </label>
-      <div className="grid grid-cols-3 gap-2">
+      </Text>
+
+      <SimpleGrid cols={3} spacing="xs">
         {/* Day */}
-        <select
+        <NativeSelect
           value={values.dob_day}
           onChange={(e) => onChange('dob_day', e.target.value)}
-          className={selectClass(!!displayError)}
-        >
-          <option value="">{t('auth.dobDay')}</option>
-          {dayOptions.map((d) => (
-            <option key={d} value={String(d)}>{d}</option>
-          ))}
-        </select>
+          size={selectSize}
+          radius={selectRadius}
+          error={!!displayError}
+          data={[
+            { value: '', label: t('auth.dobDay') },
+            ...dayOptions.map((d) => ({ value: String(d), label: String(d) })),
+          ]}
+        />
 
         {/* Month */}
-        <select
+        <NativeSelect
           value={values.dob_month}
           onChange={(e) => onChange('dob_month', e.target.value)}
-          className={selectClass(!!displayError)}
-        >
-          <option value="">{t('auth.dobMonth')}</option>
-          {months.map((name, i) => (
-            <option key={i + 1} value={String(i + 1)}>{name}</option>
-          ))}
-        </select>
+          size={selectSize}
+          radius={selectRadius}
+          error={!!displayError}
+          data={[
+            { value: '', label: t('auth.dobMonth') },
+            ...months.map((name, i) => ({ value: String(i + 1), label: name })),
+          ]}
+        />
 
         {/* Year */}
-        <select
+        <NativeSelect
           value={values.dob_year}
           onChange={(e) => onChange('dob_year', e.target.value)}
-          className={selectClass(!!displayError)}
-        >
-          <option value="">{t('auth.dobYear')}</option>
-          {yearOptions.map((y) => (
-            <option key={y} value={String(y)}>{y}</option>
-          ))}
-        </select>
-      </div>
+          size={selectSize}
+          radius={selectRadius}
+          error={!!displayError}
+          data={[
+            { value: '', label: t('auth.dobYear') },
+            ...yearOptions.map((y) => ({ value: String(y), label: String(y) })),
+          ]}
+        />
+      </SimpleGrid>
 
       {displayError && (
-        <div className="flex items-center gap-1 mt-1 ml-1 text-xs text-red-600">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" /></svg>
-          <span>{displayError}</span>
-        </div>
+        <Group gap={4} mt={4} ml={4}>
+          <IconAlertCircle size={12} color="var(--mantine-color-red-6)" />
+          <Text size="xs" c="red">{displayError}</Text>
+        </Group>
       )}
 
       {variant === 'auth' && (
-        <p className="text-xs text-gray-500 ml-1">{t('auth.dobDesc')}</p>
+        <Text size="xs" c="dimmed" ml={4}>{t('auth.dobDesc')}</Text>
       )}
-    </div>
+    </Stack>
   );
 }
 

@@ -7,26 +7,19 @@ import type { Conversation, User } from '@/types';
 
 interface ConversationCardProps {
   conversation: Conversation;
-  currentUserId: number;
+  currentUserId: string;
   onClick?: () => void;
 }
 
 export function ConversationCard({ conversation, currentUserId, onClick }: ConversationCardProps) {
   // Determine the other user (recipient)
-  const otherUser: User =
-    conversation.user1.id === currentUserId ? conversation.user2 : conversation.user1;
+  const otherUser = conversation.otherUser;
 
   // Determine unread count for current user
-  const unreadCount =
-    conversation.user1.id === currentUserId
-      ? conversation.unread_count_user1
-      : conversation.unread_count_user2;
+  const unreadCount = conversation.unreadCount ?? 0;
 
   // Check if conversation is muted
-  const isMuted =
-    conversation.user1.id === currentUserId
-      ? conversation.user1_muted
-      : conversation.user2_muted;
+  const isMuted = conversation.isMuted ?? false;
 
   // Format timestamp
   const formatTime = (timestamp: string) => {
@@ -62,13 +55,13 @@ export function ConversationCard({ conversation, currentUserId, onClick }: Conve
       <Group align="flex-start" wrap="nowrap">
         {/* Profile Picture */}
         <Avatar
-          src={otherUser.profile_picture}
+          src={otherUser?.profilePictureUrl || otherUser?.profilePicture}
           size="md"
           radius="xl"
           color="blue"
         >
-          {!otherUser.profile_picture &&
-            `${otherUser.first_name[0]}${otherUser.last_name[0]}`}
+          {!otherUser?.profilePicture &&
+            `${otherUser?.firstName?.[0] ?? ''}${otherUser?.lastName?.[0] ?? ''}`}
         </Avatar>
 
         {/* Conversation Info */}
@@ -79,10 +72,10 @@ export function ConversationCard({ conversation, currentUserId, onClick }: Conve
               fw={unreadCount > 0 ? 600 : 500}
               c={unreadCount > 0 ? 'dark' : 'dimmed'}
             >
-              {otherUser.first_name} {otherUser.last_name}
+              {otherUser?.firstName} {otherUser?.lastName}
             </Text>
             <Text size="xs" c="dimmed">
-              {formatTime(conversation.last_message_at)}
+              {conversation.lastMessageAt ? formatTime(String(conversation.lastMessageAt)) : ''}
             </Text>
           </Group>
 
@@ -96,19 +89,9 @@ export function ConversationCard({ conversation, currentUserId, onClick }: Conve
               lineClamp={1}
               style={{ flex: 1 }}
             >
-              {conversation.last_message_text || 'No messages yet'}
+              {conversation.lastMessageText || 'No messages yet'}
             </Text>
           </Group>
-
-          {/* Location */}
-          {otherUser.address && (
-            <Group gap={4} mt={4}>
-              <IconMapPin size={12} color="gray" />
-              <Text size="xs" c="dimmed">
-                {otherUser.address.city}, {otherUser.address.country.code}
-              </Text>
-            </Group>
-          )}
         </Box>
 
         {/* Unread Badge */}
@@ -138,7 +121,7 @@ export function ConversationCard({ conversation, currentUserId, onClick }: Conve
 
   return (
     <Box
-      component={Link} href={`/messages/${conversation.id}`}
+      component={Link} href={`/messages/${conversation._id}`}
       p="md"
       bg={unreadCount > 0 ? 'blue.0' : 'white'}
       style={commonStyle}

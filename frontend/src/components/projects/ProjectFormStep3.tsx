@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from '@mantine/form';
 import { useTranslations, useLocale } from 'next-intl';
+import { getSkillIcon } from '@/lib/skillIcons';
 import {
   Stack,
   Title,
@@ -25,16 +26,16 @@ import {
   IconSmoking,
   IconStar
 } from '@tabler/icons-react';
-import { skillsService } from '@/services/skills';
+import { useSkills } from '@/hooks/useConvex';
 import type { ProjectFormData } from '@/app/[locale]/(protected)/create-project/CreateProjectClient';
-import type { Skill } from '@/types';
+import { getSkillDisplayName, type Skill } from '@/types';
 
 interface Step3FormData {
   skills: string[];
-  internet_provided: boolean;
-  family_friendly: boolean;
-  pets_allowed: boolean;
-  smoking_allowed: boolean;
+  internetProvided: boolean;
+  familyFriendly: boolean;
+  petsAllowed: boolean;
+  smokingAllowed: boolean;
 }
 
 interface ProjectFormStep3Props {
@@ -47,43 +48,23 @@ interface ProjectFormStep3Props {
 export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectFormStep3Props) {
   const t = useTranslations();
   const locale = useLocale();
-  const getSkillName = (skill: Skill) => {
-    const key = `display_name_${locale}` as keyof Skill;
-    return (skill[key] as string) || skill.display_name_en;
-  };
-  const [allSkills, setAllSkills] = useState<Skill[]>([]);
-  const [isLoadingSkills, setIsLoadingSkills] = useState(true);
+  const getSkillName = (skill: Skill) => getSkillDisplayName(skill, locale);
+  const { skills: allSkills, isLoading: isLoadingSkills } = useSkills(data.projectType as "PERM" | "NATB" | undefined);
 
   const form = useForm<Step3FormData>({
     initialValues: {
       skills: data.skills || [],
-      internet_provided: data.internet_provided || false,
-      family_friendly: data.family_friendly || false,
-      pets_allowed: data.pets_allowed || false,
-      smoking_allowed: data.smoking_allowed || false,
+      internetProvided: data.internetProvided || false,
+      familyFriendly: data.familyFriendly || false,
+      petsAllowed: data.petsAllowed || false,
+      smokingAllowed: data.smokingAllowed || false,
     },
     validate: {
       skills: (value) => (value.length === 0 ? t('createProject.step3.validation.skillsRequired') : null),
     },
   });
 
-  useEffect(() => {
-    const fetchSkills = async () => {
-      try {
-        const skillsData = await skillsService.getSkills({ category: data.project_type });
-        // Handle both array and paginated response
-        const skills = Array.isArray(skillsData) ? skillsData : (skillsData as any).results || [];
-        setAllSkills(skills);
-      } catch (error) {
-        console.error('Failed to fetch skills:', error);
-        setAllSkills([]); // Set empty array on error
-      } finally {
-        setIsLoadingSkills(false);
-      }
-    };
-
-    fetchSkills();
-  }, [data.project_type]);
+  // Skills are now loaded reactively via useSkills hook
 
   const toggleSkill = (skillCode: string) => {
     const currentSkills = form.values.skills;
@@ -118,14 +99,14 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
         <div>
           <Group mb="sm">
             <ThemeIcon size="lg" color="green" variant="light">
-              {data.project_type === 'PERM' ? (
+              {data.projectType === 'PERM' ? (
                 <IconPlant size={20} />
               ) : (
                 <IconHammer size={20} />
               )}
             </ThemeIcon>
             <Title order={3}>
-              {t('createProject.step3.skillsTitle', { type: data.project_type === 'PERM' ? t('createProject.step1.permaculture') : t('createProject.step1.naturalBuilding') })}
+              {t('createProject.step3.skillsTitle', { type: data.projectType === 'PERM' ? t('createProject.step1.permaculture') : t('createProject.step1.naturalBuilding') })}
             </Title>
           </Group>
           <Text size="sm" c="dimmed" mb="md">
@@ -157,16 +138,11 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
                       }}
                       onClick={() => toggleSkill(skill.code)}
                     >
-                      <Group wrap="nowrap" align="flex-start">
-                        <Text size="xl">{skill.icon}</Text>
-                        <Text fw={500} size="sm" style={{ flex: 1 }}>
+                      <Group wrap="nowrap" align="center">
+                        {(() => { const SkillIcon = getSkillIcon(skill.icon); return <SkillIcon size={22} className={isSelected ? 'text-eco-terracotta' : 'text-gray-500'} style={{ flexShrink: 0 }} />; })()}
+                        <Text fw={isSelected ? 600 : 500} size="sm" style={{ flex: 1 }}>
                           {getSkillName(skill)}
                         </Text>
-                        {isSelected && (
-                          <ThemeIcon color="eco-terracotta" variant="light" size="sm">
-                            <IconCheck size={14} />
-                          </ThemeIcon>
-                        )}
                       </Group>
                     </Card>
                   </Grid.Col>
@@ -200,7 +176,7 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
           <Stack gap="sm">
             <Card padding="md" withBorder>
               <Checkbox
-                {...form.getInputProps('internet_provided', { type: 'checkbox' })}
+                {...form.getInputProps('internetProvided', { type: 'checkbox' })}
                 label={
                   <div>
                     <Group gap="xs" mb={4}>
@@ -217,7 +193,7 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
 
             <Card padding="md" withBorder>
               <Checkbox
-                {...form.getInputProps('family_friendly', { type: 'checkbox' })}
+                {...form.getInputProps('familyFriendly', { type: 'checkbox' })}
                 label={
                   <div>
                     <Group gap="xs" mb={4}>
@@ -234,7 +210,7 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
 
             <Card padding="md" withBorder>
               <Checkbox
-                {...form.getInputProps('pets_allowed', { type: 'checkbox' })}
+                {...form.getInputProps('petsAllowed', { type: 'checkbox' })}
                 label={
                   <div>
                     <Group gap="xs" mb={4}>
@@ -251,7 +227,7 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
 
             <Card padding="md" withBorder>
               <Checkbox
-                {...form.getInputProps('smoking_allowed', { type: 'checkbox' })}
+                {...form.getInputProps('smokingAllowed', { type: 'checkbox' })}
                 label={
                   <div>
                     <Group gap="xs" mb={4}>

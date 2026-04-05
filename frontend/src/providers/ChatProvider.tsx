@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import logger from '@/lib/logger';
-import { getAuthTokens } from '@/services/api';
+import { getSessionToken } from '@/lib/convexClient';
 import { useAuth } from '@/providers/AuthProvider';
 import type { Message } from '@/types';
 
@@ -13,11 +13,11 @@ interface ChatContextType {
   /** Last message received via WebSocket (for any conversation) */
   lastMessage: Message | null;
   /** Send a message via WebSocket */
-  sendMessage: (conversationId: number, body: string) => boolean;
+  sendMessage: (conversationId: string, body: string) => boolean;
   /** Send typing indicator */
-  sendTyping: (conversationId: number) => void;
+  sendTyping: (conversationId: string) => void;
   /** Send stop typing indicator */
-  sendStopTyping: (conversationId: number) => void;
+  sendStopTyping: (conversationId: string) => void;
   /** Register a listener for incoming messages */
   addMessageListener: (callback: ChatMessageListener) => () => void;
 }
@@ -66,7 +66,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     });
   }, []);
 
-  const sendMessage = useCallback((conversationId: number, body: string): boolean => {
+  const sendMessage = useCallback((conversationId: string, body: string): boolean => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
         type: 'send_message',
@@ -78,7 +78,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     return false;
   }, []);
 
-  const sendTyping = useCallback((conversationId: number) => {
+  const sendTyping = useCallback((conversationId: string) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
         type: 'typing',
@@ -87,7 +87,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     }
   }, []);
 
-  const sendStopTyping = useCallback((conversationId: number) => {
+  const sendStopTyping = useCallback((conversationId: string) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
         type: 'stop_typing',
@@ -103,8 +103,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       return;
     }
 
-    const tokens = getAuthTokens();
-    if (!tokens?.access) return;
+    const sessionToken = getSessionToken();
+    if (!sessionToken) return;
+    const tokens = { access: sessionToken };
 
     isConnecting.current = true;
 

@@ -3,12 +3,14 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
-import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { theme } from '@/theme';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { GoogleOAuthWrapper } from '@/providers/GoogleOAuthWrapper';
+import { ConvexClientProvider } from '@/providers/ConvexClientProvider';
+import { SetLocale } from './SetLocale';
 import '@mantine/core/styles.css';
 import '@mantine/carousel/styles.css';
 import '@mantine/dates/styles.css';
@@ -36,32 +38,20 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <head>
-        {/* ColorSchemeScript removed - causes script warning in Next.js 16 */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
-        <link rel="icon" href="/images/favicon.png" />
-        <title>Ecobilda - Natural Building Everywhere</title>
-      </head>
-      <body>
-        <NextIntlClientProvider messages={messages}>
-          <MantineProvider theme={theme}>
-            <Notifications position="top-right" />
-            <GoogleOAuthWrapper>
-              <QueryProvider>
-                <AuthProvider>
-                  {children}
-                </AuthProvider>
-              </QueryProvider>
-            </GoogleOAuthWrapper>
-          </MantineProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider messages={messages}>
+      <MantineProvider theme={theme}>
+        <Notifications position="top-right" />
+        <ConvexClientProvider>
+          <GoogleOAuthWrapper>
+            <QueryProvider>
+              <AuthProvider>
+                <SetLocale locale={locale} />
+                {children}
+              </AuthProvider>
+            </QueryProvider>
+          </GoogleOAuthWrapper>
+        </ConvexClientProvider>
+      </MantineProvider>
+    </NextIntlClientProvider>
   );
 }

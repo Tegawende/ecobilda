@@ -2,6 +2,7 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
+import { Container, SimpleGrid, Stack, Group, Text, Anchor, Divider, NativeSelect, Box } from '@mantine/core';
 import { IconBrandTwitter, IconBrandInstagram, IconBrandFacebook, IconWorld } from '@tabler/icons-react';
 
 export function Footer() {
@@ -38,68 +39,78 @@ export function Footer() {
 
   const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newLocale = event.target.value;
-    // Use router to switch locale
     router.push('/', { locale: newLocale as any });
   };
 
   return (
     <footer className="bg-white border-t border-gray-200 pt-16 pb-8">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
-          <div className="lg:col-span-2">
-            <div className="flex gap-2">
-              <a href="https://www.facebook.com/Ecobilda/" target="_blank" rel="noopener noreferrer" className="p-2 text-gray-400 hover:text-eco-primary transition-colors">
+      <Container size="xl" px={{ base: 'lg', lg: 'xl' }}>
+        <SimpleGrid cols={{ base: 1, md: 2, lg: 5 }} spacing="xl" mb="xl">
+          <Box className="lg:col-span-2">
+            <Group gap="xs">
+              <Anchor href="https://www.facebook.com/Ecobilda/" target="_blank" rel="noopener noreferrer" c="gray.4" className="hover:text-eco-primary transition-colors" p={8}>
                 <IconBrandFacebook size={20} stroke={1.5} />
-              </a>
-              <a href="https://twitter.com/Ecobilda" target="_blank" rel="noopener noreferrer" className="p-2 text-gray-400 hover:text-eco-primary transition-colors">
+              </Anchor>
+              <Anchor href="https://twitter.com/Ecobilda" target="_blank" rel="noopener noreferrer" c="gray.4" className="hover:text-eco-primary transition-colors" p={8}>
                 <IconBrandTwitter size={20} stroke={1.5} />
-              </a>
-              <a href="https://www.instagram.com/ecobilda/" target="_blank" rel="noopener noreferrer" className="p-2 text-gray-400 hover:text-eco-primary transition-colors">
+              </Anchor>
+              <Anchor href="https://www.instagram.com/ecobilda/" target="_blank" rel="noopener noreferrer" c="gray.4" className="hover:text-eco-primary transition-colors" p={8}>
                 <IconBrandInstagram size={20} stroke={1.5} />
-              </a>
-            </div>
-          </div>
+              </Anchor>
+            </Group>
+          </Box>
 
           {footerGroups.map((group) => (
-            <div key={group.title} className="flex flex-col gap-4">
-              <h4 className="font-bold text-gray-900">{group.title}</h4>
-              <div className="flex flex-col gap-2">
+            <Stack key={group.title} gap="sm">
+              <Text fw={700} c="dark">{group.title}</Text>
+              <Stack gap="xs">
                 {group.links.map((link) => (
-                  <Link
+                  <Anchor
                     key={link.label}
+                    component={Link}
                     href={link.link}
-                    className="text-gray-500 hover:text-eco-primary transition-colors text-sm"
+                    c="dimmed"
+                    size="sm"
+                    className="hover:text-eco-primary transition-colors"
                   >
                     {link.label}
-                  </Link>
+                  </Anchor>
                 ))}
-              </div>
-            </div>
+              </Stack>
+            </Stack>
           ))}
-        </div>
+        </SimpleGrid>
 
-        <div className="border-t border-gray-100 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-gray-400">
+        <Divider color="gray.1" />
+
+        <Group justify="space-between" mt="lg" wrap="wrap" gap="md">
+          <Text size="sm" c="gray.4">
             {t('footer.copyright', { year: currentYear })}
-          </p>
+          </Text>
 
-          <div className="relative">
-            <IconWorld size={18} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-            <select
-              value={locale}
-              onChange={handleLanguageChange}
-              className="appearance-none bg-transparent border border-transparent text-gray-700 py-1.5 pl-9 pr-8 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-eco-primary cursor-pointer hover:bg-gray-50 transition-colors"
-            >
-              <option value="en">English</option>
-              <option value="fr">Français</option>
-              <option value="es">Español</option>
-              <option value="de">Deutsch</option>
-              <option value="pt">Português</option>
-              <option value="nl">Nederlands</option>
-            </select>
-          </div>
-        </div>
-      </div>
+          <NativeSelect
+            value={locale}
+            onChange={handleLanguageChange}
+            leftSection={<IconWorld size={18} />}
+            size="xs"
+            variant="unstyled"
+            data={[
+              { value: 'en', label: 'English' },
+              { value: 'fr', label: 'Français' },
+              { value: 'es', label: 'Español' },
+              { value: 'de', label: 'Deutsch' },
+              { value: 'pt', label: 'Português' },
+              { value: 'nl', label: 'Nederlands' },
+            ]}
+            styles={{
+              input: {
+                cursor: 'pointer',
+              },
+            }}
+            className="hover:bg-gray-50 rounded-md transition-colors"
+          />
+        </Group>
+      </Container>
     </footer>
   );
 }

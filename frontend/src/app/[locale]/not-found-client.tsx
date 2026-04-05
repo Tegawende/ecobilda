@@ -4,52 +4,61 @@ import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { IconHome, IconArrowLeft, IconSearch } from '@tabler/icons-react';
 import { Layout } from '@/components/common/Layout';
+import { Center, Stack, Title, Text, Button, Box } from '@mantine/core';
 
 export function NotFoundClient() {
     const t = useTranslations();
 
     return (
         <Layout>
-            <div className="min-h-[70vh] flex items-center justify-center px-6">
-                <div className="text-center max-w-lg">
+            <Center mih="70vh" px="md">
+                <Stack align="center" maw={512}>
                     {/* 404 Illustration */}
-                    <div className="relative mb-8">
+                    <Box pos="relative" mb="md">
                         <div className="text-[150px] sm:text-[200px] font-display font-bold text-eco-primary/10 leading-none select-none">
                             404
                         </div>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-eco-primary/10 flex items-center justify-center">
+                        <Center pos="absolute" top={0} left={0} right={0} bottom={0}>
+                            <Center className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-eco-primary/10">
                                 <IconSearch size={48} className="text-eco-primary" strokeWidth={1.5} />
-                            </div>
-                        </div>
-                    </div>
+                            </Center>
+                        </Center>
+                    </Box>
 
                     {/* Title & Description */}
-                    <h1 className="text-2xl sm:text-3xl font-display font-bold text-gray-900 mb-3">
+                    <Title order={1} ta="center" className="text-2xl sm:text-3xl font-display">
                         {t('errors.notFound.title') || 'Page not found'}
-                    </h1>
-                    <p className="text-gray-600 mb-8 text-base sm:text-lg">
+                    </Title>
+                    <Text c="dimmed" ta="center" size="lg">
                         {t('errors.notFound.description')}
-                    </p>
+                    </Text>
 
                     {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                        <Link href="/projects"
-                            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-eco-primary text-white font-semibold hover:bg-eco-primaryDark transition-all shadow-lg hover:-translate-y-0.5"
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
+                        <Button
+                            component={Link}
+                            href="/projects"
+                            leftSection={<IconHome size={18} />}
+                            radius="xl"
+                            size="md"
+                            className="bg-eco-primary hover:bg-eco-primaryDark shadow-lg hover:-translate-y-0.5 transition-all"
                         >
-                            <IconHome size={18} />
                             {t('errors.notFound.browseProjects')}
-                        </Link>
-                        <button
+                        </Button>
+                        <Button
+                            variant="outline"
+                            leftSection={<IconArrowLeft size={18} />}
+                            radius="xl"
+                            size="md"
+                            color="gray"
                             onClick={() => window.history.back()}
-                            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border-2 border-gray-300 text-gray-700 font-semibold hover:border-eco-primary hover:text-eco-primary transition-all"
+                            className="border-2 hover:border-eco-primary hover:text-eco-primary transition-all"
                         >
-                            <IconArrowLeft size={18} />
                             {t('errors.notFound.goBack')}
-                        </button>
+                        </Button>
                     </div>
-                </div>
-            </div>
+                </Stack>
+            </Center>
         </Layout>
     );
 }

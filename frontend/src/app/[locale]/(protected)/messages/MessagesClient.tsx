@@ -14,6 +14,17 @@ import {
   IconTrash,
   IconUser,
 } from '@tabler/icons-react';
+import {
+  ActionIcon,
+  Box,
+  Center,
+  Group,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+  UnstyledButton,
+} from '@mantine/core';
 import { Layout } from '@/components/common/Layout';
 import type { Conversation, Message } from '@/types';
 
@@ -25,43 +36,46 @@ function ConversationItem({
   onClick,
 }: {
   conversation: Conversation;
-  currentUserId: number;
+  currentUserId: string;
   isSelected: boolean;
   onClick: () => void;
 }) {
-  const otherUser = conversation.user1.id === currentUserId ? conversation.user2 : conversation.user1;
-  const unreadCount = conversation.user1.id === currentUserId ? conversation.unread_count_user1 : conversation.unread_count_user2;
+  const otherUser = conversation.otherUser;
+  const unreadCount = conversation.unreadCount ?? 0;
 
   return (
-    <button
+    <UnstyledButton
       onClick={onClick}
-      className={`w-full flex items-center gap-3 p-4 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 cursor-pointer ${isSelected ? 'bg-eco-brand-50' : ''}`}
+      className={`w-full border-b border-gray-100 hover:bg-gray-50 transition-colors ${isSelected ? 'bg-eco-brand-50' : ''}`}
+      p="md"
     >
-      <img
-        src={otherUser.profile_picture || undefined}
-        alt={`${otherUser.first_name} ${otherUser.last_name}`}
-        className="w-12 h-12 rounded-full object-cover border border-gray-200 flex-shrink-0"
-      />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between">
-          <p className={`font-semibold text-gray-900 truncate ${unreadCount > 0 ? 'text-eco-primary' : ''}`}>
-            {otherUser.first_name} {otherUser.last_name}
-          </p>
-          {unreadCount > 0 && (
-            <span className="w-5 h-5 bg-eco-primary text-white text-xs font-bold rounded-full flex items-center justify-center flex-shrink-0">
-              {unreadCount}
-            </span>
-          )}
-        </div>
-        <p className="text-sm text-gray-500 truncate mt-0.5">{conversation.last_message_text}</p>
-        <p className="text-xs text-gray-400 mt-1">
-          {new Date(conversation.last_message_at).toLocaleDateString('fr-FR', {
-            day: 'numeric',
-            month: 'short',
-          })}
-        </p>
-      </div>
-    </button>
+      <Group gap="sm" wrap="nowrap">
+        <img
+          src={otherUser?.profilePictureUrl || undefined}
+          alt={`${otherUser?.firstName} ${otherUser?.lastName}`}
+          className="w-12 h-12 rounded-full object-cover border border-gray-200 flex-shrink-0"
+        />
+        <Box className="flex-1 min-w-0">
+          <Group justify="space-between" wrap="nowrap">
+            <Text fw={600} truncate className={unreadCount > 0 ? 'text-eco-primary' : ''}>
+              {otherUser?.firstName} {otherUser?.lastName}
+            </Text>
+            {unreadCount > 0 && (
+              <Center className="w-5 h-5 bg-eco-primary text-white text-xs font-bold rounded-full flex-shrink-0">
+                {unreadCount}
+              </Center>
+            )}
+          </Group>
+          <Text size="sm" c="dimmed" truncate mt={2}>{conversation.lastMessageText}</Text>
+          <Text size="xs" c="dimmed" mt={4}>
+            {conversation.lastMessageAt ? new Date(conversation.lastMessageAt).toLocaleDateString('fr-FR', {
+              day: 'numeric',
+              month: 'short',
+            }) : ''}
+          </Text>
+        </Box>
+      </Group>
+    </UnstyledButton>
   );
 }
 
@@ -71,25 +85,27 @@ function MessageBubble({ message, isOwn }: { message: Message; isOwn: boolean })
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'} mb-3`}>
       {!isOwn && (
         <img
-          src={message.sender.profile_picture || undefined}
+          src={message.sender?.profilePictureUrl || undefined}
           alt=""
           className="w-8 h-8 rounded-full object-cover mr-2 mt-1 flex-shrink-0"
         />
       )}
-      <div
-        className={`max-w-[70%] px-4 py-2.5 rounded-2xl ${isOwn
+      <Box
+        className={`max-w-[70%] rounded-2xl ${isOwn
             ? 'bg-eco-primary text-white rounded-br-md'
             : 'bg-gray-100 text-gray-900 rounded-bl-md'
           }`}
+        px="md"
+        py="sm"
       >
-        <p className="text-sm leading-relaxed">{message.body}</p>
-        <p className={`text-xs mt-1 ${isOwn ? 'text-white/70' : 'text-gray-500'}`}>
-          {new Date(message.created_at).toLocaleTimeString('fr-FR', {
+        <Text size="sm" lh={1.6}>{message.body}</Text>
+        <Text size="xs" mt={4} className={isOwn ? 'text-white/70' : 'text-gray-500'}>
+          {message._creationTime ? new Date(message._creationTime).toLocaleTimeString('fr-FR', {
             hour: '2-digit',
             minute: '2-digit',
-          })}
-        </p>
-      </div>
+          }) : ''}
+        </Text>
+      </Box>
     </div>
   );
 }
@@ -121,38 +137,52 @@ function ConversationOptionsMenu({
       {/* Backdrop */}
       <div className="fixed inset-0 z-40" onClick={onClose} />
       {/* Menu */}
-      <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 z-50 overflow-hidden">
-        <Link href={profileLink}
-          className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+      <Box className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 z-50 overflow-hidden">
+        <UnstyledButton
+          component={Link}
+          href={profileLink}
+          className="w-full hover:bg-gray-50 transition-colors"
+          px="md"
+          py="sm"
           onClick={() => {
             onViewProfile();
             onClose();
           }}
         >
-          <IconUser size={18} />
-          <span className="text-sm font-medium">{t('messaging.viewProfile')}</span>
-        </Link>
-        <button
+          <Group gap="sm">
+            <IconUser size={18} className="text-gray-700" />
+            <Text size="sm" fw={500} c="dark">{t('messaging.viewProfile')}</Text>
+          </Group>
+        </UnstyledButton>
+        <UnstyledButton
           onClick={() => {
             onMute();
             onClose();
           }}
-          className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+          className="w-full hover:bg-gray-50 transition-colors"
+          px="md"
+          py="sm"
         >
-          {isMuted ? <IconBell size={18} /> : <IconBellOff size={18} />}
-          <span className="text-sm font-medium">{isMuted ? t('messaging.unmute') : t('messaging.mute')}</span>
-        </button>
-        <button
+          <Group gap="sm">
+            {isMuted ? <IconBell size={18} className="text-gray-700" /> : <IconBellOff size={18} className="text-gray-700" />}
+            <Text size="sm" fw={500} c="dark">{isMuted ? t('messaging.unmute') : t('messaging.mute')}</Text>
+          </Group>
+        </UnstyledButton>
+        <UnstyledButton
           onClick={() => {
             onDelete();
             onClose();
           }}
-          className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+          className="w-full hover:bg-red-50 transition-colors"
+          px="md"
+          py="sm"
         >
-          <IconTrash size={18} />
-          <span className="text-sm font-medium">{t('messaging.delete')}</span>
-        </button>
-      </div>
+          <Group gap="sm">
+            <IconTrash size={18} className="text-red-600" />
+            <Text size="sm" fw={500} c="red">{t('messaging.delete')}</Text>
+          </Group>
+        </UnstyledButton>
+      </Box>
     </>
   );
 }
@@ -166,10 +196,10 @@ function ChatView({
   conversations,
   currentUser,
 }: {
-  conversationId: number;
+  conversationId: string;
   onBack: () => void;
   messages: Message[];
-  onSendMessage: (conversationId: number, text: string) => void;
+  onSendMessage: (conversationId: string, text: string) => void;
   conversations: Conversation[];
   currentUser: any;
 }) {
@@ -177,12 +207,10 @@ function ChatView({
   const [message, setMessage] = useState('');
   const [showOptions, setShowOptions] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const conversation = conversations.find((c) => c.id === conversationId);
+  const conversation = conversations.find((c) => c._id === conversationId);
 
   const otherUser = conversation
-    ? conversation.user1.id === currentUser?.id
-      ? conversation.user2
-      : conversation.user1
+    ? conversation.otherUser
     : null;
 
   const handleSend = (e: React.FormEvent) => {
@@ -202,46 +230,54 @@ function ChatView({
 
   if (!conversation || !otherUser) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gray-50 text-gray-500">
-        Conversation not found
-      </div>
+      <Center className="flex-1 bg-gray-50">
+        <Text c="dimmed">{t('messaging.conversationNotFoundShort')}</Text>
+      </Center>
     );
   }
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <Stack gap={0} h="100%" bg="white">
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-gray-200 bg-white relative">
-        <button
+      <Group gap="sm" p="md" className="border-b border-gray-200 relative" wrap="nowrap">
+        <ActionIcon
+          variant="subtle"
+          color="gray"
+          radius="xl"
           onClick={onBack}
-          className="lg:hidden p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+          className="lg:hidden"
         >
           <IconArrowLeft size={20} />
-        </button>
-        <Link href={`/profile/${otherUser.id}`} className="cursor-pointer">
+        </ActionIcon>
+        <Link href={`/profile/${otherUser._id}`}>
           <img
-            src={otherUser.profile_picture || undefined}
+            src={otherUser?.profilePictureUrl || undefined}
             alt=""
             className="w-10 h-10 rounded-full object-cover border border-gray-200 hover:opacity-80 transition-opacity"
           />
         </Link>
-        <div className="flex-1">
-          <Link href={`/profile/${otherUser.id}`}
-            className="font-semibold text-gray-900 hover:text-eco-primary transition-colors cursor-pointer"
+        <Box className="flex-1">
+          <Text
+            component={Link}
+            href={`/profile/${otherUser._id}`}
+            fw={600}
+            className="hover:text-eco-primary transition-colors"
           >
-            {otherUser.first_name} {otherUser.last_name}
-          </Link>
-          <p className="text-xs text-gray-500">
-            {otherUser.address?.city}, {otherUser.address?.country?.name}
-          </p>
-        </div>
-        <div className="relative">
-          <button
+            {otherUser?.firstName} {otherUser?.lastName}
+          </Text>
+          <Text size="xs" c="dimmed">
+            {(otherUser as any)?.address?.city}{(otherUser as any)?.address?.country?.name ? `, ${(otherUser as any).address.country.name}` : ''}
+          </Text>
+        </Box>
+        <Box pos="relative">
+          <ActionIcon
+            variant="subtle"
+            color="gray"
+            radius="xl"
             onClick={() => setShowOptions(!showOptions)}
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
           >
-            <IconDotsVertical size={20} className="text-gray-500" />
-          </button>
+            <IconDotsVertical size={20} />
+          </ActionIcon>
           <ConversationOptionsMenu
             isOpen={showOptions}
             onClose={() => setShowOptions(false)}
@@ -249,43 +285,47 @@ function ChatView({
             onDelete={() => console.log('Delete conversation')}
             onViewProfile={() => { }}
             isMuted={isMuted}
-            profileLink={`/profile/${otherUser.id}`}
+            profileLink={`/profile/${otherUser._id}`}
           />
-        </div>
-      </div>
+        </Box>
+      </Group>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+      <Box className="flex-1 overflow-y-auto" p="md" bg="gray.0">
         {initialMessages.map((msg) => (
           <MessageBubble
-            key={msg.id}
+            key={msg._id}
             message={msg}
-            isOwn={msg.sender.id === currentUser?.id}
+            isOwn={msg.senderId === currentUser?._id}
           />
         ))}
-      </div>
+      </Box>
 
       {/* Input */}
-      <form onSubmit={handleSend} className="p-4 border-t border-gray-200 bg-white">
-        <div className="flex items-center gap-3">
-          <input
-            type="text"
+      <form onSubmit={handleSend}>
+        <Group gap="sm" p="md" className="border-t border-gray-200" wrap="nowrap">
+          <TextInput
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e) => setMessage(e.currentTarget.value)}
             onKeyDown={handleKeyDown}
             placeholder={t('messaging.placeholder')}
-            className="flex-1 px-4 py-3 rounded-full border border-gray-300 focus:border-eco-primary focus:ring-2 focus:ring-eco-primary/20 focus:outline-none transition-all"
+            radius="xl"
+            size="md"
+            className="flex-1"
+            styles={{ input: { border: '1px solid var(--mantine-color-gray-3)' } }}
           />
-          <button
+          <ActionIcon
             type="submit"
             disabled={!message.trim()}
-            className="w-12 h-12 rounded-full bg-eco-primary text-white flex items-center justify-center hover:bg-eco-primaryDark disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all"
+            size={48}
+            radius="xl"
+            className="bg-eco-primary text-white hover:bg-eco-primaryDark disabled:opacity-50 transition-all"
           >
             <IconSend size={20} />
-          </button>
-        </div>
+          </ActionIcon>
+        </Group>
       </form>
-    </div>
+    </Stack>
   );
 }
 
@@ -313,21 +353,21 @@ export function MessagesClient() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const selectedConversationId = id ? parseInt(id) : null;
+  const selectedConversationId = id || null;
 
   // Filter messages for current conversation
   const currentMessages = selectedConversationId
-    ? allMessages.filter((m) => m.conversation === selectedConversationId)
+    ? allMessages.filter((m) => m.conversationId === selectedConversationId)
     : [];
 
   // Handle sending a message
-  const handleSendMessage = (conversationId: number, text: string) => {
+  const handleSendMessage = (conversationId: string, text: string) => {
     const newMessage: Message = {
-      id: Date.now(),
-      conversation: conversationId,
-      sender: currentUser,
+      _id: `temp-${Date.now()}`,
+      conversationId: conversationId,
+      sender: currentUser ? { _id: currentUser._id, firstName: currentUser.firstName, lastName: currentUser.lastName } : null,
       body: text,
-      created_at: new Date().toISOString(),
+      _creationTime: Date.now(),
     };
     setAllMessages((prev) => [...prev, newMessage]);
   };
@@ -337,7 +377,7 @@ export function MessagesClient() {
     if (selectedConversationId) {
       return (
         <Layout hideFooter>
-          <div className="h-[calc(100vh-60px)]">
+          <Box h="calc(100vh - 60px)">
             <ChatView
               conversationId={selectedConversationId}
               onBack={() => router.push('/messages')}
@@ -346,31 +386,31 @@ export function MessagesClient() {
               conversations={conversations}
               currentUser={currentUser}
             />
-          </div>
+          </Box>
         </Layout>
       );
     }
 
     return (
       <Layout hideFooter>
-        <div className="h-[calc(100vh-60px)] bg-white">
-          <div className="p-4 border-b border-gray-200">
-            <h1 className="text-xl font-display font-bold text-gray-900">
+        <Box h="calc(100vh - 60px)" bg="white">
+          <Box p="md" className="border-b border-gray-200">
+            <Title order={2} className="font-display">
               {t('messaging.title')}
-            </h1>
-          </div>
-          <div className="overflow-y-auto">
+            </Title>
+          </Box>
+          <Box className="overflow-y-auto">
             {conversations.map((conv) => (
               <ConversationItem
-                key={conv.id}
+                key={conv._id}
                 conversation={conv}
-                currentUserId={currentUser?.id}
+                currentUserId={currentUser?._id}
                 isSelected={false}
-                onClick={() => router.push(`/messages/${conv.id}`)}
+                onClick={() => router.push(`/messages/${conv._id}`)}
               />
             ))}
-          </div>
-        </div>
+          </Box>
+        </Box>
       </Layout>
     );
   }
@@ -378,36 +418,36 @@ export function MessagesClient() {
   // Desktop: Two-column layout
   return (
     <Layout hideFooter>
-      <div className="flex h-[calc(100vh-60px)]">
+      <Group gap={0} h="calc(100vh - 60px)" wrap="nowrap" align="stretch">
         {/* Conversation List */}
-        <div className="w-80 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col">
-          <div className="p-4 border-b border-gray-200">
-            <h1 className="text-xl font-display font-bold text-gray-900">
+        <Stack gap={0} w={320} className="flex-shrink-0 border-r border-gray-200" bg="white">
+          <Box p="md" className="border-b border-gray-200">
+            <Title order={2} className="font-display">
               {t('messaging.title')}
-            </h1>
-          </div>
-          <div className="overflow-y-auto flex-1">
+            </Title>
+          </Box>
+          <Box className="overflow-y-auto flex-1">
             {conversations.length > 0 ? (
               conversations.map((conv) => (
                 <ConversationItem
-                  key={conv.id}
+                  key={conv._id}
                   conversation={conv}
-                  currentUserId={currentUser?.id}
-                  isSelected={conv.id === selectedConversationId}
-                  onClick={() => router.push(`/messages/${conv.id}`)}
+                  currentUserId={currentUser?._id}
+                  isSelected={conv._id === selectedConversationId}
+                  onClick={() => router.push(`/messages/${conv._id}`)}
                 />
               ))
             ) : (
-              <div className="p-8 text-center text-gray-500">
-                <IconMail size={48} className="mx-auto mb-4 opacity-50" />
-                <p>{t('messaging.noConversations')}</p>
-              </div>
+              <Stack align="center" justify="center" p="xl" gap="md">
+                <IconMail size={48} className="text-gray-300" />
+                <Text c="dimmed">{t('messaging.noConversations')}</Text>
+              </Stack>
             )}
-          </div>
-        </div>
+          </Box>
+        </Stack>
 
         {/* Chat Area */}
-        <div className="flex-1 flex flex-col">
+        <Box className="flex-1 flex flex-col">
           {selectedConversationId ? (
             <ChatView
               conversationId={selectedConversationId}
@@ -418,20 +458,20 @@ export function MessagesClient() {
               currentUser={currentUser}
             />
           ) : (
-            <div className="flex-1 flex items-center justify-center bg-gray-50">
-              <div className="text-center">
-                <IconMail size={64} className="mx-auto mb-4 text-gray-300" />
-                <p className="text-lg font-semibold text-gray-700">
+            <Center className="flex-1" bg="gray.0">
+              <Stack align="center" gap="md">
+                <IconMail size={64} className="text-gray-300" />
+                <Text size="lg" fw={600} c="dark.3">
                   {t('messaging.selectConversation')}
-                </p>
-                <p className="text-gray-500 mt-1">
+                </Text>
+                <Text c="dimmed">
                   {t('messaging.selectConversationDesc')}
-                </p>
-              </div>
-            </div>
+                </Text>
+              </Stack>
+            </Center>
           )}
-        </div>
-      </div>
+        </Box>
+      </Group>
     </Layout>
   );
 }

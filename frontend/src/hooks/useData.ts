@@ -53,7 +53,7 @@ export function useMyProjects() {
   return useQuery<Project[]>({
     queryKey: ['myProjects'],
     queryFn: async () => {
-      const response = await projectsService.getProjects({ exclude_own: false });
+      const response = await projectsService.getProjects({ excludeOwn: false });
       return response.results;
     },
   });

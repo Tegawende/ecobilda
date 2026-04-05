@@ -17,6 +17,7 @@ import {
   IconSend,
   IconPaperclip,
 } from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
 import { messagingService } from '@/services/messaging';
 import { profileService } from '@/services/profile';
 import { MessageBubble } from './MessageBubble';
@@ -25,11 +26,12 @@ import type { Conversation, Message, User } from '@/types';
 import logger from '@/lib/logger';
 
 interface ChatInterfaceProps {
-  conversationId: number;
+  conversationId: string;
   onConversationUpdate?: (conversation: Conversation) => void;
 }
 
 export function ChatInterface({ conversationId, onConversationUpdate }: ChatInterfaceProps) {
+  const t = useTranslations();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { isConnected, sendMessage: wsSendMessage, sendTyping, addMessageListener } = useChat();
 
@@ -51,24 +53,24 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
         if (!newMessage) return;
 
         // Only add if message is for this conversation
-        if (newMessage.conversation === conversation.id) {
+        if (newMessage.conversationId === conversation._id) {
           setMessages((prev) => {
-            if (prev.some(m => m.id === newMessage.id)) return prev;
+            if (prev.some(m => m._id === newMessage._id)) return prev;
             return [...prev, newMessage];
           });
 
           // Mark as read if it's from the other user
-          if (newMessage.sender.id !== currentUser.id) {
-            messagingService.markAsRead(conversation.id).catch(err => logger.error('Mark as read error:', err));
+          if (newMessage.senderId !== currentUser._id) {
+            messagingService.markAsRead(conversation._id).catch(err => logger.error('Mark as read error:', err));
           }
         }
       } else if (data.type === 'typing') {
-        if (data.user_id !== currentUser.id && data.conversation_id === conversation.id) {
+        if (String(data.user_id) !== currentUser._id && String(data.conversation_id) === conversation._id) {
           setIsTyping(true);
           setTimeout(() => setIsTyping(false), 3000);
         }
       } else if (data.type === 'stop_typing') {
-        if (data.user_id !== currentUser.id) {
+        if (String(data.user_id) !== currentUser._id) {
           setIsTyping(false);
         }
       }
@@ -126,11 +128,11 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
 
     try {
       // Try WebSocket first, fall back to REST
-      const sentViaWs = wsSendMessage(conversation.id, messageText);
+      const sentViaWs = wsSendMessage(conversation._id, messageText);
 
       if (!sentViaWs) {
         // Fallback to REST API
-        const newMessage = await messagingService.sendMessage(conversation.id, {
+        const newMessage = await messagingService.sendMessage(conversation._id, {
           body: messageText,
         });
         setMessages((prev) => [...prev, newMessage]);
@@ -146,22 +148,18 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessageInput(e.target.value);
     if (conversation) {
-      sendTyping(conversation.id);
+      sendTyping(conversation._id);
     }
   };
 
   // Determine other user
-  const otherUser = conversation
-    ? currentUser?.id === conversation.user1.id
-      ? conversation.user2
-      : conversation.user1
-    : null;
+  const otherUser = conversation?.otherUser ?? null;
 
   if (isLoading) {
     return (
-      <Box style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <Box display="flex" style={{ flexDirection: 'column', height: '100%' }}>
         <Center style={{ flex: 1 }}>
-          <Text c="dimmed">Loading conversation...</Text>
+          <Text c="dimmed">{t('messaging.loading')}</Text>
         </Center>
       </Box>
     );
@@ -169,11 +167,11 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
 
   if (!conversation || !otherUser || !currentUser) {
     return (
-      <Box style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <Box display="flex" style={{ flexDirection: 'column', height: '100%' }}>
         <Center style={{ flex: 1 }}>
           <Stack align="center" gap="md">
             <IconMessages size={64} color="var(--mantine-color-gray-5)" />
-            <Text c="dimmed">Select a conversation to start messaging</Text>
+            <Text c="dimmed">{t('messaging.selectConversationDesc')}</Text>
           </Stack>
         </Center>
       </Box>
@@ -181,34 +179,33 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
   }
 
   return (
-    <Box style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: 'white' }}>
+    <Box display="flex" bg="white" style={{ flexDirection: 'column', height: '100%' }}>
       {/* Header */}
       <Box
         px="lg"
         py="md"
         style={{
           borderBottom: '1px solid var(--mantine-color-gray-3)',
-          backgroundColor: 'white',
         }}
       >
         <Group justify="space-between">
           <Group gap="sm">
             <Avatar
-              src={otherUser.profile_picture}
+              src={otherUser.profilePictureUrl || otherUser.profilePicture}
               size={40}
               radius="xl"
               color="blue"
             >
-              {!otherUser.profile_picture &&
-                `${otherUser.first_name[0]}${otherUser.last_name[0]}`}
+              {!otherUser.profilePicture &&
+                `${otherUser.firstName?.[0] ?? ''}${otherUser.lastName?.[0] ?? ''}`}
             </Avatar>
 
             <Box>
               <Text fw={600} size="sm">
-                {otherUser.first_name} {otherUser.last_name}
+                {otherUser.firstName} {otherUser.lastName}
               </Text>
               <Text size="xs" c={isConnected ? 'green' : 'dimmed'}>
-                {isConnected ? 'Online' : 'Offline'}
+                {isConnected ? t('messaging.online') : t('messaging.offline')}
               </Text>
             </Box>
           </Group>
@@ -220,20 +217,20 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
         style={{
           flex: 1,
           overflowY: 'auto',
-          backgroundColor: '#f7f7f7',
-          padding: '20px',
         }}
+        bg="gray.0"
+        p="lg"
       >
         {messages.length > 0 ? (
           <>
             {messages.map((message, index) => (
               <MessageBubble
-                key={message.id}
+                key={message._id}
                 message={message}
-                isOwnMessage={message.sender.id === currentUser.id}
+                isOwnMessage={message.senderId === currentUser._id}
                 showAvatar={
                   index === 0 ||
-                  messages[index - 1].sender.id !== message.sender.id
+                  messages[index - 1].senderId !== message.senderId
                 }
               />
             ))}
@@ -242,17 +239,18 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
             {isTyping && (
               <Group gap="xs" mb="md" ml="sm">
                 <Avatar size={24} radius="xl" color="gray">
-                  {otherUser.first_name[0]}
+                  {otherUser.firstName?.[0] ?? ''}
                 </Avatar>
                 <Box
+                  px="sm"
+                  py="xs"
                   style={{
-                    padding: '8px 12px',
-                    borderRadius: '16px',
+                    borderRadius: 16,
                     backgroundColor: '#f0f0f0',
                   }}
                 >
                   <Text size="sm" c="dimmed">
-                    {otherUser.first_name} is typing...
+                    {t('messaging.typing', { name: otherUser.firstName })}
                   </Text>
                 </Box>
               </Group>
@@ -264,7 +262,7 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
           <Center py={48}>
             <Stack align="center" gap="md">
               <IconMessages size={64} color="var(--mantine-color-gray-5)" />
-              <Text c="dimmed">No messages yet. Start the conversation!</Text>
+              <Text c="dimmed">{t('messaging.noMessagesYet')}</Text>
             </Stack>
           </Center>
         )}
@@ -274,14 +272,14 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
       <Box
         px="lg"
         py="md"
+        bg="white"
         style={{
-          borderTop: '1px solid #e0e0e0',
-          backgroundColor: 'white',
+          borderTop: '1px solid var(--mantine-color-gray-3)',
         }}
       >
         <form onSubmit={handleSendMessage}>
           <Group align="flex-start" gap="sm" wrap="nowrap">
-            <ActionIcon variant="subtle" size="lg" color="gray" style={{ marginTop: 8 }}>
+            <ActionIcon variant="subtle" size="lg" color="gray" mt={8}>
               <IconPaperclip size={20} />
             </ActionIcon>
 
@@ -294,7 +292,7 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
                   handleSendMessage(e);
                 }
               }}
-              placeholder="Write a message..."
+              placeholder={t('messaging.writePlaceholder')}
               minRows={1}
               maxRows={4}
               autosize
@@ -304,8 +302,7 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
               }}
               styles={{
                 input: {
-                  borderRadius: '24px',
-                  border: '1px solid #e0e0e0',
+                  borderRadius: 24,
                   padding: '12px 16px',
                 },
               }}
@@ -317,7 +314,7 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
               loading={isSending}
               radius="xl"
               size="md"
-              style={{ marginTop: 4 }}
+              mt={4}
             >
               <IconSend size={18} />
             </Button>

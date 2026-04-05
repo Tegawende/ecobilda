@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useForm } from '@mantine/form';
 import { useLocale, useTranslations } from 'next-intl';
 import logger from '@/lib/logger';
@@ -38,10 +38,9 @@ import {
 } from '@tabler/icons-react';
 import { profileService } from '@/services/profile';
 import { DateOfBirthSelect, validateDateOfBirth } from '@/components/common/DateOfBirthSelect';
-import { skillsService } from '@/services/skills';
-import { languagesService } from '@/services/languages';
+import { useSkills, useLanguages } from '@/hooks/useConvex';
 import { getSkillIcon } from '@/lib/skillIcons';
-import type { User, Skill } from '@/types';
+import { getSkillDisplayName, type User, type Skill } from '@/types';
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 
@@ -49,8 +48,8 @@ interface CityResult {
   label: string; // "City, Country"
   city: string;
   country: string;
-  country_code: string;
-  postal_code: string;
+  countryCode: string;
+  postalCode: string;
 }
 
 async function searchCities(query: string, lang: string): Promise<CityResult[]> {
@@ -72,15 +71,15 @@ async function searchCities(query: string, lang: string): Promise<CityResult[]> 
       const countryCtx = context.find((c: any) => c.id?.startsWith('country'));
       const postcodeCtx = context.find((c: any) => c.id?.startsWith('postcode'));
       const country = countryCtx?.text || '';
-      const country_code = countryCtx?.short_code?.toUpperCase() || '';
-      const postal_code = postcodeCtx?.text || '';
+      const countryCode = countryCtx?.short_code?.toUpperCase() || '';
+      const postalCode = postcodeCtx?.text || '';
 
       return {
         label: `${city}, ${country}`,
         city,
         country,
-        country_code,
-        postal_code,
+        countryCode,
+        postalCode,
       };
     });
   } catch (error) {
@@ -90,15 +89,15 @@ async function searchCities(query: string, lang: string): Promise<CityResult[]> 
 }
 
 interface ProfileFormData {
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   bio: string;
   dob_day: string;
   dob_month: string;
   dob_year: string;
   city: string;
-  postal_code: string;
-  country_code: string;
+  postalCode: string;
+  countryCode: string;
   skills: string[];
   languages: string[];
 }
@@ -109,21 +108,25 @@ interface EditProfileFormProps {
   onCancel: () => void;
 }
 
-function getSkillDisplayName(skill: Skill, locale: string): string {
-  const key = `display_name_${locale}` as keyof Skill;
-  return (skill[key] as string) || skill.display_name_en;
-}
-
 export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps) {
   const locale = useLocale();
   const t = useTranslations();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [allSkills, setAllSkills] = useState<Skill[]>([]);
-  const [isLoadingSkills, setIsLoadingSkills] = useState(true);
-  const [availableLanguages, setAvailableLanguages] = useState<{ value: string; label: string }[]>([]);
+  const { skills: allSkills, isLoading: isLoadingSkills } = useSkills();
+  const { languages: rawLanguages } = useLanguages();
+  const availableLanguages = useMemo(() => {
+    const displayNames = new Intl.DisplayNames([locale], { type: 'language' });
+    return rawLanguages
+      .map((l) => {
+        const localized = displayNames.of(l.code);
+        const label = localized ? localized.charAt(0).toUpperCase() + localized.slice(1) : l.name;
+        return { value: l.code, label };
+      })
+      .sort((a, b) => a.label.localeCompare(b.label, locale));
+  }, [rawLanguages, locale]);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>(user.profile_picture || '');
+  const [previewUrl, setPreviewUrl] = useState<string>(user.profilePictureUrl || user.profilePicture || '');
 
   // City autocomplete state
   const [citySearch, setCitySearch] = useState('');
@@ -142,8 +145,8 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
   const form = useForm<ProfileFormData>({
     initialValues: (() => {
       let dobDay = '', dobMonth = '', dobYear = '';
-      if (user.date_of_birth) {
-        const parts = String(user.date_of_birth).split('-');
+      if (user.dateOfBirth) {
+        const parts = String(user.dateOfBirth).split('-');
         if (parts.length === 3) {
           dobYear = parts[0];
           dobMonth = String(parseInt(parts[1], 10));
@@ -151,22 +154,22 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
         }
       }
       return {
-        first_name: user.first_name,
-        last_name: user.last_name,
+        firstName: user.firstName,
+        lastName: user.lastName,
         bio: user.bio || '',
         dob_day: dobDay,
         dob_month: dobMonth,
         dob_year: dobYear,
         city: user.address?.city || '',
-        postal_code: user.address?.postal_code || '',
-        country_code: (user.address?.country as any)?.code || user.address?.country || '',
+        postalCode: user.address?.postalCode || '',
+        countryCode: (user.address?.country as any)?.code || user.address?.country || '',
         skills: user.skills?.map((s) => s.code) || [],
         languages: user.languages?.map((l) => l.code) || [locale],
       };
     })(),
     validate: {
-      first_name: (value) => (value.length >= 2 ? null : t('profile.edit.firstNameError')),
-      last_name: (value) => (value.length >= 2 ? null : t('profile.edit.lastNameError')),
+      firstName: (value) => (value.length >= 2 ? null : t('profile.edit.firstNameError')),
+      lastName: (value) => (value.length >= 2 ? null : t('profile.edit.lastNameError')),
       bio: (value) => (value.length <= 1000 ? null : t('profile.edit.bioError')),
       dob_year: (val, values) => {
         if (!values.dob_day && !values.dob_month && !val) return null;
@@ -203,42 +206,12 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
     setCitySearch('');
     setCityResults([]);
     form.setFieldValue('city', result.city);
-    form.setFieldValue('country_code', result.country_code);
-    form.setFieldValue('postal_code', result.postal_code);
+    form.setFieldValue('countryCode', result.countryCode);
+    form.setFieldValue('postalCode', result.postalCode);
     combobox.closeDropdown();
   };
 
-  useEffect(() => {
-    const fetchSkills = async () => {
-      try {
-        const skills = await skillsService.getSkills();
-        const skillsArray = Array.isArray(skills) ? skills : (skills as any).results || [];
-        setAllSkills(skillsArray);
-      } catch (error) {
-        logger.error('Failed to fetch skills:', error);
-        setAllSkills([]);
-      } finally {
-        setIsLoadingSkills(false);
-      }
-    };
-    const fetchLanguages = async () => {
-      try {
-        const langs = await languagesService.getLanguages();
-        const displayNames = new Intl.DisplayNames([locale], { type: 'language' });
-        setAvailableLanguages(
-          langs.map((l: any) => {
-            const localized = displayNames.of(l.code);
-            const label = localized ? localized.charAt(0).toUpperCase() + localized.slice(1) : l.name;
-            return { value: l.code, label };
-          }).sort((a: any, b: any) => a.label.localeCompare(b.label, locale))
-        );
-      } catch (error) {
-        logger.error('Failed to fetch languages:', error);
-      }
-    };
-    fetchSkills();
-    fetchLanguages();
-  }, [locale]);
+  // Skills and languages are now loaded reactively via Convex hooks
 
   const toggleSkill = (skillCode: string) => {
     const currentSkills = form.values.skills;
@@ -280,18 +253,18 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
         : undefined;
 
       const updateData: any = {
-        first_name: data.first_name,
-        last_name: data.last_name,
+        firstName: data.firstName,
+        lastName: data.lastName,
         bio: data.bio,
-        date_of_birth: dobString,
+        dateOfBirth: dobString,
         city: data.city,
-        country_code: data.country_code,
-        skill_codes: data.skills,
-        language_codes: data.languages,
+        countryCode: data.countryCode,
+        skillCodes: data.skills,
+        languageCodes: data.languages,
       };
 
       if (profilePicture) {
-        updateData.profile_picture = profilePicture;
+        updateData.profilePicture = profilePicture;
       }
 
       const updatedUser = await profileService.updateProfile(updateData);
@@ -316,7 +289,7 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
     return (
       <Grid.Col key={skill.code} span={{ base: 6, sm: 4, md: 3 }}>
         <Card
-          padding="sm"
+          padding="md"
           withBorder
           h="100%"
           style={{
@@ -327,20 +300,15 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            minHeight: 56,
+            minHeight: 64,
           }}
           onClick={() => toggleSkill(skill.code)}
         >
           <Group wrap="nowrap" justify="center" w="100%">
-            {(() => { const SkillIcon = getSkillIcon(skill.icon); return <SkillIcon size={20} className="text-gray-600 shrink-0" />; })()}
-            <Text size="sm" ta="center">
+            {(() => { const SkillIcon = getSkillIcon(skill.icon); return <SkillIcon size={22} className={isSelected ? `text-${categoryColor === 'blue' ? 'eco-primary' : 'eco-terracotta'}` : 'text-gray-500'} style={{ flexShrink: 0 }} />; })()}
+            <Text size="sm" ta="center" fw={isSelected ? 600 : 400}>
               {getSkillDisplayName(skill, locale)}
             </Text>
-            {isSelected && (
-              <ThemeIcon color={categoryColor} variant="light" size="sm">
-                <IconCheck size={14} />
-              </ThemeIcon>
-            )}
           </Group>
         </Card>
       </Grid.Col>
@@ -393,13 +361,13 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
             <Grid.Col span={{ base: 12, md: 6 }}>
               <TextInput
                 label={t('profile.edit.firstName')}
-                {...form.getInputProps('first_name')}
+                {...form.getInputProps('firstName')}
               />
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 6 }}>
               <TextInput
                 label={t('profile.edit.lastName')}
-                {...form.getInputProps('last_name')}
+                {...form.getInputProps('lastName')}
               />
             </Grid.Col>
           </Grid>

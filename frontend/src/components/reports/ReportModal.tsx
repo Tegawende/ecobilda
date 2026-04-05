@@ -33,8 +33,8 @@ export function ReportModal({ contentType, objectId, opened, onClose }: ReportMo
     setIsLoading(true);
     try {
       await reportsService.createReport({
-        content_type: contentType,
-        object_id: objectId,
+        contentType: contentType,
+        objectId: objectId,
         reason,
         details: details.trim() || undefined,
       });

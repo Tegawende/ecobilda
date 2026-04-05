@@ -13,33 +13,33 @@ interface MessageBubbleProps {
 export function MessageBubble({ message, isOwnMessage, showAvatar = true }: MessageBubbleProps) {
   return (
     <Box
+      display="flex"
+      mb={showAvatar ? 'md' : 'xs'}
       style={{
-        display: 'flex',
         justifyContent: isOwnMessage ? 'flex-end' : 'flex-start',
-        marginBottom: showAvatar ? 16 : 8,
       }}
     >
       <Group
         align="flex-end"
         gap="xs"
+        maw="60%"
         style={{
-          maxWidth: '60%',
           flexDirection: isOwnMessage ? 'row-reverse' : 'row',
         }}
         wrap="nowrap"
       >
         {/* Profile Picture (for received messages only) */}
         {!isOwnMessage && (
-          <Box style={{ width: 28, height: 28 }}>
+          <Box w={28} h={28}>
             {showAvatar && (
               <Avatar
-                src={message.sender.profile_picture}
+                src={message.sender?.profilePictureUrl || message.sender?.profilePicture}
                 size={28}
                 radius="xl"
                 color="gray"
               >
-                {!message.sender.profile_picture &&
-                  `${message.sender.first_name[0]}${message.sender.last_name[0]}`}
+                {!message.sender?.profilePicture &&
+                  `${message.sender?.firstName?.[0] ?? ''}${message.sender?.lastName?.[0] ?? ''}`}
               </Avatar>
             )}
           </Box>
@@ -48,8 +48,8 @@ export function MessageBubble({ message, isOwnMessage, showAvatar = true }: Mess
         {/* Message Bubble */}
         <Box>
           <Box
-            px={16}
-            py={10}
+            px="md"
+            py="xs"
             style={{
               backgroundColor: isOwnMessage ? '#222222' : '#f0f0f0',
               color: isOwnMessage ? 'white' : '#222222',
@@ -73,14 +73,12 @@ export function MessageBubble({ message, isOwnMessage, showAvatar = true }: Mess
           <Text
             size="xs"
             mt={4}
-            style={{
-              color: '#717171',
-              textAlign: isOwnMessage ? 'right' : 'left',
-              paddingLeft: isOwnMessage ? 0 : 4,
-              paddingRight: isOwnMessage ? 4 : 0,
-            }}
+            c="gray.6"
+            ta={isOwnMessage ? 'right' : 'left'}
+            pl={isOwnMessage ? 0 : 4}
+            pr={isOwnMessage ? 4 : 0}
           >
-            {dayjs(message.created_at).format('h:mm A')}
+            {dayjs(message._creationTime).format('h:mm A')}
           </Text>
         </Box>
       </Group>

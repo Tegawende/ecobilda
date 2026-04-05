@@ -27,13 +27,13 @@ import type { ProjectFormData } from '@/app/[locale]/(protected)/create-project/
 
 interface Step2FormData {
   city: string;
-  postal_code: string;
-  country_code: string;
-  hours_per_day: number;
-  days_per_week: number;
-  max_helpers: number;
-  accommodation_details: string;
-  food_details: string;
+  postalCode: string;
+  countryCode: string;
+  hoursPerDay: number;
+  daysPerWeek: number;
+  maxHelpers: number;
+  accommodationDetails: string;
+  foodDetails: string;
 }
 
 interface ProjectFormStep2Props {
@@ -48,24 +48,24 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
   const form = useForm<Step2FormData>({
     initialValues: {
       city: data.address.city || '',
-      postal_code: data.address.postal_code || '',
-      country_code: data.address.country_code || '',
-      hours_per_day: data.hours_per_day || 5,
-      days_per_week: data.days_per_week || 5,
-      max_helpers: data.max_helpers || 2,
-      accommodation_details: data.accommodation_details || '',
-      food_details: data.food_details || '',
+      postalCode: data.address.postalCode || '',
+      countryCode: data.address.countryCode || '',
+      hoursPerDay: data.hoursPerDay || 5,
+      daysPerWeek: data.daysPerWeek || 5,
+      maxHelpers: data.maxHelpers || 2,
+      accommodationDetails: data.accommodationDetails || '',
+      foodDetails: data.foodDetails || '',
     },
     validate: {
       city: (value) => (value.length < 2 ? t('createProject.step2.validation.cityRequired') : null),
-      postal_code: (value) => (value.length < 2 ? t('createProject.step2.validation.postalCodeRequired') : null),
-      country_code: (value) => (value.length < 2 ? t('createProject.step2.validation.countryRequired') : null),
-      hours_per_day: (value) => (value < 1 || value > 10 ? t('createProject.step2.validation.hoursRange') : null),
-      days_per_week: (value) => (value < 1 || value > 7 ? t('createProject.step2.validation.daysRange') : null),
-      max_helpers: (value) => (value < 1 || value > 20 ? t('createProject.step2.validation.maxVolunteersRange') : null),
-      accommodation_details: (value) =>
+      postalCode: (value) => (value.length < 2 ? t('createProject.step2.validation.postalCodeRequired') : null),
+      countryCode: (value) => (value.length < 2 ? t('createProject.step2.validation.countryRequired') : null),
+      hoursPerDay: (value) => (value < 1 || value > 10 ? t('createProject.step2.validation.hoursRange') : null),
+      daysPerWeek: (value) => (value < 1 || value > 7 ? t('createProject.step2.validation.daysRange') : null),
+      maxHelpers: (value) => (value < 1 || value > 20 ? t('createProject.step2.validation.maxVolunteersRange') : null),
+      accommodationDetails: (value) =>
         value.length < 20 ? t('createProject.step2.validation.accommodationMin') : null,
-      food_details: (value) =>
+      foodDetails: (value) =>
         value.length < 20 ? t('createProject.step2.validation.foodMin') : null,
     },
   });
@@ -75,15 +75,15 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
       address: {
         ...data.address,
         city: formData.city,
-        postal_code: formData.postal_code,
-        country_code: formData.country_code,
-        formatted_address: `${formData.city}, ${formData.country_code}`,
+        postalCode: formData.postalCode,
+        countryCode: formData.countryCode,
+        formattedAddress: `${formData.city}, ${formData.countryCode}`,
       },
-      hours_per_day: formData.hours_per_day,
-      days_per_week: formData.days_per_week,
-      max_helpers: formData.max_helpers,
-      accommodation_details: formData.accommodation_details,
-      food_details: formData.food_details,
+      hoursPerDay: formData.hoursPerDay,
+      daysPerWeek: formData.daysPerWeek,
+      maxHelpers: formData.maxHelpers,
+      accommodationDetails: formData.accommodationDetails,
+      foodDetails: formData.foodDetails,
     });
     onNext();
   };
@@ -122,7 +122,7 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
               <TextInput
                 label={t('createProject.step2.postalCode')}
                 placeholder={t('createProject.step2.postalCodePlaceholder')}
-                {...form.getInputProps('postal_code')}
+                {...form.getInputProps('postalCode')}
               />
             </Grid.Col>
 
@@ -130,7 +130,7 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
               <Select
                 label={t('createProject.step2.country')}
                 placeholder={t('createProject.step2.countryPlaceholder')}
-                {...form.getInputProps('country_code')}
+                {...form.getInputProps('countryCode')}
                 data={[
                   { value: 'FR', label: 'France' },
                   { value: 'ES', label: 'Spain' },
@@ -173,7 +173,7 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
                 min={1}
                 max={10}
                 description={t('createProject.step2.hoursPerDayDesc')}
-                {...form.getInputProps('hours_per_day')}
+                {...form.getInputProps('hoursPerDay')}
               />
             </Grid.Col>
 
@@ -183,7 +183,7 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
                 min={1}
                 max={7}
                 description={t('createProject.step2.daysPerWeekDesc')}
-                {...form.getInputProps('days_per_week')}
+                {...form.getInputProps('daysPerWeek')}
               />
             </Grid.Col>
 
@@ -193,7 +193,7 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
                 min={1}
                 max={20}
                 description={t('createProject.step2.maxVolunteersDesc')}
-                {...form.getInputProps('max_helpers')}
+                {...form.getInputProps('maxHelpers')}
               />
             </Grid.Col>
           </Grid>
@@ -208,7 +208,7 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
           <Textarea
             placeholder={t('createProject.step2.accommodationPlaceholder')}
             minRows={4}
-            {...form.getInputProps('accommodation_details')}
+            {...form.getInputProps('accommodationDetails')}
           />
         </div>
 
@@ -221,7 +221,7 @@ export function ProjectFormStep2({ data, onUpdate, onNext, onBack }: ProjectForm
           <Textarea
             placeholder={t('createProject.step2.foodPlaceholder')}
             minRows={4}
-            {...form.getInputProps('food_details')}
+            {...form.getInputProps('foodDetails')}
           />
         </div>
 

@@ -37,8 +37,8 @@ export function ParticipationRequestModal({
       await participationsService.createRequest({
         project: projectId,
         motivation: motivation.trim(),
-        proposed_start_date: startDate?.toISOString().split('T')[0],
-        proposed_end_date: endDate?.toISOString().split('T')[0],
+        proposedStartDate: startDate?.toISOString().split('T')[0],
+        proposedEndDate: endDate?.toISOString().split('T')[0],
       });
 
       notifications.show({

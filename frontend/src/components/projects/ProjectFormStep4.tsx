@@ -326,14 +326,14 @@ export function ProjectFormStep4({
         <Alert color="green" title={t('createProject.step4.reviewTitle')} icon={<IconSparkles />}>
           <List size="sm" icon={<IconCheck size={16} />}>
             <List.Item>
-              <span dangerouslySetInnerHTML={{ __html: t('createProject.step4.reviewProject', { type: data.project_type === 'PERM' ? t('createProject.step1.permaculture') : t('createProject.step1.naturalBuilding') }) }} />
+              <span dangerouslySetInnerHTML={{ __html: t('createProject.step4.reviewProject', { type: data.projectType === 'PERM' ? t('createProject.step1.permaculture') : t('createProject.step1.naturalBuilding') }) }} />
             </List.Item>
             <List.Item>{t('createProject.step4.reviewTitleLabel', { title: data.title || t('createProject.step4.reviewNotSet') })}</List.Item>
             <List.Item>
-              {t('createProject.step4.reviewLocation', { city: data.address.city || t('createProject.step4.reviewNotSet'), country: data.address.country_code || t('createProject.step4.reviewNotSet') })}
+              {t('createProject.step4.reviewLocation', { city: data.address.city || t('createProject.step4.reviewNotSet'), country: data.address.countryCode || t('createProject.step4.reviewNotSet') })}
             </List.Item>
             <List.Item>
-              {t('createProject.step4.reviewWork', { hours: data.hours_per_day, days: data.days_per_week, max: data.max_helpers })}
+              {t('createProject.step4.reviewWork', { hours: data.hoursPerDay, days: data.daysPerWeek, max: data.maxHelpers })}
             </List.Item>
             <List.Item>{t('createProject.step4.reviewSkills', { count: data.skills.length })}</List.Item>
             <List.Item>{t('createProject.step4.reviewImages', { count: images.length })}</List.Item>

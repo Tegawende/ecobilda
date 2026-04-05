@@ -21,7 +21,7 @@ import type { ProjectFormData } from '@/app/[locale]/(protected)/create-project/
 interface Step1FormData {
   title: string;
   description: string;
-  project_type: 'PERM' | 'NATB';
+  projectType: 'PERM' | 'NATB';
 }
 
 interface ProjectFormStep1Props {
@@ -36,7 +36,7 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
     initialValues: {
       title: data.title || '',
       description: data.description || '',
-      project_type: data.project_type || 'PERM',
+      projectType: data.projectType || 'PERM',
     },
     validate: {
       title: (value) => {
@@ -74,7 +74,7 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
         {/* Project Type */}
         <Radio.Group
           label={t('createProject.step1.projectType')}
-          {...form.getInputProps('project_type')}
+          {...form.getInputProps('projectType')}
         >
           <Group mt="sm" grow>
             <Card
@@ -83,10 +83,10 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
               style={{
                 cursor: 'pointer',
                 borderWidth: 2,
-                borderColor: form.values.project_type === 'PERM' ? 'var(--mantine-color-eco-terracotta-5)' : undefined,
-                backgroundColor: form.values.project_type === 'PERM' ? 'var(--mantine-color-eco-terracotta-0)' : undefined,
+                borderColor: form.values.projectType === 'PERM' ? 'var(--mantine-color-eco-terracotta-5)' : undefined,
+                backgroundColor: form.values.projectType === 'PERM' ? 'var(--mantine-color-eco-terracotta-0)' : undefined,
               }}
-              onClick={() => form.setFieldValue('project_type', 'PERM')}
+              onClick={() => form.setFieldValue('projectType', 'PERM')}
             >
               <Stack gap="xs" align="center">
                 <IconPlant size={40} color="var(--mantine-color-green-6)" />
@@ -104,10 +104,10 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
               style={{
                 cursor: 'pointer',
                 borderWidth: 2,
-                borderColor: form.values.project_type === 'NATB' ? 'var(--mantine-color-eco-terracotta-5)' : undefined,
-                backgroundColor: form.values.project_type === 'NATB' ? 'var(--mantine-color-eco-terracotta-0)' : undefined,
+                borderColor: form.values.projectType === 'NATB' ? 'var(--mantine-color-eco-terracotta-5)' : undefined,
+                backgroundColor: form.values.projectType === 'NATB' ? 'var(--mantine-color-eco-terracotta-0)' : undefined,
               }}
-              onClick={() => form.setFieldValue('project_type', 'NATB')}
+              onClick={() => form.setFieldValue('projectType', 'NATB')}
             >
               <Stack gap="xs" align="center">
                 <IconHammer size={40} color="var(--mantine-color-orange-6)" />

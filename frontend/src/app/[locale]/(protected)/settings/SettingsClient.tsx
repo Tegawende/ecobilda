@@ -11,9 +11,11 @@ import {
   IconLock,
   IconTrash,
   IconCheck,
+  IconEye,
+  IconEyeOff,
 } from '@tabler/icons-react';
 import { Layout } from '@/components/common/Layout';
-import { clearAuthTokens } from '@/services/api';
+import { clearSessionToken } from '@/lib/convexClient';
 import logger from '@/lib/logger';
 
 export function SettingsClient() {
@@ -21,17 +23,17 @@ export function SettingsClient() {
   const router = useRouter();
 
   const [settings, setSettings] = useState({
-    email_notifications: true,
-    project_updates: true,
-    message_notifications: true,
-    marketing_emails: false,
+    emailNotifications: true,
+    projectUpdates: true,
+    messageNotifications: true,
+    marketingEmails: false,
     language: 'fr',
   });
 
   const [passwordForm, setPasswordForm] = useState({
-    current_password: '',
-    new_password: '',
-    confirm_password: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   });
 
   const [isDeleting, setIsDeleting] = useState(false);
@@ -51,7 +53,7 @@ export function SettingsClient() {
   const handleChangePassword = (e: React.FormEvent) => {
     e.preventDefault();
     logger.debug('Changing password');
-    setPasswordForm({ current_password: '', new_password: '', confirm_password: '' });
+    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
   };
@@ -62,7 +64,7 @@ export function SettingsClient() {
     try {
       setIsDeleting(true);
       // TODO: Call API to delete account
-      clearAuthTokens();
+      clearSessionToken();
       localStorage.removeItem('mock_user');
       setDeleteModalOpen(false);
       router.push('/');
@@ -126,30 +128,34 @@ export function SettingsClient() {
                   <Switch
                     label={t('settings.emailNotifications') || 'Email Notifications'}
                     description={t('settings.emailNotificationsDesc') || 'Receive email notifications for important updates'}
-                    checked={settings.email_notifications}
-                    onChange={(e) => setSettings({ ...settings, email_notifications: e.currentTarget.checked })}
+                    checked={settings.emailNotifications}
+                    onChange={(e) => setSettings({ ...settings, emailNotifications: e.currentTarget.checked })}
                     color="eco-primary"
+                    styles={{ track: { cursor: 'pointer' }, label: { cursor: 'pointer' } }}
                   />
                   <Switch
                     label={t('settings.projectUpdates') || 'Project Updates'}
                     description={t('settings.projectUpdatesDesc') || "Get notified about projects you're interested in"}
-                    checked={settings.project_updates}
-                    onChange={(e) => setSettings({ ...settings, project_updates: e.currentTarget.checked })}
+                    checked={settings.projectUpdates}
+                    onChange={(e) => setSettings({ ...settings, projectUpdates: e.currentTarget.checked })}
                     color="eco-primary"
+                    styles={{ track: { cursor: 'pointer' }, label: { cursor: 'pointer' } }}
                   />
                   <Switch
                     label={t('settings.messageNotifications') || 'Message Notifications'}
                     description={t('settings.messageNotificationsDesc') || 'Receive notifications for new messages'}
-                    checked={settings.message_notifications}
-                    onChange={(e) => setSettings({ ...settings, message_notifications: e.currentTarget.checked })}
+                    checked={settings.messageNotifications}
+                    onChange={(e) => setSettings({ ...settings, messageNotifications: e.currentTarget.checked })}
                     color="eco-primary"
+                    styles={{ track: { cursor: 'pointer' }, label: { cursor: 'pointer' } }}
                   />
                   <Switch
                     label={t('settings.marketingEmails') || 'Marketing Emails'}
                     description={t('settings.marketingEmailsDesc') || 'Receive news and promotional content'}
-                    checked={settings.marketing_emails}
-                    onChange={(e) => setSettings({ ...settings, marketing_emails: e.currentTarget.checked })}
+                    checked={settings.marketingEmails}
+                    onChange={(e) => setSettings({ ...settings, marketingEmails: e.currentTarget.checked })}
                     color="eco-primary"
+                    styles={{ track: { cursor: 'pointer' }, label: { cursor: 'pointer' } }}
                   />
                 </Stack>
 
@@ -199,21 +205,24 @@ export function SettingsClient() {
                 <Stack gap="md">
                   <PasswordInput
                     label={t('settings.currentPassword') || 'Current Password'}
-                    value={passwordForm.current_password}
-                    onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })}
+                    value={passwordForm.currentPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
                     radius="lg"
+                    visibilityToggleIcon={({ reveal }) => reveal ? <IconEyeOff size={18} /> : <IconEye size={18} />}
                   />
                   <PasswordInput
                     label={t('settings.newPassword') || 'New Password'}
-                    value={passwordForm.new_password}
-                    onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
+                    value={passwordForm.newPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
                     radius="lg"
+                    visibilityToggleIcon={({ reveal }) => reveal ? <IconEyeOff size={18} /> : <IconEye size={18} />}
                   />
                   <PasswordInput
                     label={t('settings.confirmPassword') || 'Confirm New Password'}
-                    value={passwordForm.confirm_password}
-                    onChange={(e) => setPasswordForm({ ...passwordForm, confirm_password: e.target.value })}
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
                     radius="lg"
+                    visibilityToggleIcon={({ reveal }) => reveal ? <IconEyeOff size={18} /> : <IconEye size={18} />}
                   />
                 </Stack>
                 <Group justify="flex-end" mt="lg">

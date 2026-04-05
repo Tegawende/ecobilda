@@ -78,7 +78,7 @@ export function ForgotPasswordClient() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email"
+                  placeholder={t('auth.email')}
                   required
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-eco-primary focus:ring-1 focus:ring-eco-primary outline-none"
                 />

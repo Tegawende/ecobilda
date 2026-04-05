@@ -1,68 +1,56 @@
-import api from './api';
+import { convexClient, getSessionToken } from "@/lib/convexClient";
+import { api } from "../../convex/_generated/api";
 import type { User } from '../types';
 
 export interface UpdateProfileData {
-  first_name?: string;
-  last_name?: string;
+  firstName?: string;
+  lastName?: string;
   bio?: string;
-  date_of_birth?: string;
-  phone_number?: string;
-  profile_picture?: File;
+  dateOfBirth?: string;
+  phoneNumber?: string;
+  profilePicture?: File;
   languages?: string[];
-  skill_codes?: string[];
+  skillCodes?: string[];
   address?: {
     city?: string;
-    postal_code?: string;
-    country_code?: string;
+    postalCode?: string;
+    countryCode?: string;
   };
 }
 
 export const profileService = {
-  // Get current user's profile
   async getProfile(): Promise<User> {
-    const response = await api.get('/profile/');
-    return response.data;
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    const user = await convexClient.query(api.auth.me, { token });
+    if (!user) throw new Error("Not authenticated");
+    return user as any;
   },
 
-  // Update current user's profile
   async updateProfile(data: UpdateProfileData): Promise<User> {
-    const formData = new FormData();
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
 
-    // Add all non-file fields
-    Object.entries(data).forEach(([key, value]) => {
-      if (key === 'profile_picture' && value instanceof File) {
-        formData.append('profile_picture', value);
-      } else if (key === 'address' && typeof value === 'object') {
-        Object.entries(value as Record<string, string>).forEach(([addrKey, addrValue]) => {
-          if (addrValue !== undefined) {
-            formData.append(`address.${addrKey}`, String(addrValue));
-          }
-        });
-      } else if (Array.isArray(value)) {
-        value.forEach((item) => formData.append(key, String(item)));
-      } else if (value !== undefined) {
-        formData.append(key, String(value));
-      }
+    // TODO: Handle profilePicture upload via Convex storage
+    await convexClient.mutation(api.users.updateProfile, {
+      token,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      bio: data.bio,
+      dateOfBirth: data.dateOfBirth,
+      city: data.address?.city,
+      postalCode: data.address?.postalCode,
+      countryCode: data.address?.countryCode,
     });
 
-    const response = await api.patch('/profile/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data;
+    return await this.getProfile();
   },
 
-  // Upload/update profile picture
   async uploadProfilePicture(file: File): Promise<User> {
-    const formData = new FormData();
-    formData.append('profile_picture', file);
-
-    const response = await api.patch('/profile/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data;
+    // TODO: Implement via Convex file storage
+    // 1. Get upload URL: convexClient.mutation(api.projects.generateUploadUrl, { token })
+    // 2. Upload file: fetch(uploadUrl, { method: "POST", body: file })
+    // 3. Save storage ID to user profile
+    return await this.getProfile();
   },
 };

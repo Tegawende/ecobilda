@@ -2,6 +2,7 @@
 
 import { Component } from 'react';
 import type { ReactNode, ErrorInfo } from 'react';
+import { Button, Center, Stack, Text, Title, Paper, Group, Code, Box } from '@mantine/core';
 import { IconAlertTriangle, IconRefresh, IconHome } from '@tabler/icons-react';
 
 interface Props {
@@ -49,51 +50,57 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen bg-eco-cream flex items-center justify-center px-6">
-          <div className="max-w-md w-full text-center">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-100 flex items-center justify-center">
+        <Center mih="100vh" className="bg-eco-cream" px="lg">
+          <Stack align="center" maw={450} w="100%">
+            <Box className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center">
               <IconAlertTriangle size={40} className="text-red-500" strokeWidth={1.5} />
-            </div>
+            </Box>
 
-            <h1 className="text-2xl font-display font-bold text-gray-900 mb-3">
+            <Title order={2} ta="center">
               Something went wrong
-            </h1>
+            </Title>
 
-            <p className="text-gray-600 mb-6">
+            <Text c="dimmed" ta="center">
               An unexpected error occurred. We apologize for the inconvenience.
-            </p>
+            </Text>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <div className="mb-6 p-4 bg-red-50 rounded-lg text-left overflow-auto max-h-48">
-                <p className="text-xs font-mono text-red-700 break-words">
+              <Paper p="md" radius="md" bg="red.0" w="100%" style={{ overflow: 'auto', maxHeight: 192 }}>
+                <Code block color="red">
                   {this.state.error.toString()}
-                </p>
+                </Code>
                 {this.state.errorInfo && (
-                  <pre className="text-xs font-mono text-red-600 mt-2 whitespace-pre-wrap">
+                  <Code block color="red" mt="xs" style={{ whiteSpace: 'pre-wrap' }}>
                     {this.state.errorInfo.componentStack}
-                  </pre>
+                  </Code>
                 )}
-              </div>
+              </Paper>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <button
+            <Group gap="sm" mt="md">
+              <Button
                 onClick={this.handleRetry}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-eco-primary text-white font-semibold hover:bg-eco-primaryDark transition-all"
+                leftSection={<IconRefresh size={18} />}
+                radius="xl"
+                size="md"
+                className="bg-eco-primary hover:bg-eco-primaryDark transition-all"
               >
-                <IconRefresh size={18} />
                 Try Again
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={this.handleGoHome}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border-2 border-gray-300 text-gray-700 font-semibold hover:border-eco-primary hover:text-eco-primary transition-all"
+                leftSection={<IconHome size={18} />}
+                variant="outline"
+                radius="xl"
+                size="md"
+                color="gray"
+                className="hover:border-eco-primary hover:text-eco-primary transition-all"
               >
-                <IconHome size={18} />
                 Go Home
-              </button>
-            </div>
-          </div>
-        </div>
+              </Button>
+            </Group>
+          </Stack>
+        </Center>
       );
     }
 

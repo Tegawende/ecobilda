@@ -10,6 +10,7 @@ import {
   List,
   Stack,
   Box,
+  Group,
   Paper,
 } from '@mantine/core';
 import {
@@ -92,10 +93,10 @@ export function TermsClient() {
             return (
               <Accordion.Item key={section.key} value={section.key}>
                 <Accordion.Control>
-                  <Box style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <Group gap={12} wrap="nowrap">
                     <Icon size={22} stroke={1.5} style={{ color: 'var(--color-eco-primary)', flexShrink: 0 }} />
                     <Text fw={600} size="md">{t(`${section.key}.title`)}</Text>
-                  </Box>
+                  </Group>
                 </Accordion.Control>
                 <Accordion.Panel>
                   <Stack gap="sm">

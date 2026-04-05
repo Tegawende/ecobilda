@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import {
   Box,
   Container,
+  Flex,
   Group,
   Avatar,
   Text,
@@ -30,6 +32,7 @@ import type { Conversation, Message, User } from '@/types';
 import logger from '@/lib/logger';
 
 export function ChatClient({ conversationId: propConversationId }: { conversationId?: string }) {
+  const t = useTranslations();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -64,7 +67,7 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
 
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsHost = process.env.NEXT_PUBLIC_API_URL?.replace('http://', '').replace('https://', '') || 'localhost:8000';
-    const wsUrl = `${wsProtocol}//${wsHost}/ws/chat/${conversation.id}/?token=${token}`;
+    const wsUrl = `${wsProtocol}//${wsHost}/ws/chat/${conversation._id}/?token=${token}`;
 
     try {
       const ws = new WebSocket(wsUrl);
@@ -81,11 +84,11 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
         if (data.type === 'new_message') {
           setMessages((prev) => [...prev, data.message]);
 
-          if (data.message.sender.id !== currentUser.id) {
-            messagingService.markAsRead(conversation.id).catch(err => logger.error('Mark as read error:', err));
+          if (data.message.senderId !== currentUser._id) {
+            messagingService.markAsRead(conversation._id).catch(err => logger.error('Mark as read error:', err));
           }
         } else if (data.type === 'typing_indicator') {
-          if (data.user_id !== currentUser.id) {
+          if (data.user_id !== currentUser._id) {
             setIsTyping(true);
             setTimeout(() => setIsTyping(false), 3000);
           }
@@ -140,7 +143,7 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
         try {
           const conversation = await messagingService.getOrCreateConversation(parseInt(id));
           // Update URL to use conversation ID
-          router.replace(`/messages/${conversation.id}`);
+          router.replace(`/messages/${conversation._id}`);
           // Recursively fetch data with the correct conversation ID
           return;
         } catch (createErr: any) {
@@ -154,10 +157,10 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
               const conversations = await messagingService.getConversations();
               // Find conversation where the other user is the one we're trying to contact
               const conversation = conversations.find(
-                (c) => c.user1.id === parseInt(id) || c.user2.id === parseInt(id)
+                (c) => c._id === id
               );
               if (conversation) {
-                router.replace(`/messages/${conversation.id}`);
+                router.replace(`/messages/${conversation._id}`);
                 return;
               }
             } catch (fetchErr) {
@@ -167,11 +170,11 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
           setError(
             createErr.response?.data?.detail ||
             createErr.response?.data?.recipient_id?.[0] ||
-            'Conversation not found and could not be created'
+            t('messaging.conversationNotFound')
           );
         }
       } else {
-        setError(err.response?.data?.detail || 'Failed to load conversation');
+        setError(err.response?.data?.detail || t('messaging.loadError'));
       }
     } finally {
       setIsLoading(false);
@@ -187,7 +190,7 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
       wsRef.current.send(
         JSON.stringify({
           type: 'typing_indicator',
-          user_id: currentUser?.id,
+          user_id: currentUser?._id,
         })
       );
     }
@@ -208,18 +211,18 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
           JSON.stringify({
             type: 'send_message',
             body: messageText,
-            sender_id: currentUser.id,
+            senderId: currentUser._id,
           })
         );
       } else {
-        const newMessage = await messagingService.sendMessage(conversation.id, {
+        const newMessage = await messagingService.sendMessage(conversation._id, {
           body: messageText,
         });
         setMessages((prev) => [...prev, newMessage]);
       }
     } catch (err) {
       logger.error('Failed to send message:', err);
-      setError('Failed to send message. Please try again.');
+      setError(t('messaging.sendError'));
       setMessageInput(messageText);
     } finally {
       setIsSending(false);
@@ -233,9 +236,7 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
 
   // Determine other user
   const otherUser = conversation
-    ? currentUser?.id === conversation.user1.id
-      ? conversation.user2
-      : conversation.user1
+    ? conversation.otherUser
     : null;
 
   if (isLoading) {
@@ -244,7 +245,7 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
         <Center mih="80vh">
           <Stack align="center" gap="md">
             <Loader size="lg" />
-            <Text c="dimmed">Loading conversation...</Text>
+            <Text c="dimmed">{t('messaging.loading')}</Text>
           </Stack>
         </Center>
       </Layout>
@@ -255,10 +256,10 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
     return (
       <Layout>
         <Container size="md" py="xl">
-          <Alert color="red" icon={<IconAlertCircle size={18} />} title="Error">
+          <Alert color="red" icon={<IconAlertCircle size={18} />} title={t('messaging.error')}>
             <Text mb="md">{error}</Text>
             <Button variant="subtle" onClick={() => router.push('/messages')}>
-              Back to messages
+              {t('messaging.backToMessages')}
             </Button>
           </Alert>
         </Container>
@@ -272,7 +273,7 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
 
   return (
     <Layout>
-      <Box style={{ display: 'flex', flexDirection: 'column', height: '100vh' }} bg="gray.0">
+      <Flex direction="column" h="100vh" bg="gray.0">
         {/* Header */}
         <Box bg="white" px="md" py="sm" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
           <Container size="md">
@@ -285,31 +286,31 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
                   hiddenFrom="sm"
                   size="sm"
                 >
-                  Back
+                  {t('common.back')}
                 </Button>
 
                 <Avatar
-                  src={otherUser.profile_picture}
+                  src={otherUser?.profilePictureUrl || otherUser?.profilePicture}
                   size="md"
                   radius="xl"
                   color="blue"
                 >
-                  {!otherUser.profile_picture &&
-                    `${otherUser.first_name[0]}${otherUser.last_name[0]}`}
+                  {!otherUser?.profilePictureUrl || otherUser?.profilePicture &&
+                    `${otherUser?.firstName[0]}${otherUser?.lastName[0]}`}
                 </Avatar>
 
                 <Box>
                   <Text fw={600}>
-                    {otherUser.first_name} {otherUser.last_name}
+                    {otherUser?.firstName} {otherUser?.lastName}
                   </Text>
                   <Text size="xs" c={isConnected ? 'green' : 'dimmed'}>
-                    {isConnected ? '● Online' : '○ Offline'}
+                    {isConnected ? `● ${t('messaging.online')}` : `○ ${t('messaging.offline')}`}
                   </Text>
                 </Box>
               </Group>
 
-              <Button variant="subtle" onClick={() => router.push(`/users/${otherUser.id}`)}>
-                View Profile
+              <Button variant="subtle" onClick={() => router.push(`/users/${otherUser._id}`)}>
+                {t('messaging.viewProfile')}
               </Button>
             </Group>
           </Container>
@@ -322,9 +323,9 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
               <>
                 {messages.map((message) => (
                   <MessageBubble
-                    key={message.id}
+                    key={message._id}
                     message={message}
-                    isOwnMessage={message.sender.id === currentUser.id}
+                    isOwnMessage={message.senderId === currentUser._id}
                   />
                 ))}
 
@@ -334,7 +335,7 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
                     <Text size="sm">●</Text>
                     <Text size="sm">●</Text>
                     <Text size="sm">●</Text>
-                    <Text size="sm">{otherUser.first_name} is typing...</Text>
+                    <Text size="sm">{t('messaging.typing', { name: otherUser?.firstName })}</Text>
                   </Group>
                 )}
 
@@ -344,7 +345,7 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
               <Center py={48}>
                 <Stack align="center" gap="md">
                   <IconMessages size={64} color="var(--mantine-color-blue-6)" />
-                  <Text c="dimmed">No messages yet. Start the conversation!</Text>
+                  <Text c="dimmed">{t('messaging.noMessagesYet')}</Text>
                 </Stack>
               </Center>
             )}
@@ -365,7 +366,7 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
                       handleSendMessage(e);
                     }
                   }}
-                  placeholder="Type a message..."
+                  placeholder={t('messaging.typePlaceholder')}
                   minRows={1}
                   maxRows={4}
                   autosize
@@ -378,16 +379,16 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
                   loading={isSending}
                   leftSection={<IconSend size={18} />}
                 >
-                  Send
+                  {t('messaging.send')}
                 </Button>
               </Group>
               <Text size="xs" c="dimmed" mt="xs">
-                Press Enter to send, Shift+Enter for new line
+                {t('messaging.enterToSend')}
               </Text>
             </form>
           </Container>
         </Box>
-      </Box>
+      </Flex>
     </Layout>
   );
 }

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import { Container, Title, Text, SimpleGrid, Paper, Button, Group, Stack, ThemeIcon, ActionIcon, Badge, Avatar } from '@mantine/core';
+import { Container, Title, Text, SimpleGrid, Paper, Button, Group, Stack, ThemeIcon, ActionIcon, Badge, Avatar, Box } from '@mantine/core';
 import {
   IconHeart,
   IconLayoutGrid,
@@ -30,13 +30,13 @@ import { ProjectCardSkeleton } from '@/components/projects/ProjectCard';
 function ProjectCardList({ project }: { project: Project }) {
   const t = useTranslations();
   const images = project.images && project.images.length > 0
-    ? project.images.map(img => img.image)
+    ? project.images.map(img => img.url)
     : ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'];
 
-  const isNatB = project.project_type === 'NATB';
+  const isNatB = project.projectType === 'NATB';
 
   return (
-    <Link href={`/projects/${project.id}`}
+    <Link href={`/projects/${project._id}`}
       className="block group cursor-pointer"
     >
       <Paper radius="lg" p="md" mb="md" withBorder className="hover:shadow-md transition-all">
@@ -49,7 +49,7 @@ function ProjectCardList({ project }: { project: Project }) {
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
             <div className="absolute top-2 right-2 z-10">
-              <FavoriteButton projectId={project.id} variant="ghost" size="sm" initialFavorite={true} />
+              <FavoriteButton projectId={project._id} variant="ghost" size="sm" initialFavorite={true} />
             </div>
 
             <div className="absolute top-2 left-2">
@@ -80,27 +80,27 @@ function ProjectCardList({ project }: { project: Project }) {
             <Group gap="md">
               <Group gap={4}>
                 <IconUsers size={14} />
-                <Text size="xs" c="dimmed">{project.max_helpers} {t('projects.volunteers') || 'volunteers'}</Text>
+                <Text size="xs" c="dimmed">{project.maxHelpers} {t('projects.volunteers') || 'volunteers'}</Text>
               </Group>
               <Group gap={4}>
                 <IconClock size={14} />
-                <Text size="xs" c="dimmed">{project.hours_per_day}h/{t('common.day') || 'day'}</Text>
+                <Text size="xs" c="dimmed">{project.hoursPerDay}h/{t('common.day') || 'day'}</Text>
               </Group>
             </Group>
 
             {/* Amenities */}
             <Group gap="xs">
-              {project.internet_provided && (
+              {project.internetProvided && (
                 <Badge variant="light" color="gray" size="xs" leftSection={<IconWifi size={12} />}>
                   {t('projects.wifi')}
                 </Badge>
               )}
-              {project.family_friendly && (
+              {project.familyFriendly && (
                 <Badge variant="light" color="gray" size="xs" leftSection={<IconBabyCarriage size={12} />}>
                   {t('projects.familyFriendly') || 'Family'}
                 </Badge>
               )}
-              {project.pets_allowed && (
+              {project.petsAllowed && (
                 <Badge variant="light" color="gray" size="xs" leftSection={<IconDog size={12} />}>
                   {t('projects.petsAllowed') || 'Pets'}
                 </Badge>
@@ -110,13 +110,13 @@ function ProjectCardList({ project }: { project: Project }) {
             {/* Host Info */}
             {project.owner && (
               <Group gap="sm" pt="xs" className="border-t border-gray-100">
-                <Avatar src={project.owner.profile_picture} size="xs" radius="xl" />
+                <Avatar src={project.owner?.profilePictureUrl} size="xs" radius="xl" />
                 <Text size="xs" c="dimmed">
-                  {t('common.by') || 'By'} <Text component="span" fw={500}>{project.owner.first_name}</Text>
+                  {t('common.by') || 'By'} <Text component="span" fw={500}>{project.owner?.firstName}</Text>
                 </Text>
-                {project.owner.average_rating && (
+                {project.owner?.averageRating && (
                   <Group gap={4}>
-                    <Text size="xs" fw={600} c="yellow">{Number(project.owner.average_rating || 0).toFixed(1)}</Text>
+                    <Text size="xs" fw={600} c="yellow">{Number(project.owner?.averageRating || 0).toFixed(1)}</Text>
                     <IconStar size={12} className="text-yellow-500 fill-yellow-500" />
                   </Group>
                 )}
@@ -146,91 +146,93 @@ export function FavoritesClient() {
     <Layout>
       <div className="bg-stone-50 min-h-screen py-12">
         <Container size="md">
-          {/* Header */}
-          <Group justify="space-between" align="flex-start" mb="xl">
-            <Group gap="md">
-              <ThemeIcon size={48} radius="md" color="red" variant="light">
-                <IconHeart size={28} className="fill-current" />
-              </ThemeIcon>
-              <Stack gap={4}>
-                <Title order={1} className="font-display">
-                  {t('favorites.title') || 'My Favorites'}
-                </Title>
-                <Text c="dimmed">
-                  {t('favorites.subtitle') || 'Projects you saved for later'}
-                </Text>
-              </Stack>
+          <Stack gap="lg">
+            {/* Header */}
+            <Group justify="space-between" align="flex-start">
+              <Group gap="md" mb="xl">
+                <ThemeIcon size={48} radius="md" color="red" variant="light">
+                  <IconHeart size={28} className="fill-current" />
+                </ThemeIcon>
+                <Stack gap={4}>
+                  <Title order={1} className="font-display">
+                    {t('favorites.title') || 'My Favorites'}
+                  </Title>
+                  <Text c="dimmed">
+                    {t('favorites.subtitle') || 'Projects you saved for later'}
+                  </Text>
+                </Stack>
+              </Group>
+
+              {/* View Toggle - Hidden on mobile */}
+              <Group gap={4} className="hidden sm:flex" p={4} bg="white" style={{ borderRadius: 8, border: '1px solid #e5e7eb' }}>
+                <ActionIcon
+                  variant={viewMode === 'grid' ? 'filled' : 'subtle'}
+                  color={viewMode === 'grid' ? 'gray' : 'gray'}
+                  onClick={() => setViewMode('grid')}
+                >
+                  <IconLayoutGrid size={18} />
+                </ActionIcon>
+                <ActionIcon
+                  variant={viewMode === 'list' ? 'filled' : 'subtle'}
+                  color={viewMode === 'list' ? 'gray' : 'gray'}
+                  onClick={() => setViewMode('list')}
+                >
+                  <IconList size={18} />
+                </ActionIcon>
+              </Group>
             </Group>
 
-            {/* View Toggle - Hidden on mobile */}
-            <Group gap={4} className="hidden sm:flex" p={4} bg="white" style={{ borderRadius: 8, border: '1px solid #e5e7eb' }}>
-              <ActionIcon
-                variant={viewMode === 'grid' ? 'filled' : 'subtle'}
-                color={viewMode === 'grid' ? 'gray' : 'gray'}
-                onClick={() => setViewMode('grid')}
-              >
-                <IconLayoutGrid size={18} />
-              </ActionIcon>
-              <ActionIcon
-                variant={viewMode === 'list' ? 'filled' : 'subtle'}
-                color={viewMode === 'list' ? 'gray' : 'gray'}
-                onClick={() => setViewMode('list')}
-              >
-                <IconList size={18} />
-              </ActionIcon>
-            </Group>
-          </Group>
-
-          {/* Content */}
-          {isLoading ? (
-            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <ProjectCardSkeleton key={i} />
-              ))}
-            </SimpleGrid>
-          ) : favorites.length > 0 ? (
-            viewMode === 'grid' ? (
+            {/* Content */}
+            {isLoading ? (
               <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
-                {favorites.map((project) => (
-                  <ProjectCard
-                    key={project.id}
-                    project={project}
-                    initialFavorite={true}
-                    onMobileClick={setMobileModalProject}
-                  />
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <ProjectCardSkeleton key={i} />
                 ))}
               </SimpleGrid>
+            ) : favorites.length > 0 ? (
+              viewMode === 'grid' ? (
+                <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
+                  {favorites.map((project) => (
+                    <ProjectCard
+                      key={project._id}
+                      project={project}
+                      initialFavorite={true}
+                      onMobileClick={setMobileModalProject}
+                    />
+                  ))}
+                </SimpleGrid>
+              ) : (
+                <Box maw={900} mx="auto">
+                  {favorites.map((project) => (
+                    <ProjectCardList
+                      key={project._id}
+                      project={project}
+                    />
+                  ))}
+                </Box>
+              )
             ) : (
-              <div className="max-w-4xl mx-auto">
-                {favorites.map((project) => (
-                  <ProjectCardList
-                    key={project.id}
-                    project={project}
-                  />
-                ))}
-              </div>
-            )
-          ) : (
-            <Paper radius="xl" p="xl" withBorder className="text-center max-w-xl mx-auto">
-              <Stack align="center" gap="md">
-                <IconHeart size={64} className="text-gray-300" />
-                <Title order={3} className="font-display">
-                  {t('favorites.noFavorites') || 'No favorites yet'}
-                </Title>
-                <Text c="dimmed" maw={400}>
-                  {t('favorites.noFavoritesDesc') || 'Start exploring projects and save the ones you like!'}
-                </Text>
-                <Button
-                  component={Link} href="/projects"
-                  radius="xl"
-                  size="md"
-                  color="eco-primary"
-                >
-                  {t('favorites.browseProjects') || 'Browse Projects'}
-                </Button>
-              </Stack>
-            </Paper>
-          )}
+              <Paper radius="lg" p="xl" withBorder className="text-center max-w-xl mx-auto">
+                <Stack align="center" gap="md">
+                  <IconHeart size={64} className="text-gray-300" />
+                  <Title order={3} className="font-display">
+                    {t('favorites.noFavorites') || 'No favorites yet'}
+                  </Title>
+                  <Text c="dimmed" maw={400}>
+                    {t('favorites.noFavoritesDesc') || 'Start exploring projects and save the ones you like!'}
+                  </Text>
+                  <Button
+                    component={Link} href="/projects"
+                    radius="xl"
+                    size="md"
+                    color="eco-primary"
+                  >
+                    {t('favorites.browseProjects') || 'Browse Projects'}
+                  </Button>
+                </Stack>
+              </Paper>
+            )}
+          </Stack>
         </Container>
       </div>
 

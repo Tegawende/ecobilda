@@ -3,8 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import type { Skill } from '@/types';
-import { skillsService } from '@/services/skills';
-import logger from '@/lib/logger';
+import { useSkills } from '@/hooks/useConvex';
 import { getSkillIcon } from '@/lib/skillIcons';
 
 import {
@@ -466,8 +465,8 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
     const t = useTranslations();
     const locale = useLocale();
     const getSkillName = (skill: Skill) => {
-        const key = `display_name_${locale}` as keyof Skill;
-        return (skill[key] as string) || skill.display_name_en;
+        const key = `displayName${locale.charAt(0).toUpperCase() + locale.slice(1)}` as keyof Skill;
+        return (skill[key] as string) || skill.displayNameEn;
     };
     const [showModal, setShowModal] = useState(false);
     const [showMobileSearch, setShowMobileSearch] = useState(false);
@@ -477,24 +476,10 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
     const [showCalendar, setShowCalendar] = useState(false);
     const [locationSuggestions, setLocationSuggestions] = useState<MapboxFeature[]>([]);
     const [isSearching, setIsSearching] = useState(false);
-    const [allSkills, setAllSkills] = useState<Skill[]>([]);
+    const { skills: allSkills } = useSkills();
     const locationRef = useRef<HTMLDivElement>(null);
     const calendarRef = useRef<HTMLDivElement>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    // Fetch skills
-    useEffect(() => {
-        const fetchSkills = async () => {
-            try {
-                const skills = await skillsService.getSkills();
-                const arr = Array.isArray(skills) ? skills : (skills as any).results || [];
-                setAllSkills(arr);
-            } catch (err) {
-                logger.error('Failed to fetch skills:', err);
-            }
-        };
-        fetchSkills();
-    }, []);
 
     // Filter visible skills based on project type
     const visibleSkills = allSkills.filter(s => {

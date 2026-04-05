@@ -1,32 +1,39 @@
-import api from './api';
+import { convexClient, getSessionToken } from "@/lib/convexClient";
+import { api } from "../../convex/_generated/api";
 import type { Notification } from '../types';
 
 export const notificationsService = {
-  // Get all notifications for current user
   async getNotifications(unreadOnly = false, type?: string): Promise<Notification[]> {
-    const params: Record<string, string> = {};
-    if (unreadOnly) params.unread_only = 'true';
-    if (type) params.type = type;
-
-    const response = await api.get('/notifications/', { params });
-    return response.data.results || response.data;
+    const token = getSessionToken();
+    if (!token) return [];
+    const results = await convexClient.query(api.notifications.listForUser, {
+      token,
+      unreadOnly,
+      type,
+    });
+    return results as any;
   },
 
-  // Get unread notifications count
   async getUnreadCount(): Promise<number> {
-    const response = await api.get('/notifications/unread-count/');
-    return response.data.count;
+    const token = getSessionToken();
+    if (!token) return 0;
+    return await convexClient.query(api.notifications.getUnreadCount, { token });
   },
 
-  // Mark notification as read
-  async markAsRead(notificationId: number): Promise<Notification> {
-    const response = await api.post(`/notifications/${notificationId}/mark-as-read/`);
-    return response.data;
+  async markAsRead(notificationId: number | string): Promise<Notification> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.notifications.markAsRead, {
+      token,
+      id: notificationId as any,
+    });
+    return { id: notificationId } as any;
   },
 
-  // Mark all notifications as read
   async markAllAsRead(): Promise<{ updated_count: number }> {
-    const response = await api.post('/notifications/mark-all-read/');
-    return response.data;
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    const result = await convexClient.mutation(api.notifications.markAllAsRead, { token });
+    return { updated_count: result.count };
   },
 };

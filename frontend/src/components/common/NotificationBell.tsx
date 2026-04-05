@@ -6,7 +6,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { IconBell, IconCheck, IconMessage } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
-import { isAuthenticated } from '@/services/api';
+import { isAuthenticated } from '@/lib/convexClient';
 import { notificationsService } from '@/services/notifications';
 import type { Notification } from '@/types';
 import dayjs from 'dayjs';
@@ -56,11 +56,11 @@ export function NotificationBell() {
     }
   }, [opened]);
 
-  const handleNotificationClick = async (notificationId: number, linkUrl: string, isRead: boolean) => {
+  const handleNotificationClick = async (notificationId: string, linkUrl: string, isRead: boolean) => {
     if (!isRead) {
       try {
         await notificationsService.markAsRead(notificationId);
-        setNotifications(prev => prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n));
+        setNotifications(prev => prev.map(n => n._id === notificationId ? { ...n, isRead: true } : n));
         setUnreadCount(prev => Math.max(0, prev - 1));
       } catch {
         // silently fail
@@ -73,7 +73,7 @@ export function NotificationBell() {
   const handleMarkAllRead = async () => {
     try {
       await notificationsService.markAllAsRead();
-      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
       setUnreadCount(0);
     } catch {
       // silently fail
@@ -128,17 +128,17 @@ export function NotificationBell() {
             <Stack gap={0}>
               {notifications.map((notification) => (
                 <Menu.Item
-                  key={notification.id}
-                  onClick={() => handleNotificationClick(notification.id, notification.link_url, notification.is_read)}
+                  key={notification._id}
+                  onClick={() => handleNotificationClick(notification._id, notification.linkUrl ?? '', notification.isRead)}
                   style={{
                     whiteSpace: 'normal',
                     height: 'auto',
                     padding: '12px',
-                    backgroundColor: notification.is_read ? 'transparent' : 'var(--mantine-color-eco-primary-0)',
+                    backgroundColor: notification.isRead ? 'transparent' : 'var(--mantine-color-eco-primary-0)',
                   }}
                 >
                   <Group gap="sm" wrap="nowrap" align="flex-start">
-                    {notification.sender_profile_picture ? (
+                    {false ? (
                       <Box
                         style={{
                           width: 40,
@@ -149,7 +149,7 @@ export function NotificationBell() {
                         }}
                       >
                         <img
-                          src={notification.sender_profile_picture}
+                          src=""
                           alt=""
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
@@ -171,17 +171,17 @@ export function NotificationBell() {
                       </Box>
                     )}
                     <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
-                      <Text size="sm" fw={notification.is_read ? 400 : 600} lineClamp={1}>
+                      <Text size="sm" fw={notification.isRead ? 400 : 600} lineClamp={1}>
                         {notification.title}
                       </Text>
                       <Text size="xs" c="dimmed" lineClamp={2}>
                         {notification.message}
                       </Text>
                       <Text size="xs" c="dimmed">
-                        {dayjs(notification.created_at).fromNow()}
+                        {dayjs(notification._creationTime).fromNow()}
                       </Text>
                     </Stack>
-                    {!notification.is_read && (
+                    {!notification.isRead && (
                       <Box
                         style={{
                           width: 8,
@@ -206,16 +206,12 @@ export function NotificationBell() {
           )}
         </ScrollArea.Autosize>
 
-        {notifications.length > 0 && (
-          <>
-            <Menu.Divider />
-            <Menu.Item onClick={() => { router.push('/messages'); setOpened(false); }}>
-              <Text size="sm" fw={500} c="eco-primary" ta="center">
-                {t('notifications.viewAllMessages')}
-              </Text>
-            </Menu.Item>
-          </>
-        )}
+        <Menu.Divider />
+        <Menu.Item onClick={() => { router.push('/notifications'); setOpened(false); }}>
+          <Text size="sm" fw={500} c="eco-primary" ta="center">
+            {t('notifications.viewAll')}
+          </Text>
+        </Menu.Item>
       </Menu.Dropdown>
     </Menu>
   );

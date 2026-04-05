@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { authService } from '@/services/auth';
-import { getAuthTokens, clearAuthTokens, isAuthenticated as checkAuth } from '@/services/api';
+import { getSessionToken, clearSessionToken, isAuthenticated as checkAuth } from '@/lib/convexClient';
 import type { User } from '@/types';
 
 interface AuthContextType {
@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const currentUser = await authService.getCurrentUser();
       setUser(currentUser);
     } catch {
-      clearAuthTokens();
+      clearSessionToken();
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const { user: loggedInUser } = await authService.login({ email, password });
-    setUser(loggedInUser);
+    setUser(loggedInUser as any);
   };
 
   const register = async (data: Record<string, unknown>) => {
@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     authService.logout().catch(() => {});
-    clearAuthTokens();
+    clearSessionToken();
     setUser(null);
     window.location.href = '/';
   };
@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user && !!getAuthTokens()?.access,
+        isAuthenticated: !!user && checkAuth(),
         isLoading,
         login,
         register,

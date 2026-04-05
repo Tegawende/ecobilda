@@ -22,7 +22,22 @@ import {
 import { ProjectImageGallery } from '@/components/projects/ProjectImageGallery';
 import { useProject } from '@/hooks/useData';
 import { getSkillIcon } from '@/lib/skillIcons';
-import { Loader, Center } from '@mantine/core';
+import {
+  Loader,
+  Center,
+  Container,
+  Stack,
+  Group,
+  Title,
+  Text,
+  Paper,
+  Badge,
+  SimpleGrid,
+  ThemeIcon,
+  Avatar,
+  Button,
+  Divider,
+} from '@mantine/core';
 
 export function ProjectDetailClient({ id: projectId }: { id?: string }) {
   const t = useTranslations();
@@ -42,267 +57,292 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
   if (!project) {
     return (
       <Layout>
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <h2 className="text-2xl font-bold mb-4">{t('projectDetail.notFound')}</h2>
-          <Link href="/projects" className="text-eco-primary hover:underline">{t('projectDetail.backToProjects')}</Link>
-        </div>
+        <Center mih="60vh">
+          <Stack align="center" gap="md">
+            <Title order={2}>{t('projectDetail.notFound')}</Title>
+            <Link href="/projects" className="text-eco-primary hover:underline">{t('projectDetail.backToProjects')}</Link>
+          </Stack>
+        </Center>
       </Layout>
     );
   }
 
-  const isNatB = project.project_type === 'NATB';
+  const isNatB = project.projectType === 'NATB';
   // Get all images as array of strings
   const projectImages = project.images && project.images.length > 0
-    ? project.images.map(img => img.image)
+    ? project.images.map(img => img.url || '')
     : ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200'];
 
   return (
     <Layout>
       <div className="bg-white min-h-screen pb-20">
-        {/* Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <Container size="xl" pt="xl">
           {/* Title and Location Header */}
-          <div className="mb-6">
-            <span className={`inline-flex items-center gap-1.5 text-white text-xs font-bold px-3 py-1.5 rounded-full mb-4 uppercase tracking-wider shadow-sm ${isNatB ? 'bg-eco-primary' : 'bg-eco-terracotta'
-              }`}>
-              {isNatB ? <IconHome size={14} /> : <IconLeaf size={14} />}
+          <Stack gap="sm" mb="lg">
+            <Badge
+              size="md"
+              color={isNatB ? 'eco-primary' : 'eco-terracotta'}
+              leftSection={isNatB ? <IconHome size={14} /> : <IconLeaf size={14} />}
+              tt="uppercase"
+              variant="filled"
+              style={{ letterSpacing: '0.05em' }}
+            >
               {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
-            </span>
-            <h1 className="text-4xl sm:text-5xl font-display font-bold text-gray-900 mb-4">{project.title}</h1>
-            <div className="flex items-center text-gray-600 text-lg">
-              <IconMapPin size={22} className="mr-2" />
-              {project.address?.city}, {project.address?.country?.name}
-            </div>
-          </div>
+            </Badge>
+            <Title order={1} className="text-4xl sm:text-5xl font-display">{project.title}</Title>
+            <Group gap="xs">
+              <IconMapPin size={22} className="text-gray-600" />
+              <Text size="lg" c="dimmed">
+                {project.address?.city}, {project.address?.country?.name}
+              </Text>
+            </Group>
+          </Stack>
 
           {/* Photo Gallery */}
           <div className="mb-8">
             <ProjectImageGallery images={projectImages} title={project.title} />
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
+          <SimpleGrid cols={{ base: 1, lg: 3 }} spacing="xl">
             {/* Main Info */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* About */}
-              <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 font-display">{t('projectDetail.about')}</h2>
-                <p className="text-gray-600 leading-relaxed text-lg">
-                  {project.description}
-                </p>
-              </div>
+            <div className="lg:col-span-2">
+              <Stack gap="xl">
+                {/* About */}
+                <Paper radius="xl" p="xl" withBorder>
+                  <Title order={3} mb="md" className="font-display">{t('projectDetail.about')}</Title>
+                  <Text size="lg" c="dimmed" lh={1.7}>
+                    {project.description}
+                  </Text>
+                </Paper>
 
-              {/* Work Details */}
-              <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 font-display">Détails du travail</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-eco-primary/10 flex items-center justify-center">
-                      <IconClock size={24} className="text-eco-primary" />
-                    </div>
+                {/* Work Details */}
+                <Paper radius="xl" p="xl" withBorder>
+                  <Title order={3} mb="lg" className="font-display">{t('projectDetail.workDetails') || 'Work Details'}</Title>
+                  <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="lg">
+                    <Group gap="sm" wrap="nowrap">
+                      <ThemeIcon size={48} radius="md" color="eco-primary" variant="light">
+                        <IconClock size={24} />
+                      </ThemeIcon>
+                      <Stack gap={0}>
+                        <Text size="sm" c="dimmed">{t('projectDetail.hoursPerDay') || 'Hours / day'}</Text>
+                        <Text size="lg" fw={700}>{project.hoursPerDay}h</Text>
+                      </Stack>
+                    </Group>
+                    <Group gap="sm" wrap="nowrap">
+                      <ThemeIcon size={48} radius="md" color="eco-primary" variant="light">
+                        <IconCalendar size={24} />
+                      </ThemeIcon>
+                      <Stack gap={0}>
+                        <Text size="sm" c="dimmed">{t('projectDetail.daysPerWeek') || 'Days / week'}</Text>
+                        <Text size="lg" fw={700}>{project.daysPerWeek}d</Text>
+                      </Stack>
+                    </Group>
+                    <Group gap="sm" wrap="nowrap">
+                      <ThemeIcon size={48} radius="md" color="eco-primary" variant="light">
+                        <IconUsers size={24} />
+                      </ThemeIcon>
+                      <Stack gap={0}>
+                        <Text size="sm" c="dimmed">{t('projectDetail.maxVolunteers') || 'Max volunteers'}</Text>
+                        <Text size="lg" fw={700}>{project.maxHelpers}</Text>
+                      </Stack>
+                    </Group>
+                  </SimpleGrid>
+                </Paper>
+
+                {/* Amenities */}
+                <Paper radius="xl" p="xl" withBorder>
+                  <Title order={3} mb="lg" className="font-display">{t('projectDetail.amenities') || 'Amenities & Conditions'}</Title>
+                  <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="md">
+                    {[
+                      { available: project.internetProvided, icon: IconWifi, label: 'WiFi', sublabel: project.internetProvided ? t('common.included') || 'Included' : t('common.no') || 'No' },
+                      { available: project.familyFriendly, icon: IconBabyCarriage, label: t('projects.families') || 'Families', sublabel: project.familyFriendly ? t('common.welcome') || 'Welcome' : t('common.no') || 'No' },
+                      { available: project.petsAllowed, icon: IconDog, label: t('projects.pets') || 'Pets', sublabel: project.petsAllowed ? t('common.accepted') || 'Accepted' : t('common.no') || 'No' },
+                      { available: project.smokingAllowed, icon: IconSmoking, label: t('projects.smoking') || 'Smoking', sublabel: project.smokingAllowed ? t('common.allowed') || 'Allowed' : t('common.no') || 'No' },
+                    ].map((amenity, idx) => (
+                      <Paper
+                        key={idx}
+                        radius="md"
+                        p="md"
+                        withBorder
+                        style={{
+                          borderWidth: 2,
+                          borderColor: amenity.available ? 'var(--color-eco-primary)' : 'var(--mantine-color-gray-3)',
+                          opacity: amenity.available ? 1 : 0.5,
+                          backgroundColor: amenity.available ? 'var(--color-eco-primary-light, rgba(103,163,111,0.05))' : undefined,
+                        }}
+                      >
+                        <Stack align="center" gap={4}>
+                          <amenity.icon size={28} className={amenity.available ? 'text-eco-primary' : 'text-gray-400'} />
+                          <Text size="sm" fw={500}>{amenity.label}</Text>
+                          <Text size="xs" c="dimmed">{amenity.sublabel}</Text>
+                        </Stack>
+                      </Paper>
+                    ))}
+                  </SimpleGrid>
+                </Paper>
+
+                {/* Accommodation & Food */}
+                <Paper radius="xl" p="xl" withBorder>
+                  <Title order={3} mb="lg" className="font-display">{t('projectDetail.accommodation') || 'Accommodation & Meals'}</Title>
+                  <Stack gap="lg">
                     <div>
-                      <p className="text-sm text-gray-500">Heures / jour</p>
-                      <p className="text-lg font-bold text-gray-900">{project.hours_per_day}h</p>
+                      <Text fw={600} mb="xs">{t('projectDetail.accommodationType') || 'Accommodation'}</Text>
+                      <Text c="dimmed">{project.accommodationDetails}</Text>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-eco-primary/10 flex items-center justify-center">
-                      <IconCalendar size={24} className="text-eco-primary" />
-                    </div>
+                    <Divider />
                     <div>
-                      <p className="text-sm text-gray-500">Jours / semaine</p>
-                      <p className="text-lg font-bold text-gray-900">{project.days_per_week}j</p>
+                      <Text fw={600} mb="xs">{t('projectDetail.meals') || 'Meals'}</Text>
+                      <Text c="dimmed">{project.foodDetails}</Text>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-eco-primary/10 flex items-center justify-center">
-                      <IconUsers size={24} className="text-eco-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Volontaires max</p>
-                      <p className="text-lg font-bold text-gray-900">{project.max_helpers}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                  </Stack>
+                </Paper>
 
-              {/* Amenities */}
-              <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 font-display">Équipements & Conditions</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <div className={`flex flex-col items-center p-4 rounded-xl border-2 ${project.internet_provided ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
-                    }`}>
-                    <IconWifi size={28} className={project.internet_provided ? 'text-eco-primary' : 'text-gray-400'} />
-                    <span className="text-sm font-medium mt-2">WiFi</span>
-                    <span className="text-xs text-gray-500">{project.internet_provided ? 'Inclus' : 'Non'}</span>
-                  </div>
-                  <div className={`flex flex-col items-center p-4 rounded-xl border-2 ${project.family_friendly ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
-                    }`}>
-                    <IconBabyCarriage size={28} className={project.family_friendly ? 'text-eco-primary' : 'text-gray-400'} />
-                    <span className="text-sm font-medium mt-2">Familles</span>
-                    <span className="text-xs text-gray-500">{project.family_friendly ? 'Bienvenues' : 'Non'}</span>
-                  </div>
-                  <div className={`flex flex-col items-center p-4 rounded-xl border-2 ${project.pets_allowed ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
-                    }`}>
-                    <IconDog size={28} className={project.pets_allowed ? 'text-eco-primary' : 'text-gray-400'} />
-                    <span className="text-sm font-medium mt-2">Animaux</span>
-                    <span className="text-xs text-gray-500">{project.pets_allowed ? 'Acceptés' : 'Non'}</span>
-                  </div>
-                  <div className={`flex flex-col items-center p-4 rounded-xl border-2 ${project.smoking_allowed ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
-                    }`}>
-                    <IconSmoking size={28} className={project.smoking_allowed ? 'text-eco-primary' : 'text-gray-400'} />
-                    <span className="text-sm font-medium mt-2">Fumeur</span>
-                    <span className="text-xs text-gray-500">{project.smoking_allowed ? 'Autorisé' : 'Non'}</span>
-                  </div>
-                </div>
-              </div>
+                {/* Skills */}
+                {project.skills && project.skills.length > 0 && (
+                  <Paper radius="xl" p="xl" withBorder>
+                    <Title order={3} mb="lg" className="font-display">{t('projectDetail.skills') || 'Skills'}</Title>
+                    <Group gap="xs">
+                      {project.skills.map((skill, idx) => {
+                        const SkillIcon = getSkillIcon(skill.icon);
+                        return (
+                          <Badge
+                            key={idx}
+                            size="lg"
+                            variant="light"
+                            color="eco-primary"
+                            leftSection={<SkillIcon size={16} />}
+                            radius="xl"
+                          >
+                            {skill.displayNameEn}
+                          </Badge>
+                        );
+                      })}
+                    </Group>
+                  </Paper>
+                )}
 
-              {/* Accommodation & Food */}
-              <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 font-display">Hébergement & Repas</h2>
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Hébergement</h3>
-                    <p className="text-gray-600">{project.accommodation_details}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Repas</h3>
-                    <p className="text-gray-600">{project.food_details}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Skills */}
-              {project.skills && project.skills.length > 0 && (
-                <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6 font-display">Compétences</h2>
-                  <div className="flex flex-wrap gap-2">
-                    {project.skills.map((skill, idx) => {
-                      const SkillIcon = getSkillIcon(skill.icon);
-                      return (
-                        <span
-                          key={idx}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-eco-primary/10 text-eco-primary font-medium rounded-full text-sm"
+                {/* Languages */}
+                {(project as any).languages && (project as any).languages.length > 0 && (
+                  <Paper radius="xl" p="xl" withBorder>
+                    <Title order={3} mb="lg" className="font-display">{t('projectDetail.languages')}</Title>
+                    <Group gap="xs">
+                      {((project as any).languages as Array<{code: string; name: string}>).map((lang) => (
+                        <Badge
+                          key={lang.code}
+                          size="lg"
+                          variant="light"
+                          color="gray"
+                          radius="xl"
                         >
-                          <SkillIcon size={16} />
-                          {skill.display_name_en}
-                        </span>
+                          {lang.name}
+                        </Badge>
+                      ))}
+                    </Group>
+                  </Paper>
+                )}
+
+                {/* Availability */}
+                {project.availabilities && project.availabilities.length > 0 && (
+                  <Paper radius="xl" p="xl" withBorder>
+                    <Title order={3} mb="lg" className="font-display">{t('projectDetail.availability')}</Title>
+                    {project.availabilities.map((avail) => {
+                      const monthKeys = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'] as const;
+                      const monthNames: string[] = t.raw('auth.dobMonths');
+                      return (
+                        <div key={avail._id || avail.year}>
+                          <Text fw={600} mb="sm">{avail.year}</Text>
+                          <SimpleGrid cols={{ base: 3, sm: 4, md: 6 }} spacing="xs">
+                            {monthKeys.map((key, idx) => {
+                              const available = avail[key];
+                              return (
+                                <Paper
+                                  key={key}
+                                  radius="md"
+                                  py="xs"
+                                  px={4}
+                                  ta="center"
+                                  bg={available ? 'var(--color-eco-primary-light, rgba(103,163,111,0.1))' : 'gray.0'}
+                                  style={{ color: available ? 'var(--color-eco-primary)' : 'var(--mantine-color-gray-4)' }}
+                                >
+                                  <Text size="sm" fw={500} inherit>
+                                    {monthNames[idx]?.slice(0, 3)}
+                                  </Text>
+                                </Paper>
+                              );
+                            })}
+                          </SimpleGrid>
+                        </div>
                       );
                     })}
-                  </div>
-                </div>
-              )}
+                  </Paper>
+                )}
 
-              {/* Languages */}
-              {project.languages && project.languages.length > 0 && (
-                <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6 font-display">{t('projectDetail.languages')}</h2>
-                  <div className="flex flex-wrap gap-2">
-                    {project.languages.map((lang) => (
-                      <span
-                        key={lang.code}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-full text-sm"
-                      >
-                        {lang.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Availability */}
-              {project.availabilities && project.availabilities.length > 0 && (
-                <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6 font-display">{t('projectDetail.availability')}</h2>
-                  {project.availabilities.map((avail) => {
-                    const monthKeys = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'] as const;
-                    const monthNames: string[] = t.raw('auth.dobMonths');
-                    return (
-                      <div key={avail.id || avail.year}>
-                        <h3 className="font-semibold text-gray-900 mb-3">{avail.year}</h3>
-                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-                          {monthKeys.map((key, idx) => {
-                            const available = avail[key];
-                            return (
-                              <div
-                                key={key}
-                                className={`text-center py-2 px-1 rounded-lg text-sm font-medium ${
-                                  available
-                                    ? 'bg-eco-primary/10 text-eco-primary'
-                                    : 'bg-gray-50 text-gray-300'
-                                }`}
-                              >
-                                {monthNames[idx]?.slice(0, 3)}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Host */}
-              {project.owner && (
-                <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6 font-display">Votre hôte</h2>
-                  <div className="flex items-center gap-4">
-                    <img
-                      src={project.owner.profile_picture || undefined}
-                      alt={`${project.owner.first_name} ${project.owner.last_name}`}
-                      className="w-16 h-16 rounded-full object-cover border-2 border-eco-primary"
-                    />
-                    <div>
-                      <h3 className="font-bold text-gray-900 text-lg">
-                        {project.owner.first_name} {project.owner.last_name}
-                      </h3>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <IconStar size={16} className="text-yellow-500 mr-1" />
-                        {Number(project.owner.average_rating || 0).toFixed(1)} ({project.owner.review_count} avis)
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+                {/* Host */}
+                {project.owner && (
+                  <Paper radius="xl" p="xl" withBorder>
+                    <Title order={3} mb="lg" className="font-display">{t('projectDetail.yourHost') || 'Your Host'}</Title>
+                    <Group gap="md">
+                      <Avatar
+                        src={project.owner?.profilePictureUrl || undefined}
+                        alt={`${project.owner?.firstName} ${project.owner?.lastName}`}
+                        size="lg"
+                        radius="xl"
+                        color="eco-primary"
+                      />
+                      <Stack gap={0}>
+                        <Text fw={700} size="lg">
+                          {project.owner?.firstName} {project.owner?.lastName}
+                        </Text>
+                        <Group gap={4}>
+                          <IconStar size={16} className="text-yellow-500" />
+                          <Text size="sm" c="dimmed">
+                            {Number(project.owner?.averageRating || 0).toFixed(1)} ({project.owner?.reviewCount} {t('projects.reviews') || 'reviews'})
+                          </Text>
+                        </Group>
+                      </Stack>
+                    </Group>
+                  </Paper>
+                )}
+              </Stack>
             </div>
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 sticky top-24">
-                <h3 className="text-xl font-bold text-gray-900 mb-6 font-display">{t('projectDetail.details')}</h3>
+              <Paper radius="xl" p="lg" shadow="xl" withBorder className="sticky top-24">
+                <Title order={3} mb="lg" className="font-display">{t('projectDetail.details')}</Title>
 
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-                    <div className="text-gray-500 text-sm">{t('projectDetail.status')}</div>
-                    <span className={`font-bold ${project.is_active ? 'text-eco-primary' : 'text-gray-400'}`}>
-                      {project.is_active ? 'Actif' : 'Inactif'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-                    <div className="text-gray-500 text-sm">Type</div>
-                    <div className="font-bold text-gray-900 flex items-center gap-1">
+                <Stack gap="md" mb="xl">
+                  <Group justify="space-between" pb="md" className="border-b border-gray-100">
+                    <Text size="sm" c="dimmed">{t('projectDetail.status')}</Text>
+                    <Text fw={700} c={project.isActive ? 'eco-primary' : 'dimmed'}>
+                      {project.isActive ? t('common.active') || 'Active' : t('common.inactive') || 'Inactive'}
+                    </Text>
+                  </Group>
+                  <Group justify="space-between" pb="md" className="border-b border-gray-100">
+                    <Text size="sm" c="dimmed">Type</Text>
+                    <Group gap={4}>
                       {isNatB ? <IconHome size={16} /> : <IconLeaf size={16} />}
-                      {isNatB ? 'Construction' : 'Permaculture'}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-                    <div className="text-gray-500 text-sm">{t('projectDetail.volunteers')}</div>
-                    <div className="font-bold text-gray-900 flex items-center">
-                      <IconUsers size={18} className="mr-2 text-gray-400" />
-                      {project.max_helpers} max
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pb-4">
-                    <div className="text-gray-500 text-sm">Localisation</div>
-                    <div className="font-bold text-gray-900 flex items-center">
-                      <IconMapPin size={18} className="mr-2 text-gray-400" />
-                      {project.address?.city}
-                    </div>
-                  </div>
-                </div>
+                      <Text fw={700}>{isNatB ? t('projects.naturalBuilding') || 'Construction' : t('projects.permaculture') || 'Permaculture'}</Text>
+                    </Group>
+                  </Group>
+                  <Group justify="space-between" pb="md" className="border-b border-gray-100">
+                    <Text size="sm" c="dimmed">{t('projectDetail.volunteers')}</Text>
+                    <Group gap="xs">
+                      <IconUsers size={18} className="text-gray-400" />
+                      <Text fw={700}>{project.maxHelpers} max</Text>
+                    </Group>
+                  </Group>
+                  <Group justify="space-between">
+                    <Text size="sm" c="dimmed">{t('projectDetail.location') || 'Location'}</Text>
+                    <Group gap="xs">
+                      <IconMapPin size={18} className="text-gray-400" />
+                      <Text fw={700}>{project.address?.city}</Text>
+                    </Group>
+                  </Group>
+                </Stack>
 
-                <div className="mb-6">
-                  <div className="text-gray-500 text-sm mb-2">{t('projectDetail.selectDates')}</div>
+                <Stack gap="md">
+                  <Text size="sm" c="dimmed">{t('projectDetail.selectDates')}</Text>
                   <DatePickerInput
                     type="range"
                     placeholder={t('projectDetail.pickDates')}
@@ -315,24 +355,27 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                     styles={{
                       input: {
                         borderColor: '#e5e7eb',
-                        '&:focus': {
-                          borderColor: 'var(--eco-primary)',
-                        }
                       }
                     }}
                   />
-                </div>
 
-                <button className="w-full bg-eco-primary hover:bg-eco-primaryDark text-white font-bold py-4 rounded-xl shadow-lg shadow-eco-primary/20 transition-all transform hover:-translate-y-1 active:translate-y-0 text-lg cursor-pointer">
-                  {t('projectDetail.apply')}
-                </button>
-                <p className="text-center text-xs text-gray-400 mt-4">
-                  {t('projectDetail.freeForMembers')}
-                </p>
-              </div>
+                  <Button
+                    fullWidth
+                    size="lg"
+                    radius="md"
+                    color="eco-primary"
+                    className="shadow-lg shadow-eco-primary/20 hover:-translate-y-1 transition-all"
+                  >
+                    {t('projectDetail.apply')}
+                  </Button>
+                  <Text size="xs" c="dimmed" ta="center">
+                    {t('projectDetail.freeForMembers')}
+                  </Text>
+                </Stack>
+              </Paper>
             </div>
-          </div>
-        </div>
+          </SimpleGrid>
+        </Container>
       </div>
     </Layout>
   );

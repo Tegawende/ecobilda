@@ -20,6 +20,7 @@ import {
 } from '@tabler/icons-react';
 import { FavoriteButton } from '../common/FavoriteButton';
 import type { Project } from '@/types';
+import { Button } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 
 interface MobileProjectDetailModalProps {
@@ -42,7 +43,7 @@ export function MobileProjectDetailModal({
     // Reset image index when project changes
     useEffect(() => {
         setCurrentImageIndex(0);
-    }, [project?.id]);
+    }, [project?._id]);
 
     // Prevent body scroll when modal is open
     useEffect(() => {
@@ -57,7 +58,7 @@ export function MobileProjectDetailModal({
     }, [isOpen]);
 
     const images = project?.images && project.images.length > 0
-        ? project.images.map(img => img.image)
+        ? project.images.map(img => img.url || '')
         : ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200'];
 
     const nextImage = useCallback(() => {
@@ -70,7 +71,7 @@ export function MobileProjectDetailModal({
 
     if (!isOpen || !project) return null;
 
-    const isNatB = project.project_type === 'NATB';
+    const isNatB = project.projectType === 'NATB';
 
     return (
         <div
@@ -115,7 +116,7 @@ export function MobileProjectDetailModal({
                 {/* Favorite Button */}
                 <div className="absolute top-4 right-4 z-10">
                     <FavoriteButton
-                        projectId={project.id}
+                        projectId={project._id}
                         variant="ghost"
                         size="md"
                         initialFavorite={initialFavorite}
@@ -194,21 +195,21 @@ export function MobileProjectDetailModal({
                                     <IconClock size={20} className="text-eco-primary" />
                                 </div>
                                 <p className="text-xs text-gray-500">{t('projects.hoursPerDayShort') || 'Heures/jour'}</p>
-                                <p className="font-bold text-gray-900">{project.hours_per_day}h</p>
+                                <p className="font-bold text-gray-900">{project.hoursPerDay}h</p>
                             </div>
                             <div className="text-center">
                                 <div className="w-10 h-10 mx-auto rounded-xl bg-eco-primary/10 flex items-center justify-center mb-2">
                                     <IconCalendar size={20} className="text-eco-primary" />
                                 </div>
                                 <p className="text-xs text-gray-500">{t('projects.daysPerWeekShort') || 'Jours/sem'}</p>
-                                <p className="font-bold text-gray-900">{project.days_per_week}j</p>
+                                <p className="font-bold text-gray-900">{project.daysPerWeek}j</p>
                             </div>
                             <div className="text-center">
                                 <div className="w-10 h-10 mx-auto rounded-xl bg-eco-primary/10 flex items-center justify-center mb-2">
                                     <IconUsers size={20} className="text-eco-primary" />
                                 </div>
                                 <p className="text-xs text-gray-500">{t('projects.volunteers') || 'Volontaires'}</p>
-                                <p className="font-bold text-gray-900">{project.max_helpers}</p>
+                                <p className="font-bold text-gray-900">{project.maxHelpers}</p>
                             </div>
                         </div>
                     </div>
@@ -217,24 +218,24 @@ export function MobileProjectDetailModal({
                     <div className="bg-gray-50 rounded-2xl p-5">
                         <h2 className="text-lg font-bold text-gray-900 mb-4 font-display">{t('projects.filters.amenities') || 'Équipements'}</h2>
                         <div className="grid grid-cols-2 gap-3">
-                            <div className={`flex items-center gap-2 p-3 rounded-xl border-2 ${project.internet_provided ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
+                            <div className={`flex items-center gap-2 p-3 rounded-xl border-2 ${project.internetProvided ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
                                 }`}>
-                                <IconWifi size={20} className={project.internet_provided ? 'text-eco-primary' : 'text-gray-400'} />
+                                <IconWifi size={20} className={project.internetProvided ? 'text-eco-primary' : 'text-gray-400'} />
                                 <span className="text-sm font-medium">{t('projects.wifi') || 'WiFi'}</span>
                             </div>
-                            <div className={`flex items-center gap-2 p-3 rounded-xl border-2 ${project.family_friendly ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
+                            <div className={`flex items-center gap-2 p-3 rounded-xl border-2 ${project.familyFriendly ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
                                 }`}>
-                                <IconBabyCarriage size={20} className={project.family_friendly ? 'text-eco-primary' : 'text-gray-400'} />
+                                <IconBabyCarriage size={20} className={project.familyFriendly ? 'text-eco-primary' : 'text-gray-400'} />
                                 <span className="text-sm font-medium">{t('projects.familyFriendly') || 'Familles'}</span>
                             </div>
-                            <div className={`flex items-center gap-2 p-3 rounded-xl border-2 ${project.pets_allowed ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
+                            <div className={`flex items-center gap-2 p-3 rounded-xl border-2 ${project.petsAllowed ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
                                 }`}>
-                                <IconDog size={20} className={project.pets_allowed ? 'text-eco-primary' : 'text-gray-400'} />
+                                <IconDog size={20} className={project.petsAllowed ? 'text-eco-primary' : 'text-gray-400'} />
                                 <span className="text-sm font-medium">{t('projects.petsAllowed') || 'Animaux'}</span>
                             </div>
-                            <div className={`flex items-center gap-2 p-3 rounded-xl border-2 ${project.smoking_allowed ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
+                            <div className={`flex items-center gap-2 p-3 rounded-xl border-2 ${project.smokingAllowed ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
                                 }`}>
-                                <IconSmoking size={20} className={project.smoking_allowed ? 'text-eco-primary' : 'text-gray-400'} />
+                                <IconSmoking size={20} className={project.smokingAllowed ? 'text-eco-primary' : 'text-gray-400'} />
                                 <span className="text-sm font-medium">{t('projects.smokingAllowed') || 'Fumeur'}</span>
                             </div>
                         </div>
@@ -246,17 +247,17 @@ export function MobileProjectDetailModal({
                             <h2 className="text-lg font-bold text-gray-900 mb-4 font-display">{t('projectDetail.yourHost') || 'Votre hôte'}</h2>
                             <div className="flex items-center gap-4">
                                 <img
-                                    src={project.owner.profile_picture || undefined}
-                                    alt={`${project.owner.first_name} ${project.owner.last_name}`}
+                                    src={project.owner?.profilePictureUrl || undefined}
+                                    alt={`${project.owner?.firstName} ${project.owner?.lastName}`}
                                     className="w-14 h-14 rounded-full object-cover border-2 border-eco-primary"
                                 />
                                 <div>
                                     <h3 className="font-bold text-gray-900">
-                                        {project.owner.first_name} {project.owner.last_name}
+                                        {project.owner?.firstName} {project.owner?.lastName}
                                     </h3>
                                     <div className="flex items-center text-sm text-gray-500">
                                         <IconStar size={16} className="text-yellow-500 mr-1" />
-                                        {Number(project.owner.average_rating || 0).toFixed(1)} ({project.owner.review_count} {t('projectDetail.reviews') || 'avis'})
+                                        {Number(project.owner?.averageRating || 0).toFixed(1)} ({project.owner?.reviewCount} {t('projectDetail.reviews') || 'avis'})
                                     </div>
                                 </div>
                             </div>
@@ -293,9 +294,9 @@ export function MobileProjectDetailModal({
 
             {/* Fixed Apply Button */}
             <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 z-10">
-                <button className="w-full bg-eco-primary hover:bg-eco-primaryDark text-white font-bold py-4 rounded-xl shadow-lg shadow-eco-primary/20 transition-all text-lg cursor-pointer">
+                <Button fullWidth size="lg" radius="xl" color="eco-primary" className="shadow-lg shadow-eco-primary/20">
                     {t('projectDetail.apply')}
-                </button>
+                </Button>
             </div>
         </div>
     );

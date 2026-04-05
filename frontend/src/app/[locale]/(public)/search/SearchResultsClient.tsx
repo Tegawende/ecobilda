@@ -27,6 +27,7 @@ import {
   IconPaw,
   IconSmokingNo,
 } from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
 import { Layout } from '@/components/common/Layout';
 import { InteractiveMap } from '@/components/search/InteractiveMap';
 import { ProjectCard, ProjectCardSkeleton } from '@/components/projects/ProjectCard';
@@ -36,6 +37,7 @@ import type { Project } from '@/types';
 const ITEMS_PER_PAGE = 12;
 
 export function SearchResultsClient() {
+  const t = useTranslations();
   const searchParams = useSearchParams();
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
@@ -45,12 +47,12 @@ export function SearchResultsClient() {
 
   // Filter states
   const [filters, setFilters] = useState({
-    project_types: [] as ('PERM' | 'NATB')[],
+    projectTypes: [] as ('PERM' | 'NATB')[],
     is_free: null as boolean | null,
-    internet_provided: false,
-    family_friendly: false,
-    pets_allowed: false,
-    smoking_allowed: false,
+    internetProvided: false,
+    familyFriendly: false,
+    petsAllowed: false,
+    smokingAllowed: false,
   });
 
   // Fetch projects based on search params
@@ -88,25 +90,25 @@ export function SearchResultsClient() {
   useEffect(() => {
     let filtered = [...projects];
 
-    if (filters.project_types.length > 0) {
-      filtered = filtered.filter(p => filters.project_types.includes(p.project_type));
+    if (filters.projectTypes.length > 0) {
+      filtered = filtered.filter(p => filters.projectTypes.includes(p.projectType));
     }
 
     if (filters.is_free !== null) {
-      filtered = filtered.filter(p => p.is_free === filters.is_free);
+      filtered = filtered.filter(p => (p as any).is_free === filters.is_free);
     }
 
-    if (filters.internet_provided) {
-      filtered = filtered.filter(p => p.internet_provided);
+    if (filters.internetProvided) {
+      filtered = filtered.filter(p => p.internetProvided);
     }
-    if (filters.family_friendly) {
-      filtered = filtered.filter(p => p.family_friendly);
+    if (filters.familyFriendly) {
+      filtered = filtered.filter(p => p.familyFriendly);
     }
-    if (filters.pets_allowed) {
-      filtered = filtered.filter(p => p.pets_allowed);
+    if (filters.petsAllowed) {
+      filtered = filtered.filter(p => p.petsAllowed);
     }
-    if (filters.smoking_allowed) {
-      filtered = filtered.filter(p => p.smoking_allowed);
+    if (filters.smokingAllowed) {
+      filtered = filtered.filter(p => p.smokingAllowed);
     }
 
     setFilteredProjects(filtered);
@@ -136,30 +138,30 @@ export function SearchResultsClient() {
   const toggleProjectType = (type: 'PERM' | 'NATB') => {
     setFilters(prev => ({
       ...prev,
-      project_types: prev.project_types.includes(type)
-        ? prev.project_types.filter(t => t !== type)
-        : [...prev.project_types, type]
+      projectTypes: prev.projectTypes.includes(type)
+        ? prev.projectTypes.filter(t => t !== type)
+        : [...prev.projectTypes, type]
     }));
   };
 
   const clearFilters = () => {
     setFilters({
-      project_types: [],
+      projectTypes: [],
       is_free: null,
-      internet_provided: false,
-      family_friendly: false,
-      pets_allowed: false,
-      smoking_allowed: false,
+      internetProvided: false,
+      familyFriendly: false,
+      petsAllowed: false,
+      smokingAllowed: false,
     });
   };
 
   const hasActiveFilters =
-    filters.project_types.length > 0 ||
+    filters.projectTypes.length > 0 ||
     filters.is_free !== null ||
-    filters.internet_provided ||
-    filters.family_friendly ||
-    filters.pets_allowed ||
-    filters.smoking_allowed;
+    filters.internetProvided ||
+    filters.familyFriendly ||
+    filters.petsAllowed ||
+    filters.smokingAllowed;
 
   return (
     <Layout>
@@ -168,11 +170,11 @@ export function SearchResultsClient() {
         <Box maw="1920px" mx="auto" px="xl" py="md">
           <Group justify="space-between" mb="xs">
             <Text fw={600} size="lg">
-              {filteredProjects.length} project{filteredProjects.length !== 1 ? 's' : ''}
+              {filteredProjects.length === 1 ? t('search.results', { count: filteredProjects.length }) : t('search.resultsPlural', { count: filteredProjects.length })}
             </Text>
             {hasActiveFilters && (
               <Button variant="subtle" size="xs" onClick={clearFilters}>
-                Clear all filters
+                {t('search.clearFilters')}
               </Button>
             )}
           </Group>
@@ -186,27 +188,27 @@ export function SearchResultsClient() {
                 leftSection={<IconFilter size={16} />}
                 onClick={toggleFilters}
               >
-                Filters
+                {t('search.filters')}
               </Button>
 
               <Button
-                variant={filters.project_types.includes('PERM') ? 'filled' : 'outline'}
+                variant={filters.projectTypes.includes('PERM') ? 'filled' : 'outline'}
                 color="eco-primary"
                 size="sm"
                 leftSection={<IconPlant size={16} />}
                 onClick={() => toggleProjectType('PERM')}
               >
-                Permaculture
+                {t('search.permaculture')}
               </Button>
 
               <Button
-                variant={filters.project_types.includes('NATB') ? 'filled' : 'outline'}
+                variant={filters.projectTypes.includes('NATB') ? 'filled' : 'outline'}
                 color="orange"
                 size="sm"
                 leftSection={<IconHammer size={16} />}
                 onClick={() => toggleProjectType('NATB')}
               >
-                Natural Building
+                {t('search.naturalBuilding')}
               </Button>
 
               <Button
@@ -215,7 +217,7 @@ export function SearchResultsClient() {
                 size="sm"
                 onClick={() => setFilters({ ...filters, is_free: filters.is_free === true ? null : true })}
               >
-                Free
+                {t('search.free')}
               </Button>
 
               <Button
@@ -224,43 +226,43 @@ export function SearchResultsClient() {
                 size="sm"
                 onClick={() => setFilters({ ...filters, is_free: filters.is_free === false ? null : false })}
               >
-                Paid
+                {t('search.paid')}
               </Button>
 
               <Button
-                variant={filters.internet_provided ? 'filled' : 'outline'}
+                variant={filters.internetProvided ? 'filled' : 'outline'}
                 size="sm"
                 leftSection={<IconWifi size={16} />}
-                onClick={() => setFilters({ ...filters, internet_provided: !filters.internet_provided })}
+                onClick={() => setFilters({ ...filters, internetProvided: !filters.internetProvided })}
               >
-                Internet
+                {t('search.internet')}
               </Button>
 
               <Button
-                variant={filters.family_friendly ? 'filled' : 'outline'}
+                variant={filters.familyFriendly ? 'filled' : 'outline'}
                 size="sm"
                 leftSection={<IconUsers size={16} />}
-                onClick={() => setFilters({ ...filters, family_friendly: !filters.family_friendly })}
+                onClick={() => setFilters({ ...filters, familyFriendly: !filters.familyFriendly })}
               >
-                Family Friendly
+                {t('search.familyFriendly')}
               </Button>
 
               <Button
-                variant={filters.pets_allowed ? 'filled' : 'outline'}
+                variant={filters.petsAllowed ? 'filled' : 'outline'}
                 size="sm"
                 leftSection={<IconPaw size={16} />}
-                onClick={() => setFilters({ ...filters, pets_allowed: !filters.pets_allowed })}
+                onClick={() => setFilters({ ...filters, petsAllowed: !filters.petsAllowed })}
               >
-                Pets
+                {t('search.pets')}
               </Button>
 
               <Button
-                variant={filters.smoking_allowed ? 'filled' : 'outline'}
+                variant={filters.smokingAllowed ? 'filled' : 'outline'}
                 size="sm"
                 leftSection={<IconSmokingNo size={16} />}
-                onClick={() => setFilters({ ...filters, smoking_allowed: !filters.smoking_allowed })}
+                onClick={() => setFilters({ ...filters, smokingAllowed: !filters.smokingAllowed })}
               >
-                Smoking
+                {t('search.smoking')}
               </Button>
             </Group>
           </ScrollArea>
@@ -271,32 +273,32 @@ export function SearchResultsClient() {
               <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="xl">
                 {/* Project Type */}
                 <Stack gap="xs">
-                  <Text fw={600} size="sm">Project Type</Text>
+                  <Text fw={600} size="sm">{t('search.projectType')}</Text>
                   <Checkbox
                     label={
                       <Group gap="xs">
                         <IconPlant size={16} color="var(--color-eco-primary)" />
-                        <span>Permaculture</span>
+                        <span>{t('search.permaculture')}</span>
                       </Group>
                     }
-                    checked={filters.project_types.includes('PERM')}
+                    checked={filters.projectTypes.includes('PERM')}
                     onChange={() => toggleProjectType('PERM')}
                   />
                   <Checkbox
                     label={
                       <Group gap="xs">
                         <IconHammer size={16} color="orange" />
-                        <span>Natural Building</span>
+                        <span>{t('search.naturalBuilding')}</span>
                       </Group>
                     }
-                    checked={filters.project_types.includes('NATB')}
+                    checked={filters.projectTypes.includes('NATB')}
                     onChange={() => toggleProjectType('NATB')}
                   />
                 </Stack>
 
                 {/* Price */}
                 <Stack gap="xs">
-                  <Text fw={600} size="sm">Price</Text>
+                  <Text fw={600} size="sm">{t('search.price')}</Text>
                   <Radio.Group
                     value={filters.is_free === null ? 'all' : filters.is_free ? 'free' : 'paid'}
                     onChange={(value) => setFilters({
@@ -305,60 +307,60 @@ export function SearchResultsClient() {
                     })}
                   >
                     <Stack gap="xs">
-                      <Radio value="all" label="All" />
-                      <Radio value="free" label="Free" />
-                      <Radio value="paid" label="Paid" />
+                      <Radio value="all" label={t('common.all')} />
+                      <Radio value="free" label={t('search.free')} />
+                      <Radio value="paid" label={t('search.paid')} />
                     </Stack>
                   </Radio.Group>
                 </Stack>
 
                 {/* Amenities */}
                 <Stack gap="xs">
-                  <Text fw={600} size="sm">Amenities</Text>
+                  <Text fw={600} size="sm">{t('search.amenities')}</Text>
                   <Checkbox
                     label={
                       <Group gap="xs">
                         <IconWifi size={16} />
-                        <span>Internet</span>
+                        <span>{t('search.internet')}</span>
                       </Group>
                     }
-                    checked={filters.internet_provided}
-                    onChange={(e) => setFilters({ ...filters, internet_provided: e.currentTarget.checked })}
+                    checked={filters.internetProvided}
+                    onChange={(e) => setFilters({ ...filters, internetProvided: e.currentTarget.checked })}
                   />
                   <Checkbox
                     label={
                       <Group gap="xs">
                         <IconUsers size={16} />
-                        <span>Family Friendly</span>
+                        <span>{t('search.familyFriendly')}</span>
                       </Group>
                     }
-                    checked={filters.family_friendly}
-                    onChange={(e) => setFilters({ ...filters, family_friendly: e.currentTarget.checked })}
+                    checked={filters.familyFriendly}
+                    onChange={(e) => setFilters({ ...filters, familyFriendly: e.currentTarget.checked })}
                   />
                 </Stack>
 
                 {/* Policies */}
                 <Stack gap="xs">
-                  <Text fw={600} size="sm">Policies</Text>
+                  <Text fw={600} size="sm">{t('search.policies')}</Text>
                   <Checkbox
                     label={
                       <Group gap="xs">
                         <IconPaw size={16} />
-                        <span>Pets Allowed</span>
+                        <span>{t('search.petsAllowed')}</span>
                       </Group>
                     }
-                    checked={filters.pets_allowed}
-                    onChange={(e) => setFilters({ ...filters, pets_allowed: e.currentTarget.checked })}
+                    checked={filters.petsAllowed}
+                    onChange={(e) => setFilters({ ...filters, petsAllowed: e.currentTarget.checked })}
                   />
                   <Checkbox
                     label={
                       <Group gap="xs">
                         <IconSmokingNo size={16} />
-                        <span>Smoking Allowed</span>
+                        <span>{t('search.smokingAllowed')}</span>
                       </Group>
                     }
-                    checked={filters.smoking_allowed}
-                    onChange={(e) => setFilters({ ...filters, smoking_allowed: e.currentTarget.checked })}
+                    checked={filters.smokingAllowed}
+                    onChange={(e) => setFilters({ ...filters, smokingAllowed: e.currentTarget.checked })}
                   />
                 </Stack>
               </SimpleGrid>
@@ -382,7 +384,7 @@ export function SearchResultsClient() {
               <>
                 <SimpleGrid cols={{ base: 1, xl: 2 }} spacing="lg">
                   {paginatedProjects.map((project) => (
-                    <ProjectCard key={project.id} project={project} />
+                    <ProjectCard key={project._id} project={project} />
                   ))}
                 </SimpleGrid>
 
@@ -401,8 +403,8 @@ export function SearchResultsClient() {
             ) : (
               <Center py={64}>
                 <Stack align="center" gap="xs">
-                  <Text size="lg" c="dimmed">No projects match your filters</Text>
-                  <Text size="sm" c="dimmed">Try adjusting your search criteria</Text>
+                  <Text size="lg" c="dimmed">{t('search.noResults')}</Text>
+                  <Text size="sm" c="dimmed">{t('search.adjustCriteria')}</Text>
                 </Stack>
               </Center>
             )}

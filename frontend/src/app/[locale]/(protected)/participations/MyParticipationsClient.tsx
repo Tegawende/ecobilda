@@ -25,7 +25,8 @@ import {
   IconArrowRight,
   IconAlertCircle,
 } from '@tabler/icons-react';
-import { participationsService, type ParticipationRequest } from '@/services/participations';
+import { participationsService } from '@/services/participations';
+import type { ParticipationRequest } from '@/types';
 import { Layout } from '@/components/common/Layout';
 
 type DisplayStatus = 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled' | 'expired';
@@ -74,10 +75,10 @@ function ParticipationCard({ participation }: { participation: ParticipationRequ
           <StatusBadge status={participation.status} />
         </div>
         <Link
-          href={`/projects/${participation.project.id}`}
+          href={`/projects/${participation.project?._id}`}
           className="text-lg font-display font-bold text-gray-900 hover:text-eco-primary transition-colors line-clamp-2 pr-20"
         >
-          {participation.project.title}
+          {participation.project?.title}
         </Link>
       </div>
 
@@ -86,30 +87,30 @@ function ParticipationCard({ participation }: { participation: ParticipationRequ
           <div className="flex items-center gap-2 mb-4 text-xs font-medium text-eco-primary bg-eco-primary/5 p-2 rounded-lg">
             <IconCalendar size={16} />
             <span>
-              {participation.requested_start_date ? new Date(participation.requested_start_date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : ''}
+              {participation.proposedStartDate ? new Date(participation.proposedStartDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : ''}
               {' - '}
-              {participation.requested_end_date ? new Date(participation.requested_end_date).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : ''}
+              {participation.proposedEndDate ? new Date(participation.proposedEndDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : ''}
             </span>
           </div>
 
-          {participation.message && (
-            <p className="text-sm text-gray-600 line-clamp-2 mb-4">{participation.message}</p>
+          {participation.motivation && (
+            <p className="text-sm text-gray-600 line-clamp-2 mb-4">{participation.motivation}</p>
           )}
 
-          {participation.host_response_message && (
+          {participation.hostResponseMessage && (
             <Paper radius="md" p="sm" bg="gray.0">
               <Text size="sm" fw={600} c="dimmed">{t('participations.hostResponse') || 'Host response'}:</Text>
-              <Text size="sm" c="dimmed" mt={4}>{participation.host_response_message}</Text>
+              <Text size="sm" c="dimmed" mt={4}>{participation.hostResponseMessage}</Text>
             </Paper>
           )}
         </div>
 
         <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
           <Text size="xs" c="dimmed">
-            {t('participations.host') || 'Host'}: {participation.project.owner?.first_name}
+            {t('participations.host') || 'Host'}
           </Text>
           <Link
-            href={`/projects/${participation.project.id}`}
+            href={`/projects/${participation.project?._id}`}
             className="inline-flex items-center gap-1 text-xs font-bold text-eco-primary hover:text-eco-primaryDark"
           >
             {t('participations.viewProject') || 'View Project'}
@@ -155,9 +156,14 @@ export function MyParticipationsClient() {
         const data = await participationsService.getMyParticipations();
         const requestList = Array.isArray(data) ? data : ((data as any).results || []);
         setParticipations(requestList);
-      } catch (err) {
-        logger.error('Failed to fetch participations:', err);
-        setError(t('participations.fetchError') || 'Failed to load participations');
+      } catch (err: any) {
+        // 404 means the endpoint doesn't exist yet - treat as empty list
+        if (err?.response?.status === 404) {
+          setParticipations([]);
+        } else {
+          logger.error('Failed to fetch participations:', err);
+          setError(t('participations.fetchError') || 'Failed to load participations');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -180,72 +186,74 @@ export function MyParticipationsClient() {
 
   return (
     <Layout>
-    <div className="bg-stone-50 min-h-screen py-12">
-      <Container size="lg">
-        {/* Header */}
-        <Group gap="md" mb="xl">
-          <ThemeIcon size={48} radius="md" color="blue" variant="light">
-            <IconCompass size={28} />
-          </ThemeIcon>
-          <Stack gap={4}>
-            <Title order={1} className="font-display">
-              {t('participations.title') || 'My Participations'}
-            </Title>
-            <Text c="dimmed">
-              {t('participations.subtitle') || 'Projects you applied to join'}
-            </Text>
+      <div className="bg-stone-50 min-h-screen py-12">
+        <Container size="md">
+          <Stack gap="lg">
+            {/* Header */}
+            <Group gap="md" mb="xl">
+              <ThemeIcon size={48} radius="md" color="eco-primary" variant="light">
+                <IconCompass size={28} />
+              </ThemeIcon>
+              <Stack gap={4}>
+                <Title order={1} className="font-display">
+                  {t('participations.title') || 'My Participations'}
+                </Title>
+                <Text c="dimmed">
+                  {t('participations.subtitle') || 'Projects you applied to join'}
+                </Text>
+              </Stack>
+            </Group>
+
+            {/* Filter Tabs */}
+            <Paper radius="lg" p="lg" withBorder>
+              <FilterTabs value={filter} onChange={setFilter} options={filterOptions} />
+            </Paper>
+
+            {/* Error */}
+            {error && (
+              <Alert icon={<IconAlertCircle size={16} />} color="red" onClose={() => setError(null)} withCloseButton>
+                {error}
+              </Alert>
+            )}
+
+            {/* Content */}
+            {isLoading ? (
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
+                {[1, 2, 3].map((i) => (
+                  <Paper key={i} radius="lg" h={256} withBorder className="animate-pulse bg-gray-100" />
+                ))}
+              </SimpleGrid>
+            ) : !error && filteredParticipations.length > 0 ? (
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
+                {filteredParticipations.map((participation) => (
+                  <ParticipationCard key={participation._id} participation={participation} />
+                ))}
+              </SimpleGrid>
+            ) : (
+              <Paper radius="lg" p="xl" withBorder className="text-center">
+                <Stack align="center" gap="md">
+                  <IconCompass size={64} className="text-gray-300" />
+                  <Title order={3} className="font-display">
+                    {t('participations.noParticipations') || 'No participations yet'}
+                  </Title>
+                  <Text c="dimmed" maw={400}>
+                    {t('participations.noParticipationsDesc') || 'Start exploring projects and apply to join them!'}
+                  </Text>
+                  <Button
+                    component={Link}
+                    href="/projects"
+                    radius="xl"
+                    size="md"
+                    color="eco-primary"
+                  >
+                    {t('participations.browseProjects') || 'Browse Projects'}
+                  </Button>
+                </Stack>
+              </Paper>
+            )}
           </Stack>
-        </Group>
-
-        {/* Filter Tabs */}
-        <div className="mb-8 pb-4 border-b border-gray-100">
-          <FilterTabs value={filter} onChange={setFilter} options={filterOptions} />
-        </div>
-
-        {/* Error */}
-        {error && (
-          <Alert icon={<IconAlertCircle size={16} />} color="red" mb="lg" onClose={() => setError(null)} withCloseButton>
-            {error}
-          </Alert>
-        )}
-
-        {/* Content */}
-        {isLoading ? (
-          <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
-            {[1, 2, 3].map((i) => (
-              <Paper key={i} radius="lg" h={256} withBorder className="animate-pulse bg-gray-100" />
-            ))}
-          </SimpleGrid>
-        ) : !error && filteredParticipations.length > 0 ? (
-          <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
-            {filteredParticipations.map((participation) => (
-              <ParticipationCard key={participation.id} participation={participation} />
-            ))}
-          </SimpleGrid>
-        ) : (
-          <Paper radius="xl" p="xl" withBorder className="text-center max-w-xl mx-auto">
-            <Stack align="center" gap="md">
-              <IconCompass size={64} className="text-gray-300" />
-              <Title order={3} className="font-display">
-                {t('participations.noParticipations') || 'No participations yet'}
-              </Title>
-              <Text c="dimmed" maw={400}>
-                {t('participations.noParticipationsDesc') || 'Start exploring projects and apply to join them!'}
-              </Text>
-              <Button
-                component={Link}
-                href="/projects"
-                radius="xl"
-                size="md"
-                color="eco-primary"
-              >
-                {t('participations.browseProjects') || 'Browse Projects'}
-              </Button>
-            </Stack>
-          </Paper>
-        )}
-      </Container>
-    </div>
+        </Container>
+      </div>
     </Layout>
   );
 }

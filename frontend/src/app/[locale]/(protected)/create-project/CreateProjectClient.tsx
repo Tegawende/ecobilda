@@ -26,31 +26,31 @@ export interface ProjectFormData {
   // Step 1: Basic Info
   title: string;
   description: string;
-  project_type: 'PERM' | 'NATB';
+  projectType: 'PERM' | 'NATB';
 
   // Step 2: Location & Work
   address: {
     street: string;
-    street_number: string;
+    streetNumber: string;
     city: string;
-    postal_code: string;
-    country_code: string;
+    postalCode: string;
+    countryCode: string;
     latitude: number;
     longitude: number;
-    formatted_address: string;
+    formattedAddress: string;
   };
-  hours_per_day: number;
-  days_per_week: number;
-  max_helpers: number;
-  accommodation_details: string;
-  food_details: string;
+  hoursPerDay: number;
+  daysPerWeek: number;
+  maxHelpers: number;
+  accommodationDetails: string;
+  foodDetails: string;
 
   // Step 3: Skills & Amenities
   skills: string[];
-  internet_provided: boolean;
-  family_friendly: boolean;
-  pets_allowed: boolean;
-  smoking_allowed: boolean;
+  internetProvided: boolean;
+  familyFriendly: boolean;
+  petsAllowed: boolean;
+  smokingAllowed: boolean;
 
   // Step 4: Availability
   availabilities: {
@@ -83,27 +83,27 @@ export function CreateProjectClient() {
   const [formData, setFormData] = useState<ProjectFormData>({
     title: '',
     description: '',
-    project_type: 'PERM',
+    projectType: 'PERM',
     address: {
       street: '',
-      street_number: '',
+      streetNumber: '',
       city: '',
-      postal_code: '',
-      country_code: '',
+      postalCode: '',
+      countryCode: '',
       latitude: 0,
       longitude: 0,
-      formatted_address: '',
+      formattedAddress: '',
     },
-    hours_per_day: 5,
-    days_per_week: 5,
-    max_helpers: 2,
-    accommodation_details: '',
-    food_details: '',
+    hoursPerDay: 5,
+    daysPerWeek: 5,
+    maxHelpers: 2,
+    accommodationDetails: '',
+    foodDetails: '',
     skills: [],
-    internet_provided: false,
-    family_friendly: false,
-    pets_allowed: false,
-    smoking_allowed: false,
+    internetProvided: false,
+    familyFriendly: false,
+    petsAllowed: false,
+    smokingAllowed: false,
     availabilities: [],
     images: [],
   });
@@ -136,18 +136,18 @@ export function CreateProjectClient() {
       const projectPayload: Record<string, unknown> = {
         title: formData.title,
         description: formData.description,
-        project_type: formData.project_type,
-        address: formData.address, // Backend will handle address creation
-        hours_per_day: formData.hours_per_day,
-        days_per_week: formData.days_per_week,
-        max_helpers: formData.max_helpers,
-        accommodation_details: formData.accommodation_details,
-        food_details: formData.food_details,
-        skills: formData.skills, // Backend expects skill codes
-        internet_provided: formData.internet_provided,
-        family_friendly: formData.family_friendly,
-        pets_allowed: formData.pets_allowed,
-        smoking_allowed: formData.smoking_allowed,
+        projectType: formData.projectType,
+        address: formData.address,
+        hoursPerDay: formData.hoursPerDay,
+        daysPerWeek: formData.daysPerWeek,
+        maxHelpers: formData.maxHelpers,
+        accommodationDetails: formData.accommodationDetails,
+        foodDetails: formData.foodDetails,
+        skills: formData.skills,
+        internetProvided: formData.internetProvided,
+        familyFriendly: formData.familyFriendly,
+        petsAllowed: formData.petsAllowed,
+        smokingAllowed: formData.smokingAllowed,
       };
 
       const project = await projectsService.createProject(projectPayload as any);
@@ -156,11 +156,11 @@ export function CreateProjectClient() {
       if (formData.images.length > 0) {
         for (let i = 0; i < formData.images.length; i++) {
           const isCover = i === 0;
-          await projectsService.uploadImage(project.id, formData.images[i], isCover);
+          await projectsService.uploadImage(project._id, formData.images[i], isCover);
         }
       }
 
-      router.push(`/projects/${project.id}`);
+      router.push(`/projects/${project._id}`);
     } catch (err: any) {
       console.error('Failed to create project:', err);
       const errorMessage =

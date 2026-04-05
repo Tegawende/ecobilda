@@ -36,22 +36,14 @@ export function VerifyEmailClient({ token }: { token: string }) {
 
   const verifyEmail = async (verificationToken: string) => {
     try {
-      const response = await authService.verifyEmail(verificationToken);
-      if (response.data?.already_verified) {
-        setStatus('already_verified');
-        setMessage(t('auth.verification.alreadyVerified') || 'Your email has already been verified.');
-      } else {
-        setStatus('success');
-        setMessage(t('auth.verification.success'));
-      }
+      await authService.verifyEmail(verificationToken);
+      setStatus('success');
+      setMessage(t('auth.verification.success'));
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { error?: string; expired?: boolean; already_verified?: boolean }; status?: number } };
-      if (err.response?.data?.already_verified) {
-        setStatus('already_verified');
-        setMessage(t('auth.verification.alreadyVerified') || 'Your email has already been verified.');
-      } else if (err.response?.status === 400 && err.response?.data?.expired) {
-        setStatus('expired');
-        setMessage(t('auth.verification.expired'));
+      const err = error as Error;
+      if (err.message?.includes('already') || err.message?.includes('Invalid')) {
+        setStatus('error');
+        setMessage(t('auth.verification.error'));
       } else {
         setStatus('error');
         setMessage(t('auth.verification.error'));

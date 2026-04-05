@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ActionIcon, Tooltip, Loader } from '@mantine/core';
+import { ActionIcon, Tooltip, Loader, UnstyledButton } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { notifications } from '@mantine/notifications';
@@ -12,10 +12,10 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { favoritesService } from '@/services/favorites';
-import { isAuthenticated } from '@/services/api';
+import { isAuthenticated } from '@/lib/convexClient';
 
 interface FavoriteButtonProps {
-  projectId: number;
+  projectId: string | number;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'circle' | 'ghost';
   initialFavorite?: boolean;
@@ -114,20 +114,15 @@ export function FavoriteButton({
   if (variant === 'ghost') {
     return (
       <Tooltip label={label} withArrow>
-        <button
+        <UnstyledButton
           onClick={handleToggleFavorite}
           disabled={isLoading}
+          className="hover:scale-110 active:scale-95 transition-transform"
           style={{
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            cursor: isLoading ? 'not-allowed' : 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            transition: 'transform 0.2s ease',
           }}
-          className="hover:scale-110 active:scale-95"
           aria-label={label}
         >
           {isLoading ? (
@@ -145,7 +140,7 @@ export function FavoriteButton({
               className={isFavorite ? 'fill-[#ff385c]' : ''}
             />
           )}
-        </button>
+        </UnstyledButton>
       </Tooltip>
     );
   }

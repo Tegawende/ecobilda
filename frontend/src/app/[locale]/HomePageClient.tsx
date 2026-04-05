@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
-import { ThemeIcon, Accordion } from '@mantine/core';
+import { Container, ThemeIcon, Accordion, SimpleGrid, Stack, Title, Text, Group, Paper } from '@mantine/core';
 import {
   IconPlant,
   IconHammer,
@@ -11,9 +11,7 @@ import {
   IconSearch,
   IconSend,
   IconSchool,
-  IconHome,
   IconUserPlus,
-  IconQuestionMark,
 } from '@tabler/icons-react';
 import { Layout } from '@/components/common/Layout';
 import { useAuth } from '@/providers/AuthProvider';
@@ -26,9 +24,14 @@ export function HomePageClient() {
   // Redirect authenticated users to projects page
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.push('/projects');
+      router.replace('/projects');
     }
   }, [isAuthenticated, isLoading, router]);
+
+  // Don't render landing page content for authenticated users
+  if (isLoading || isAuthenticated) {
+    return null;
+  }
 
   const faqItems = [
     { q: t('home.faq.q1'), a: t('home.faq.a1') },
@@ -40,7 +43,7 @@ export function HomePageClient() {
 
   return (
     <Layout>
-      {/* Hero Section */}
+      {/* Hero Section - Full-bleed design, stays Tailwind */}
       <div className="relative isolate h-screen w-full overflow-hidden">
         <img
           src="/images/home_cover.jpeg"
@@ -69,16 +72,17 @@ export function HomePageClient() {
 
       {/* Values Section */}
       <div className="bg-white py-16 sm:py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-3xl sm:text-4xl font-display font-bold tracking-tight text-eco-primary">
+        <Container size="lg">
+          <Stack align="center" gap="xs" mb="xl">
+            <Title order={2} ta="center" className="text-3xl sm:text-4xl font-display font-bold tracking-tight text-eco-primary">
               {t('home.about.title')}
-            </h2>
-            <p className="mt-4 text-lg leading-8 text-gray-600">
+            </Title>
+            <Text size="lg" c="dimmed" ta="center" maw={720}>
               {t('home.about.intro')}
-            </p>
-          </div>
-          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
+            </Text>
+          </Stack>
+
+          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="lg" mt="xl">
             {[
               {
                 icon: <IconHammer size={36} stroke={1.5} />,
@@ -96,44 +100,48 @@ export function HomePageClient() {
                 content: t('home.community.content'),
               },
             ].map((item, i) => (
-              <div
+              <Paper
                 key={i}
-                className="flex flex-col items-center text-center rounded-2xl bg-stone-50 p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
+                radius="lg"
+                p="lg"
+                bg="var(--mantine-color-gray-0)"
+                className="hover:shadow-lg hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300"
               >
-                <ThemeIcon
-                  size={72}
-                  radius="xl"
-                  color="eco-primary"
-                  variant="light"
-                  className="mb-5"
-                >
-                  {item.icon}
-                </ThemeIcon>
-                <h3 className="text-lg font-bold text-gray-900 font-display">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-gray-600">
-                  {item.content}
-                </p>
-              </div>
+                <Stack align="center" ta="center" gap="sm">
+                  <ThemeIcon
+                    size={72}
+                    radius="xl"
+                    color="eco-primary"
+                    variant="light"
+                  >
+                    {item.icon}
+                  </ThemeIcon>
+                  <Title order={4} className="font-display">
+                    {item.title}
+                  </Title>
+                  <Text size="sm" c="dimmed" lh={1.6}>
+                    {item.content}
+                  </Text>
+                </Stack>
+              </Paper>
             ))}
-          </div>
-        </div>
+          </SimpleGrid>
+        </Container>
       </div>
 
       {/* How It Works Section */}
       <div className="bg-stone-50 py-16 sm:py-20 border-t border-stone-100">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-display font-bold tracking-tight text-eco-primary">
+        <Container size="lg">
+          <Stack align="center" gap="xs" mb="xl">
+            <Title order={2} ta="center" className="text-3xl sm:text-4xl font-display font-bold tracking-tight text-eco-primary">
               {t('home.howItWorks.title')}
-            </h2>
-            <p className="mt-4 text-lg text-gray-600">
+            </Title>
+            <Text size="lg" c="dimmed" ta="center">
               {t('home.howItWorks.subtitle')}
-            </p>
-          </div>
+            </Text>
+          </Stack>
 
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="xl">
             {[
               {
                 step: 1,
@@ -154,8 +162,8 @@ export function HomePageClient() {
                 desc: t('home.howItWorks.step3.desc'),
               },
             ].map((item) => (
-              <div key={item.step} className="relative flex flex-col items-center text-center">
-                <div className="relative mb-4">
+              <Stack key={item.step} align="center" ta="center" gap="xs" className="hover:-translate-y-1 hover:scale-[1.03] transition-all duration-300 cursor-default">
+                <div className="relative mb-1">
                   <ThemeIcon
                     size={64}
                     radius="xl"
@@ -168,39 +176,30 @@ export function HomePageClient() {
                     {item.step}
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 font-display">
+                <Title order={4} className="font-display">
                   {item.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-gray-600 max-w-xs">
+                </Title>
+                <Text size="sm" c="dimmed" lh={1.6} maw={320}>
                   {item.desc}
-                </p>
-              </div>
+                </Text>
+              </Stack>
             ))}
-          </div>
-        </div>
+          </SimpleGrid>
+        </Container>
       </div>
 
       {/* For Hosts Section */}
       <div className="bg-eco-primary/5 py-16 sm:py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="flex flex-col lg:flex-row items-center gap-10">
-            <div className="flex-1 text-center lg:text-left">
-              <ThemeIcon
-                size={56}
-                radius="xl"
-                color="eco-terracotta"
-                variant="filled"
-                className="mb-4 mx-auto lg:mx-0"
-              >
-                <IconHome size={28} stroke={1.5} />
-              </ThemeIcon>
-              <h2 className="text-3xl sm:text-4xl font-display font-bold tracking-tight text-eco-primary">
+        <Container size="lg">
+          <Group align="center" gap="xl" wrap="wrap" justify="center">
+            <Stack gap="md" maw={560} className="text-center lg:text-left">
+              <Title order={2} className="text-3xl sm:text-4xl font-display font-bold tracking-tight text-eco-primary">
                 {t('home.forHosts.title')}
-              </h2>
-              <p className="mt-4 text-lg leading-relaxed text-gray-600 max-w-xl">
+              </Title>
+              <Text size="lg" c="dimmed" lh={1.7}>
                 {t('home.forHosts.desc')}
-              </p>
-              <div className="mt-8">
+              </Text>
+              <Group mt="sm">
                 <Link
                   href="/register"
                   className="inline-flex items-center gap-2 rounded-full bg-eco-terracotta px-7 py-3.5 text-base font-bold text-white shadow-md hover:bg-eco-terracotta/90 transform hover:-translate-y-0.5 transition-all duration-300"
@@ -208,45 +207,37 @@ export function HomePageClient() {
                   <IconUserPlus size={20} />
                   {t('home.forHosts.cta')}
                 </Link>
-              </div>
-            </div>
-            <div className="flex-1 w-full max-w-md">
-              <div className="rounded-2xl bg-white p-6 shadow-md space-y-4">
+              </Group>
+            </Stack>
+
+            <Paper radius="lg" p="lg" shadow="sm" maw={400} w="100%" className="hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+              <Stack gap="md">
                 {[
                   t('home.forHosts.benefit1'),
                   t('home.forHosts.benefit2'),
                   t('home.forHosts.benefit3'),
                 ].map((benefit, i) => (
-                  <div key={i} className="flex items-start gap-3">
+                  <Group key={i} align="flex-start" gap="sm" wrap="nowrap">
                     <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-eco-primary/10 text-eco-primary text-xs font-bold">
                       {i + 1}
                     </span>
-                    <p className="text-sm text-gray-700 leading-relaxed">{benefit}</p>
-                  </div>
+                    <Text size="sm" c="dimmed" lh={1.6}>{benefit}</Text>
+                  </Group>
                 ))}
-              </div>
-            </div>
-          </div>
-        </div>
+              </Stack>
+            </Paper>
+          </Group>
+        </Container>
       </div>
 
       {/* FAQ Section */}
       <div className="bg-white py-16 sm:py-20 border-t border-stone-100">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          <div className="text-center mb-10">
-            <ThemeIcon
-              size={56}
-              radius="xl"
-              color="eco-primary"
-              variant="light"
-              className="mx-auto mb-4"
-            >
-              <IconQuestionMark size={28} stroke={1.5} />
-            </ThemeIcon>
-            <h2 className="text-3xl sm:text-4xl font-display font-bold tracking-tight text-eco-primary">
+        <Container size="sm">
+          <Stack align="center" gap="xs" mb="xl">
+            <Title order={2} ta="center" className="text-3xl sm:text-4xl font-display font-bold tracking-tight text-eco-primary">
               {t('home.faq.title')}
-            </h2>
-          </div>
+            </Title>
+          </Stack>
 
           <Accordion
             variant="separated"
@@ -273,28 +264,30 @@ export function HomePageClient() {
               </Accordion.Item>
             ))}
           </Accordion>
-        </div>
+        </Container>
       </div>
 
       {/* CTA Section */}
       <div className="bg-eco-primary py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
-          <h2 className="text-3xl sm:text-4xl font-display font-bold tracking-tight text-white">
-            {t('home.cta.title')}
-          </h2>
-          <p className="mt-4 text-lg text-white/80">
-            {t('home.cta.subtitle')}
-          </p>
-          <div className="mt-10">
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-bold text-eco-primary shadow-lg hover:bg-eco-cream transform hover:-translate-y-0.5 transition-all duration-300"
-            >
-              <IconUserPlus size={20} />
-              {t('home.cta.button')}
-            </Link>
-          </div>
-        </div>
+        <Container size="sm">
+          <Stack align="center" ta="center" gap="md">
+            <Title order={2} c="white" className="text-3xl sm:text-4xl font-display font-bold tracking-tight">
+              {t('home.cta.title')}
+            </Title>
+            <Text size="lg" c="white" opacity={0.8}>
+              {t('home.cta.subtitle')}
+            </Text>
+            <Group mt="md">
+              <Link
+                href="/register"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-bold text-eco-primary shadow-lg hover:bg-eco-cream transform hover:-translate-y-0.5 transition-all duration-300"
+              >
+                <IconUserPlus size={20} />
+                {t('home.cta.button')}
+              </Link>
+            </Group>
+          </Stack>
+        </Container>
       </div>
     </Layout>
   );

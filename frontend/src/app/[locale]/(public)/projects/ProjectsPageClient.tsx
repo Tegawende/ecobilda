@@ -18,6 +18,17 @@ import {
   IconDog,
   IconStar,
 } from '@tabler/icons-react';
+import {
+  Text,
+  Title,
+  Group,
+  Stack,
+  Badge,
+  Button,
+  SimpleGrid,
+  ActionIcon,
+  Avatar,
+} from '@mantine/core';
 import { Layout } from '@/components/common/Layout';
 import { ProjectsMap } from '@/components/projects/ProjectsMap';
 import { ProjectFilters, defaultFilters, type ProjectFiltersState } from '@/components/projects/ProjectFilters';
@@ -34,9 +45,9 @@ const StarRating = memo(function StarRating({ rating: rawRating, size = 12 }: { 
   const partialFill = (rating - fullStars) * 100;
 
   return (
-    <div className="flex flex-col items-center gap-0.5">
-      <span className="text-xs font-semibold text-gray-700">{rating.toFixed(1)}</span>
-      <div className="flex gap-0.5">
+    <Stack align="center" gap={2}>
+      <Text size="xs" fw={600} c="gray.7">{rating.toFixed(1)}</Text>
+      <Group gap={2}>
         {[1, 2, 3, 4, 5].map((star) => {
           let fillPercentage = 0;
           if (star <= fullStars) {
@@ -47,13 +58,11 @@ const StarRating = memo(function StarRating({ rating: rawRating, size = 12 }: { 
 
           return (
             <div key={star} className="relative" style={{ width: size, height: size }}>
-              {/* Empty star (background) */}
               <IconStar
                 size={size}
                 className="absolute text-gray-300"
                 style={{ strokeWidth: 1.5 }}
               />
-              {/* Filled star with clip */}
               <div
                 className="absolute overflow-hidden"
                 style={{ width: `${fillPercentage}%`, height: '100%' }}
@@ -67,8 +76,8 @@ const StarRating = memo(function StarRating({ rating: rawRating, size = 12 }: { 
             </div>
           );
         })}
-      </div>
-    </div>
+      </Group>
+    </Stack>
   );
 });
 
@@ -110,19 +119,19 @@ function ProjectCardList({
 }) {
   const t = useTranslations();
   const images = project.images && project.images.length > 0
-    ? project.images.map(img => img.image)
+    ? project.images.map(img => img.url || '')
     : ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'];
-  const isNatB = project.project_type === 'NATB';
+  const isNatB = project.projectType === 'NATB';
 
   return (
-    <Link href={`/projects/${project.id}`}
+    <Link href={`/projects/${project._id}`}
       target="_blank"
       rel="noopener noreferrer"
       className={`block group cursor-pointer transition-all duration-200 ${isHovered ? 'bg-gray-50' : ''}`}
       onMouseEnter={() => onHover(project)}
       onMouseLeave={() => onHover(null)}
     >
-      <div className="flex gap-4 p-4 hover:bg-gray-50 transition-colors border-b border-gray-100">
+      <Group gap="md" p="md" wrap="nowrap" align="flex-start" className="hover:bg-gray-50 transition-colors border-b border-gray-100">
         {/* Image */}
         <div className="relative w-[200px] h-[150px] flex-shrink-0 rounded-xl overflow-hidden">
           <img
@@ -133,100 +142,97 @@ function ProjectCardList({
 
           {/* Favorite Button */}
           <div className="absolute top-2 right-2 z-10">
-            <FavoriteButton projectId={project.id} variant="ghost" size="sm" />
+            <FavoriteButton projectId={project._id} variant="ghost" size="sm" />
           </div>
 
           {/* Type Badge */}
           <div className="absolute top-2 left-2">
-            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${isNatB ? 'bg-eco-primary text-white' : 'bg-eco-terracotta text-white'
-              }`}>
-              {isNatB ? <IconHome size={10} /> : <IconLeaf size={10} />}
+            <Badge
+              size="xs"
+              color={isNatB ? 'eco-primary' : 'eco-terracotta'}
+              leftSection={isNatB ? <IconHome size={10} /> : <IconLeaf size={10} />}
+            >
               {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
-            </span>
+            </Badge>
           </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0 py-1">
-          {/* Title & Location */}
-          <h3 className="font-semibold text-gray-900 text-lg group-hover:text-eco-primary transition-colors line-clamp-1 mb-1">
+        <Stack gap="xs" className="flex-1 min-w-0 py-1">
+          <Title order={4} className="group-hover:text-eco-primary transition-colors line-clamp-1">
             {project.title}
-          </h3>
+          </Title>
 
-          <div className="flex items-center text-gray-500 text-sm mb-2">
-            <IconMapPin size={14} className="mr-1 flex-shrink-0" />
-            <span>{project.address?.city}, {project.address?.country?.name}</span>
-          </div>
+          <Group gap={4}>
+            <IconMapPin size={14} className="flex-shrink-0 text-gray-500" />
+            <Text size="sm" c="dimmed">{project.address?.city}, {project.address?.country?.name}</Text>
+          </Group>
 
-          {/* Description */}
-          <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+          <Text size="sm" c="dimmed" lineClamp={2}>
             {project.description}
-          </p>
+          </Text>
 
           {/* Stats */}
-          <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-            <span className="flex items-center gap-1">
+          <Group gap="md">
+            <Group gap={4}>
               <IconUsers size={14} />
-              {project.max_helpers} {t('projects.volunteers') || 'volunteers'} max
-            </span>
-            <span className="flex items-center gap-1">
+              <Text size="sm" c="dimmed">{project.maxHelpers} {t('projects.volunteers') || 'volunteers'} max</Text>
+            </Group>
+            <Group gap={4}>
               <IconClock size={14} />
-              {project.hours_per_day}h/{t('common.day')}
-            </span>
-            <span>{project.days_per_week}{t('projects.daysPerWeekShort')}</span>
-          </div>
+              <Text size="sm" c="dimmed">{project.hoursPerDay}h/{t('common.day')}</Text>
+            </Group>
+            <Text size="sm" c="dimmed">{project.daysPerWeek}{t('projects.daysPerWeekShort')}</Text>
+          </Group>
 
           {/* Amenities */}
-          <div className="flex flex-wrap gap-2 mb-3">
-            {project.internet_provided && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-eco-primary/10 text-eco-primary text-xs rounded-full font-medium">
-                <IconWifi size={12} aria-hidden="true" /> {t('projects.wifiIncluded')}
-              </span>
+          <Group gap="xs">
+            {project.internetProvided && (
+              <Badge variant="light" color="eco-primary" size="xs" leftSection={<IconWifi size={12} />}>
+                {t('projects.wifiIncluded')}
+              </Badge>
             )}
-            {project.family_friendly && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-eco-primary/10 text-eco-primary text-xs rounded-full font-medium">
-                <IconBabyCarriage size={12} aria-hidden="true" /> {t('projects.familiesWelcome')}
-              </span>
+            {project.familyFriendly && (
+              <Badge variant="light" color="eco-primary" size="xs" leftSection={<IconBabyCarriage size={12} />}>
+                {t('projects.familiesWelcome')}
+              </Badge>
             )}
-            {project.pets_allowed && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-eco-primary/10 text-eco-primary text-xs rounded-full font-medium">
-                <IconDog size={12} aria-hidden="true" /> {t('projects.petsAccepted')}
-              </span>
+            {project.petsAllowed && (
+              <Badge variant="light" color="eco-primary" size="xs" leftSection={<IconDog size={12} />}>
+                {t('projects.petsAccepted')}
+              </Badge>
             )}
-          </div>
+          </Group>
 
           {/* host info */}
           {project.owner && (
-            <div className="pt-3 border-t border-gray-100">
-              {/* Label removed per user request */}
-              <div className="flex items-center gap-3">
-                {project.owner.profile_picture ? (
-                  <Image
-                    src={project.owner.profile_picture}
-                    alt={project.owner.first_name}
-                    width={40}
-                    height={40}
-                    className="rounded-full object-cover flex-shrink-0"
-                    referrerPolicy="no-referrer"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <IconUsers size={18} className="text-gray-400" />
-                  </div>
-                )}
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-gray-900">{project.owner.first_name} {project.owner.last_name?.charAt(0)}.</span>
-                  <div className="flex items-center gap-1">
-                    <IconStar size={13} className="text-yellow-400 fill-yellow-400" />
-                    <span className="text-xs text-gray-500">{Number(project.owner.average_rating || 0).toFixed(1)} ({project.owner.review_count || 0} {t('projects.reviews')})</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <Group gap="sm" pt="xs" className="border-t border-gray-100">
+              {project.owner?.profilePictureUrl ? (
+                <Image
+                  src={project.owner?.profilePictureUrl}
+                  alt={project.owner?.firstName}
+                  width={40}
+                  height={40}
+                  className="rounded-full object-cover flex-shrink-0"
+                  referrerPolicy="no-referrer"
+                  unoptimized
+                />
+              ) : (
+                <Avatar size="sm" radius="xl" color="gray">
+                  <IconUsers size={18} />
+                </Avatar>
+              )}
+              <Stack gap={0}>
+                <Text size="sm" fw={600}>{project.owner?.firstName} {project.owner?.lastName?.charAt(0)}.</Text>
+                <Group gap={4}>
+                  <IconStar size={13} className="text-yellow-400 fill-yellow-400" />
+                  <Text size="xs" c="dimmed">{Number(project.owner?.averageRating || 0).toFixed(1)} ({project.owner?.reviewCount || 0} {t('projects.reviews')})</Text>
+                </Group>
+              </Stack>
+            </Group>
           )}
-        </div>
-      </div>
+        </Stack>
+      </Group>
     </Link>
   );
 }
@@ -287,7 +293,7 @@ export function ProjectsPageClient() {
   const applyClientFilters = useCallback((projectList: Project[], f: ProjectFiltersState) => {
     return projectList.filter((project) => {
       // Project type
-      if (f.projectType !== 'all' && project.project_type !== f.projectType) {
+      if (f.projectType !== 'all' && project.projectType !== f.projectType) {
         return false;
       }
       // Location
@@ -298,16 +304,16 @@ export function ProjectsPageClient() {
         if (!matchesLocation) return false;
       }
       // Amenities
-      if (f.internetProvided && !project.internet_provided) return false;
-      if (f.familyFriendly && !project.family_friendly) return false;
-      if (f.petsAllowed && !project.pets_allowed) return false;
-      if (f.smokingAllowed && !project.smoking_allowed) return false;
+      if (f.internetProvided && !project.internetProvided) return false;
+      if (f.familyFriendly && !project.familyFriendly) return false;
+      if (f.petsAllowed && !project.petsAllowed) return false;
+      if (f.smokingAllowed && !project.smokingAllowed) return false;
       // Work details
-      if (project.hours_per_day < f.hoursPerDay[0] || project.hours_per_day > f.hoursPerDay[1]) return false;
-      if (project.days_per_week < f.daysPerWeek[0] || project.days_per_week > f.daysPerWeek[1]) return false;
+      if (project.hoursPerDay < f.hoursPerDay[0] || project.hoursPerDay > f.hoursPerDay[1]) return false;
+      if (project.daysPerWeek < f.daysPerWeek[0] || project.daysPerWeek > f.daysPerWeek[1]) return false;
 
       if (f.maxHelpers[0] !== 1 || f.maxHelpers[1] !== 30) {
-        if (project.max_helpers < f.maxHelpers[0] || project.max_helpers > f.maxHelpers[1]) return false;
+        if (project.maxHelpers < f.maxHelpers[0] || project.maxHelpers > f.maxHelpers[1]) return false;
       }
 
       // Skills
@@ -362,32 +368,35 @@ export function ProjectsPageClient() {
         <div className="flex-1 flex overflow-hidden">
           <div className={`${isMobile && showMap ? 'hidden' : 'w-full lg:w-[55%] xl:w-[50%]'} flex flex-col overflow-hidden bg-white border-r border-gray-200`}>
             {/* Sticky Header with Status Tabs */}
-            <div className="sticky top-0 z-10 bg-white border-b border-gray-100 flex flex-col">
-
-              <div className="px-4 py-2 flex items-center justify-between">
-                <span className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">
-                  {visibleProjects.length} {visibleProjects.length === 1 ? t('projects.foundSingle') || 'projet trouvé' : t('projects.found') || 'projets trouvés'}
-                </span>
+            <div className="sticky top-0 z-10 bg-white border-b border-gray-100">
+              <Group justify="space-between" px="md" py="xs">
+                <Text size="xs" fw={500} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+                  {visibleProjects.length} {visibleProjects.length === 1 ? t('projects.foundSingle') || 'projet trouve' : t('projects.found') || 'projets trouves'}
+                </Text>
                 {/* Hide view toggle on mobile - grid only */}
-                <div className="hidden sm:flex gap-1 p-1 bg-gray-100 rounded-lg" role="group" aria-label={t('projects.viewMode')}>
-                  <button
+                <Group gap={4} className="hidden sm:flex" p={4} bg="gray.1" style={{ borderRadius: 8 }}>
+                  <ActionIcon
+                    variant={viewMode === 'grid' ? 'white' : 'subtle'}
+                    color="gray"
+                    size="sm"
                     onClick={() => setViewMode('grid')}
-                    className={`p-1.5 rounded transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                     aria-label={t('projects.viewGrid') || 'Grid view'}
                     aria-pressed={viewMode === 'grid'}
                   >
-                    <IconLayoutGrid size={18} aria-hidden="true" />
-                  </button>
-                  <button
+                    <IconLayoutGrid size={18} />
+                  </ActionIcon>
+                  <ActionIcon
+                    variant={viewMode === 'list' ? 'white' : 'subtle'}
+                    color="gray"
+                    size="sm"
                     onClick={() => setViewMode('list')}
-                    className={`p-1.5 rounded transition-all cursor-pointer ${viewMode === 'list' ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                     aria-label={t('projects.viewList') || 'List view'}
                     aria-pressed={viewMode === 'list'}
                   >
-                    <IconList size={18} aria-hidden="true" />
-                  </button>
-                </div>
-              </div>
+                    <IconList size={18} />
+                  </ActionIcon>
+                </Group>
+              </Group>
             </div>
 
             {/* Scrollable Project List */}
@@ -395,24 +404,24 @@ export function ProjectsPageClient() {
               {visibleProjects.length > 0 ? (
                 <>
                   {viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 p-4">
+                    <SimpleGrid cols={{ base: 1, sm: 2, xl: 3 }} spacing="md" p="md">
                       {paginatedProjects.map((project) => (
                         <ProjectCard
-                          key={project.id}
+                          key={project._id}
                           project={project}
-                          isHovered={hoveredProject?.id === project.id}
+                          isHovered={hoveredProject?._id === project._id}
                           onHover={setHoveredProject}
                           onMobileClick={setMobileModalProject}
                         />
                       ))}
-                    </div>
+                    </SimpleGrid>
                   ) : (
                     <div>
                       {paginatedProjects.map((project) => (
                         <ProjectCardList
-                          key={project.id}
+                          key={project._id}
                           project={project}
-                          isHovered={hoveredProject?.id === project.id}
+                          isHovered={hoveredProject?._id === project._id}
                           onHover={setHoveredProject}
                         />
                       ))}
@@ -421,41 +430,47 @@ export function ProjectsPageClient() {
 
                   {/* Pagination */}
                   {totalPages > 1 && (
-                    <div className="flex justify-center items-center gap-2 py-4 border-t border-gray-100">
-                      <button
+                    <Group justify="center" gap="sm" py="md" className="border-t border-gray-100">
+                      <Button
+                        variant="outline"
+                        size="xs"
+                        radius="lg"
                         onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                         disabled={currentPage === 1}
-                        className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors cursor-pointer"
                       >
                         {t('common.previous') || 'Previous'}
-                      </button>
-                      <span className="text-sm text-gray-600">
+                      </Button>
+                      <Text size="sm" c="dimmed">
                         {currentPage} / {totalPages}
-                      </span>
-                      <button
+                      </Text>
+                      <Button
+                        variant="outline"
+                        size="xs"
+                        radius="lg"
                         onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                         disabled={currentPage === totalPages}
-                        className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors cursor-pointer"
                       >
                         {t('common.next') || 'Next'}
-                      </button>
-                    </div>
+                      </Button>
+                    </Group>
                   )}
                 </>
               ) : (
-                <div className="flex flex-col items-center justify-center h-full text-center py-16 px-6">
-                  <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                <Stack align="center" justify="center" h="100%" ta="center" py="xl" px="lg">
+                  <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center">
                     <IconMapPin size={32} className="text-gray-400" />
                   </div>
-                  <h3 className="text-lg font-display font-bold text-gray-900 mb-2">{t('projects.noResults')}</h3>
-                  <p className="text-gray-500 text-sm max-w-xs mb-4">{t('projects.noResultsDesc')}</p>
-                  <button
+                  <Title order={4} className="font-display">{t('projects.noResults')}</Title>
+                  <Text size="sm" c="dimmed" maw={300}>{t('projects.noResultsDesc')}</Text>
+                  <Button
+                    radius="xl"
+                    color="eco-primary"
+                    size="sm"
                     onClick={handleClearFilters}
-                    className="px-5 py-2 rounded-full bg-eco-primary text-white text-sm font-semibold hover:bg-eco-primaryDark transition-all cursor-pointer"
                   >
                     {t('projects.clearFilters')}
-                  </button>
-                </div>
+                  </Button>
+                </Stack>
               )}
             </div>
           </div>
@@ -463,14 +478,14 @@ export function ProjectsPageClient() {
           <div className={`${isMobile && !showMap ? 'hidden' : 'flex-1'} relative`}>
             {isMapUpdating && (
               <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
-                <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg">
-                  <span className="text-sm text-gray-600 font-medium">{t('projects.loadingMap') || 'Chargement'}</span>
+                <Group gap="sm" px="md" py="xs" bg="white" style={{ borderRadius: 'var(--mantine-radius-xl)', boxShadow: 'var(--mantine-shadow-lg)' }}>
+                  <Text size="sm" c="dimmed" fw={500}>{t('projects.loadingMap') || 'Chargement'}</Text>
                   <div className="flex gap-1">
                     <span className="w-2 h-2 bg-eco-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-2 h-2 bg-eco-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                     <span className="w-2 h-2 bg-eco-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
-                </div>
+                </Group>
               </div>
             )}
             <ProjectsMap
@@ -481,22 +496,22 @@ export function ProjectsPageClient() {
               onProjectSelect={setSelectedProject}
               onBoundsChange={handleBoundsChange}
               onMoveStart={handleMoveStart}
-              hoveredProjectId={hoveredProject?.id}
+              hoveredProjectId={hoveredProject?._id}
             />
           </div>
         </div>
 
         <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-30">
-          <button
+          <Button
+            radius="xl"
+            size="md"
+            color="dark"
+            leftSection={showMap ? <IconList size={18} /> : <IconMap size={18} />}
             onClick={() => setShowMap(!showMap)}
-            className="flex items-center gap-2 px-6 py-3 rounded-full bg-gray-900 text-white font-semibold shadow-lg hover:bg-gray-800 transition-all cursor-pointer"
+            className="shadow-lg"
           >
-            {showMap ? (
-              <><IconList size={18} /> {t('projects.viewList') || 'Voir la liste'}</>
-            ) : (
-              <><IconMap size={18} /> {t('projects.viewMap') || 'Voir la carte'}</>
-            )}
-          </button>
+            {showMap ? (t('projects.viewList') || 'Voir la liste') : (t('projects.viewMap') || 'Voir la carte')}
+          </Button>
         </div>
       </div>
 
