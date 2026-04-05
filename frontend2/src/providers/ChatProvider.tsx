@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import logger from '@/lib/logger';
-import { getAuthTokens } from '@/services/api';
+import { getSessionToken } from '@/lib/convexClient';
 import { useAuth } from '@/providers/AuthProvider';
 import type { Message } from '@/types';
 
@@ -103,8 +103,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       return;
     }
 
-    const tokens = getAuthTokens();
-    if (!tokens?.access) return;
+    const sessionToken = getSessionToken();
+    if (!sessionToken) return;
+    const tokens = { access: sessionToken };
 
     isConnecting.current = true;
 

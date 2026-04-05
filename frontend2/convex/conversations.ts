@@ -1,0 +1,142 @@
+import { query, mutation } from "./_generated/server";
+import { v } from "convex/values";
+
+async function getUserFromToken(ctx: any, token: string) {
+  const session = await ctx.db
+    .query("sessions")
+    .withIndex("by_token", (q: any) => q.eq("token", token))
+    .first();
+  if (!session || session.expiresAt < Date.now()) return null;
+  return await ctx.db.get(session.userId);
+}
+
+// ============================================
+// List Conversations for User (reactive)
+// ============================================
+
+export const listForUser = query({
+  args: { token: v.string() },
+  handler: async (ctx, args) => {
+    const user = await getUserFromToken(ctx, args.token);
+    if (!user) return [];
+
+    // Get conversations where user is user1 or user2
+    const asUser1 = await ctx.db
+      .query("conversations")
+      .withIndex("by_user1", (q) => q.eq("user1Id", user._id))
+      .collect();
+    const asUser2 = await ctx.db
+      .query("conversations")
+      .withIndex("by_user2", (q) => q.eq("user2Id", user._id))
+      .collect();
+
+    const all = [...asUser1, ...asUser2];
+
+    // Enrich with other user data
+    const enriched = [];
+    for (const conv of all) {
+      const otherUserId = conv.user1Id === user._id ? conv.user2Id : conv.user1Id;
+      const otherUser = await ctx.db.get(otherUserId);
+      const unreadCount =
+        conv.user1Id === user._id ? conv.unreadCountUser1 : conv.unreadCountUser2;
+      const isMuted =
+        conv.user1Id === user._id ? conv.user1Muted : conv.user2Muted;
+
+      enriched.push({
+        ...conv,
+        otherUser: otherUser
+          ? {
+              _id: otherUser._id,
+              firstName: otherUser.firstName,
+              lastName: otherUser.lastName,
+              profilePicture: otherUser.profilePicture,
+              profilePictureUrl: otherUser.profilePictureUrl,
+            }
+          : null,
+        unreadCount,
+        isMuted,
+      });
+    }
+
+    // Sort by last message
+    return enriched.sort(
+      (a, b) => (b.lastMessageAt ?? 0) - (a.lastMessageAt ?? 0)
+    );
+  },
+});
+
+// ============================================
+// Get Single Conversation
+// ============================================
+
+export const getById = query({
+  args: { token: v.string(), id: v.id("conversations") },
+  handler: async (ctx, args) => {
+    const user = await getUserFromToken(ctx, args.token);
+    if (!user) return null;
+
+    const conv = await ctx.db.get(args.id);
+    if (!conv) return null;
+    if (conv.user1Id !== user._id && conv.user2Id !== user._id) return null;
+
+    const otherUserId = conv.user1Id === user._id ? conv.user2Id : conv.user1Id;
+    const otherUser = await ctx.db.get(otherUserId);
+
+    return {
+      ...conv,
+      otherUser: otherUser
+        ? {
+            _id: otherUser._id,
+            firstName: otherUser.firstName,
+            lastName: otherUser.lastName,
+            profilePicture: otherUser.profilePicture,
+            profilePictureUrl: otherUser.profilePictureUrl,
+          }
+        : null,
+    };
+  },
+});
+
+// ============================================
+// Mark as Read
+// ============================================
+
+export const markAsRead = mutation({
+  args: { token: v.string(), id: v.id("conversations") },
+  handler: async (ctx, args) => {
+    const user = await getUserFromToken(ctx, args.token);
+    if (!user) throw new Error("Not authenticated.");
+
+    const conv = await ctx.db.get(args.id);
+    if (!conv) throw new Error("Conversation not found.");
+
+    if (conv.user1Id === user._id) {
+      await ctx.db.patch(args.id, { unreadCountUser1: 0 });
+    } else if (conv.user2Id === user._id) {
+      await ctx.db.patch(args.id, { unreadCountUser2: 0 });
+    }
+    return { success: true };
+  },
+});
+
+// ============================================
+// Toggle Mute
+// ============================================
+
+export const toggleMute = mutation({
+  args: { token: v.string(), id: v.id("conversations") },
+  handler: async (ctx, args) => {
+    const user = await getUserFromToken(ctx, args.token);
+    if (!user) throw new Error("Not authenticated.");
+
+    const conv = await ctx.db.get(args.id);
+    if (!conv) throw new Error("Conversation not found.");
+
+    if (conv.user1Id === user._id) {
+      await ctx.db.patch(args.id, { user1Muted: !conv.user1Muted });
+    } else if (conv.user2Id === user._id) {
+      await ctx.db.patch(args.id, { user2Muted: !conv.user2Muted });
+    }
+    return { success: true };
+  },
+});

@@ -9,6 +9,7 @@ import { theme } from '@/theme';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { GoogleOAuthWrapper } from '@/providers/GoogleOAuthWrapper';
+import { ConvexClientProvider } from '@/providers/ConvexClientProvider';
 import { SetLocale } from './SetLocale';
 import '@mantine/core/styles.css';
 import '@mantine/carousel/styles.css';
@@ -40,14 +41,16 @@ export default async function LocaleLayout({
     <NextIntlClientProvider messages={messages}>
       <MantineProvider theme={theme}>
         <Notifications position="top-right" />
-        <GoogleOAuthWrapper>
-          <QueryProvider>
-            <AuthProvider>
-              <SetLocale locale={locale} />
-              {children}
-            </AuthProvider>
-          </QueryProvider>
-        </GoogleOAuthWrapper>
+        <ConvexClientProvider>
+          <GoogleOAuthWrapper>
+            <QueryProvider>
+              <AuthProvider>
+                <SetLocale locale={locale} />
+                {children}
+              </AuthProvider>
+            </QueryProvider>
+          </GoogleOAuthWrapper>
+        </ConvexClientProvider>
       </MantineProvider>
     </NextIntlClientProvider>
   );

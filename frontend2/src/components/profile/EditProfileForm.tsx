@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useForm } from '@mantine/form';
 import { useLocale, useTranslations } from 'next-intl';
 import logger from '@/lib/logger';
@@ -38,8 +38,7 @@ import {
 } from '@tabler/icons-react';
 import { profileService } from '@/services/profile';
 import { DateOfBirthSelect, validateDateOfBirth } from '@/components/common/DateOfBirthSelect';
-import { skillsService } from '@/services/skills';
-import { languagesService } from '@/services/languages';
+import { useSkills, useLanguages } from '@/hooks/useConvex';
 import { getSkillIcon } from '@/lib/skillIcons';
 import type { User, Skill } from '@/types';
 
@@ -119,9 +118,18 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
   const t = useTranslations();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [allSkills, setAllSkills] = useState<Skill[]>([]);
-  const [isLoadingSkills, setIsLoadingSkills] = useState(true);
-  const [availableLanguages, setAvailableLanguages] = useState<{ value: string; label: string }[]>([]);
+  const { skills: allSkills, isLoading: isLoadingSkills } = useSkills();
+  const { languages: rawLanguages } = useLanguages();
+  const availableLanguages = useMemo(() => {
+    const displayNames = new Intl.DisplayNames([locale], { type: 'language' });
+    return rawLanguages
+      .map((l) => {
+        const localized = displayNames.of(l.code);
+        const label = localized ? localized.charAt(0).toUpperCase() + localized.slice(1) : l.name;
+        return { value: l.code, label };
+      })
+      .sort((a, b) => a.label.localeCompare(b.label, locale));
+  }, [rawLanguages, locale]);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(user.profile_picture || '');
 
@@ -208,37 +216,7 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
     combobox.closeDropdown();
   };
 
-  useEffect(() => {
-    const fetchSkills = async () => {
-      try {
-        const skills = await skillsService.getSkills();
-        const skillsArray = Array.isArray(skills) ? skills : (skills as any).results || [];
-        setAllSkills(skillsArray);
-      } catch (error) {
-        logger.error('Failed to fetch skills:', error);
-        setAllSkills([]);
-      } finally {
-        setIsLoadingSkills(false);
-      }
-    };
-    const fetchLanguages = async () => {
-      try {
-        const langs = await languagesService.getLanguages();
-        const displayNames = new Intl.DisplayNames([locale], { type: 'language' });
-        setAvailableLanguages(
-          langs.map((l: any) => {
-            const localized = displayNames.of(l.code);
-            const label = localized ? localized.charAt(0).toUpperCase() + localized.slice(1) : l.name;
-            return { value: l.code, label };
-          }).sort((a: any, b: any) => a.label.localeCompare(b.label, locale))
-        );
-      } catch (error) {
-        logger.error('Failed to fetch languages:', error);
-      }
-    };
-    fetchSkills();
-    fetchLanguages();
-  }, [locale]);
+  // Skills and languages are now loaded reactively via Convex hooks
 
   const toggleSkill = (skillCode: string) => {
     const currentSkills = form.values.skills;

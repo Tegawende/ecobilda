@@ -15,7 +15,7 @@ import {
   IconEyeOff,
 } from '@tabler/icons-react';
 import { Layout } from '@/components/common/Layout';
-import { clearAuthTokens } from '@/services/api';
+import { clearSessionToken } from '@/lib/convexClient';
 import logger from '@/lib/logger';
 
 export function SettingsClient() {
@@ -64,7 +64,7 @@ export function SettingsClient() {
     try {
       setIsDeleting(true);
       // TODO: Call API to delete account
-      clearAuthTokens();
+      clearSessionToken();
       localStorage.removeItem('mock_user');
       setDeleteModalOpen(false);
       router.push('/');

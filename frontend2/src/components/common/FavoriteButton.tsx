@@ -12,7 +12,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { favoritesService } from '@/services/favorites';
-import { isAuthenticated } from '@/services/api';
+import { isAuthenticated } from '@/lib/convexClient';
 
 interface FavoriteButtonProps {
   projectId: number;

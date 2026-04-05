@@ -1,8 +1,9 @@
-import api from './api';
+import { convexClient, getSessionToken } from "@/lib/convexClient";
+import { api } from "../../convex/_generated/api";
 
 export interface ParticipationRequest {
   id: number;
-  project: any; // Can be a number (ID) or full Project object depending on endpoint
+  project: any;
   project_title?: string;
   project_image?: string;
   volunteer: number;
@@ -21,46 +22,67 @@ export interface ParticipationRequest {
 }
 
 export interface CreateParticipationData {
-  project: number;
+  project: number | string;
   motivation: string;
   proposed_start_date?: string;
   proposed_end_date?: string;
 }
 
 export const participationsService = {
-  // Get my participation requests (as volunteer)
   async getMyParticipations(): Promise<ParticipationRequest[]> {
-    const response = await api.get('/participations/');
-    return response.data.results || response.data;
+    const token = getSessionToken();
+    if (!token) return [];
+    const results = await convexClient.query(api.participations.getMyRequests, { token });
+    return results as any;
   },
 
-  // Get requests received (as host)
   async getReceivedRequests(): Promise<ParticipationRequest[]> {
-    const response = await api.get('/participations/received/');
-    return response.data.results || response.data;
+    const token = getSessionToken();
+    if (!token) return [];
+    const results = await convexClient.query(api.participations.getReceivedRequests, { token });
+    return results as any;
   },
 
-  // Create a participation request
   async createRequest(data: CreateParticipationData): Promise<ParticipationRequest> {
-    const response = await api.post('/participations/', data);
-    return response.data;
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    const id = await convexClient.mutation(api.participations.create, {
+      token,
+      projectId: data.project as any,
+      motivation: data.motivation,
+      proposedStartDate: data.proposed_start_date,
+      proposedEndDate: data.proposed_end_date,
+    });
+    return { id } as any;
   },
 
-  // Accept a request (host action)
-  async acceptRequest(id: number): Promise<ParticipationRequest> {
-    const response = await api.post(`/participations/${id}/accept/`);
-    return response.data;
+  async acceptRequest(id: number | string): Promise<ParticipationRequest> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.participations.accept, {
+      token,
+      requestId: id as any,
+    });
+    return { id } as any;
   },
 
-  // Refuse a request (host action)
-  async refuseRequest(id: number): Promise<ParticipationRequest> {
-    const response = await api.post(`/participations/${id}/refuse/`);
-    return response.data;
+  async refuseRequest(id: number | string): Promise<ParticipationRequest> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.participations.refuse, {
+      token,
+      requestId: id as any,
+    });
+    return { id } as any;
   },
 
-  // Cancel a request (volunteer action)
-  async cancelRequest(id: number): Promise<ParticipationRequest> {
-    const response = await api.post(`/participations/${id}/cancel/`);
-    return response.data;
+  async cancelRequest(id: number | string): Promise<ParticipationRequest> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.participations.cancel, {
+      token,
+      requestId: id as any,
+    });
+    return { id } as any;
   },
 };

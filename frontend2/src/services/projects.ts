@@ -1,4 +1,5 @@
-import api from './api';
+import { convexClient, getSessionToken } from "@/lib/convexClient";
+import { api } from "../../convex/_generated/api";
 import type { Project, PaginatedResponse } from '../types';
 
 export interface ProjectFilters {
@@ -16,60 +17,130 @@ export interface ProjectFilters {
 }
 
 export const projectsService = {
-  // Get paginated list of projects
   async getProjects(filters?: ProjectFilters): Promise<PaginatedResponse<Project>> {
-    const response = await api.get('/projects/', { params: filters });
-    return response.data;
+    const convexFilters: any = {};
+    if (filters?.keyword) convexFilters.keyword = filters.keyword;
+    if (filters?.skills) convexFilters.skills = filters.skills.split(",");
+    if (filters?.countries) convexFilters.countries = filters.countries.split(",");
+    if (filters?.project_type) convexFilters.projectType = filters.project_type;
+    if (filters?.internet === "true") convexFilters.internetProvided = true;
+    if (filters?.family_friendly === "true") convexFilters.familyFriendly = true;
+    if (filters?.pets_allowed === "true") convexFilters.petsAllowed = true;
+    if (filters?.smoking_allowed === "true") convexFilters.smokingAllowed = true;
+
+    const results = await convexClient.query(api.projects.list, convexFilters);
+    return {
+      count: results.length,
+      next: null,
+      previous: null,
+      results: results as any,
+    };
   },
 
-  // Get single project by ID
-  async getProject(id: number): Promise<Project> {
-    const response = await api.get(`/projects/${id}/`);
-    return response.data;
+  async getProject(id: number | string): Promise<Project> {
+    const result = await convexClient.query(api.projects.getById, { id: id as any });
+    if (!result) throw new Error("Project not found");
+    return result as any;
   },
 
-  // Create new project
-  async createProject(data: Partial<Project>): Promise<Project> {
-    const response = await api.post('/projects/', data);
-    return response.data;
+  async createProject(data: any): Promise<Project> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+
+    const projectId = await convexClient.mutation(api.projects.create, {
+      token,
+      title: data.title,
+      description: data.description,
+      projectType: data.project_type,
+      hoursPerDay: data.hours_per_day,
+      daysPerWeek: data.days_per_week,
+      maxHelpers: data.max_helpers,
+      accommodationDetails: data.accommodation_details,
+      foodDetails: data.food_details,
+      internetProvided: data.internet_provided ?? false,
+      familyFriendly: data.family_friendly ?? false,
+      petsAllowed: data.pets_allowed ?? false,
+      smokingAllowed: data.smoking_allowed ?? false,
+      skillCodes: data.skills || [],
+      city: data.address?.city,
+      postalCode: data.address?.postal_code,
+      countryCode: data.address?.country_code,
+      latitude: data.address?.latitude,
+      longitude: data.address?.longitude,
+      formattedAddress: data.address?.formatted_address,
+    });
+
+    return await this.getProject(projectId);
   },
 
-  // Update project
-  async updateProject(id: number, data: Partial<Project>): Promise<Project> {
-    const response = await api.patch(`/projects/${id}/`, data);
-    return response.data;
+  async updateProject(id: number | string, data: any): Promise<Project> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+
+    await convexClient.mutation(api.projects.update, {
+      token,
+      id: id as any,
+      title: data.title,
+      description: data.description,
+      hoursPerDay: data.hours_per_day,
+      daysPerWeek: data.days_per_week,
+      maxHelpers: data.max_helpers,
+      accommodationDetails: data.accommodation_details,
+      foodDetails: data.food_details,
+      internetProvided: data.internet_provided,
+      familyFriendly: data.family_friendly,
+      petsAllowed: data.pets_allowed,
+      smokingAllowed: data.smoking_allowed,
+      skillCodes: data.skills,
+    });
+
+    return await this.getProject(id);
   },
 
-  // Delete project
-  async deleteProject(id: number): Promise<void> {
-    await api.delete(`/projects/${id}/`);
+  async deleteProject(id: number | string): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.projects.remove, { token, id: id as any });
   },
 
-  // Get projects for map view
-  async getMapData(filters?: ProjectFilters): Promise<Project[]> {
-    const response = await api.get('/projects/map-data/', { params: filters });
-    return response.data;
+  async getMapData(): Promise<any[]> {
+    return await convexClient.query(api.projects.getMapData);
   },
 
-  // Upload project image
-  async uploadImage(projectId: number, file: File, isCover = false): Promise<void> {
-    const formData = new FormData();
-    formData.append('image', file);
-    formData.append('is_cover', String(isCover));
+  async uploadImage(projectId: number | string, file: File, isCover = false): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
 
-    await api.post(`/projects/${projectId}/upload-image/`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    // Get upload URL from Convex
+    const uploadUrl = await convexClient.mutation(api.projects.generateUploadUrl, { token });
+
+    // Upload file
+    const uploadResult = await fetch(uploadUrl, {
+      method: "POST",
+      headers: { "Content-Type": file.type },
+      body: file,
+    });
+    const { storageId } = await uploadResult.json();
+
+    // Save to project
+    await convexClient.mutation(api.projects.saveProjectImage, {
+      token,
+      projectId: projectId as any,
+      storageId,
+      order: isCover ? 0 : 999,
     });
   },
 
-  // Flag project (community moderation)
-  async flagProject(id: number, reason: string): Promise<void> {
-    await api.post(`/projects/${id}/flag/`, { reason });
+  async flagProject(id: number | string): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.projects.flag, { token, id: id as any });
   },
 
-  // Get user's own projects
   async getMyProjects(): Promise<Project[]> {
-    const response = await api.get('/projects/my-projects/');
-    return response.data.results || response.data;
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    const results = await convexClient.query(api.projects.getMyProjects, { token });
+    return results as any;
   },
 };

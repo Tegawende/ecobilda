@@ -1,5 +1,5 @@
-import api from './api';
-
+// Contact form - for now, this is a no-op since there's no Django backend
+// TODO: Implement via Convex action that sends email
 export interface ContactFormData {
   name: string;
   email: string;
@@ -9,6 +9,7 @@ export interface ContactFormData {
 
 export const contactService = {
   async sendMessage(data: ContactFormData): Promise<void> {
-    await api.post('/contact/', data);
+    // TODO: Implement via Convex action
+    console.log("Contact form submitted:", data);
   },
 };

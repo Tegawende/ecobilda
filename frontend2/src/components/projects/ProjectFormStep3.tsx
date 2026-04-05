@@ -26,7 +26,7 @@ import {
   IconSmoking,
   IconStar
 } from '@tabler/icons-react';
-import { skillsService } from '@/services/skills';
+import { useSkills } from '@/hooks/useConvex';
 import type { ProjectFormData } from '@/app/[locale]/(protected)/create-project/CreateProjectClient';
 import type { Skill } from '@/types';
 
@@ -52,8 +52,7 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
     const key = `display_name_${locale}` as keyof Skill;
     return (skill[key] as string) || skill.display_name_en;
   };
-  const [allSkills, setAllSkills] = useState<Skill[]>([]);
-  const [isLoadingSkills, setIsLoadingSkills] = useState(true);
+  const { skills: allSkills, isLoading: isLoadingSkills } = useSkills(data.project_type as "PERM" | "NATB" | undefined);
 
   const form = useForm<Step3FormData>({
     initialValues: {
@@ -68,23 +67,7 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
     },
   });
 
-  useEffect(() => {
-    const fetchSkills = async () => {
-      try {
-        const skillsData = await skillsService.getSkills({ category: data.project_type });
-        // Handle both array and paginated response
-        const skills = Array.isArray(skillsData) ? skillsData : (skillsData as any).results || [];
-        setAllSkills(skills);
-      } catch (error) {
-        console.error('Failed to fetch skills:', error);
-        setAllSkills([]); // Set empty array on error
-      } finally {
-        setIsLoadingSkills(false);
-      }
-    };
-
-    fetchSkills();
-  }, [data.project_type]);
+  // Skills are now loaded reactively via useSkills hook
 
   const toggleSkill = (skillCode: string) => {
     const currentSkills = form.values.skills;

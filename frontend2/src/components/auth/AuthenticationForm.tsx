@@ -8,7 +8,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useGoogleLogin } from '@react-oauth/google';
 import { authService } from '@/services/auth';
 import { profileService } from '@/services/profile';
-import { setAuthTokens } from '@/services/api';
+import { setSessionToken } from '@/lib/convexClient';
 import { useAuth } from '@/providers/AuthProvider';
 import { DateOfBirthSelect } from '@/components/common/DateOfBirthSelect';
 import {
@@ -252,7 +252,7 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
           setEmail(user.email);
         } else {
           // Existing user: login directly
-          setAuthTokens(tokens);
+          setSessionToken(tokens.access);
           await refreshUser();
           router.push('/projects');
         }
@@ -273,7 +273,7 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
     setError(null);
     try {
       // Store tokens first
-      setAuthTokens(googleAuthData.tokens);
+      setSessionToken(googleAuthData.tokens.access);
       // Build date of birth string
       const dobString = values.dob_year && values.dob_month && values.dob_day
         ? `${values.dob_year}-${values.dob_month.padStart(2, '0')}-${values.dob_day.padStart(2, '0')}`

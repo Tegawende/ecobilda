@@ -6,7 +6,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { IconBell, IconCheck, IconMessage } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
-import { isAuthenticated } from '@/services/api';
+import { isAuthenticated } from '@/lib/convexClient';
 import { notificationsService } from '@/services/notifications';
 import type { Notification } from '@/types';
 import dayjs from 'dayjs';
