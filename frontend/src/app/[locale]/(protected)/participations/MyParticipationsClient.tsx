@@ -280,7 +280,7 @@ function ParticipationCard({
                 {host.firstName?.[0]}
               </Avatar>
               <Text size="xs" c="dimmed" className="truncate">
-                {host.firstName} {host.lastName}
+                {host.firstName}
               </Text>
               {host.averageRating > 0 && (
                 <Group gap={2} wrap="nowrap">

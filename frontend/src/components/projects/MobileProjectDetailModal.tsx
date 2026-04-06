@@ -248,12 +248,12 @@ export function MobileProjectDetailModal({
                             <div className="flex items-center gap-4">
                                 <img
                                     src={project.owner?.profilePictureUrl || undefined}
-                                    alt={`${project.owner?.firstName} ${project.owner?.lastName}`}
+                                    alt={project.owner?.firstName}
                                     className="w-14 h-14 rounded-full object-cover border-2 border-eco-primary"
                                 />
                                 <div>
                                     <h3 className="font-bold text-gray-900">
-                                        {project.owner?.firstName} {project.owner?.lastName}
+                                        {project.owner?.firstName}
                                     </h3>
                                     <div className="flex items-center text-sm text-gray-500">
                                         <IconStar size={16} className="text-yellow-500 mr-1" />
