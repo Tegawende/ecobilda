@@ -215,6 +215,10 @@ export default defineSchema({
     // Mute
     user1Muted: v.boolean(),
     user2Muted: v.boolean(),
+
+    // Read receipts
+    user1LastReadAt: v.optional(v.number()),
+    user2LastReadAt: v.optional(v.number()),
   })
     .index("by_user1", ["user1Id"])
     .index("by_user2", ["user2Id"])
@@ -227,6 +231,7 @@ export default defineSchema({
     senderId: v.id("users"),
     body: v.string(),
     isSystem: v.optional(v.boolean()),
+    imageStorageId: v.optional(v.id("_storage")),
   }).index("by_conversation", ["conversationId"]),
 
   // ============================================

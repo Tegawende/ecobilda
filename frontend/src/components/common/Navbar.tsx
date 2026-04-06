@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
-import { Burger, Group, Menu, Avatar, Drawer, Stack, Divider, Anchor, Button, Container } from '@mantine/core';
+import { Burger, Group, Menu, Avatar, Drawer, Stack, Divider, Anchor, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconUser,
@@ -56,7 +56,7 @@ export function Navbar() {
         : 'bg-white/95 backdrop-blur-md shadow-sm'
         }`}
     >
-      <Container size="xl" h="100%" px={{ base: 'xs', sm: 'sm', lg: 'lg' }}>
+      <div className="h-full w-full px-4 sm:px-8 lg:px-12">
         <Group justify="space-between" h="100%">
           <Link
             href={isAuthenticated ? '/projects' : '/'}
@@ -150,7 +150,7 @@ export function Navbar() {
             </div>
           </Group>
         </Group>
-      </Container>
+      </div>
 
       {/* Mobile Drawer */}
       <Drawer opened={opened} onClose={close} title="" withCloseButton={false} padding="md" size="md">
