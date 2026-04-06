@@ -36,6 +36,7 @@ import {
 import { adminApi, type ProjectDetail } from '@/services/api';
 import { formatDate } from '@/lib/utils';
 import { toast } from '@/hooks/useToast';
+import { getSkillIcon } from '@/lib/skillIcons';
 
 // Project Card with frontend-style UI
 function ProjectCard({
@@ -282,11 +283,15 @@ function ProjectCard({
                 <Dog size={10} /> {t('projectDetail.pets')}
               </span>
             )}
-            {project.skills && project.skills.slice(0, 3).map((skill) => (
-              <Badge key={skill.code} variant="secondary" className="text-[10px] px-1.5 py-0">
-                {i18n.language === 'fr' ? skill.displayNameFr : skill.displayNameEn}
-              </Badge>
-            ))}
+            {project.skills && project.skills.slice(0, 3).map((skill) => {
+              const SkillIcon = getSkillIcon(skill.code);
+              return (
+                <Badge key={skill.code} variant="secondary" className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0">
+                  <SkillIcon size={9} />
+                  {i18n.language === 'fr' ? skill.displayNameFr : skill.displayNameEn}
+                </Badge>
+              );
+            })}
             {project.skills && project.skills.length > 3 && (
               <Badge variant="outline" className="text-[10px] px-1.5 py-0">
                 +{project.skills.length - 3}
