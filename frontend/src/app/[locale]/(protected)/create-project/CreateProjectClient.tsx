@@ -69,6 +69,9 @@ export interface ProjectFormData {
     december: boolean;
   }[];
 
+  // Languages
+  languages: string[];
+
   // Images
   images: File[];
 
@@ -108,6 +111,7 @@ export function CreateProjectClient() {
     petsAllowed: false,
     smokingAllowed: false,
     availabilities: [],
+    languages: [],
     images: [],
   });
 
@@ -147,6 +151,7 @@ export function CreateProjectClient() {
         accommodationDetails: formData.accommodationDetails,
         foodDetails: formData.foodDetails,
         skills: formData.skills,
+        languageCodes: formData.languages,
         internetProvided: formData.internetProvided,
         familyFriendly: formData.familyFriendly,
         petsAllowed: formData.petsAllowed,

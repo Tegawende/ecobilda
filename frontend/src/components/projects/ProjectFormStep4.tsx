@@ -24,7 +24,6 @@ import {
   IconPhoto,
   IconX,
   IconAlertCircle,
-  IconGripVertical,
   IconCheck,
   IconMapPin,
   IconUsers,
@@ -421,13 +420,15 @@ export function ProjectFormStep4({
                 >
                   <IconX size={12} />
                 </ActionIcon>
-                <Group gap={2} p={4} justify="center">
-                  <IconGripVertical size={12} className="text-gray-400" />
-                  <Text size="xs" c="dimmed">{index + 1}</Text>
-                </Group>
               </Card>
             ))}
           </SimpleGrid>
+        )}
+
+        {images.length > 0 && (
+          <Text size="xs" c="dimmed">
+            {t('createProject.step4.imagesHint')}
+          </Text>
         )}
       </Stack>
 

@@ -34,6 +34,13 @@ async function enrichProject(ctx: any, project: any) {
     if (skill) skills.push(skill);
   }
 
+  // Languages
+  const languages = [];
+  for (const langId of project.languageIds || []) {
+    const lang = await ctx.db.get(langId);
+    if (lang) languages.push({ code: lang.code, name: lang.name });
+  }
+
   // Images (resolve storage IDs to URLs, or use direct URL)
   const rawImages = await ctx.db
     .query("projectImages")
@@ -73,6 +80,7 @@ async function enrichProject(ctx: any, project: any) {
       : null,
     address,
     skills,
+    languages,
     images,
     availabilities,
   };
@@ -86,6 +94,7 @@ export const list = query({
   args: {
     keyword: v.optional(v.string()),
     skills: v.optional(v.array(v.string())), // skill codes
+    languages: v.optional(v.array(v.string())), // language codes
     countries: v.optional(v.array(v.string())), // country codes
     projectType: v.optional(v.string()),
     internetProvided: v.optional(v.boolean()),
@@ -137,6 +146,17 @@ export const list = query({
     // Filter: exclude own projects
     if (args.excludeOwner) {
       projects = projects.filter((p) => p.ownerId !== args.excludeOwner);
+    }
+
+    // Filter: languages
+    if (args.languages && args.languages.length > 0) {
+      const langDocs = await ctx.db.query("languages").collect();
+      const matchingLangIds = langDocs
+        .filter((l) => args.languages!.includes(l.code))
+        .map((l) => l._id);
+      projects = projects.filter((p) =>
+        (p.languageIds || []).some((lid: any) => matchingLangIds.includes(lid))
+      );
     }
 
     // Filter: skills (by code)
@@ -285,6 +305,7 @@ export const create = mutation({
     petsAllowed: v.boolean(),
     smokingAllowed: v.boolean(),
     skillCodes: v.array(v.string()),
+    languageCodes: v.optional(v.array(v.string())),
     // Address
     city: v.optional(v.string()),
     postalCode: v.optional(v.string()),
@@ -302,6 +323,12 @@ export const create = mutation({
     const skillIds = allSkills
       .filter((s) => args.skillCodes.includes(s.code))
       .map((s) => s._id);
+
+    // Resolve language codes to IDs
+    const allLanguages = await ctx.db.query("languages").collect();
+    const languageIds = allLanguages
+      .filter((l) => (args.languageCodes || []).includes(l.code))
+      .map((l) => l._id);
 
     // Create address
     let addressId = undefined;
@@ -340,6 +367,7 @@ export const create = mutation({
       petsAllowed: args.petsAllowed,
       smokingAllowed: args.smokingAllowed,
       skillIds,
+      languageIds,
       isActive: true,
       flaggedCount: 0,
       status: "PENDING",
@@ -370,6 +398,7 @@ export const update = mutation({
     petsAllowed: v.optional(v.boolean()),
     smokingAllowed: v.optional(v.boolean()),
     skillCodes: v.optional(v.array(v.string())),
+    languageCodes: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const user = await getUserFromToken(ctx, args.token);
@@ -398,6 +427,13 @@ export const update = mutation({
       updates.skillIds = allSkills
         .filter((s) => args.skillCodes!.includes(s.code))
         .map((s) => s._id);
+    }
+
+    if (args.languageCodes !== undefined) {
+      const allLanguages = await ctx.db.query("languages").collect();
+      updates.languageIds = allLanguages
+        .filter((l) => args.languageCodes!.includes(l.code))
+        .map((l) => l._id);
     }
 
     await ctx.db.patch(args.id, updates);

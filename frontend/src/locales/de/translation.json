@@ -266,7 +266,8 @@
       "wifi": "WLAN inklusive",
       "workDetails": "Arbeitsdetails",
       "accommodation": "Unterkunft inklusive",
-      "food": "Verpflegung inklusive"
+      "food": "Verpflegung inklusive",
+      "languages": "Sprachen"
     },
     "helpersMax": "Helfer max",
     "daysPerWeekShort": "T/Woche",
@@ -431,6 +432,9 @@
       "petsAllowedDesc": "Freiwillige können ihre Haustiere mitbringen",
       "smokingAllowed": "Rauchen erlaubt",
       "smokingAllowedDesc": "Rauchen ist auf dem Grundstück erlaubt",
+      "languages": "Gesprochene Sprachen",
+      "languagesDescription": "Welche Sprachen werden in diesem Projekt gesprochen? Das hilft Freiwilligen zu wissen, ob sie mit Ihnen kommunizieren können.",
+      "languagesPlaceholder": "Sprachen auswählen...",
       "back": "Zurück",
       "next": "Weiter",
       "validation": {
@@ -453,6 +457,7 @@
       "uploadButton": "Klicken Sie, um Bilder hochzuladen",
       "uploadHint": "PNG, JPG bis zu 10MB jeweils",
       "cover": "Titelbild",
+      "imagesHint": "Das erste Bild wird als Titelbild verwendet. Ziehen und ablegen, um die Reihenfolge zu ändern.",
       "imagesUploaded": "{count} / 10 Bilder hochgeladen",
       "maxImagesAlert": "Maximal 10 Bilder erlaubt",
       "imagesMin": "Mindestens 5 Bilder erforderlich. Akzeptierte Formate: JPG, PNG.",

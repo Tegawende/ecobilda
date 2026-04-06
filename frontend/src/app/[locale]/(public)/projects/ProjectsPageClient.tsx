@@ -326,6 +326,13 @@ export function ProjectsPageClient() {
         if (!hasMatchingSkill) return false;
       }
 
+      // Languages
+      if (f.languages && f.languages.length > 0) {
+        const projectLanguageCodes = (project.languages || []).map((l: any) => typeof l === 'string' ? l : l.code);
+        const hasMatchingLanguage = f.languages.some(code => projectLanguageCodes.includes(code));
+        if (!hasMatchingLanguage) return false;
+      }
+
       return true;
     });
   }, []);

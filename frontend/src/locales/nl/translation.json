@@ -453,7 +453,8 @@
       "pets": "Huisdieren toegestaan",
       "smoking": "Roken toegestaan",
       "accommodation": "Accommodatie inbegrepen",
-      "food": "Maaltijden inbegrepen"
+      "food": "Maaltijden inbegrepen",
+      "languages": "Talen"
     },
     "helpersMax": "vrijwilligers max",
     "viewList": "Lijst bekijken",
@@ -620,6 +621,9 @@
       "petsAllowedDesc": "Vrijwilligers kunnen hun huisdieren meenemen",
       "smokingAllowed": "Roken toegestaan",
       "smokingAllowedDesc": "Roken is toegestaan op het terrein",
+      "languages": "Gesproken talen",
+      "languagesDescription": "Welke talen worden er in dit project gesproken? Dit helpt vrijwilligers te weten of ze met je kunnen communiceren.",
+      "languagesPlaceholder": "Selecteer talen...",
       "back": "Terug",
       "next": "Volgende",
       "validation": {
@@ -642,6 +646,7 @@
       "uploadButton": "Klik om afbeeldingen te uploaden",
       "uploadHint": "PNG, JPG tot 10MB elk",
       "cover": "Omslag",
+      "imagesHint": "De eerste afbeelding wordt gebruikt als omslag. Sleep om de volgorde te wijzigen.",
       "imagesUploaded": "{count} / 10 afbeeldingen geüpload",
       "maxImagesAlert": "Maximaal 10 afbeeldingen toegestaan",
       "imagesMin": "Minimaal 5 afbeeldingen vereist. Geaccepteerde formaten: JPG, PNG.",

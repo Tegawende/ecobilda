@@ -366,7 +366,8 @@
       "pets": "Pets allowed",
       "smoking": "Smoking allowed",
       "accommodation": "Accommodation provided",
-      "food": "Food provided"
+      "food": "Food provided",
+      "languages": "Languages"
     },
     "helpersMax": "helpers max",
     "viewList": "View List",
@@ -531,6 +532,9 @@
       "petsAllowedDesc": "Volunteers can bring their pets",
       "smokingAllowed": "Smoking allowed",
       "smokingAllowedDesc": "Smoking is permitted on the property",
+      "languages": "Languages spoken",
+      "languagesDescription": "Which languages do you speak on this project? This helps volunteers know if they can communicate with you.",
+      "languagesPlaceholder": "Select languages...",
       "back": "Back",
       "next": "Next",
       "validation": {
@@ -553,6 +557,7 @@
       "uploadButton": "Click to upload images",
       "uploadHint": "PNG, JPG up to 10MB each",
       "cover": "Cover",
+      "imagesHint": "The first image will be used as the cover. Drag and drop to reorder.",
       "imagesUploaded": "{count} / 10 images uploaded",
       "maxImagesAlert": "Maximum 10 images allowed",
       "imagesMin": "Minimum 5 images required. Accepted formats: JPG, PNG.",

@@ -69,6 +69,7 @@ export const projectsService = {
       petsAllowed: data.petsAllowed ?? false,
       smokingAllowed: data.smokingAllowed ?? false,
       skillCodes: data.skills || [],
+      languageCodes: data.languageCodes || data.languages || [],
       city: data.address?.city,
       postalCode: data.address?.postalCode,
       countryCode: data.address?.countryCode,
@@ -99,6 +100,7 @@ export const projectsService = {
       petsAllowed: data.petsAllowed,
       smokingAllowed: data.smokingAllowed,
       skillCodes: data.skills,
+      languageCodes: data.languages,
     });
 
     return await this.getProject(id);

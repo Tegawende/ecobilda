@@ -131,6 +131,7 @@ export function useProjects(filters?: {
   keyword?: string;
   skills?: string[];
   countries?: string[];
+  languages?: string[];
   projectType?: string;
   internetProvided?: boolean;
   familyFriendly?: boolean;
