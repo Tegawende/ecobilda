@@ -257,29 +257,11 @@ function ParticipationCard({
 
       {/* Content — compact */}
       <Stack gap={2} px={2}>
-        <Group justify="space-between" align="center" gap="xs" wrap="nowrap">
-          <Group gap={6} wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
-            <Link href={`/projects/${participation.project?._id}`} className="no-underline min-w-0">
-              <Text fw={700} size="sm" c="dark" className="group-hover:text-eco-primary transition-colors line-clamp-1">
-                {participation.project?.title}
-              </Text>
-            </Link>
-            <StatusBadge status={participation.status} />
-          </Group>
-          {canReview && (
-            <Button
-              size="compact-xs"
-              variant="light"
-              color="eco-primary"
-              radius="xl"
-              leftSection={<IconStar size={12} />}
-              onClick={() => onReview(participation)}
-              style={{ flexShrink: 0 }}
-            >
-              {t('participations.leaveReview')}
-            </Button>
-          )}
-        </Group>
+        <Link href={`/projects/${participation.project?._id}`} className="no-underline">
+          <Text fw={700} size="sm" c="dark" className="group-hover:text-eco-primary transition-colors line-clamp-1">
+            {participation.project?.title}
+          </Text>
+        </Link>
 
         {address?.city && (
           <Group gap={4} wrap="nowrap">
@@ -306,6 +288,23 @@ function ParticipationCard({
             )}
           </Group>
         )}
+
+        {/* Status + Review — bottom row */}
+        <Group justify="space-between" align="center" pt={4} className="border-t border-gray-100">
+          <StatusBadge status={participation.status} />
+          {canReview && (
+            <Button
+              size="compact-xs"
+              variant="light"
+              color="eco-primary"
+              radius="xl"
+              leftSection={<IconStar size={12} />}
+              onClick={() => onReview(participation)}
+            >
+              {t('participations.leaveReview')}
+            </Button>
+          )}
+        </Group>
       </Stack>
     </div>
   );
