@@ -393,59 +393,60 @@ export function ProfilePublicClient() {
               </Stack>
             </Paper>
 
-            {/* Projects — mini cards */}
+            {/* Projects */}
             {profile.projects && profile.projects.length > 0 && (
-              <Paper radius="lg" p="xl" withBorder>
-                <Stack gap="md">
-                  <Group gap="xs">
-                    <IconHome2 size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
-                    <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
-                      {t('nav.projects')}
-                    </Text>
-                  </Group>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {profile.projects.map((project: any) => {
-                      const isPerm = project.projectType === 'PERM';
-                      return (
-                        <Link key={project._id} href={`/projects/${project._id}`} className="block group no-underline">
-                          <div className="rounded-lg overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
-                            {project.coverImageUrl && (
-                              <div className="aspect-[16/9] bg-gray-100 overflow-hidden">
-                                <img
-                                  src={project.coverImageUrl}
-                                  alt={project.title}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                />
-                              </div>
-                            )}
-                            <div className="p-3">
-                              <Badge
-                                size="xs"
-                                radius="xl"
-                                variant="light"
-                                color={isPerm ? 'eco-terracotta' : 'eco-primary'}
-                                leftSection={isPerm ? <IconLeaf size={10} /> : <IconHome2 size={10} />}
-                                mb={6}
-                              >
-                                {isPerm ? t('projects.permaculture') : t('projects.naturalBuilding')}
-                              </Badge>
-                              <Text size="sm" fw={600} c="dark" className="line-clamp-1 group-hover:text-eco-primary transition-colors">
-                                {project.title}
-                              </Text>
-                              {project.address?.city && (
-                                <Group gap={4} mt={4}>
-                                  <IconMapPin size={11} className="text-gray-400" />
-                                  <Text size="xs" c="dimmed">{[project.address.city, project.address.country?.name].filter(Boolean).join(', ')}</Text>
-                                </Group>
-                              )}
-                            </div>
+              <Stack gap="md">
+                <Group gap="xs">
+                  <IconHome2 size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+                  <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+                    {t('nav.projects')}
+                  </Text>
+                </Group>
+                {profile.projects.map((project: any) => {
+                  const isPerm = project.projectType === 'PERM';
+                  const coverUrl = project.coverImageUrl ?? 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800';
+                  return (
+                    <Link key={project._id} href={`/projects/${project._id}`} className="block group no-underline">
+                      <div className="rounded-xl overflow-hidden bg-white border border-gray-100 hover:shadow-md transition-shadow">
+                        <div className="relative aspect-[16/9] bg-gray-100 overflow-hidden">
+                          <img
+                            src={coverUrl}
+                            alt={project.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute top-2 right-2">
+                            <Badge
+                              size="xs"
+                              radius="xl"
+                              variant="filled"
+                              color={isPerm ? 'eco-terracotta' : 'eco-primary'}
+                              leftSection={isPerm ? <IconLeaf size={10} /> : <IconHome2 size={10} />}
+                              tt="uppercase"
+                              fw={700}
+                              styles={{ root: { letterSpacing: '0.05em', fontSize: '0.6rem' } }}
+                            >
+                              {isPerm ? t('projects.permaculture') : t('projects.naturalBuilding')}
+                            </Badge>
                           </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </Stack>
-              </Paper>
+                        </div>
+                        <div className="p-3">
+                          <Text size="sm" fw={700} c="dark" className="line-clamp-1 group-hover:text-eco-primary transition-colors">
+                            {project.title}
+                          </Text>
+                          {project.address?.city && (
+                            <Group gap={4} mt={4}>
+                              <IconMapPin size={12} className="text-gray-400" />
+                              <Text size="xs" c="dimmed">
+                                {[project.address.city, project.address.country?.name].filter(Boolean).join(', ')}
+                              </Text>
+                            </Group>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </Stack>
             )}
 
           </Stack>
