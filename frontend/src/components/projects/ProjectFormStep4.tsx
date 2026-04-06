@@ -17,7 +17,7 @@ import {
   Alert,
   SimpleGrid,
   SegmentedControl,
-  Tabs,
+  Divider,
 } from '@mantine/core';
 import {
   IconCalendar,
@@ -25,7 +25,17 @@ import {
   IconX,
   IconAlertCircle,
   IconGripVertical,
-  IconCalendarMonth,
+  IconCheck,
+  IconMapPin,
+  IconUsers,
+  IconClock,
+  IconHome,
+  IconLeaf,
+  IconWifi,
+  IconBabyCarriage,
+  IconDog,
+  IconChevronLeft,
+  IconChevronRight,
 } from '@tabler/icons-react';
 import type { ProjectFormData } from '@/app/[locale]/(protected)/create-project/CreateProjectClient';
 
@@ -75,15 +85,19 @@ function rangeToAvailabilities(start: Date, end: Date): AvailabilityData[] {
 interface ProjectFormStep4Props {
   data: ProjectFormData;
   onUpdate: (data: Partial<ProjectFormData>) => void;
-  onNext: () => void;
+  onSubmit: () => void;
   onBack: () => void;
+  isSubmitting: boolean;
+  error: string | null;
 }
 
 export function ProjectFormStep4({
   data,
   onUpdate,
-  onNext,
+  onSubmit,
   onBack,
+  isSubmitting,
+  error,
 }: ProjectFormStep4Props) {
   const t = useTranslations();
 
@@ -116,6 +130,7 @@ export function ProjectFormStep4({
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [currentImg, setCurrentImg] = useState(0);
 
   const handleImageUpload = (files: File[] | null) => {
     if (!files) return;
@@ -154,19 +169,19 @@ export function ProjectFormStep4({
     setImages(newImages);
     setPreviewUrls(newPreviews);
     onUpdate({ images: newImages });
+    setCurrentImg(0);
     setDragIndex(null);
     setDragOverIndex(null);
   };
 
-  const handleNext = () => {
+  const handleSubmit = () => {
     // Validate availability
     if (availMode === 'range') {
       if (!dateRange[0] || !dateRange[1]) {
         setAvailError(t('createProject.step4.availabilityRequired'));
         return;
       }
-      const avails = rangeToAvailabilities(dateRange[0], dateRange[1]);
-      onUpdate({ availabilities: avails });
+      onUpdate({ availabilities: rangeToAvailabilities(dateRange[0], dateRange[1]) });
     } else {
       const hasAny = monthsData.some(y => MONTH_KEYS.some(k => y[k]));
       if (!hasAny) {
@@ -178,8 +193,10 @@ export function ProjectFormStep4({
 
     if (images.length < 5) return;
     setAvailError(null);
-    onNext();
+    onSubmit();
   };
+
+  const isNatB = data.projectType === 'NATB';
 
   const monthLabels = [
     t('createProject.step4.monthLabels.jan'), t('createProject.step4.monthLabels.feb'),
@@ -228,51 +245,92 @@ export function ProjectFormStep4({
             error={availError}
           />
         ) : (
-          <Stack gap="sm">
-            <Tabs value={selectedYearTab} onChange={(v) => setSelectedYearTab(v || String(currentYear))}>
-              <Tabs.List>
-                {years.map(y => (
-                  <Tabs.Tab key={y} value={String(y)}>{y}</Tabs.Tab>
-                ))}
-              </Tabs.List>
-
+          <Stack gap="md">
+            {/* Year tabs — custom buttons to avoid Mantine Tabs click issues */}
+            <Group gap="xs">
               {years.map(y => {
-                const yearData = monthsData.find(d => d.year === y) || emptyYear(y);
-                const isCurrentYear = y === currentYear;
+                const isActive = selectedYearTab === String(y);
                 return (
-                  <Tabs.Panel key={y} value={String(y)} pt="md">
-                    <SimpleGrid cols={4} spacing="xs">
-                      {MONTH_KEYS.map((key, idx) => {
-                        const isPast = isCurrentYear && idx < currentMonth;
-                        if (isPast) return null;
-                        const active = yearData[key];
-                        return (
-                          <button
-                            key={key}
-                            type="button"
-                            onClick={() => { toggleMonth(y, key); setAvailError(null); }}
-                            style={{
-                              padding: '8px 4px',
-                              borderRadius: 8,
-                              border: '2px solid',
-                              borderColor: active ? 'var(--mantine-color-eco-primary-6)' : 'var(--mantine-color-gray-3)',
-                              backgroundColor: active ? 'var(--mantine-color-eco-primary-0)' : 'white',
-                              color: active ? 'var(--mantine-color-eco-primary-8)' : 'var(--mantine-color-gray-7)',
-                              fontWeight: active ? 600 : 400,
-                              fontSize: 13,
-                              cursor: 'pointer',
-                              transition: 'all 0.15s',
-                            }}
-                          >
-                            {monthLabels[idx]}
-                          </button>
-                        );
-                      })}
-                    </SimpleGrid>
-                  </Tabs.Panel>
+                  <button
+                    key={y}
+                    type="button"
+                    onClick={() => setSelectedYearTab(String(y))}
+                    style={{
+                      padding: '6px 18px',
+                      borderRadius: 8,
+                      border: '2px solid',
+                      borderColor: isActive ? 'var(--mantine-color-eco-primary-6)' : 'var(--mantine-color-gray-3)',
+                      backgroundColor: isActive ? 'var(--mantine-color-eco-primary-6)' : 'white',
+                      color: isActive ? 'white' : 'var(--mantine-color-gray-7)',
+                      fontWeight: isActive ? 700 : 400,
+                      fontSize: 14,
+                      cursor: 'pointer',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {y}
+                  </button>
                 );
               })}
-            </Tabs>
+            </Group>
+
+            {/* Month grid for selected year — 6 per row */}
+            {years.map(y => {
+              if (String(y) !== selectedYearTab) return null;
+              const yearData = monthsData.find(d => d.year === y) || emptyYear(y);
+              const isCurrentYear = y === currentYear;
+              return (
+                <SimpleGrid key={y} cols={6} spacing="xs">
+                  {MONTH_KEYS.map((key, idx) => {
+                    const isPast = isCurrentYear && idx < currentMonth;
+                    const active = yearData[key];
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        disabled={isPast}
+                        onClick={() => { if (!isPast) { toggleMonth(y, key); setAvailError(null); } }}
+                        style={{
+                          padding: '8px 4px',
+                          borderRadius: 8,
+                          border: '2px solid',
+                          borderColor: active ? 'var(--mantine-color-eco-primary-6)' : isPast ? 'var(--mantine-color-gray-2)' : 'var(--mantine-color-gray-3)',
+                          backgroundColor: active ? 'var(--mantine-color-eco-primary-0)' : isPast ? 'var(--mantine-color-gray-1)' : 'white',
+                          color: active ? 'var(--mantine-color-eco-primary-8)' : isPast ? 'var(--mantine-color-gray-4)' : 'var(--mantine-color-gray-7)',
+                          fontWeight: active ? 600 : 400,
+                          fontSize: 13,
+                          cursor: isPast ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.15s',
+                        }}
+                      >
+                        {monthLabels[idx]}
+                      </button>
+                    );
+                  })}
+                </SimpleGrid>
+              );
+            })}
+
+            {/* Summary */}
+            {monthsData.some(y => MONTH_KEYS.some(k => y[k])) && (
+              <Stack gap={4} pt={4}>
+                {monthsData.map(y => {
+                  const count = MONTH_KEYS.filter(k => y[k]).length;
+                  if (count === 0) return null;
+                  const selectedNames = MONTH_KEYS
+                    .map((k, idx) => y[k] ? monthLabels[idx] : null)
+                    .filter(Boolean)
+                    .join(', ');
+                  return (
+                    <Text key={y.year} size="sm" c="dimmed">
+                      <Text span fw={600} c="eco-primary">{y.year}</Text>
+                      {' — '}{count} {count === 1 ? t('createProject.step4.monthSingular') : t('createProject.step4.monthPlural')} : {selectedNames}
+                    </Text>
+                  );
+                })}
+              </Stack>
+            )}
+
             {availError && <Text size="sm" c="red">{availError}</Text>}
           </Stack>
         )}
@@ -352,16 +410,131 @@ export function ProjectFormStep4({
         </Alert>
       )}
 
+      {/* Live Preview */}
+      {images.length > 0 && (
+        <>
+          <Divider />
+          <Stack gap="md">
+            <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+              {t('createProject.step5.title')}
+            </Text>
+            <Text size="sm" c="dimmed">{t('createProject.step5.description')}</Text>
+
+            <div style={{ maxWidth: 260 }}>
+              {/* Image carousel — same as ProjectCard */}
+              <div className="relative rounded-xl overflow-hidden aspect-[4/3] mb-3 bg-gray-100">
+                <div
+                  className="flex h-full transition-transform duration-300 ease-out"
+                  style={{ transform: `translateX(-${currentImg * 100}%)` }}
+                >
+                  {previewUrls.map((url, idx) => (
+                    <img
+                      key={idx}
+                      src={url}
+                      alt={`Preview ${idx + 1}`}
+                      className="w-full h-full flex-shrink-0 object-cover"
+                      style={{ minWidth: '100%' }}
+                    />
+                  ))}
+                </div>
+
+                {/* Type badge */}
+                <div className="absolute top-3 left-3 z-10">
+                  <Badge
+                    size="sm" radius="xl" variant="filled"
+                    color={isNatB ? 'eco-primary' : 'eco-terracotta'}
+                    leftSection={isNatB ? <IconHome size={12} /> : <IconLeaf size={12} />}
+                    tt="uppercase" fw={700}
+                    styles={{ root: { letterSpacing: '0.05em', fontSize: '0.65rem' } }}
+                  >
+                    {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
+                  </Badge>
+                </div>
+
+                {/* Nav arrows — same as ProjectCard */}
+                {previewUrls.length > 1 && (
+                  <>
+                    {currentImg > 0 && (
+                      <button type="button" onClick={() => setCurrentImg(i => i - 1)}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-100 transition-opacity hover:bg-white cursor-pointer z-10 shadow-sm text-gray-800">
+                        <IconChevronLeft size={18} />
+                      </button>
+                    )}
+                    {currentImg < previewUrls.length - 1 && (
+                      <button type="button" onClick={() => setCurrentImg(i => i + 1)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-100 transition-opacity hover:bg-white cursor-pointer z-10 shadow-sm text-gray-800">
+                        <IconChevronRight size={18} />
+                      </button>
+                    )}
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                      {previewUrls.map((_, idx) => (
+                        <span key={idx} className={`w-1.5 h-1.5 rounded-full transition-all ${idx === currentImg ? 'bg-white w-2' : 'bg-white/50'}`} />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Card content — same as ProjectCard */}
+              <Stack gap={4} px={4}>
+                <Text fw={700} size="lg" c="dark" className="line-clamp-1">
+                  {data.title || '—'}
+                </Text>
+                <Group gap={4} wrap="nowrap">
+                  <IconMapPin size={14} className="text-gray-500 flex-shrink-0" />
+                  <Text size="sm" c="dimmed" className="truncate">
+                    {data.address.city || '—'}{data.address.countryCode ? `, ${data.address.countryCode}` : ''}
+                  </Text>
+                </Group>
+                <Group gap="md">
+                  <Group gap={4}>
+                    <IconUsers size={14} className="text-gray-500" />
+                    <Text size="sm" c="dimmed">{data.maxHelpers} {t('projects.volunteers')}</Text>
+                  </Group>
+                  <Group gap={4}>
+                    <IconClock size={14} className="text-gray-500" />
+                    <Text size="sm" c="dimmed">{data.hoursPerDay}h/{t('common.day')}</Text>
+                  </Group>
+                </Group>
+                <Group gap="xs" pt={4}>
+                  {data.internetProvided && (
+                    <Badge size="xs" variant="light" color="gray" leftSection={<IconWifi size={10} />} radius="xl">WiFi</Badge>
+                  )}
+                  {data.familyFriendly && (
+                    <Badge size="xs" variant="light" color="gray" leftSection={<IconBabyCarriage size={10} />} radius="xl">
+                      {t('projects.families')}
+                    </Badge>
+                  )}
+                  {data.petsAllowed && (
+                    <Badge size="xs" variant="light" color="gray" leftSection={<IconDog size={10} />} radius="xl">
+                      {t('projects.pets')}
+                    </Badge>
+                  )}
+                </Group>
+              </Stack>
+            </div>
+          </Stack>
+        </>
+      )}
+
+      {error && (
+        <Alert color="red" variant="light" icon={<IconX size={18} />}>
+          {error}
+        </Alert>
+      )}
+
       <Group justify="space-between" pt="md" className="border-t border-gray-200">
-        <Button type="button" onClick={onBack} variant="default">
+        <Button type="button" onClick={onBack} variant="default" disabled={isSubmitting}>
           {t('createProject.step4.back')}
         </Button>
         <Button
-          onClick={handleNext}
+          onClick={handleSubmit}
           disabled={images.length < 5}
-          color="eco-blue"
+          loading={isSubmitting}
+          color="eco-primary"
+          leftSection={!isSubmitting ? <IconCheck size={18} /> : undefined}
         >
-          {t('createProject.step4.nextPreview')}
+          {isSubmitting ? t('createProject.step4.creating') : t('createProject.step4.create')}
         </Button>
       </Group>
     </Stack>

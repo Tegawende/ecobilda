@@ -242,6 +242,7 @@ export function EditProjectClient() {
               onSubmit={handleSubmit}
               onBack={handleBack}
               isSubmitting={isSubmitting}
+              error={error}
             />
           )}
         </Paper>

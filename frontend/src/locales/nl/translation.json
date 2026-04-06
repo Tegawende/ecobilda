@@ -673,7 +673,9 @@
         "dec": "Dec"
       },
       "availabilityRequired": "Selecteer je beschikbaarheid.",
-      "nextPreview": "Voorbeeld"
+      "nextPreview": "Voorbeeld",
+      "monthSingular": "maand",
+      "monthPlural": "maanden"
     },
     "step5": {
       "title": "Voorbeeld van je project",

@@ -587,7 +587,9 @@
         "dec": "Dez"
       },
       "availabilityRequired": "Por favor selecione sua disponibilidade.",
-      "nextPreview": "Pre-visualizar"
+      "nextPreview": "Pre-visualizar",
+      "monthSingular": "mês",
+      "monthPlural": "meses"
     },
     "step5": {
       "title": "Pre-visualizacao do seu projeto",

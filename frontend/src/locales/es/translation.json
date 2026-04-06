@@ -587,7 +587,9 @@
         "dec": "Dic"
       },
       "availabilityRequired": "Por favor selecciona tu disponibilidad.",
-      "nextPreview": "Vista previa"
+      "nextPreview": "Vista previa",
+      "monthSingular": "mes",
+      "monthPlural": "meses"
     },
     "step5": {
       "title": "Vista previa de tu proyecto",

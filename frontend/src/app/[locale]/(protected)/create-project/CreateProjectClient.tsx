@@ -20,7 +20,6 @@ import { ProjectFormStep1 } from '@/components/projects/ProjectFormStep1';
 import { ProjectFormStep2 } from '@/components/projects/ProjectFormStep2';
 import { ProjectFormStep3 } from '@/components/projects/ProjectFormStep3';
 import { ProjectFormStep4 } from '@/components/projects/ProjectFormStep4';
-import { ProjectPreviewStep } from '@/components/projects/ProjectPreviewStep';
 import { projectsService } from '@/services/projects';
 
 export interface ProjectFormData {
@@ -109,7 +108,7 @@ export function CreateProjectClient() {
     images: [],
   });
 
-  const totalSteps = 5;
+  const totalSteps = 4;
 
   const handleNext = () => {
     if (currentStep < totalSteps - 1) {
@@ -184,7 +183,6 @@ export function CreateProjectClient() {
     t('createProject.steps.locationWork'),
     t('createProject.steps.skillsAmenities'),
     t('createProject.steps.availabilityImages'),
-    t('createProject.steps.preview'),
   ];
 
   return (
@@ -242,15 +240,6 @@ export function CreateProjectClient() {
 
           {currentStep === 3 && (
             <ProjectFormStep4
-              data={formData}
-              onUpdate={updateFormData}
-              onNext={handleNext}
-              onBack={handleBack}
-            />
-          )}
-
-          {currentStep === 4 && (
-            <ProjectPreviewStep
               data={formData}
               onUpdate={updateFormData}
               onSubmit={handleSubmit}

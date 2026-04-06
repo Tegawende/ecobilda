@@ -484,7 +484,9 @@
         "dec": "Dez"
       },
       "availabilityRequired": "Bitte wahle deine Verfugbarkeit aus.",
-      "nextPreview": "Vorschau"
+      "nextPreview": "Vorschau",
+      "monthSingular": "Monat",
+      "monthPlural": "Monate"
     },
     "step5": {
       "title": "Vorschau deines Projekts",

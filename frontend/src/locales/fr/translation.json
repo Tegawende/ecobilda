@@ -584,7 +584,9 @@
         "dec": "Déc"
       },
       "availabilityRequired": "Veuillez sélectionner vos disponibilités.",
-      "nextPreview": "Aperçu"
+      "nextPreview": "Aperçu",
+      "monthSingular": "mois",
+      "monthPlural": "mois"
     },
     "step5": {
       "title": "Aperçu de votre projet",

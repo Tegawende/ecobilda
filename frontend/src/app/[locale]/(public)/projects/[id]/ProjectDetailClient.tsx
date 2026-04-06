@@ -304,16 +304,26 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                   <Paper radius="xl" p="xl" withBorder>
                     <Title order={3} mb="lg" className="font-display">{t('projectDetail.yourHost')}</Title>
                     <Group gap="md">
-                      <Avatar
-                        src={project.owner?.profilePictureUrl || undefined}
-                        alt={`${project.owner?.firstName} ${project.owner?.lastName}`}
-                        size="lg"
-                        radius="xl"
-                        color="eco-primary"
-                        component={project.owner?.publicId ? Link : 'div'}
-                        {...(project.owner?.publicId ? { href: `/users/${project.owner.publicId}` } : {})}
-                        style={project.owner?.publicId ? { cursor: 'pointer' } : undefined}
-                      />
+                      {project.owner?.publicId ? (
+                        <Link href={`/users/${project.owner.publicId}`}>
+                          <Avatar
+                            src={project.owner?.profilePictureUrl || undefined}
+                            alt={`${project.owner?.firstName} ${project.owner?.lastName}`}
+                            size="lg"
+                            radius="xl"
+                            color="eco-primary"
+                            style={{ cursor: 'pointer' }}
+                          />
+                        </Link>
+                      ) : (
+                        <Avatar
+                          src={project.owner?.profilePictureUrl || undefined}
+                          alt={`${project.owner?.firstName} ${project.owner?.lastName}`}
+                          size="lg"
+                          radius="xl"
+                          color="eco-primary"
+                        />
+                      )}
                       <Stack gap={0}>
                         {project.owner?.publicId ? (
                           <Link href={`/users/${project.owner.publicId}`} className="no-underline hover:underline">
