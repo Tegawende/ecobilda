@@ -91,7 +91,7 @@ async function verifyPassword(password: string, storedHash: string): Promise<boo
   // PBKDF2 verification
   if (parts[0] === "pbkdf2" && parts.length === 4) {
     const iterations = parseInt(parts[1]);
-    const salt = fromHex(parts[2]);
+    const salt = fromHex(parts[2]) as unknown as BufferSource;
     const expectedHash = parts[3];
 
     const keyMaterial = await crypto.subtle.importKey(
