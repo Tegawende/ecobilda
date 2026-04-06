@@ -4,6 +4,7 @@ import type { Conversation, Message } from '../types';
 
 export interface SendMessageData {
   body: string;
+  imageStorageId?: string;
 }
 
 export interface CreateConversationData {
@@ -59,6 +60,7 @@ export const messagingService = {
       token,
       conversationId: conversationId as any,
       body: data.body,
+      ...(data.imageStorageId ? { imageStorageId: data.imageStorageId as any } : {}),
     });
     return { id: messageId } as any;
   },
@@ -83,6 +85,20 @@ export const messagingService = {
   },
 
   async deleteConversation(conversationId: number | string): Promise<void> {
-    // TODO: Implement conversation deletion in Convex
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.conversations.deleteConversation, {
+      token,
+      id: conversationId as any,
+    });
+  },
+
+  async generateMessageUploadUrl(conversationId: number | string): Promise<string> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    return await convexClient.mutation(api.conversations.generateMessageUploadUrl, {
+      token,
+      conversationId: conversationId as any,
+    });
   },
 };
