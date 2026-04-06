@@ -554,7 +554,14 @@
     "editProject": "Projekt bearbeiten",
     "editProjectDesc": "Aktualisieren Sie Ihre Projektinformationen",
     "projectCreated": "Ihr Projekt wurde erfolgreich eingereicht!",
-    "projectCreatedDesc": "Es wird von einem Administrator überprüft, bevor es veröffentlicht wird. Sie erhalten eine Benachrichtigung, sobald es genehmigt wurde. Ihr Projekt ist für Benutzer nicht sichtbar, bis es validiert wurde."
+    "projectCreatedDesc": "Es wird von einem Administrator überprüft, bevor es veröffentlicht wird. Sie erhalten eine Benachrichtigung, sobald es genehmigt wurde. Ihr Projekt ist für Benutzer nicht sichtbar, bis es validiert wurde.",
+    "deleteProject": "Projekt löschen",
+    "deleteProjectTitle": "Dieses Projekt löschen?",
+    "deleteProjectConfirm": "Diese Aktion ist unwiderruflich. Das Projekt und alle zugehörigen Daten (Bilder, Verfügbarkeiten) werden dauerhaft gelöscht.",
+    "deleteProjectBtn": "Ja, löschen",
+    "deleteProjectCancel": "Abbrechen",
+    "deleteProjectSuccess": "Projekt erfolgreich gelöscht.",
+    "deleteProjectError": "Fehler beim Löschen des Projekts. Bitte erneut versuchen."
   },
   "participations": {
     "title": "Meine Teilnahmen",
@@ -564,7 +571,7 @@
     "accepted": "Akzeptiert",
     "rejected": "Abgelehnt",
     "completed": "Abgeschlossen",
-    "hostedBy": "Gehostet von",
+    "hostedBy": "Veranstaltet von",
     "viewProject": "Projekt anzeigen",
     "noParticipations": "Noch keine Teilnahmen",
     "noParticipationsDesc": "Beginnen Sie, Projekte zu erkunden und bewerben Sie sich, um teilzunehmen!",
@@ -583,7 +590,20 @@
     "requestSent": "Anfrage gesendet!",
     "requestSentDesc": "Der Gastgeber wird Ihre Anfrage prüfen und Ihnen antworten.",
     "sendRequest": "Anfrage senden",
-    "startDate": "Startdatum"
+    "startDate": "Startdatum",
+    "leaveReview": "Bewertung abgeben",
+    "reviewModalTitle": "Bewerte deine Erfahrung",
+    "reviewRating": "Bewertung",
+    "reviewRatingHint": "Klicke zum Bewerten (halbe Sterne möglich)",
+    "reviewFeedback": "Deine Bewertung",
+    "reviewFeedbackPlaceholder": "Teile deine Erfahrung mit diesem Gastgeber...",
+    "reviewFeedbackRequired": "Bitte schreibe mindestens 20 Zeichen.",
+    "reviewSubmit": "Bewertung absenden",
+    "reviewSubmitting": "Wird gesendet...",
+    "reviewSuccess": "Deine Bewertung wurde eingereicht!",
+    "reviewError": "Fehler beim Senden. Bitte erneut versuchen.",
+    "reviewAlreadyDone": "Du hast diesen Gastgeber bereits bewertet.",
+    "viewProfile": "Profil anzeigen"
   },
   "favorites": {
     "title": "Meine Favoriten",

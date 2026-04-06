@@ -654,7 +654,14 @@
     "editProjectDesc": "Mettre à jour les informations de votre projet",
     "fetchError": "Impossible de charger vos projets. Veuillez réessayer.",
     "projectCreated": "Votre projet a été soumis avec succès !",
-    "projectCreatedDesc": "Il sera examiné par un administrateur avant d'être publié. Vous recevrez une notification dès qu'il aura été approuvé. Votre projet ne sera pas visible par les utilisateurs tant qu'il n'est pas validé."
+    "projectCreatedDesc": "Il sera examiné par un administrateur avant d'être publié. Vous recevrez une notification dès qu'il aura été approuvé. Votre projet ne sera pas visible par les utilisateurs tant qu'il n'est pas validé.",
+    "deleteProject": "Supprimer le projet",
+    "deleteProjectTitle": "Supprimer ce projet ?",
+    "deleteProjectConfirm": "Cette action est irréversible. Le projet et toutes ses données (images, disponibilités) seront définitivement supprimés.",
+    "deleteProjectBtn": "Oui, supprimer",
+    "deleteProjectCancel": "Annuler",
+    "deleteProjectSuccess": "Projet supprimé avec succès.",
+    "deleteProjectError": "Échec de la suppression. Veuillez réessayer."
   },
   "participations": {
     "title": "Mes participations",
@@ -683,7 +690,20 @@
     "requestSent": "Demande envoyée !",
     "requestSentDesc": "L'hôte examinera votre demande et vous répondra.",
     "sendRequest": "Envoyer la demande",
-    "startDate": "Date de début"
+    "startDate": "Date de début",
+    "leaveReview": "Laisser un avis",
+    "reviewModalTitle": "Évaluez votre expérience",
+    "reviewRating": "Note",
+    "reviewRatingHint": "Cliquez pour noter (demi-étoiles disponibles)",
+    "reviewFeedback": "Votre avis",
+    "reviewFeedbackPlaceholder": "Partagez votre expérience avec cet hôte...",
+    "reviewFeedbackRequired": "Veuillez écrire au moins 20 caractères.",
+    "reviewSubmit": "Soumettre l'avis",
+    "reviewSubmitting": "Envoi en cours...",
+    "reviewSuccess": "Votre avis a été soumis !",
+    "reviewError": "Échec de l'envoi. Veuillez réessayer.",
+    "reviewAlreadyDone": "Vous avez déjà évalué cet hôte.",
+    "viewProfile": "Voir le profil"
   },
   "profile": {
     "personalInfo": "Informations personnelles",

@@ -654,7 +654,14 @@
     "editProjectDesc": "Update your project information",
     "fetchError": "Failed to load your projects. Please try again.",
     "projectCreated": "Your project has been submitted successfully!",
-    "projectCreatedDesc": "It will be reviewed by an administrator before being published. You will receive a notification once it has been approved. Your project will not be visible to users until it is validated."
+    "projectCreatedDesc": "It will be reviewed by an administrator before being published. You will receive a notification once it has been approved. Your project will not be visible to users until it is validated.",
+    "deleteProject": "Delete project",
+    "deleteProjectTitle": "Delete this project?",
+    "deleteProjectConfirm": "This action is irreversible. The project and all its data (images, availabilities) will be permanently deleted.",
+    "deleteProjectBtn": "Yes, delete",
+    "deleteProjectCancel": "Cancel",
+    "deleteProjectSuccess": "Project deleted successfully.",
+    "deleteProjectError": "Failed to delete project. Please try again."
   },
   "participations": {
     "title": "My Participations",
@@ -683,7 +690,20 @@
     "requestSent": "Request sent!",
     "requestSentDesc": "The host will review your request and get back to you.",
     "sendRequest": "Send Request",
-    "startDate": "Start date"
+    "startDate": "Start date",
+    "leaveReview": "Leave a review",
+    "reviewModalTitle": "Review your experience",
+    "reviewRating": "Rating",
+    "reviewRatingHint": "Click to rate (half stars allowed)",
+    "reviewFeedback": "Your review",
+    "reviewFeedbackPlaceholder": "Share your experience with this host...",
+    "reviewFeedbackRequired": "Please write at least 20 characters.",
+    "reviewSubmit": "Submit review",
+    "reviewSubmitting": "Submitting...",
+    "reviewSuccess": "Your review has been submitted!",
+    "reviewError": "Failed to submit review. Please try again.",
+    "reviewAlreadyDone": "You have already reviewed this host.",
+    "viewProfile": "View profile"
   },
   "profile": {
     "personalInfo": "Personal Information",

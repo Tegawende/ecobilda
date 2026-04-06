@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { Link, useRouter } from '@/i18n/navigation';
+import { useMutation } from 'convex/react';
+import { api } from '../../../../../convex/_generated/api';
 import {
   Container,
   Title,
@@ -15,11 +17,13 @@ import {
   SimpleGrid,
   Paper,
   Button,
+  Modal,
 } from '@mantine/core';
-import { IconFolder, IconPlus, IconCheck } from '@tabler/icons-react';
+import { IconFolder, IconPlus, IconCheck, IconTrash, IconAlertTriangle } from '@tabler/icons-react';
 import type { Project } from '@/types';
 import { ProjectCard, ProjectCardSkeleton } from '@/components/projects/ProjectCard';
 import { useMyProjects } from '@/hooks/useConvex';
+import { getSessionToken } from '@/lib/convexClient';
 import { Layout } from '@/components/common/Layout';
 
 
@@ -32,6 +36,11 @@ export function MyProjectsClient() {
     initialTab === 'pending' || initialTab === 'active' || initialTab === 'past' ? initialTab : 'active'
   );
   const [showCreatedAlert, setShowCreatedAlert] = useState(searchParams?.get('created') === 'true');
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const removeProject = useMutation(api.projects.remove);
 
   const { projects: rawProjects, isLoading } = useMyProjects();
   const projects = (rawProjects || []) as Project[];
@@ -43,6 +52,22 @@ export function MyProjectsClient() {
 
   const handleEdit = (id: string) => {
     router.push(`/projects/${id}/edit`);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!projectToDelete) return;
+    const token = getSessionToken();
+    if (!token) return;
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await removeProject({ token, id: projectToDelete._id as any });
+      setProjectToDelete(null);
+    } catch {
+      setDeleteError(t('myProjects.deleteProjectError'));
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -127,7 +152,14 @@ export function MyProjectsClient() {
             ) : filteredProjects.length > 0 ? (
               <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
                 {filteredProjects.map((project) => (
-                  <ProjectCard key={project._id} project={project} showEdit onEdit={handleEdit} showStatus />
+                  <ProjectCard
+                    key={project._id}
+                    project={project}
+                    showEdit
+                    onEdit={handleEdit}
+                    onDelete={(p) => { setProjectToDelete(p); setDeleteError(null); }}
+                    showStatus
+                  />
                 ))}
               </SimpleGrid>
             ) : (
@@ -166,6 +198,61 @@ export function MyProjectsClient() {
           </Stack>
         </Container>
       </div>
+
+      {/* Delete confirmation modal */}
+      <Modal
+        opened={projectToDelete !== null}
+        onClose={() => { if (!isDeleting) { setProjectToDelete(null); setDeleteError(null); } }}
+        title={
+          <Group gap="sm">
+            <ThemeIcon color="red" variant="light" size="md" radius="xl">
+              <IconAlertTriangle size={16} />
+            </ThemeIcon>
+            <Text fw={600}>{t('myProjects.deleteProjectTitle')}</Text>
+          </Group>
+        }
+        centered
+        radius="lg"
+        size="sm"
+      >
+        <Stack gap="lg">
+          <Text size="sm" c="dimmed">
+            {t('myProjects.deleteProjectConfirm')}
+          </Text>
+
+          {projectToDelete && (
+            <Paper p="sm" radius="md" withBorder>
+              <Text size="sm" fw={600} lineClamp={1}>{projectToDelete.title}</Text>
+            </Paper>
+          )}
+
+          {deleteError && (
+            <Alert color="red" variant="light" radius="md">
+              {deleteError}
+            </Alert>
+          )}
+
+          <Group justify="flex-end" gap="sm">
+            <Button
+              variant="default"
+              radius="xl"
+              onClick={() => { setProjectToDelete(null); setDeleteError(null); }}
+              disabled={isDeleting}
+            >
+              {t('myProjects.deleteProjectCancel')}
+            </Button>
+            <Button
+              color="red"
+              radius="xl"
+              leftSection={<IconTrash size={16} />}
+              loading={isDeleting}
+              onClick={handleDeleteConfirm}
+            >
+              {t('myProjects.deleteProjectBtn')}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Layout>
   );
 }
