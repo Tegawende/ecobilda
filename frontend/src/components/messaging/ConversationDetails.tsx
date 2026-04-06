@@ -92,27 +92,30 @@ export function ConversationDetails({
           {project && (
             <Box p="md">
               <Stack gap="sm">
-                {/* Cover image */}
+                {/* Cover image + type badge */}
                 <Link href={`/projects/${project._id}`}>
-                  <div className="rounded-lg overflow-hidden aspect-[16/9] bg-gray-100">
+                  <div className="relative rounded-lg overflow-hidden aspect-[16/9] bg-gray-100">
                     <img
                       src={project.coverImageUrl || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'}
                       alt={project.title}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                     />
+                    <div className="absolute top-2 right-2">
+                      <Badge
+                        size="xs"
+                        radius="xl"
+                        variant="filled"
+                        color={isNatB ? 'eco-primary' : 'eco-terracotta'}
+                        leftSection={isNatB ? <IconHome2 size={10} /> : <IconLeaf size={10} />}
+                        tt="uppercase"
+                        fw={700}
+                        styles={{ root: { letterSpacing: '0.05em', fontSize: '0.6rem' } }}
+                      >
+                        {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
+                      </Badge>
+                    </div>
                   </div>
                 </Link>
-
-                {/* Type badge */}
-                <Badge
-                  size="xs"
-                  radius="xl"
-                  variant="light"
-                  color={isNatB ? 'eco-primary' : 'eco-terracotta'}
-                  leftSection={isNatB ? <IconHome2 size={10} /> : <IconLeaf size={10} />}
-                >
-                  {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
-                </Badge>
 
                 {/* Title + link */}
                 <Group justify="space-between" align="flex-start" wrap="nowrap" gap="xs">
