@@ -122,7 +122,7 @@ export function MyProjectsClient() {
             )}
 
             {/* Filter Tabs */}
-            <div className="inline-flex w-fit items-center rounded-md bg-gray-100 p-1 gap-0.5">
+            <div className="flex w-full items-center rounded-lg bg-gray-100 p-1 gap-0.5">
               {[
                 { value: 'pending', label: t('myProjects.pendingTab') },
                 { value: 'active', label: t('myProjects.activeTab') },
@@ -131,7 +131,7 @@ export function MyProjectsClient() {
                 <button
                   key={tab.value}
                   onClick={() => setProjectStatus(tab.value as 'pending' | 'active' | 'past')}
-                  className={`px-3 py-1.5 rounded-sm text-sm font-medium transition-all cursor-pointer whitespace-nowrap ${
+                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all cursor-pointer whitespace-nowrap ${
                     projectStatus === tab.value
                       ? 'bg-white text-gray-900 shadow-sm'
                       : 'text-gray-500 hover:text-gray-700'
