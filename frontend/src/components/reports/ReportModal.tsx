@@ -21,10 +21,10 @@ export function ReportModal({ contentType, objectId, opened, onClose }: ReportMo
   const [isLoading, setIsLoading] = useState(false);
 
   const reasons = [
-    { value: 'spam', label: t('reports.reasons.spam') || 'Spam' },
-    { value: 'inappropriate', label: t('reports.reasons.inappropriate') || 'Inappropriate content' },
-    { value: 'misleading', label: t('reports.reasons.misleading') || 'Misleading information' },
-    { value: 'other', label: t('reports.reasons.other') || 'Other' },
+    { value: 'spam', label: t('reports.reasons.spam') },
+    { value: 'inappropriate', label: t('reports.reasons.inappropriate') },
+    { value: 'misleading', label: t('reports.reasons.misleading') },
+    { value: 'other', label: t('reports.reasons.other') },
   ];
 
   const handleSubmit = async () => {
@@ -40,8 +40,8 @@ export function ReportModal({ contentType, objectId, opened, onClose }: ReportMo
       });
 
       notifications.show({
-        title: t('reports.submitted') || 'Report submitted',
-        message: t('reports.submittedDesc') || 'Thank you for helping us keep the community safe.',
+        title: t('reports.submitted'),
+        message: t('reports.submittedDesc'),
         color: 'eco-primary',
       });
 
@@ -50,8 +50,8 @@ export function ReportModal({ contentType, objectId, opened, onClose }: ReportMo
       onClose();
     } catch {
       notifications.show({
-        title: t('common.error') || 'Error',
-        message: t('reports.submitError') || 'Failed to submit report.',
+        title: t('common.error'),
+        message: t('reports.submitError'),
         color: 'red',
       });
     } finally {
@@ -60,10 +60,10 @@ export function ReportModal({ contentType, objectId, opened, onClose }: ReportMo
   };
 
   return (
-    <Modal opened={opened} onClose={onClose} title={t('reports.title') || 'Report'} size="md" radius="lg">
+    <Modal opened={opened} onClose={onClose} title={t('reports.title')} size="md" radius="lg">
       <Stack gap="md">
         <Select
-          label={t('reports.reason') || 'Reason'}
+          label={t('reports.reason')}
           data={reasons}
           value={reason}
           onChange={(v) => setReason(v || '')}
@@ -71,7 +71,7 @@ export function ReportModal({ contentType, objectId, opened, onClose }: ReportMo
           radius="lg"
         />
         <Textarea
-          label={t('reports.details') || 'Additional details'}
+          label={t('reports.details')}
           value={details}
           onChange={(e) => setDetails(e.target.value)}
           minRows={3}
@@ -87,7 +87,7 @@ export function ReportModal({ contentType, objectId, opened, onClose }: ReportMo
             radius="xl"
             leftSection={<IconFlag size={16} />}
           >
-            {t('reports.submit') || 'Submit Report'}
+            {t('reports.submit')}
           </Button>
         </Group>
       </Stack>

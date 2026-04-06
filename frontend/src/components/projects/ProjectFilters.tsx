@@ -21,6 +21,8 @@ import {
     IconChevronRight,
     IconSearch,
     IconLoader2,
+    IconBed,
+    IconToolsKitchen2,
 } from '@tabler/icons-react';
 import { MobileSearchModal } from './MobileSearchModal';
 
@@ -35,6 +37,8 @@ export interface ProjectFiltersState {
     familyFriendly: boolean;
     petsAllowed: boolean;
     smokingAllowed: boolean;
+    accommodationProvided: boolean;
+    foodProvided: boolean;
     skills: string[];
 }
 
@@ -58,6 +62,8 @@ export const defaultFilters: ProjectFiltersState = {
     familyFriendly: false,
     petsAllowed: false,
     smokingAllowed: false,
+    accommodationProvided: false,
+    foodProvided: false,
     skills: [],
 };
 
@@ -592,6 +598,8 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
         if (filters.familyFriendly) count++;
         if (filters.petsAllowed) count++;
         if (filters.smokingAllowed) count++;
+        if (filters.accommodationProvided) count++;
+        if (filters.foodProvided) count++;
         if (filters.hoursPerDay[0] > 1 || filters.hoursPerDay[1] < 10) count++;
         if (filters.daysPerWeek[0] > 1 || filters.daysPerWeek[1] < 7) count++;
         if (filters.maxHelpers[0] > 1 || filters.maxHelpers[1] < 30) count++;
@@ -633,15 +641,15 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
 
 
     const formatDateRange = () => {
-        if (!filters.dateRange.start && !filters.dateRange.end) return t('projects.filters.dates') || 'Dates';
+        if (!filters.dateRange.start && !filters.dateRange.end) return t('projects.filters.dates');
         const format = (d: Date) => d.toLocaleDateString();
         if (filters.dateRange.start && filters.dateRange.end) {
             return `${format(filters.dateRange.start)} - ${format(filters.dateRange.end)}`;
         }
         if (filters.dateRange.start) {
-            return `${t('projects.filters.startingFrom') || 'À partir du'} ${format(filters.dateRange.start)}`;
+            return `${t('projects.filters.startingFrom')} ${format(filters.dateRange.start)}`;
         }
-        return t('projects.filters.dates') || 'Dates';
+        return t('projects.filters.dates');
     };
 
     // Get location icon based on type
@@ -668,7 +676,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
                                 {filters.location || filters.dateRange.start || filters.projectType !== 'all' ? (
                                     <div>
                                         <p className="text-sm font-medium text-gray-900 truncate">
-                                            {filters.location?.name?.split(',')[0] || t('projects.filters.anywhere') || 'Partout'}
+                                            {filters.location?.name?.split(',')[0] || t('projects.filters.anywhere')}
                                         </p>
                                         <p className="text-xs text-gray-500 truncate">
                                             {formatDateRange()}
@@ -676,7 +684,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
                                         </p>
                                     </div>
                                 ) : (
-                                    <p className="text-sm text-gray-500">{t('projects.filters.searchPlaceholder') || 'Où allez-vous ?'}</p>
+                                    <p className="text-sm text-gray-500">{t('projects.filters.searchPlaceholder')}</p>
                                 )}
                             </div>
                         </button>
@@ -728,7 +736,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
                                     value={locationQuery}
                                     onChange={(e) => handleLocationSearch(e.target.value)}
                                     onFocus={() => setShowLocationDropdown(true)}
-                                    placeholder={t('projects.filters.searchPlaceholder') || 'Où allez-vous ?'}
+                                    placeholder={t('projects.filters.searchPlaceholder')}
                                     className="flex-1 outline-none text-sm bg-transparent"
                                 />
                                 {filters.location && (
@@ -744,7 +752,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
                                     {isSearching ? (
                                         <div className="px-4 py-3 text-center text-gray-500 text-sm">
                                             <IconLoader2 size={20} className="animate-spin mx-auto mb-2" />
-                                            {t('projects.filters.searching') || 'Recherche...'}
+                                            {t('projects.filters.searching')}
                                         </div>
                                     ) : (
                                         locationSuggestions.map((feature) => (
@@ -771,7 +779,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
                                 <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 py-4 px-4 w-full min-w-[280px] z-50">
                                     <div className="text-center text-gray-500 text-sm">
                                         <IconMapPin size={24} className="mx-auto mb-2 text-gray-400" />
-                                        {t('projects.filters.noResultsFor') || 'Aucun résultat pour'} "{locationQuery}"
+                                        {t('projects.filters.noResultsFor')} "{locationQuery}"
                                     </div>
                                 </div>
                             )}
@@ -898,31 +906,43 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
                         <div className="p-6 overflow-y-auto max-h-[60vh] space-y-8">
                             {/* Amenities */}
                             <div>
-                                <h3 className="font-semibold text-gray-900 mb-4">{t('projects.filters.amenities') || 'Équipements & Conditions'}</h3>
+                                <h3 className="font-semibold text-gray-900 mb-4">{t('projects.filters.amenities')}</h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <AmenityToggle
                                         value={tempFilters.internetProvided}
                                         onChange={(val) => setTempFilter('internetProvided', val)}
                                         icon={IconWifi}
-                                        label={t('projects.filters.wifi') || 'WiFi inclus'}
+                                        label={t('projects.filters.wifi')}
                                     />
                                     <AmenityToggle
                                         value={tempFilters.familyFriendly}
                                         onChange={(val) => setTempFilter('familyFriendly', val)}
                                         icon={IconBabyCarriage}
-                                        label={t('projects.filters.family') || 'Familles bienvenues'}
+                                        label={t('projects.filters.family')}
                                     />
                                     <AmenityToggle
                                         value={tempFilters.petsAllowed}
                                         onChange={(val) => setTempFilter('petsAllowed', val)}
                                         icon={IconDog}
-                                        label={t('projects.filters.pets') || 'Animaux acceptés'}
+                                        label={t('projects.filters.pets')}
                                     />
                                     <AmenityToggle
                                         value={tempFilters.smokingAllowed}
                                         onChange={(val) => setTempFilter('smokingAllowed', val)}
                                         icon={IconSmoking}
-                                        label={t('projects.filters.smoking') || 'Fumeur autorisé'}
+                                        label={t('projects.filters.smoking')}
+                                    />
+                                    <AmenityToggle
+                                        value={tempFilters.accommodationProvided}
+                                        onChange={(val) => setTempFilter('accommodationProvided', val)}
+                                        icon={IconBed}
+                                        label={t('projects.filters.accommodation')}
+                                    />
+                                    <AmenityToggle
+                                        value={tempFilters.foodProvided}
+                                        onChange={(val) => setTempFilter('foodProvided', val)}
+                                        icon={IconToolsKitchen2}
+                                        label={t('projects.filters.food')}
                                     />
                                 </div>
                             </div>
@@ -930,7 +950,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
                             {/* Skills */}
                             {allSkills.length > 0 && (
                                 <div>
-                                    <h3 className="font-semibold text-gray-900 mb-4">{t('profile.skills') || 'Skills'}</h3>
+                                    <h3 className="font-semibold text-gray-900 mb-4">{t('profile.skills')}</h3>
 
                                     {/* Natural Building */}
                                     <div className="mb-3">

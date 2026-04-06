@@ -30,7 +30,8 @@
     "users": "Users",
     "adminPanel": "Admin Panel",
     "settings": "Settings",
-    "logout": "Logout"
+    "logout": "Logout",
+    "contacts": "Contact Messages"
   },
   "login": {
     "title": "Ecobilda Admin",
@@ -76,10 +77,6 @@
     "platformActivityDesc": "New users and projects over the last 30 days",
     "newUsers": "New Users",
     "newProjects": "New Projects",
-    "platformActivity": "Platform Activity",
-    "platformActivityDesc": "New users and projects over the last 30 days",
-    "newUsers": "New Users",
-    "newProjects": "New Projects",
     "tooltips": {
       "totalUsers": "Total number of registered users on the platform",
       "activeProjects": "Validated projects visible to volunteers",
@@ -117,12 +114,6 @@
     "validatedOn": "Validated on",
     "searchPlaceholder": "Search by title or owner name...",
     "allTypes": "All types",
-    "noMatchingProjects": "No projects match your search",
-    "searchPlaceholder": "Search by title or owner name...",
-    "allTypes": "All types",
-    "noMatchingProjects": "No projects match your search",
-    "searchPlaceholder": "Search by title or owner name...",
-    "allTypes": "All types",
     "noMatchingProjects": "No projects match your search"
   },
   "reports": {
@@ -142,18 +133,6 @@
     "adminNotes": "Admin notes (optional)...",
     "view": "View",
     "failedToLoad": "Failed to load reports",
-    "searchPlaceholder": "Search by reporter name, email or details...",
-    "allReasons": "All reasons",
-    "noMatchingReports": "No reports match your search",
-    "reasons": {
-      "inappropriate": "Inappropriate",
-      "misleading": "Misleading",
-      "spam": "Spam",
-      "harassment": "Harassment",
-      "fake": "Fake",
-      "safety": "Safety",
-      "other": "Other"
-    },
     "searchPlaceholder": "Search by reporter name, email or details...",
     "allReasons": "All reasons",
     "noMatchingReports": "No reports match your search",
@@ -196,6 +175,8 @@
   "users": {
     "title": "Users Management",
     "subtitle": "View and manage platform users",
+    "usersTab": "Users",
+    "adminsTab": "Admins",
     "searchPlaceholder": "Search by name or email...",
     "user": "User",
     "email": "Email",
@@ -323,5 +304,26 @@
     "emailUnverified": "Email unverified",
     "emailUnverifiedDesc": "The user's email has been marked as unverified.",
     "emailUnverifyError": "Failed to unverify the email. Please try again."
+  },
+  "contacts": {
+    "title": "Contact Messages",
+    "subtitle": "Messages received from the contact form",
+    "tabNew": "New",
+    "tabAll": "All messages",
+    "statusNew": "New",
+    "statusRead": "Read",
+    "statusResolved": "Resolved",
+    "markRead": "Mark as read",
+    "markResolved": "Mark as resolved",
+    "markedAsRead": "Marked as read",
+    "markedAsResolved": "Marked as resolved",
+    "reply": "Reply",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "noNewMessages": "No new messages",
+    "noMessages": "No messages yet",
+    "noMatchingMessages": "No messages match your search",
+    "failedToLoad": "Failed to load contact messages",
+    "searchPlaceholder": "Search by name, email or subject..."
   }
 }

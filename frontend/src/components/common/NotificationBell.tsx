@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ActionIcon, Menu, Text, Stack, Button, ScrollArea, Group, Box, Indicator } from '@mantine/core';
+import { useState } from 'react';
+import { ActionIcon, Menu, Text, Stack, Button, ScrollArea, Group, Box } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconBell, IconCheck, IconMessage } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { isAuthenticated } from '@/lib/convexClient';
 import { notificationsService } from '@/services/notifications';
-import type { Notification } from '@/types';
+import { useUnreadCount, useNotifications } from '@/hooks/useConvex';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -18,50 +18,18 @@ export function NotificationBell() {
   const t = useTranslations();
   const router = useRouter();
   const [opened, setOpened] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const width = isMobile ? (typeof window !== 'undefined' ? window.innerWidth - 32 : 360) : 360;
 
-  const refreshCount = async () => {
-    if (!isAuthenticated()) return;
-    try {
-      const count = await notificationsService.getUnreadCount();
-      setUnreadCount(count);
-    } catch {
-      // silently fail
-    }
-  };
-
-  const refreshNotifications = async () => {
-    if (!isAuthenticated()) return;
-    try {
-      const notifs = await notificationsService.getNotifications(true);
-      setNotifications(notifs.slice(0, 10));
-    } catch {
-      // silently fail
-    }
-  };
-
-  useEffect(() => {
-    refreshCount();
-    refreshNotifications();
-    const interval = setInterval(refreshCount, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (opened && isAuthenticated()) {
-      refreshNotifications();
-    }
-  }, [opened]);
+  // Real-time reactive queries
+  const unreadCount = useUnreadCount();
+  const { notifications: allNotifications } = useNotifications();
+  const notifications = allNotifications.slice(0, 10);
 
   const handleNotificationClick = async (notificationId: string, linkUrl: string, isRead: boolean) => {
     if (!isRead) {
       try {
         await notificationsService.markAsRead(notificationId);
-        setNotifications(prev => prev.map(n => n._id === notificationId ? { ...n, isRead: true } : n));
-        setUnreadCount(prev => Math.max(0, prev - 1));
       } catch {
         // silently fail
       }
@@ -73,8 +41,6 @@ export function NotificationBell() {
   const handleMarkAllRead = async () => {
     try {
       await notificationsService.markAllAsRead();
-      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-      setUnreadCount(0);
     } catch {
       // silently fail
     }
@@ -93,17 +59,35 @@ export function NotificationBell() {
       withinPortal
     >
       <Menu.Target>
-        <Indicator
-          label={unreadCount > 0 ? (unreadCount > 9 ? '9+' : unreadCount) : undefined}
-          size={16}
-          color="red"
-          disabled={unreadCount === 0}
-          offset={4}
-        >
+        <div style={{ position: 'relative', display: 'inline-flex' }}>
           <ActionIcon variant="subtle" size="xl" radius="xl" aria-label={t('notifications.title')}>
             <IconBell size={24} />
           </ActionIcon>
-        </Indicator>
+          {unreadCount > 0 && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 2,
+                right: 2,
+                minWidth: 16,
+                height: 16,
+                borderRadius: 8,
+                backgroundColor: 'var(--mantine-color-eco-blue-6)',
+                color: 'white',
+                fontSize: 10,
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0 4px',
+                lineHeight: 1,
+                boxShadow: '0 0 0 2px white',
+              }}
+            >
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </div>
+          )}
+        </div>
       </Menu.Target>
 
       <Menu.Dropdown style={isMobile ? { left: '16px', right: '16px', position: 'fixed' } : undefined}>
@@ -126,7 +110,7 @@ export function NotificationBell() {
         <ScrollArea.Autosize mah={400} type="auto">
           {notifications.length > 0 ? (
             <Stack gap={0}>
-              {notifications.map((notification) => (
+              {notifications.map((notification: any) => (
                 <Menu.Item
                   key={notification._id}
                   onClick={() => handleNotificationClick(notification._id, notification.linkUrl ?? '', notification.isRead)}
@@ -138,38 +122,20 @@ export function NotificationBell() {
                   }}
                 >
                   <Group gap="sm" wrap="nowrap" align="flex-start">
-                    {false ? (
-                      <Box
-                        style={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: '50%',
-                          overflow: 'hidden',
-                          flexShrink: 0,
-                        }}
-                      >
-                        <img
-                          src=""
-                          alt=""
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                      </Box>
-                    ) : (
-                      <Box
-                        style={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: '50%',
-                          backgroundColor: 'var(--mantine-color-eco-primary-1)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0,
-                        }}
-                      >
-                        <IconMessage size={20} color="var(--mantine-color-eco-primary-6)" />
-                      </Box>
-                    )}
+                    <Box
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        backgroundColor: 'var(--mantine-color-eco-primary-1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <IconMessage size={20} color="var(--mantine-color-eco-primary-6)" />
+                    </Box>
                     <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
                       <Text size="sm" fw={notification.isRead ? 400 : 600} lineClamp={1}>
                         {notification.title}

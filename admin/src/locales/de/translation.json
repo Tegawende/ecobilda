@@ -30,7 +30,8 @@
     "users": "Benutzer",
     "adminPanel": "Verwaltungspanel",
     "settings": "Einstellungen",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "contacts": "Kontaktnachrichten"
   },
   "login": {
     "title": "Ecobilda Admin",
@@ -155,6 +156,8 @@
   "users": {
     "title": "Benutzerverwaltung",
     "subtitle": "Plattformbenutzer anzeigen und verwalten",
+    "usersTab": "Benutzer",
+    "adminsTab": "Administratoren",
     "searchPlaceholder": "Nach Name oder E-Mail suchen...",
     "user": "Benutzer",
     "email": "E-Mail",
@@ -255,5 +258,26 @@
     "saved": "Einstellungen gespeichert",
     "savedDesc": "Ihre Einstellungen wurden aktualisiert.",
     "saveError": "Einstellungen konnten nicht gespeichert werden"
+  },
+  "contacts": {
+    "title": "Kontaktnachrichten",
+    "subtitle": "Nachrichten aus dem Kontaktformular",
+    "tabNew": "Neu",
+    "tabAll": "Alle Nachrichten",
+    "statusNew": "Neu",
+    "statusRead": "Gelesen",
+    "statusResolved": "Erledigt",
+    "markRead": "Als gelesen markieren",
+    "markResolved": "Als erledigt markieren",
+    "markedAsRead": "Als gelesen markiert",
+    "markedAsResolved": "Als erledigt markiert",
+    "reply": "Antworten",
+    "showMore": "Mehr anzeigen",
+    "showLess": "Weniger anzeigen",
+    "noNewMessages": "Keine neuen Nachrichten",
+    "noMessages": "Noch keine Nachrichten",
+    "noMatchingMessages": "Keine Nachrichten entsprechen Ihrer Suche",
+    "failedToLoad": "Kontaktnachrichten konnten nicht geladen werden",
+    "searchPlaceholder": "Nach Name, E-Mail oder Betreff suchen..."
   }
 }

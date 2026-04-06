@@ -65,7 +65,7 @@ export function ResetPasswordClient() {
               </p>
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center w-full px-6 py-3 rounded-full bg-eco-primary text-white font-semibold hover:bg-eco-primaryDark transition-all"
+                className="inline-flex items-center justify-center w-full px-6 py-3 rounded-full bg-eco-blue text-white font-semibold hover:bg-eco-blueDark transition-all"
               >
                 {t('auth.backToLogin')}
               </Link>
@@ -73,8 +73,8 @@ export function ResetPasswordClient() {
           ) : (
             <>
               <div className="flex justify-center mb-6">
-                <div className="w-16 h-16 rounded-full bg-eco-primary/10 flex items-center justify-center">
-                  <IconLock size={32} className="text-eco-primary" strokeWidth={1.5} />
+                <div className="w-16 h-16 rounded-full bg-eco-blue/10 flex items-center justify-center">
+                  <IconLock size={32} className="text-eco-blue" strokeWidth={1.5} />
                 </div>
               </div>
               <h1 className="text-2xl font-display font-bold text-gray-900 mb-2">
@@ -99,7 +99,7 @@ export function ResetPasswordClient() {
                     placeholder={t('settings.newPassword')}
                     required
                     minLength={8}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-eco-primary focus:ring-1 focus:ring-eco-primary outline-none pr-12"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-eco-blue focus:ring-1 focus:ring-eco-blue outline-none pr-12"
                   />
                   <button
                     type="button"
@@ -116,12 +116,12 @@ export function ResetPasswordClient() {
                   placeholder={t('settings.confirmPassword')}
                   required
                   minLength={8}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-eco-primary focus:ring-1 focus:ring-eco-primary outline-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-eco-blue focus:ring-1 focus:ring-eco-blue outline-none"
                 />
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full px-6 py-3 rounded-full bg-eco-primary text-white font-semibold hover:bg-eco-primaryDark transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full px-6 py-3 rounded-full bg-eco-blue text-white font-semibold hover:bg-eco-blueDark transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isLoading ? <IconLoader2 size={18} className="animate-spin" /> : null}
                   {t('auth.resetPassword')}
@@ -130,7 +130,7 @@ export function ResetPasswordClient() {
 
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 mt-6 text-sm text-gray-500 hover:text-eco-primary"
+                className="inline-flex items-center gap-2 mt-6 text-sm text-gray-500 hover:text-eco-blue"
               >
                 <IconArrowLeft size={16} />
                 {t('auth.backToLogin')}

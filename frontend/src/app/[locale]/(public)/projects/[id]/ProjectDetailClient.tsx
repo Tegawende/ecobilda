@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { Link } from '@/i18n/navigation';
+import { useState, useEffect } from 'react';
+import { Link, useRouter } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { DatePickerInput } from '@mantine/dates';
 import { Layout } from '@/components/common/Layout';
+import { useAuth } from '@/providers/AuthProvider';
+import { participationsService } from '@/services/participations';
 import {
   IconMapPin,
   IconCalendar,
@@ -20,7 +21,7 @@ import {
   IconStar,
 } from '@tabler/icons-react';
 import { ProjectImageGallery } from '@/components/projects/ProjectImageGallery';
-import { useProject } from '@/hooks/useData';
+import { useProject } from '@/hooks/useConvex';
 import { getSkillIcon } from '@/lib/skillIcons';
 import {
   Loader,
@@ -28,6 +29,9 @@ import {
   Container,
   Stack,
   Group,
+  Textarea,
+  Alert,
+  Modal,
   Title,
   Text,
   Paper,
@@ -43,8 +47,26 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
   const t = useTranslations();
   const params = useParams();
   const id = projectId || (params?.id as string);
-  const { data: project, isLoading } = useProject(id);
-  const [dates, setDates] = useState<[Date | null, Date | null]>([null, null]);
+  const { project, isLoading } = useProject(id);
+  const { user, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const [applyModalOpen, setApplyModalOpen] = useState(false);
+  const [motivation, setMotivation] = useState('');
+  const [isApplying, setIsApplying] = useState(false);
+  const [applySuccess, setApplySuccess] = useState(false);
+  const [applyError, setApplyError] = useState<string | null>(null);
+  const [existingRequest, setExistingRequest] = useState<{ status: string; _id: string } | null>(null);
+
+  // Check if user already applied to this project
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    participationsService.getMyParticipations().then((participations) => {
+      const existing = participations.find(
+        (p: any) => p.projectId === id && (p.status === 'PENDING' || p.status === 'ACCEPTED' || p.status === 'REFUSED')
+      );
+      if (existing) setExistingRequest({ status: existing.status, _id: existing._id });
+    }).catch(() => {});
+  }, [isAuthenticated, id]);
 
   if (isLoading) {
     return (
@@ -117,14 +139,14 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
 
                 {/* Work Details */}
                 <Paper radius="xl" p="xl" withBorder>
-                  <Title order={3} mb="lg" className="font-display">{t('projectDetail.workDetails') || 'Work Details'}</Title>
+                  <Title order={3} mb="lg" className="font-display">{t('projectDetail.workDetails')}</Title>
                   <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="lg">
                     <Group gap="sm" wrap="nowrap">
                       <ThemeIcon size={48} radius="md" color="eco-primary" variant="light">
                         <IconClock size={24} />
                       </ThemeIcon>
                       <Stack gap={0}>
-                        <Text size="sm" c="dimmed">{t('projectDetail.hoursPerDay') || 'Hours / day'}</Text>
+                        <Text size="sm" c="dimmed">{t('projectDetail.hoursPerDay')}</Text>
                         <Text size="lg" fw={700}>{project.hoursPerDay}h</Text>
                       </Stack>
                     </Group>
@@ -133,7 +155,7 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                         <IconCalendar size={24} />
                       </ThemeIcon>
                       <Stack gap={0}>
-                        <Text size="sm" c="dimmed">{t('projectDetail.daysPerWeek') || 'Days / week'}</Text>
+                        <Text size="sm" c="dimmed">{t('projectDetail.daysPerWeek')}</Text>
                         <Text size="lg" fw={700}>{project.daysPerWeek}d</Text>
                       </Stack>
                     </Group>
@@ -142,7 +164,7 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                         <IconUsers size={24} />
                       </ThemeIcon>
                       <Stack gap={0}>
-                        <Text size="sm" c="dimmed">{t('projectDetail.maxVolunteers') || 'Max volunteers'}</Text>
+                        <Text size="sm" c="dimmed">{t('projectDetail.maxVolunteers')}</Text>
                         <Text size="lg" fw={700}>{project.maxHelpers}</Text>
                       </Stack>
                     </Group>
@@ -151,13 +173,13 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
 
                 {/* Amenities */}
                 <Paper radius="xl" p="xl" withBorder>
-                  <Title order={3} mb="lg" className="font-display">{t('projectDetail.amenities') || 'Amenities & Conditions'}</Title>
+                  <Title order={3} mb="lg" className="font-display">{t('projectDetail.amenities')}</Title>
                   <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="md">
                     {[
-                      { available: project.internetProvided, icon: IconWifi, label: 'WiFi', sublabel: project.internetProvided ? t('common.included') || 'Included' : t('common.no') || 'No' },
-                      { available: project.familyFriendly, icon: IconBabyCarriage, label: t('projects.families') || 'Families', sublabel: project.familyFriendly ? t('common.welcome') || 'Welcome' : t('common.no') || 'No' },
-                      { available: project.petsAllowed, icon: IconDog, label: t('projects.pets') || 'Pets', sublabel: project.petsAllowed ? t('common.accepted') || 'Accepted' : t('common.no') || 'No' },
-                      { available: project.smokingAllowed, icon: IconSmoking, label: t('projects.smoking') || 'Smoking', sublabel: project.smokingAllowed ? t('common.allowed') || 'Allowed' : t('common.no') || 'No' },
+                      { available: project.internetProvided, icon: IconWifi, label: 'WiFi', sublabel: project.internetProvided ? t('common.included') : t('common.no') },
+                      { available: project.familyFriendly, icon: IconBabyCarriage, label: t('projects.families'), sublabel: project.familyFriendly ? t('common.welcome') : t('common.no') },
+                      { available: project.petsAllowed, icon: IconDog, label: t('projects.pets'), sublabel: project.petsAllowed ? t('common.accepted') : t('common.no') },
+                      { available: project.smokingAllowed, icon: IconSmoking, label: t('projects.smoking'), sublabel: project.smokingAllowed ? t('common.allowed') : t('common.no') },
                     ].map((amenity, idx) => (
                       <Paper
                         key={idx}
@@ -183,16 +205,16 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
 
                 {/* Accommodation & Food */}
                 <Paper radius="xl" p="xl" withBorder>
-                  <Title order={3} mb="lg" className="font-display">{t('projectDetail.accommodation') || 'Accommodation & Meals'}</Title>
+                  <Title order={3} mb="lg" className="font-display">{t('projectDetail.accommodation')}</Title>
                   <Stack gap="lg">
                     <div>
-                      <Text fw={600} mb="xs">{t('projectDetail.accommodationType') || 'Accommodation'}</Text>
-                      <Text c="dimmed">{project.accommodationDetails}</Text>
+                      <Text fw={600} mb="xs">{t('projectDetail.accommodationType')}</Text>
+                      <Text c="dimmed">{project.accommodationDetails || t('projectDetail.notSpecified')}</Text>
                     </div>
                     <Divider />
                     <div>
-                      <Text fw={600} mb="xs">{t('projectDetail.meals') || 'Meals'}</Text>
-                      <Text c="dimmed">{project.foodDetails}</Text>
+                      <Text fw={600} mb="xs">{t('projectDetail.meals')}</Text>
+                      <Text c="dimmed">{project.foodDetails || t('projectDetail.notSpecified')}</Text>
                     </div>
                   </Stack>
                 </Paper>
@@ -200,7 +222,7 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                 {/* Skills */}
                 {project.skills && project.skills.length > 0 && (
                   <Paper radius="xl" p="xl" withBorder>
-                    <Title order={3} mb="lg" className="font-display">{t('projectDetail.skills') || 'Skills'}</Title>
+                    <Title order={3} mb="lg" className="font-display">{t('projectDetail.skills')}</Title>
                     <Group gap="xs">
                       {project.skills.map((skill, idx) => {
                         const SkillIcon = getSkillIcon(skill.icon);
@@ -280,7 +302,7 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                 {/* Host */}
                 {project.owner && (
                   <Paper radius="xl" p="xl" withBorder>
-                    <Title order={3} mb="lg" className="font-display">{t('projectDetail.yourHost') || 'Your Host'}</Title>
+                    <Title order={3} mb="lg" className="font-display">{t('projectDetail.yourHost')}</Title>
                     <Group gap="md">
                       <Avatar
                         src={project.owner?.profilePictureUrl || undefined}
@@ -288,15 +310,26 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                         size="lg"
                         radius="xl"
                         color="eco-primary"
+                        component={project.owner?.publicId ? Link : 'div'}
+                        {...(project.owner?.publicId ? { href: `/users/${project.owner.publicId}` } : {})}
+                        style={project.owner?.publicId ? { cursor: 'pointer' } : undefined}
                       />
                       <Stack gap={0}>
-                        <Text fw={700} size="lg">
-                          {project.owner?.firstName} {project.owner?.lastName}
-                        </Text>
+                        {project.owner?.publicId ? (
+                          <Link href={`/users/${project.owner.publicId}`} className="no-underline hover:underline">
+                            <Text fw={700} size="lg" c="eco-primary">
+                              {project.owner?.firstName} {project.owner?.lastName}
+                            </Text>
+                          </Link>
+                        ) : (
+                          <Text fw={700} size="lg">
+                            {project.owner?.firstName} {project.owner?.lastName}
+                          </Text>
+                        )}
                         <Group gap={4}>
                           <IconStar size={16} className="text-yellow-500" />
                           <Text size="sm" c="dimmed">
-                            {Number(project.owner?.averageRating || 0).toFixed(1)} ({project.owner?.reviewCount} {t('projects.reviews') || 'reviews'})
+                            {Number(project.owner?.averageRating || 0).toFixed(1)} ({project.owner?.reviewCount} {t('projects.reviews')})
                           </Text>
                         </Group>
                       </Stack>
@@ -315,14 +348,14 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                   <Group justify="space-between" pb="md" className="border-b border-gray-100">
                     <Text size="sm" c="dimmed">{t('projectDetail.status')}</Text>
                     <Text fw={700} c={project.isActive ? 'eco-primary' : 'dimmed'}>
-                      {project.isActive ? t('common.active') || 'Active' : t('common.inactive') || 'Inactive'}
+                      {project.isActive ? t('common.active') : t('common.inactive')}
                     </Text>
                   </Group>
                   <Group justify="space-between" pb="md" className="border-b border-gray-100">
                     <Text size="sm" c="dimmed">Type</Text>
                     <Group gap={4}>
                       {isNatB ? <IconHome size={16} /> : <IconLeaf size={16} />}
-                      <Text fw={700}>{isNatB ? t('projects.naturalBuilding') || 'Construction' : t('projects.permaculture') || 'Permaculture'}</Text>
+                      <Text fw={700}>{isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}</Text>
                     </Group>
                   </Group>
                   <Group justify="space-between" pb="md" className="border-b border-gray-100">
@@ -333,7 +366,7 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                     </Group>
                   </Group>
                   <Group justify="space-between">
-                    <Text size="sm" c="dimmed">{t('projectDetail.location') || 'Location'}</Text>
+                    <Text size="sm" c="dimmed">{t('projectDetail.location')}</Text>
                     <Group gap="xs">
                       <IconMapPin size={18} className="text-gray-400" />
                       <Text fw={700}>{project.address?.city}</Text>
@@ -341,42 +374,126 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                   </Group>
                 </Stack>
 
-                <Stack gap="md">
-                  <Text size="sm" c="dimmed">{t('projectDetail.selectDates')}</Text>
-                  <DatePickerInput
-                    type="range"
-                    placeholder={t('projectDetail.pickDates')}
-                    value={dates}
-                    onChange={setDates}
-                    numberOfColumns={2}
-                    size="md"
-                    radius="xl"
-                    leftSection={<IconCalendar size={18} stroke={1.5} />}
-                    styles={{
-                      input: {
-                        borderColor: '#e5e7eb',
+                {/* Application Button */}
+                {!(isAuthenticated && user?._id === project.ownerId) && (
+                  applySuccess || existingRequest ? (
+                    <Alert
+                      color={
+                        applySuccess ? 'green'
+                        : existingRequest?.status === 'ACCEPTED' ? 'green'
+                        : existingRequest?.status === 'REFUSED' ? 'red'
+                        : 'blue'
                       }
-                    }}
-                  />
+                      variant="light"
+                    >
+                      {applySuccess
+                        ? t('projectDetail.applySuccess')
+                        : existingRequest?.status === 'ACCEPTED'
+                        ? t('projectDetail.applicationAccepted')
+                        : existingRequest?.status === 'REFUSED'
+                        ? t('projectDetail.applicationRefused')
+                        : t('projectDetail.alreadyApplied')}
+                    </Alert>
+                  ) : (
+                    <Stack gap="md">
+                      <Button
+                        fullWidth
+                        size="lg"
+                        radius="md"
+                        color="eco-primary"
+                        className="shadow-lg shadow-eco-primary/20 hover:-translate-y-1 transition-all"
+                        onClick={() => {
+                          if (!isAuthenticated) {
+                            router.push('/login');
+                            return;
+                          }
+                          if (!motivation) {
+                            setMotivation(t('projectDetail.defaultMotivation', { projectTitle: project.title }));
+                          }
+                          setApplyModalOpen(true);
+                        }}
+                      >
+                        {!isAuthenticated
+                          ? t('projectDetail.loginToApply')
+                          : t('projectDetail.apply')}
+                      </Button>
+                      {!isAuthenticated && (
+                        <Text size="xs" c="dimmed" ta="center">
+                          {t('projectDetail.loginRequired')}
+                        </Text>
+                      )}
 
-                  <Button
-                    fullWidth
-                    size="lg"
-                    radius="md"
-                    color="eco-primary"
-                    className="shadow-lg shadow-eco-primary/20 hover:-translate-y-1 transition-all"
-                  >
-                    {t('projectDetail.apply')}
-                  </Button>
-                  <Text size="xs" c="dimmed" ta="center">
-                    {t('projectDetail.freeForMembers')}
-                  </Text>
-                </Stack>
+                    </Stack>
+                  )
+                )}
               </Paper>
             </div>
           </SimpleGrid>
         </Container>
       </div>
+      {/* Apply Modal */}
+      <Modal
+        opened={applyModalOpen}
+        onClose={() => { setApplyModalOpen(false); setApplyError(null); }}
+        title={t('projectDetail.applyModalTitle')}
+        centered
+        size="lg"
+      >
+        <Stack gap="md">
+          <Text size="sm" c="dimmed">
+            {t('projectDetail.applyModalDesc')}
+          </Text>
+
+          <Textarea
+            value={motivation}
+            onChange={(e) => setMotivation(e.currentTarget.value)}
+            minRows={6}
+            autosize
+            maxRows={12}
+          />
+
+          {motivation.trim().length > 0 && motivation.trim().length < 20 && (
+            <Text size="xs" c="red">
+              {t('projectDetail.motivationMin')}
+            </Text>
+          )}
+
+          {applyError && (
+            <Alert color="red" variant="light">
+              {applyError}
+            </Alert>
+          )}
+
+          <Group justify="flex-end">
+            <Button variant="default" onClick={() => setApplyModalOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              color="eco-primary"
+              loading={isApplying}
+              disabled={motivation.trim().length < 20}
+              onClick={async () => {
+                setIsApplying(true);
+                setApplyError(null);
+                try {
+                  await participationsService.createRequest({
+                    project: id,
+                    motivation: motivation.trim(),
+                  });
+                  setApplySuccess(true);
+                  setApplyModalOpen(false);
+                } catch (err: any) {
+                  setApplyError(err.message || t('projectDetail.applyError'));
+                } finally {
+                  setIsApplying(false);
+                }
+              }}
+            >
+              {t('projectDetail.sendApplication')}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Layout>
   );
 }

@@ -13,10 +13,10 @@ export function ForVolunteersClient() {
       <div className="bg-white py-24 sm:py-32">
         <div className="mx-auto max-w-4xl px-6 lg:px-8">
           <h1 className="text-4xl font-display font-bold text-eco-primary text-center mb-4">
-            {t('forVolunteers.title') || 'For Volunteers'}
+            {t('forVolunteers.title')}
           </h1>
           <p className="text-lg text-gray-600 text-center mb-16 max-w-2xl mx-auto">
-            {t('forVolunteers.subtitle') || 'Learn new skills while contributing to sustainable projects'}
+            {t('forVolunteers.subtitle')}
           </p>
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
@@ -24,22 +24,22 @@ export function ForVolunteersClient() {
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-eco-primary/10 flex items-center justify-center">
                 <IconSearch size={28} className="text-eco-primary" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">{t('forVolunteers.find.title') || 'Find Projects'}</h3>
-              <p className="text-gray-600 text-sm">{t('forVolunteers.find.desc') || 'Browse eco-construction and permaculture projects worldwide.'}</p>
+              <h3 className="font-bold text-gray-900 mb-2">{t('forVolunteers.find.title')}</h3>
+              <p className="text-gray-600 text-sm">{t('forVolunteers.find.desc')}</p>
             </div>
             <div className="text-center p-6">
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-eco-primary/10 flex items-center justify-center">
                 <IconLeaf size={28} className="text-eco-primary" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">{t('forVolunteers.learn.title') || 'Learn Skills'}</h3>
-              <p className="text-gray-600 text-sm">{t('forVolunteers.learn.desc') || 'Gain hands-on experience in natural building and permaculture.'}</p>
+              <h3 className="font-bold text-gray-900 mb-2">{t('forVolunteers.learn.title')}</h3>
+              <p className="text-gray-600 text-sm">{t('forVolunteers.learn.desc')}</p>
             </div>
             <div className="text-center p-6">
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-eco-primary/10 flex items-center justify-center">
                 <IconWorld size={28} className="text-eco-primary" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">{t('forVolunteers.travel.title') || 'Travel & Connect'}</h3>
-              <p className="text-gray-600 text-sm">{t('forVolunteers.travel.desc') || 'Meet like-minded people and experience different cultures.'}</p>
+              <h3 className="font-bold text-gray-900 mb-2">{t('forVolunteers.travel.title')}</h3>
+              <p className="text-gray-600 text-sm">{t('forVolunteers.travel.desc')}</p>
             </div>
           </div>
 
@@ -48,7 +48,7 @@ export function ForVolunteersClient() {
               href="/projects"
               className="inline-flex items-center gap-2 rounded-full bg-eco-primary px-8 py-4 text-base font-bold text-white shadow-lg hover:bg-eco-primaryDark transition-all"
             >
-              {t('forVolunteers.cta') || 'Browse Projects'}
+              {t('forVolunteers.cta')}
             </Link>
           </div>
         </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { Box, Center, Stack, Text } from '@mantine/core';
 import { IconMap } from '@tabler/icons-react';
 
@@ -11,6 +12,7 @@ interface ProjectMapProps {
 }
 
 export function ProjectMap({ latitude, longitude, title }: ProjectMapProps) {
+  const t = useTranslations();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
 
@@ -103,7 +105,7 @@ export function ProjectMap({ latitude, longitude, title }: ProjectMapProps) {
       <Center h={256} bg="gray.1" style={{ borderRadius: 8, border: '1px solid var(--mantine-color-gray-3)' }}>
         <Stack align="center" gap="xs">
           <IconMap size={48} color="gray" />
-          <Text size="sm" c="dimmed">Map view</Text>
+          <Text size="sm" c="dimmed">{t('projects.mapView')}</Text>
           <Text size="xs" c="dimmed">
             {latitude.toFixed(6)}, {longitude.toFixed(6)}
           </Text>

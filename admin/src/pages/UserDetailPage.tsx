@@ -28,7 +28,6 @@ import {
   User as UserIcon,
   Globe,
   Bell,
-  Heart,
   FolderOpen,
   MessageSquare,
   Eye,
@@ -42,12 +41,12 @@ export function UserDetailPage() {
 
   const { data: user, isLoading, error } = useQuery<AdminUserDetail>({
     queryKey: ['admin-user-detail', id],
-    queryFn: () => adminApi.getUserDetail(Number(id)),
+    queryFn: () => adminApi.getUserDetail(id!),
     enabled: !!id,
   });
 
   const verifyEmailMutation = useMutation({
-    mutationFn: async (userId: number) => {
+    mutationFn: async (userId: string) => {
       await adminApi.verifyUserEmail(userId);
     },
     onSuccess: () => {
@@ -69,7 +68,7 @@ export function UserDetailPage() {
   });
 
   const blockMutation = useMutation({
-    mutationFn: (userId: number) => adminApi.blockUser(userId),
+    mutationFn: (userId: string) => adminApi.blockUser(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-user-detail', id] });
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
@@ -77,7 +76,7 @@ export function UserDetailPage() {
   });
 
   const unblockMutation = useMutation({
-    mutationFn: (userId: number) => adminApi.unblockUser(userId),
+    mutationFn: (userId: string) => adminApi.unblockUser(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-user-detail', id] });
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
@@ -114,7 +113,7 @@ export function UserDetailPage() {
   };
 
   const getSkillName = (skill: AdminUserDetail['skills'][0]) => {
-    return i18n.language === 'fr' ? skill.display_name_fr : skill.display_name_en;
+    return skill.displayNameEn;
   };
 
   if (isLoading) {
@@ -139,8 +138,8 @@ export function UserDetailPage() {
     );
   }
 
-  const avatarUrl = user.profile_picture || user.profile_picture_url;
-  const initials = `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`.toUpperCase();
+  const avatarUrl = user.profilePictureUrl;
+  const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
 
   return (
     <div className="space-y-6">
@@ -155,7 +154,7 @@ export function UserDetailPage() {
         {avatarUrl ? (
           <img
             src={avatarUrl}
-            alt={`${user.first_name} ${user.last_name}`}
+            alt={`${user.firstName} ${user.lastName}`}
             className="w-16 h-16 rounded-full object-cover"
           />
         ) : (
@@ -165,19 +164,19 @@ export function UserDetailPage() {
         )}
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-3xl font-bold">{user.first_name} {user.last_name}</h1>
-            {user.is_staff && (
+            <h1 className="text-3xl font-bold">{user.firstName} {user.lastName}</h1>
+            {user.isStaff && (
               <Badge variant="default" className="bg-yellow-500">
                 <Crown className="w-3 h-3 mr-1" />
                 Staff
               </Badge>
             )}
-            {user.is_superuser && (
+            {user.isSuperuser && (
               <Badge variant="default" className="bg-purple-500">
                 Superuser
               </Badge>
             )}
-            {user.email_verified ? (
+            {user.emailVerified ? (
               <Badge variant="default" className="bg-green-500">
                 <MailCheck className="w-3 h-3 mr-1" />
                 {t('users.verified')}
@@ -188,7 +187,7 @@ export function UserDetailPage() {
                 {t('users.unverified')}
               </Badge>
             )}
-            {!user.is_active && (
+            {!user.isActive && (
               <Badge variant="destructive">
                 <ShieldBan className="w-3 h-3 mr-1" />
                 {t('users.blocked')}
@@ -196,34 +195,34 @@ export function UserDetailPage() {
             )}
           </div>
           <p className="text-muted-foreground mt-1">{user.email}</p>
-          {user.review_count > 0 && (
+          {user.reviewCount > 0 && (
             <div className="flex items-center gap-1 mt-1">
               <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span className="font-semibold text-amber-700">{user.average_rating.toFixed(1)}</span>
-              <span className="text-sm text-muted-foreground">({user.review_count} {t('users.reviews')})</span>
+              <span className="font-semibold text-amber-700">{user.averageRating.toFixed(1)}</span>
+              <span className="text-sm text-muted-foreground">({user.reviewCount} {t('users.reviews')})</span>
             </div>
           )}
         </div>
 
         {/* Action buttons */}
         <div className="flex gap-2 flex-wrap">
-          {!user.email_verified && (
+          {!user.emailVerified && (
             <Button
               variant="outline"
               size="sm"
-              onClick={() => verifyEmailMutation.mutate(user.id)}
+              onClick={() => verifyEmailMutation.mutate(user._id)}
               disabled={verifyEmailMutation.isPending}
             >
               <MailCheck className="w-4 h-4 mr-1" />
               {t('users.clickToVerify')}
             </Button>
           )}
-          {!user.is_staff && (
-            user.is_active ? (
+          {!user.isStaff && (
+            user.isActive ? (
               <Button
                 variant="destructive"
                 size="sm"
-                onClick={() => blockMutation.mutate(user.id)}
+                onClick={() => blockMutation.mutate(user._id)}
                 disabled={blockMutation.isPending}
               >
                 <ShieldBan className="w-4 h-4 mr-1" />
@@ -234,7 +233,7 @@ export function UserDetailPage() {
                 variant="outline"
                 size="sm"
                 className="text-green-600 border-green-600 hover:bg-green-50"
-                onClick={() => unblockMutation.mutate(user.id)}
+                onClick={() => unblockMutation.mutate(user._id)}
                 disabled={unblockMutation.isPending}
               >
                 <ShieldCheck className="w-4 h-4 mr-1" />
@@ -258,7 +257,7 @@ export function UserDetailPage() {
           <CardContent className="space-y-3">
             <div className="flex justify-between">
               <span className="text-muted-foreground">{t('userDetail.dateOfBirth')}</span>
-              <span>{formatDate(user.date_of_birth)}</span>
+              <span>{formatDate(user.dateOfBirth)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">{t('userDetail.gender')}</span>
@@ -293,26 +292,19 @@ export function UserDetailPage() {
           <CardContent className="space-y-3">
             <div className="flex justify-between">
               <span className="text-muted-foreground">{t('users.joined')}</span>
-              <span>{formatDate(user.date_joined)}</span>
+              <span>{formatDate(user._creationTime)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">{t('users.lastLogin')}</span>
-              <span>{formatDate(user.last_login)}</span>
+              <span>{formatDate(user.lastLoginAt)}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">{t('userDetail.projects')}</span>
-              <Badge variant="outline">{user.projects_count}</Badge>
+              <Badge variant="outline">{user.projects.length}</Badge>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">{t('userDetail.reviewsReceived')}</span>
-              <Badge variant="outline">{user.review_count}</Badge>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">
-                <Heart className="w-4 h-4 inline mr-1" />
-                Favorites
-              </span>
-              <Badge variant="outline">{user.favorites_count}</Badge>
+              <Badge variant="outline">{user.reviewCount}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -328,19 +320,9 @@ export function UserDetailPage() {
           <CardContent>
             {user.address ? (
               <div className="space-y-2">
-                {user.address.formatted_address && (
-                  <p>{user.address.formatted_address}</p>
-                )}
-                {!user.address.formatted_address && (
-                  <p>
-                    {[user.address.city, user.address.country?.name].filter(Boolean).join(', ')}
-                  </p>
-                )}
-                {user.address.latitude && user.address.longitude && (
-                  <p className="text-sm text-muted-foreground">
-                    {user.address.latitude}, {user.address.longitude}
-                  </p>
-                )}
+                <p>
+                  {[user.address.city, user.address.country?.name].filter(Boolean).join(', ')}
+                </p>
               </div>
             ) : (
               <p className="italic text-muted-foreground">{t('userDetail.noAddress')}</p>
@@ -359,8 +341,8 @@ export function UserDetailPage() {
           <CardContent className="space-y-3">
             <div className="flex justify-between">
               <span className="text-muted-foreground">{t('userDetail.emailNotifications')}</span>
-              <Badge variant={user.email_notifications ? 'default' : 'secondary'} className={user.email_notifications ? 'bg-green-500' : ''}>
-                {user.email_notifications ? t('userDetail.enabled') : t('userDetail.disabled')}
+              <Badge variant={user.emailNotifications ? 'default' : 'secondary'} className={user.emailNotifications ? 'bg-green-500' : ''}>
+                {user.emailNotifications ? t('userDetail.enabled') : t('userDetail.disabled')}
               </Badge>
             </div>
             <div className="flex justify-between">
@@ -371,13 +353,13 @@ export function UserDetailPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">{t('userDetail.inAppNotifications')}</span>
-              <Badge variant={user.in_app_notifications ? 'default' : 'secondary'} className={user.in_app_notifications ? 'bg-green-500' : ''}>
-                {user.in_app_notifications ? t('userDetail.enabled') : t('userDetail.disabled')}
+              <Badge variant={user.inAppNotifications ? 'default' : 'secondary'} className={user.inAppNotifications ? 'bg-green-500' : ''}>
+                {user.inAppNotifications ? t('userDetail.enabled') : t('userDetail.disabled')}
               </Badge>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">{t('userDetail.notificationLanguage')}</span>
-              <span>{user.notification_language || '-'}</span>
+              <span>{user.notificationLanguage || '-'}</span>
             </div>
           </CardContent>
         </Card>
@@ -429,17 +411,17 @@ export function UserDetailPage() {
               </TableHeader>
               <TableBody>
                 {user.projects.map((project) => (
-                  <TableRow key={project.id}>
-                    <TableCell className="font-mono text-sm">{project.id}</TableCell>
+                  <TableRow key={project._id}>
+                    <TableCell className="font-mono text-sm">{project._id}</TableCell>
                     <TableCell className="font-medium">{project.title}</TableCell>
-                    <TableCell>{project.project_type}</TableCell>
+                    <TableCell>{project.projectType}</TableCell>
                     <TableCell>{getStatusBadge(project.status)}</TableCell>
                     <TableCell className="text-muted-foreground text-sm">
-                      {formatDate(project.created_at)}
+                      {formatDate(project._creationTime)}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="sm" asChild>
-                        <Link to={`/projects?id=${project.id}`}>
+                        <Link to={`/projects?id=${project._id}`}>
                           <Eye className="w-4 h-4" />
                         </Link>
                       </Button>
@@ -459,24 +441,23 @@ export function UserDetailPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <MessageSquare className="w-5 h-5" />
-            {t('userDetail.reviewsReceived')} ({user.reviews_received.length})
+            {t('userDetail.reviewsReceived')} ({user.reviewsReceived.length})
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {user.reviews_received.length > 0 ? (
+          {user.reviewsReceived.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Writer</TableHead>
                   <TableHead>{t('users.rating')}</TableHead>
                   <TableHead>Feedback</TableHead>
-                  <TableHead>Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {user.reviews_received.map((review) => (
-                  <TableRow key={review.id}>
-                    <TableCell className="font-medium">{review.writer}</TableCell>
+                {user.reviewsReceived.map((review) => (
+                  <TableRow key={review._id}>
+                    <TableCell className="font-medium">{review.writerId}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
@@ -485,9 +466,6 @@ export function UserDetailPage() {
                     </TableCell>
                     <TableCell className="max-w-xs truncate text-sm text-muted-foreground">
                       {review.feedback || '-'}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
-                      {formatDate(review.created_at)}
                     </TableCell>
                   </TableRow>
                 ))}

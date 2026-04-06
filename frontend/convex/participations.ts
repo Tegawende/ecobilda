@@ -50,6 +50,35 @@ async function enrichParticipation(ctx: any, participation: any) {
   };
 }
 
+// Helper to find conversation for a participation request
+async function getConversationByRequest(ctx: any, requestId: any) {
+  return await ctx.db
+    .query("conversations")
+    .withIndex("by_participation_request", (q: any) =>
+      q.eq("participationRequestId", requestId)
+    )
+    .first();
+}
+
+// ============================================
+// Get single participation request
+// ============================================
+
+export const getById = query({
+  args: { token: v.string(), id: v.id("participationRequests") },
+  handler: async (ctx, args) => {
+    const user = await getUserFromToken(ctx, args.token);
+    if (!user) return null;
+    const request = await ctx.db.get(args.id);
+    if (!request) return null;
+    // Only accessible to the volunteer or the project host
+    const project = await ctx.db.get(request.projectId);
+    if (!project) return null;
+    if (request.volunteerId !== user._id && project.ownerId !== user._id) return null;
+    return request;
+  },
+});
+
 // ============================================
 // My Requests (as volunteer)
 // ============================================
@@ -83,7 +112,6 @@ export const getReceivedRequests = query({
     const user = await getUserFromToken(ctx, args.token);
     if (!user) return [];
 
-    // Get all projects owned by user
     const myProjects = await ctx.db
       .query("projects")
       .withIndex("by_owner", (q) => q.eq("ownerId", user._id))
@@ -105,7 +133,7 @@ export const getReceivedRequests = query({
 });
 
 // ============================================
-// Create Request
+// Create Request → creates conversation + message immediately
 // ============================================
 
 export const create = mutation({
@@ -122,25 +150,21 @@ export const create = mutation({
 
     const project = await ctx.db.get(args.projectId);
     if (!project) throw new Error("Project not found.");
-    if (project.ownerId === user._id) {
-      throw new Error("Cannot apply to your own project.");
-    }
-    if (project.status !== "ACTIVE") {
-      throw new Error("Project is not active.");
-    }
+    if (project.ownerId === user._id) throw new Error("Cannot apply to your own project.");
+    if (project.status !== "ACTIVE") throw new Error("Project is not active.");
 
-    // Check for duplicate pending request
+    // Check duplicate pending request
     const existing = await ctx.db
       .query("participationRequests")
       .withIndex("by_volunteer_status", (q) =>
         q.eq("volunteerId", user._id).eq("status", "PENDING")
       )
       .collect();
-    const duplicate = existing.find((r) => r.projectId === args.projectId);
-    if (duplicate) {
+    if (existing.find((r) => r.projectId === args.projectId)) {
       throw new Error("You already have a pending request for this project.");
     }
 
+    // Create participation request
     const requestId = await ctx.db.insert("participationRequests", {
       volunteerId: user._id,
       projectId: args.projectId,
@@ -150,22 +174,43 @@ export const create = mutation({
       proposedEndDate: args.proposedEndDate,
     });
 
-    // Create notification for host
+    // Create conversation immediately (host=user1, volunteer=user2)
+    const now = Date.now();
+    const conversationId = await ctx.db.insert("conversations", {
+      user1Id: project.ownerId,
+      user2Id: user._id,
+      participationRequestId: requestId,
+      lastMessageText: args.motivation,
+      lastMessageAt: now,
+      unreadCountUser1: 1, // host hasn't read yet
+      unreadCountUser2: 0,
+      user1Muted: false,
+      user2Muted: false,
+    });
+
+    // Insert motivation as first message
+    await ctx.db.insert("messages", {
+      conversationId,
+      senderId: user._id,
+      body: args.motivation,
+    });
+
+    // Notify host — link directly to the conversation
     await ctx.db.insert("notifications", {
       recipientId: project.ownerId,
       type: "PROJECT",
-      title: `New participation request from ${user.firstName}`,
+      title: `New application from ${user.firstName} ${user.lastName}`,
       message: args.motivation.slice(0, 200),
-      linkUrl: "/participations",
+      linkUrl: `/messages/${conversationId}`,
       isRead: false,
     });
 
-    return requestId;
+    return { requestId, conversationId };
   },
 });
 
 // ============================================
-// Accept Request (host only)
+// Accept Request (host only) — from messaging
 // ============================================
 
 export const accept = mutation({
@@ -182,9 +227,7 @@ export const accept = mutation({
     if (!request) throw new Error("Request not found.");
 
     const project = await ctx.db.get(request.projectId);
-    if (!project || project.ownerId !== user._id) {
-      throw new Error("Not authorized.");
-    }
+    if (!project || project.ownerId !== user._id) throw new Error("Not authorized.");
 
     await ctx.db.patch(args.requestId, {
       status: "ACCEPTED",
@@ -192,33 +235,45 @@ export const accept = mutation({
       respondedAt: Date.now(),
     });
 
-    // Create conversation
-    await ctx.db.insert("conversations", {
-      user1Id: user._id,
-      user2Id: request.volunteerId,
-      participationRequestId: args.requestId,
-      unreadCountUser1: 0,
-      unreadCountUser2: 0,
-      user1Muted: false,
-      user2Muted: false,
-    });
+    // Find the conversation created at application time
+    const conversation = await getConversationByRequest(ctx, args.requestId);
 
-    // Notify volunteer
-    await ctx.db.insert("notifications", {
-      recipientId: request.volunteerId,
-      type: "PROJECT",
-      title: `Your request was accepted!`,
-      message: `${user.firstName} accepted your participation request for "${project.title}"`,
-      linkUrl: "/messages",
-      isRead: false,
-    });
+    if (conversation) {
+      // Send acceptance message in the conversation
+      const acceptMsg = args.responseMessage
+        ? args.responseMessage
+        : `✓ ${user.firstName} accepted your application for "${project.title}".`;
+      const now = Date.now();
+      await ctx.db.insert("messages", {
+        conversationId: conversation._id,
+        senderId: user._id,
+        body: acceptMsg,
+        isSystem: true,
+      });
+      // Increment unread for volunteer (user2)
+      await ctx.db.patch(conversation._id, {
+        lastMessageText: acceptMsg,
+        lastMessageAt: now,
+        unreadCountUser2: (conversation.unreadCountUser2 ?? 0) + 1,
+      });
+
+      // Notify volunteer with link to the conversation
+      await ctx.db.insert("notifications", {
+        recipientId: request.volunteerId,
+        type: "PROJECT",
+        title: `Your application was accepted!`,
+        message: `${user.firstName} accepted your application for "${project.title}"`,
+        linkUrl: `/messages/${conversation._id}`,
+        isRead: false,
+      });
+    }
 
     return { success: true };
   },
 });
 
 // ============================================
-// Refuse Request (host only)
+// Refuse Request (host only) — from messaging
 // ============================================
 
 export const refuse = mutation({
@@ -235,9 +290,7 @@ export const refuse = mutation({
     if (!request) throw new Error("Request not found.");
 
     const project = await ctx.db.get(request.projectId);
-    if (!project || project.ownerId !== user._id) {
-      throw new Error("Not authorized.");
-    }
+    if (!project || project.ownerId !== user._id) throw new Error("Not authorized.");
 
     await ctx.db.patch(args.requestId, {
       status: "REFUSED",
@@ -245,15 +298,36 @@ export const refuse = mutation({
       respondedAt: Date.now(),
     });
 
-    // Notify volunteer
-    await ctx.db.insert("notifications", {
-      recipientId: request.volunteerId,
-      type: "PROJECT",
-      title: `Your request was declined`,
-      message: `${user.firstName} declined your participation request for "${project.title}"`,
-      linkUrl: "/participations",
-      isRead: false,
-    });
+    // Find the conversation
+    const conversation = await getConversationByRequest(ctx, args.requestId);
+
+    if (conversation) {
+      const refuseMsg = args.responseMessage
+        ? args.responseMessage
+        : `✗ ${user.firstName} declined your application for "${project.title}".`;
+      const now = Date.now();
+      await ctx.db.insert("messages", {
+        conversationId: conversation._id,
+        senderId: user._id,
+        body: refuseMsg,
+        isSystem: true,
+      });
+      await ctx.db.patch(conversation._id, {
+        lastMessageText: refuseMsg,
+        lastMessageAt: now,
+        unreadCountUser2: (conversation.unreadCountUser2 ?? 0) + 1,
+      });
+
+      // Notify volunteer
+      await ctx.db.insert("notifications", {
+        recipientId: request.volunteerId,
+        type: "PROJECT",
+        title: `Your application was declined`,
+        message: `${user.firstName} declined your application for "${project.title}"`,
+        linkUrl: `/messages/${conversation._id}`,
+        isRead: false,
+      });
+    }
 
     return { success: true };
   },
@@ -273,9 +347,7 @@ export const cancel = mutation({
     if (!user) throw new Error("Not authenticated.");
 
     const request = await ctx.db.get(args.requestId);
-    if (!request || request.volunteerId !== user._id) {
-      throw new Error("Not authorized.");
-    }
+    if (!request || request.volunteerId !== user._id) throw new Error("Not authorized.");
 
     await ctx.db.patch(args.requestId, { status: "CANCELLED" });
     return { success: true };

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { Center, Stack, Text, Box } from '@mantine/core';
 import { IconMap } from '@tabler/icons-react';
 import type { Project } from '@/types';
@@ -17,6 +18,7 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
   const markersRef = useRef<any[]>([]);
   const onBoundsChangeRef = useRef(onBoundsChange);
   const router = useRouter();
+  const t = useTranslations();
   const [isMapReady, setIsMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
@@ -32,7 +34,7 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
         mapRef.current.remove();
         mapRef.current = null;
         setIsMapReady(false);
-        setMapError('WebGL context lost. Please refresh the page.');
+        setMapError('errors.generic.webglLost');
       } catch (error) {
         console.error('Error handling WebGL context loss:', error);
       }
@@ -127,7 +129,7 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
         mapRef.current = map;
       } catch (error) {
         console.error('Failed to initialize Mapbox map:', error);
-        setMapError('Failed to load map. Please refresh the page.');
+        setMapError('errors.generic.mapLoadFailed');
       }
     }
 
@@ -259,7 +261,7 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
       <Center h="100%" bg="gray.1" style={{ borderRadius: 8 }}>
         <Stack align="center" gap="xs">
           <IconMap size={48} color="red" />
-          <Text size="sm" c="red">{mapError}</Text>
+          <Text size="sm" c="red">{t(mapError)}</Text>
         </Stack>
       </Center>
     );

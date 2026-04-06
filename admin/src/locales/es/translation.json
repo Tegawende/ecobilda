@@ -30,7 +30,8 @@
     "users": "Usuarios",
     "adminPanel": "Panel de administración",
     "settings": "Configuración",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "contacts": "Mensajes de contacto"
   },
   "login": {
     "title": "Ecobilda Admin",
@@ -155,6 +156,8 @@
   "users": {
     "title": "Gestión de usuarios",
     "subtitle": "Ver y gestionar los usuarios de la plataforma",
+    "usersTab": "Usuarios",
+    "adminsTab": "Administradores",
     "searchPlaceholder": "Buscar por nombre o correo electrónico...",
     "user": "Usuario",
     "email": "Correo electrónico",
@@ -255,5 +258,26 @@
     "saved": "Configuración guardada",
     "savedDesc": "Sus preferencias han sido actualizadas.",
     "saveError": "Error al guardar la configuración"
+  },
+  "contacts": {
+    "title": "Mensajes de contacto",
+    "subtitle": "Mensajes recibidos a través del formulario de contacto",
+    "tabNew": "Nuevos",
+    "tabAll": "Todos los mensajes",
+    "statusNew": "Nuevo",
+    "statusRead": "Leído",
+    "statusResolved": "Resuelto",
+    "markRead": "Marcar como leído",
+    "markResolved": "Marcar como resuelto",
+    "markedAsRead": "Marcado como leído",
+    "markedAsResolved": "Marcado como resuelto",
+    "reply": "Responder",
+    "showMore": "Ver más",
+    "showLess": "Ver menos",
+    "noNewMessages": "No hay mensajes nuevos",
+    "noMessages": "Aún no hay mensajes",
+    "noMatchingMessages": "Ningún mensaje coincide con su búsqueda",
+    "failedToLoad": "No se pudieron cargar los mensajes de contacto",
+    "searchPlaceholder": "Buscar por nombre, email o asunto..."
   }
 }

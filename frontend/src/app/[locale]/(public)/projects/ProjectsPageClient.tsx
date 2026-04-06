@@ -28,13 +28,14 @@ import {
   SimpleGrid,
   ActionIcon,
   Avatar,
+  Loader,
 } from '@mantine/core';
 import { Layout } from '@/components/common/Layout';
 import { ProjectsMap } from '@/components/projects/ProjectsMap';
 import { ProjectFilters, defaultFilters, type ProjectFiltersState } from '@/components/projects/ProjectFilters';
 import { FavoriteButton } from '@/components/common/FavoriteButton';
 import type { Project } from '@/types';
-import { useProjects } from '@/hooks/useData';
+import { useProjects } from '@/hooks/useConvex';
 import { ProjectCard } from '@/components/projects/ProjectCard';
 import { MobileProjectDetailModal } from '@/components/projects/MobileProjectDetailModal';
 
@@ -176,7 +177,7 @@ function ProjectCardList({
           <Group gap="md">
             <Group gap={4}>
               <IconUsers size={14} />
-              <Text size="sm" c="dimmed">{project.maxHelpers} {t('projects.volunteers') || 'volunteers'} max</Text>
+              <Text size="sm" c="dimmed">{project.maxHelpers} {t('projects.volunteers')} max</Text>
             </Group>
             <Group gap={4}>
               <IconClock size={14} />
@@ -242,7 +243,7 @@ const ITEMS_PER_PAGE = 18;
 
 export function ProjectsPageClient() {
   const t = useTranslations();
-  const { data: projects } = useProjects();
+  const { projects, isLoading: projectsLoading } = useProjects();
   const [filters, setFilters] = useState<ProjectFiltersState>(defaultFilters);
   const [currentPage, setCurrentPage] = useState(1);
   const [hoveredProject, setHoveredProject] = useState<Project | null>(null);
@@ -308,6 +309,8 @@ export function ProjectsPageClient() {
       if (f.familyFriendly && !project.familyFriendly) return false;
       if (f.petsAllowed && !project.petsAllowed) return false;
       if (f.smokingAllowed && !project.smokingAllowed) return false;
+      if (f.accommodationProvided && !project.accommodationDetails) return false;
+      if (f.foodProvided && !project.foodDetails) return false;
       // Work details
       if (project.hoursPerDay < f.hoursPerDay[0] || project.hoursPerDay > f.hoursPerDay[1]) return false;
       if (project.daysPerWeek < f.daysPerWeek[0] || project.daysPerWeek > f.daysPerWeek[1]) return false;
@@ -371,7 +374,7 @@ export function ProjectsPageClient() {
             <div className="sticky top-0 z-10 bg-white border-b border-gray-100">
               <Group justify="space-between" px="md" py="xs">
                 <Text size="xs" fw={500} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
-                  {visibleProjects.length} {visibleProjects.length === 1 ? t('projects.foundSingle') || 'projet trouve' : t('projects.found') || 'projets trouves'}
+                  {visibleProjects.length} {visibleProjects.length === 1 ? t('projects.foundSingle') : t('projects.found')}
                 </Text>
                 {/* Hide view toggle on mobile - grid only */}
                 <Group gap={4} className="hidden sm:flex" p={4} bg="gray.1" style={{ borderRadius: 8 }}>
@@ -380,7 +383,7 @@ export function ProjectsPageClient() {
                     color="gray"
                     size="sm"
                     onClick={() => setViewMode('grid')}
-                    aria-label={t('projects.viewGrid') || 'Grid view'}
+                    aria-label={t('projects.viewGrid')}
                     aria-pressed={viewMode === 'grid'}
                   >
                     <IconLayoutGrid size={18} />
@@ -390,7 +393,7 @@ export function ProjectsPageClient() {
                     color="gray"
                     size="sm"
                     onClick={() => setViewMode('list')}
-                    aria-label={t('projects.viewList') || 'List view'}
+                    aria-label={t('projects.viewList')}
                     aria-pressed={viewMode === 'list'}
                   >
                     <IconList size={18} />
@@ -401,7 +404,12 @@ export function ProjectsPageClient() {
 
             {/* Scrollable Project List */}
             <div className="flex-1 overflow-y-auto">
-              {visibleProjects.length > 0 ? (
+              {projectsLoading ? (
+                <Stack align="center" justify="center" h="100%" ta="center" py="xl" px="lg">
+                  <Loader size="lg" color="eco-primary" />
+                  <Text size="sm" c="dimmed" mt="sm">{t('projects.loading')}</Text>
+                </Stack>
+              ) : visibleProjects.length > 0 ? (
                 <>
                   {viewMode === 'grid' ? (
                     <SimpleGrid cols={{ base: 1, sm: 2, xl: 3 }} spacing="md" p="md">
@@ -438,7 +446,7 @@ export function ProjectsPageClient() {
                         onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                         disabled={currentPage === 1}
                       >
-                        {t('common.previous') || 'Previous'}
+                        {t('common.previous')}
                       </Button>
                       <Text size="sm" c="dimmed">
                         {currentPage} / {totalPages}
@@ -450,7 +458,7 @@ export function ProjectsPageClient() {
                         onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                         disabled={currentPage === totalPages}
                       >
-                        {t('common.next') || 'Next'}
+                        {t('common.next')}
                       </Button>
                     </Group>
                   )}
@@ -479,7 +487,7 @@ export function ProjectsPageClient() {
             {isMapUpdating && (
               <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
                 <Group gap="sm" px="md" py="xs" bg="white" style={{ borderRadius: 'var(--mantine-radius-xl)', boxShadow: 'var(--mantine-shadow-lg)' }}>
-                  <Text size="sm" c="dimmed" fw={500}>{t('projects.loadingMap') || 'Chargement'}</Text>
+                  <Text size="sm" c="dimmed" fw={500}>{t('projects.loadingMap')}</Text>
                   <div className="flex gap-1">
                     <span className="w-2 h-2 bg-eco-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-2 h-2 bg-eco-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -490,7 +498,7 @@ export function ProjectsPageClient() {
             )}
             <ProjectsMap
               ref={mapRef}
-              projects={filteredProjects}
+              projects={visibleProjects}
               allProjects={filteredProjects}
               selectedProject={selectedProject}
               onProjectSelect={setSelectedProject}
@@ -510,7 +518,7 @@ export function ProjectsPageClient() {
             onClick={() => setShowMap(!showMap)}
             className="shadow-lg"
           >
-            {showMap ? (t('projects.viewList') || 'Voir la liste') : (t('projects.viewMap') || 'Voir la carte')}
+            {showMap ? t('projects.viewList') : t('projects.viewMap')}
           </Button>
         </div>
       </div>

@@ -188,27 +188,27 @@ export function MobileProjectDetailModal({
 
                     {/* Work Details */}
                     <div className="bg-gray-50 rounded-2xl p-5">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4 font-display">{t('projects.filters.workDetails') || 'Détails du travail'}</h2>
+                        <h2 className="text-lg font-bold text-gray-900 mb-4 font-display">{t('projects.filters.workDetails')}</h2>
                         <div className="grid grid-cols-3 gap-4">
                             <div className="text-center">
                                 <div className="w-10 h-10 mx-auto rounded-xl bg-eco-primary/10 flex items-center justify-center mb-2">
                                     <IconClock size={20} className="text-eco-primary" />
                                 </div>
-                                <p className="text-xs text-gray-500">{t('projects.hoursPerDayShort') || 'Heures/jour'}</p>
+                                <p className="text-xs text-gray-500">{t('projects.hoursPerDayShort')}</p>
                                 <p className="font-bold text-gray-900">{project.hoursPerDay}h</p>
                             </div>
                             <div className="text-center">
                                 <div className="w-10 h-10 mx-auto rounded-xl bg-eco-primary/10 flex items-center justify-center mb-2">
                                     <IconCalendar size={20} className="text-eco-primary" />
                                 </div>
-                                <p className="text-xs text-gray-500">{t('projects.daysPerWeekShort') || 'Jours/sem'}</p>
+                                <p className="text-xs text-gray-500">{t('projects.daysPerWeekShort')}</p>
                                 <p className="font-bold text-gray-900">{project.daysPerWeek}j</p>
                             </div>
                             <div className="text-center">
                                 <div className="w-10 h-10 mx-auto rounded-xl bg-eco-primary/10 flex items-center justify-center mb-2">
                                     <IconUsers size={20} className="text-eco-primary" />
                                 </div>
-                                <p className="text-xs text-gray-500">{t('projects.volunteers') || 'Volontaires'}</p>
+                                <p className="text-xs text-gray-500">{t('projects.volunteers')}</p>
                                 <p className="font-bold text-gray-900">{project.maxHelpers}</p>
                             </div>
                         </div>
@@ -216,27 +216,27 @@ export function MobileProjectDetailModal({
 
                     {/* Amenities */}
                     <div className="bg-gray-50 rounded-2xl p-5">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4 font-display">{t('projects.filters.amenities') || 'Équipements'}</h2>
+                        <h2 className="text-lg font-bold text-gray-900 mb-4 font-display">{t('projects.filters.amenities')}</h2>
                         <div className="grid grid-cols-2 gap-3">
                             <div className={`flex items-center gap-2 p-3 rounded-xl border-2 ${project.internetProvided ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
                                 }`}>
                                 <IconWifi size={20} className={project.internetProvided ? 'text-eco-primary' : 'text-gray-400'} />
-                                <span className="text-sm font-medium">{t('projects.wifi') || 'WiFi'}</span>
+                                <span className="text-sm font-medium">{t('projects.wifi')}</span>
                             </div>
                             <div className={`flex items-center gap-2 p-3 rounded-xl border-2 ${project.familyFriendly ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
                                 }`}>
                                 <IconBabyCarriage size={20} className={project.familyFriendly ? 'text-eco-primary' : 'text-gray-400'} />
-                                <span className="text-sm font-medium">{t('projects.familyFriendly') || 'Familles'}</span>
+                                <span className="text-sm font-medium">{t('projects.familyFriendly')}</span>
                             </div>
                             <div className={`flex items-center gap-2 p-3 rounded-xl border-2 ${project.petsAllowed ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
                                 }`}>
                                 <IconDog size={20} className={project.petsAllowed ? 'text-eco-primary' : 'text-gray-400'} />
-                                <span className="text-sm font-medium">{t('projects.petsAllowed') || 'Animaux'}</span>
+                                <span className="text-sm font-medium">{t('projects.petsAllowed')}</span>
                             </div>
                             <div className={`flex items-center gap-2 p-3 rounded-xl border-2 ${project.smokingAllowed ? 'border-eco-primary bg-eco-primary/5' : 'border-gray-200 opacity-50'
                                 }`}>
                                 <IconSmoking size={20} className={project.smokingAllowed ? 'text-eco-primary' : 'text-gray-400'} />
-                                <span className="text-sm font-medium">{t('projects.smokingAllowed') || 'Fumeur'}</span>
+                                <span className="text-sm font-medium">{t('projects.smokingAllowed')}</span>
                             </div>
                         </div>
                     </div>
@@ -244,7 +244,7 @@ export function MobileProjectDetailModal({
                     {/* Host */}
                     {project.owner && (
                         <div className="bg-gray-50 rounded-2xl p-5">
-                            <h2 className="text-lg font-bold text-gray-900 mb-4 font-display">{t('projectDetail.yourHost') || 'Votre hôte'}</h2>
+                            <h2 className="text-lg font-bold text-gray-900 mb-4 font-display">{t('projectDetail.yourHost')}</h2>
                             <div className="flex items-center gap-4">
                                 <img
                                     src={project.owner?.profilePictureUrl || undefined}
@@ -257,7 +257,7 @@ export function MobileProjectDetailModal({
                                     </h3>
                                     <div className="flex items-center text-sm text-gray-500">
                                         <IconStar size={16} className="text-yellow-500 mr-1" />
-                                        {Number(project.owner?.averageRating || 0).toFixed(1)} ({project.owner?.reviewCount} {t('projectDetail.reviews') || 'avis'})
+                                        {Number(project.owner?.averageRating || 0).toFixed(1)} ({project.owner?.reviewCount} {t('projectDetail.reviews')})
                                     </div>
                                 </div>
                             </div>

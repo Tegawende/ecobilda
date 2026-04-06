@@ -25,8 +25,8 @@ export function ReportsPage() {
   const [isLoadingAll, setIsLoadingAll] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'PENDING' | 'all'>('PENDING');
-  const [actionLoading, setActionLoading] = useState<number | null>(null);
-  const [resolvingId, setResolvingId] = useState<number | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [resolvingId, setResolvingId] = useState<string | null>(null);
   const [resolveNotes, setResolveNotes] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [reasonFilter, setReasonFilter] = useState<string>('all');
@@ -61,12 +61,13 @@ export function ReportsPage() {
     fetchAllReports();
   }, [fetchPendingReports, fetchAllReports]);
 
-  const handleResolve = useCallback(async (id: number, action: 'resolve' | 'dismiss') => {
+  const handleResolve = useCallback(async (id: string, action: 'resolve' | 'dismiss') => {
     setActionLoading(id);
     try {
-      await adminApi.resolveReport(id, action, resolveNotes);
+      const status = action === 'resolve' ? 'RESOLVED' as const : 'DISMISSED' as const;
+      await adminApi.resolveReport(id, status, resolveNotes);
       // Remove from pending reports
-      setPendingReports((prev) => prev.filter((r) => r.id !== id));
+      setPendingReports((prev) => prev.filter((r) => r._id !== id));
       // Refresh all reports to get updated status
       fetchAllReports();
       setResolvingId(null);
@@ -105,8 +106,8 @@ export function ReportsPage() {
       if (reasonFilter !== 'all' && report.reason !== reasonFilter) return false;
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase().trim();
-        const name = (report.reporter_name || '').toLowerCase();
-        const email = (report.reporter_email || '').toLowerCase();
+        const name = (report.reporterName || '').toLowerCase();
+        const email = (report.reporterEmail || '').toLowerCase();
         const details = (report.details || '').toLowerCase();
         if (!name.includes(query) && !email.includes(query) && !details.includes(query)) return false;
       }
@@ -130,11 +131,11 @@ export function ReportsPage() {
 
   const getTargetLink = useCallback((report: Report) => {
     const baseUrl = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173';
-    switch (report.target_type) {
+    switch (report.targetType) {
       case 'PROJECT':
-        return `${baseUrl}/projects/${report.target_id}`;
+        return `${baseUrl}/projects/${report.targetId}`;
       case 'USER':
-        return `${baseUrl}/profile/${report.target_id}`;
+        return `${baseUrl}/profile/${report.targetId}`;
       default:
         return null;
     }
@@ -237,22 +238,22 @@ export function ReportsPage() {
             ) : (
               <div className="space-y-4">
                 {reports.map((report) => (
-              <Card key={report.id}>
+              <Card key={report._id}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
                       <CardTitle className="text-base flex items-center gap-2">
-                        <span>{t('reports.report')} #{report.id}</span>
+                        <span>{t('reports.report')} #{report._id}</span>
                         <Badge variant={getReasonBadgeVariant(report.reason)}>
-                          {report.reason_display}
+                          {report.reason}
                         </Badge>
                       </CardTitle>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {report.target_type_display} (ID: {report.target_id})
+                        {report.targetType} (ID: {report.targetId})
                       </p>
                     </div>
                     <Badge variant={report.status === 'PENDING' ? 'warning' : 'secondary'}>
-                      {report.status_display}
+                      {report.status}
                     </Badge>
                   </div>
                 </CardHeader>
@@ -260,7 +261,7 @@ export function ReportsPage() {
                   <div className="space-y-3">
                     <div className="text-sm">
                       <span className="text-muted-foreground">{t('reports.reportedBy')}:</span>{' '}
-                      {report.reporter_name} ({report.reporter_email})
+                      {report.reporterName} ({report.reporterEmail})
                     </div>
 
                     {report.details && (
@@ -270,12 +271,12 @@ export function ReportsPage() {
                     )}
 
                     <div className="text-xs text-muted-foreground">
-                      {t('reports.submitted')} {formatDateTime(report.created_at)}
+                      {t('reports.submitted')} {formatDateTime(report._creationTime)}
                     </div>
 
                     {report.status === 'PENDING' && (
                       <>
-                        {resolvingId === report.id ? (
+                        {resolvingId === report._id ? (
                           <div className="space-y-3 pt-2">
                             <Input
                               placeholder={t('reports.adminNotes')}
@@ -285,10 +286,10 @@ export function ReportsPage() {
                             <div className="flex gap-2">
                               <Button
                                 size="sm"
-                                onClick={() => handleResolve(report.id, 'resolve')}
-                                disabled={actionLoading === report.id}
+                                onClick={() => handleResolve(report._id, 'resolve')}
+                                disabled={actionLoading === report._id}
                               >
-                                {actionLoading === report.id ? (
+                                {actionLoading === report._id ? (
                                   <Loader2 className="w-4 h-4 animate-spin mr-1" />
                                 ) : (
                                   <Check className="w-4 h-4 mr-1" />
@@ -298,8 +299,8 @@ export function ReportsPage() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleResolve(report.id, 'dismiss')}
-                                disabled={actionLoading === report.id}
+                                onClick={() => handleResolve(report._id, 'dismiss')}
+                                disabled={actionLoading === report._id}
                               >
                                 <X className="w-4 h-4 mr-1" />
                                 {t('reports.dismiss')}
@@ -320,7 +321,7 @@ export function ReportsPage() {
                           <div className="flex gap-2 pt-2">
                             <Button
                               size="sm"
-                              onClick={() => setResolvingId(report.id)}
+                              onClick={() => setResolvingId(report._id)}
                             >
                               {t('reports.takeAction')}
                             </Button>
@@ -335,7 +336,7 @@ export function ReportsPage() {
                                   target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  {t('reports.view')} {report.target_type_display}
+                                  {t('reports.view')} {report.targetType}
                                 </a>
                               </Button>
                             )}

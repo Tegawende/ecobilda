@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useForm } from '@mantine/form';
 import { useTranslations, useLocale } from 'next-intl';
 import { getSkillIcon } from '@/lib/skillIcons';
@@ -10,21 +9,18 @@ import {
   Text,
   Group,
   Button,
-  Checkbox,
   Card,
   Grid,
   Skeleton,
-  ThemeIcon,
 } from '@mantine/core';
 import {
-  IconPlant,
-  IconHammer,
-  IconCheck,
+  IconLeaf,
+  IconHome,
   IconWifi,
-  IconUsers,
+  IconBabyCarriage,
   IconDog,
   IconSmoking,
-  IconStar
+  IconCheck,
 } from '@tabler/icons-react';
 import { useSkills } from '@/hooks/useConvex';
 import type { ProjectFormData } from '@/app/[locale]/(protected)/create-project/CreateProjectClient';
@@ -48,7 +44,6 @@ interface ProjectFormStep3Props {
 export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectFormStep3Props) {
   const t = useTranslations();
   const locale = useLocale();
-  const getSkillName = (skill: Skill) => getSkillDisplayName(skill, locale);
   const { skills: allSkills, isLoading: isLoadingSkills } = useSkills(data.projectType as "PERM" | "NATB" | undefined);
 
   const form = useForm<Step3FormData>({
@@ -64,18 +59,17 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
     },
   });
 
-  // Skills are now loaded reactively via useSkills hook
-
   const toggleSkill = (skillCode: string) => {
     const currentSkills = form.values.skills;
     if (currentSkills.includes(skillCode)) {
-      form.setFieldValue(
-        'skills',
-        currentSkills.filter((s) => s !== skillCode)
-      );
+      form.setFieldValue('skills', currentSkills.filter((s) => s !== skillCode));
     } else {
       form.setFieldValue('skills', [...currentSkills, skillCode]);
     }
+  };
+
+  const toggleAmenity = (field: keyof Step3FormData) => {
+    form.setFieldValue(field, !form.values[field]);
   };
 
   const handleFormSubmit = (formData: Step3FormData) => {
@@ -83,11 +77,58 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
     onNext();
   };
 
+  const color = data.projectType === 'NATB' ? '#70A771' : '#c9696b';
+
+  const renderSkillCard = (skill: Skill) => {
+    const isSelected = form.values.skills.includes(skill.code);
+    const SkillIcon = getSkillIcon(skill.icon);
+    return (
+      <Grid.Col key={skill.code} span={{ base: 6, sm: 4, md: 3 }}>
+        <Card
+          padding="md"
+          withBorder
+          h="100%"
+          style={{
+            cursor: 'pointer',
+            borderWidth: 2,
+            borderColor: isSelected ? color : '#e5e7eb',
+            backgroundColor: isSelected ? `${color}15` : undefined,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 64,
+            transition: 'all 0.15s ease',
+          }}
+          onClick={() => toggleSkill(skill.code)}
+        >
+          <Group wrap="nowrap" justify="center" w="100%">
+            <SkillIcon size={22} style={{ flexShrink: 0, color: isSelected ? color : '#6b7280' }} />
+            <Text size="sm" ta="center" fw={isSelected ? 600 : 400} style={{ color: isSelected ? color : '#4b5563' }}>
+              {getSkillDisplayName(skill, locale)}
+            </Text>
+          </Group>
+        </Card>
+      </Grid.Col>
+    );
+  };
+
+  const amenities = [
+    { key: 'internetProvided' as const, icon: IconWifi, label: t('createProject.step3.internetProvided'), desc: t('createProject.step3.internetProvidedDesc') },
+    { key: 'familyFriendly' as const, icon: IconBabyCarriage, label: t('createProject.step3.familyFriendly'), desc: t('createProject.step3.familyFriendlyDesc') },
+    { key: 'petsAllowed' as const, icon: IconDog, label: t('createProject.step3.petsAllowed'), desc: t('createProject.step3.petsAllowedDesc') },
+    { key: 'smokingAllowed' as const, icon: IconSmoking, label: t('createProject.step3.smokingAllowed'), desc: t('createProject.step3.smokingAllowedDesc') },
+  ];
+
   return (
-    <form onSubmit={form.onSubmit(handleFormSubmit)}>
+    <form onSubmit={form.onSubmit(handleFormSubmit, () => {
+      setTimeout(() => {
+        const firstError = document.querySelector('[data-error="true"]');
+        firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 50);
+    })}>
       <Stack gap="xl">
         <div>
-          <Title order={2} mb="md">
+          <Title order={2} mb="xs">
             {t('createProject.step3.title')}
           </Title>
           <Text c="dimmed">
@@ -96,167 +137,93 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
         </div>
 
         {/* Skills Selection */}
-        <div>
-          <Group mb="sm">
-            <ThemeIcon size="lg" color="green" variant="light">
-              {data.projectType === 'PERM' ? (
-                <IconPlant size={20} />
-              ) : (
-                <IconHammer size={20} />
-              )}
-            </ThemeIcon>
-            <Title order={3}>
-              {t('createProject.step3.skillsTitle', { type: data.projectType === 'PERM' ? t('createProject.step1.permaculture') : t('createProject.step1.naturalBuilding') })}
-            </Title>
-          </Group>
-          <Text size="sm" c="dimmed" mb="md">
+        <Stack gap="md">
+          <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+            {t('createProject.step3.skillsTitle', { type: data.projectType === 'PERM' ? t('createProject.step1.permaculture') : t('createProject.step1.naturalBuilding') })}
+          </Text>
+          <Text size="sm" c="dimmed">
             {t('createProject.step3.skillsDescription')}
           </Text>
 
           {isLoadingSkills ? (
-            <Grid gutter="md">
+            <Grid gutter="xs">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Grid.Col key={i} span={{ base: 12, sm: 6, md: 4 }}>
-                  <Skeleton height={80} radius="md" />
+                <Grid.Col key={i} span={{ base: 6, sm: 4, md: 3 }}>
+                  <Skeleton height={64} radius="md" />
                 </Grid.Col>
               ))}
             </Grid>
           ) : (
-            <Grid gutter="md">
-              {allSkills.map((skill) => {
-                const isSelected = form.values.skills.includes(skill.code);
-                return (
-                  <Grid.Col key={skill.code} span={{ base: 12, sm: 6, md: 4 }}>
-                    <Card
-                      padding="md"
-                      withBorder
-                      style={{
-                        cursor: 'pointer',
-                        borderWidth: 2,
-                        borderColor: isSelected ? 'var(--mantine-color-eco-terracotta-5)' : undefined,
-                        backgroundColor: isSelected ? 'var(--mantine-color-eco-terracotta-0)' : undefined,
-                      }}
-                      onClick={() => toggleSkill(skill.code)}
-                    >
-                      <Group wrap="nowrap" align="center">
-                        {(() => { const SkillIcon = getSkillIcon(skill.icon); return <SkillIcon size={22} className={isSelected ? 'text-eco-terracotta' : 'text-gray-500'} style={{ flexShrink: 0 }} />; })()}
-                        <Text fw={isSelected ? 600 : 500} size="sm" style={{ flex: 1 }}>
-                          {getSkillName(skill)}
-                        </Text>
-                      </Group>
-                    </Card>
-                  </Grid.Col>
-                );
-              })}
+            <Grid gutter="xs">
+              {allSkills.map((skill) => renderSkillCard(skill))}
             </Grid>
           )}
 
           {form.errors.skills && (
-            <Text size="sm" c="red" mt="xs">
-              {form.errors.skills}
-            </Text>
+            <Text size="sm" c="red">{form.errors.skills}</Text>
           )}
-          <Text size="sm" c="dimmed" mt="xs">
+          <Text size="sm" c="dimmed">
             {t('createProject.step3.selected', { count: form.values.skills.length })}
           </Text>
-        </div>
+        </Stack>
 
         {/* Amenities */}
-        <div>
-          <Group mb="sm">
-            <ThemeIcon size="lg" color="yellow" variant="light">
-              <IconStar size={20} />
-            </ThemeIcon>
-            <Title order={3}>{t('createProject.step3.amenities')}</Title>
-          </Group>
-          <Text size="sm" c="dimmed" mb="md">
+        <Stack gap="md">
+          <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+            {t('createProject.step3.amenities')}
+          </Text>
+          <Text size="sm" c="dimmed">
             {t('createProject.step3.amenitiesDescription')}
           </Text>
 
-          <Stack gap="sm">
-            <Card padding="md" withBorder>
-              <Checkbox
-                {...form.getInputProps('internetProvided', { type: 'checkbox' })}
-                label={
-                  <div>
-                    <Group gap="xs" mb={4}>
-                      <IconWifi size={18} color="var(--mantine-color-eco-terracotta-5)" />
-                      <Text fw={500}>{t('createProject.step3.internetProvided')}</Text>
+          <Grid gutter="sm">
+            {amenities.map((amenity) => {
+              const isActive = form.values[amenity.key] as boolean;
+              return (
+                <Grid.Col key={amenity.key} span={{ base: 12, sm: 6 }}>
+                  <Card
+                    padding="md"
+                    withBorder
+                    style={{
+                      cursor: 'pointer',
+                      borderWidth: 2,
+                      borderColor: isActive ? '#70A771' : '#e5e7eb',
+                      backgroundColor: isActive ? '#70A77115' : undefined,
+                      transition: 'all 0.15s ease',
+                    }}
+                    onClick={() => toggleAmenity(amenity.key)}
+                  >
+                    <Group wrap="nowrap" justify="space-between">
+                      <Group wrap="nowrap" gap="sm">
+                        <amenity.icon size={22} style={{ flexShrink: 0, color: '#6b7280' }} />
+                        <div>
+                          <Text fw={500} size="sm">{amenity.label}</Text>
+                          <Text size="xs" c="dimmed">{amenity.desc}</Text>
+                        </div>
+                      </Group>
+                      <div style={{
+                        width: 24, height: 24, borderRadius: 6,
+                        border: `2px solid ${isActive ? '#70A771' : '#d1d5db'}`,
+                        backgroundColor: isActive ? '#70A771' : 'transparent',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        flexShrink: 0, transition: 'all 0.15s ease',
+                      }}>
+                        {isActive && <IconCheck size={14} color="white" />}
+                      </div>
                     </Group>
-                    <Text size="sm" c="dimmed">
-                      {t('createProject.step3.internetProvidedDesc')}
-                    </Text>
-                  </div>
-                }
-              />
-            </Card>
-
-            <Card padding="md" withBorder>
-              <Checkbox
-                {...form.getInputProps('familyFriendly', { type: 'checkbox' })}
-                label={
-                  <div>
-                    <Group gap="xs" mb={4}>
-                      <IconUsers size={18} color="var(--mantine-color-green-6)" />
-                      <Text fw={500}>{t('createProject.step3.familyFriendly')}</Text>
-                    </Group>
-                    <Text size="sm" c="dimmed">
-                      {t('createProject.step3.familyFriendlyDesc')}
-                    </Text>
-                  </div>
-                }
-              />
-            </Card>
-
-            <Card padding="md" withBorder>
-              <Checkbox
-                {...form.getInputProps('petsAllowed', { type: 'checkbox' })}
-                label={
-                  <div>
-                    <Group gap="xs" mb={4}>
-                      <IconDog size={18} color="var(--mantine-color-orange-6)" />
-                      <Text fw={500}>{t('createProject.step3.petsAllowed')}</Text>
-                    </Group>
-                    <Text size="sm" c="dimmed">
-                      {t('createProject.step3.petsAllowedDesc')}
-                    </Text>
-                  </div>
-                }
-              />
-            </Card>
-
-            <Card padding="md" withBorder>
-              <Checkbox
-                {...form.getInputProps('smokingAllowed', { type: 'checkbox' })}
-                label={
-                  <div>
-                    <Group gap="xs" mb={4}>
-                      <IconSmoking size={18} color="var(--mantine-color-red-6)" />
-                      <Text fw={500}>{t('createProject.step3.smokingAllowed')}</Text>
-                    </Group>
-                    <Text size="sm" c="dimmed">
-                      {t('createProject.step3.smokingAllowedDesc')}
-                    </Text>
-                  </div>
-                }
-              />
-            </Card>
-          </Stack>
-        </div>
+                  </Card>
+                </Grid.Col>
+              );
+            })}
+          </Grid>
+        </Stack>
 
         {/* Navigation */}
-        <Group justify="space-between" pt="md" style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}>
-          <Button
-            type="button"
-            onClick={onBack}
-            variant="default"
-          >
+        <Group justify="space-between" pt="md" className="border-t border-gray-200">
+          <Button type="button" onClick={onBack} variant="default">
             {t('createProject.step3.back')}
           </Button>
-          <Button
-            type="submit"
-            color="eco-terracotta"
-          >
+          <Button type="submit" color="eco-blue">
             {t('createProject.step3.next')}
           </Button>
         </Group>

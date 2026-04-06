@@ -8,7 +8,8 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useGoogleLogin } from '@react-oauth/google';
 import { authService } from '@/services/auth';
 import { profileService } from '@/services/profile';
-import { setSessionToken } from '@/lib/convexClient';
+import { setSessionToken, convexClient } from '@/lib/convexClient';
+import { api } from '../../../convex/_generated/api';
 import { useAuth } from '@/providers/AuthProvider';
 import { DateOfBirthSelect } from '@/components/common/DateOfBirthSelect';
 import {
@@ -84,12 +85,14 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
 
   const { refreshUser } = useAuth();
 
-  // Steps: 'email' -> 'login' OR 'register' OR 'google-register' OR 'google-only'
-  const [step, setStep] = useState<'email' | 'login' | 'register' | 'google-register' | 'google-only' | 'verification-sent'>('email');
+  // Steps: 'email' -> 'login' OR 'register' OR 'google-register' OR 'google-only' OR 'email-not-verified'
+  const [step, setStep] = useState<'email' | 'login' | 'register' | 'google-register' | 'google-only' | 'verification-sent' | 'email-not-verified'>('email');
   const [submittedEmail, setSubmittedEmail] = useState('');
   const [email, setEmail] = useState(''); // Shared email state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [googleAuthData, setGoogleAuthData] = useState<{ tokens: any; user: any } | null>(null);
 
@@ -182,12 +185,31 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
     setError(null);
     try {
       await authService.login(data);
+      await refreshUser();
       router.push('/projects');
     } catch (err: any) {
-      const detail = err?.response?.data?.non_field_errors?.[0] || err?.response?.data?.detail;
-      setError(detail || t('auth.errorLogin'));
+      const message = err?.message || err?.response?.data?.detail || '';
+      if (message.includes('EMAIL_NOT_VERIFIED')) {
+        setSubmittedEmail(data.email);
+        setStep('email-not-verified');
+        setResendSuccess(false);
+      } else {
+        setError(t('auth.errorLogin'));
+      }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setResendLoading(true);
+    try {
+      await convexClient.mutation(api.auth.resendVerificationEmail, { email: submittedEmail });
+      setResendSuccess(true);
+    } catch {
+      setError(t('auth.errorResendVerification'));
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -251,8 +273,7 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
           registerForm.setFieldValue('lastName', user.lastName || '');
           setEmail(user.email);
         } else {
-          // Existing user: login directly
-          setSessionToken(tokens.access);
+          // Existing user: login directly (token already set in authService.googleLogin)
           await refreshUser();
           router.push('/projects');
         }
@@ -348,7 +369,7 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
                 fullWidth
                 size="md"
                 radius="md"
-                className="bg-eco-primary hover:bg-eco-primaryDark transition-all"
+                color="eco-blue"
               >
                 {isLoading ? <Loader size="sm" color="white" /> : t('auth.continue')}
               </Button>
@@ -414,7 +435,7 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
               size="md"
               radius="md"
               mt="sm"
-              className="bg-eco-primary hover:bg-eco-primaryDark transition-all"
+              color="eco-blue"
             >
               {isLoading ? t('auth.loggingIn') : t('auth.login')}
             </Button>
@@ -490,7 +511,7 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
               size="md"
               radius="md"
               mt="xs"
-              className="bg-eco-primary hover:bg-eco-primaryDark transition-all"
+              color="eco-blue"
             >
               {isLoading ? t('auth.registering') : t('auth.agreeAndContinue')}
             </Button>
@@ -541,7 +562,7 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
               size="md"
               radius="md"
               mt="xs"
-              className="bg-eco-primary hover:bg-eco-primaryDark transition-all"
+              color="eco-blue"
             >
               {isLoading ? t('auth.registering') : t('auth.agreeAndContinue')}
             </Button>
@@ -602,9 +623,48 @@ export function AuthenticationForm({ initialType: _initialType = 'login' }: Auth
             size="md"
             radius="md"
             mt="md"
-            className="bg-eco-primary hover:bg-eco-primaryDark transition-all"
+            color="eco-blue"
           >
             {t('auth.registrationSuccess.backToLogin')}
+          </Button>
+        </Stack>
+      )}
+
+      {step === 'email-not-verified' && (
+        <Stack align="center" py="md">
+          <Center>
+            <Box className="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center">
+              <IconMail size={32} className="text-yellow-600" stroke={1.5} />
+            </Box>
+          </Center>
+          <Title order={4} ta="center">{t('auth.emailNotVerified.title')}</Title>
+          <Text c="dimmed" ta="center">{t('auth.emailNotVerified.message')}</Text>
+          <Text fw={500} size="sm" ta="center">{submittedEmail}</Text>
+          {resendSuccess ? (
+            <Text size="sm" c="green" ta="center" fw={500}>{t('auth.emailNotVerified.resendSuccess')}</Text>
+          ) : (
+            <Button
+              onClick={handleResendVerification}
+              loading={resendLoading}
+              fullWidth
+              size="md"
+              radius="md"
+              variant="outline"
+              color="eco-blue"
+            >
+              {t('auth.emailNotVerified.resendButton')}
+            </Button>
+          )}
+          <Text size="xs" c="dimmed" ta="center">{t('auth.registrationSuccess.spamNote')}</Text>
+          <Button
+            onClick={resetFlow}
+            fullWidth
+            size="md"
+            radius="md"
+            variant="subtle"
+            color="gray"
+          >
+            {t('auth.emailNotVerified.backToLogin')}
           </Button>
         </Stack>
       )}

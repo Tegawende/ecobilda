@@ -28,14 +28,25 @@ async function enrichProject(ctx: any, project: any) {
     const skill = await ctx.db.get(skillId);
     if (skill) skills.push(skill);
   }
-  const images = await ctx.db
+  const rawImages = await ctx.db
     .query("projectImages")
     .withIndex("by_project", (q: any) => q.eq("projectId", project._id))
     .collect();
+  const images = await Promise.all(
+    rawImages.map(async (img: any) => ({
+      ...img,
+      url: img.url ?? (img.storageId ? await ctx.storage.getUrl(img.storageId) : null),
+    }))
+  );
+
+  let ownerPictureUrl = owner?.profilePictureUrl ?? null;
+  if (owner?.profilePicture && !ownerPictureUrl) {
+    ownerPictureUrl = await ctx.storage.getUrl(owner.profilePicture);
+  }
 
   return {
     ...project,
-    owner: owner ? { _id: owner._id, email: owner.email, firstName: owner.firstName, lastName: owner.lastName, profilePictureUrl: owner.profilePictureUrl } : null,
+    owner: owner ? { _id: owner._id, email: owner.email, firstName: owner.firstName, lastName: owner.lastName, profilePictureUrl: ownerPictureUrl } : null,
     address,
     skills,
     images,
@@ -78,7 +89,21 @@ export const validate = mutation({
   args: { token: v.string(), id: v.id("projects") },
   handler: async (ctx, args) => {
     const admin = await requireAdmin(ctx, args.token);
+    const project = await ctx.db.get(args.id);
+    if (!project) throw new Error("Project not found.");
+
     await ctx.db.patch(args.id, { status: "ACTIVE", validatedAt: Date.now(), validatedBy: admin._id });
+
+    // Notify project owner
+    await ctx.db.insert("notifications", {
+      recipientId: project.ownerId,
+      type: "PROJECT",
+      title: "Your project has been approved!",
+      message: `Your project "${project.title}" is now live and visible to volunteers.`,
+      linkUrl: `/my-projects`,
+      isRead: false,
+    });
+
     return { success: true };
   },
 });
@@ -87,7 +112,21 @@ export const reject = mutation({
   args: { token: v.string(), id: v.id("projects"), reason: v.string() },
   handler: async (ctx, args) => {
     const admin = await requireAdmin(ctx, args.token);
+    const project = await ctx.db.get(args.id);
+    if (!project) throw new Error("Project not found.");
+
     await ctx.db.patch(args.id, { status: "REJECTED", rejectionReason: args.reason, validatedAt: Date.now(), validatedBy: admin._id });
+
+    // Notify project owner
+    await ctx.db.insert("notifications", {
+      recipientId: project.ownerId,
+      type: "PROJECT",
+      title: "Your project was not approved",
+      message: `Your project "${project.title}" was not approved. Reason: ${args.reason}`,
+      linkUrl: `/my-projects`,
+      isRead: false,
+    });
+
     return { success: true };
   },
 });

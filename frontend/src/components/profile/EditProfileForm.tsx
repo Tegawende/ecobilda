@@ -5,6 +5,7 @@ import { useForm } from '@mantine/form';
 import { useLocale, useTranslations } from 'next-intl';
 import logger from '@/lib/logger';
 import {
+  Paper,
   Card,
   Title,
   TextInput,
@@ -37,6 +38,7 @@ import {
   IconSearch,
 } from '@tabler/icons-react';
 import { profileService } from '@/services/profile';
+import { ImageCropModal } from '@/components/common/ImageCropModal';
 import { DateOfBirthSelect, validateDateOfBirth } from '@/components/common/DateOfBirthSelect';
 import { useSkills, useLanguages } from '@/hooks/useConvex';
 import { getSkillIcon } from '@/lib/skillIcons';
@@ -127,6 +129,8 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
   }, [rawLanguages, locale]);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(user.profilePictureUrl || user.profilePicture || '');
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [rawImageSrc, setRawImageSrc] = useState<string>('');
 
   // City autocomplete state
   const [citySearch, setCitySearch] = useState('');
@@ -238,9 +242,14 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
       return;
     }
 
-    setProfilePicture(file);
-    setPreviewUrl(URL.createObjectURL(file));
     setError('');
+    setRawImageSrc(URL.createObjectURL(file));
+    setCropModalOpen(true);
+  };
+
+  const handleCropComplete = (croppedFile: File) => {
+    setProfilePicture(croppedFile);
+    setPreviewUrl(URL.createObjectURL(croppedFile));
   };
 
   const handleSubmit = async (data: ProfileFormData) => {
@@ -284,8 +293,10 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
     }
   };
 
-  const renderSkillCard = (skill: Skill, categoryColor: string) => {
+  const renderSkillCard = (skill: Skill, category: 'NATB' | 'PERM') => {
     const isSelected = form.values.skills.includes(skill.code);
+    const color = category === 'NATB' ? '#70A771' : '#c9696b';
+    const SkillIcon = getSkillIcon(skill.icon);
     return (
       <Grid.Col key={skill.code} span={{ base: 6, sm: 4, md: 3 }}>
         <Card
@@ -295,18 +306,19 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
           style={{
             cursor: 'pointer',
             borderWidth: 2,
-            borderColor: isSelected ? `var(--mantine-color-${categoryColor}-6)` : undefined,
-            backgroundColor: isSelected ? `var(--mantine-color-${categoryColor}-0)` : undefined,
+            borderColor: isSelected ? color : '#e5e7eb',
+            backgroundColor: isSelected ? `${color}15` : undefined,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             minHeight: 64,
+            transition: 'all 0.15s ease',
           }}
           onClick={() => toggleSkill(skill.code)}
         >
           <Group wrap="nowrap" justify="center" w="100%">
-            {(() => { const SkillIcon = getSkillIcon(skill.icon); return <SkillIcon size={22} className={isSelected ? `text-${categoryColor === 'blue' ? 'eco-primary' : 'eco-terracotta'}` : 'text-gray-500'} style={{ flexShrink: 0 }} />; })()}
-            <Text size="sm" ta="center" fw={isSelected ? 600 : 400}>
+            <SkillIcon size={22} style={{ flexShrink: 0, color: isSelected ? color : '#6b7280' }} />
+            <Text size="sm" ta="center" fw={isSelected ? 600 : 400} style={{ color: isSelected ? color : '#4b5563' }}>
               {getSkillDisplayName(skill, locale)}
             </Text>
           </Group>
@@ -316,87 +328,97 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
   };
 
   return (
-    <Card withBorder shadow="sm" padding="lg">
+    <>
+    <Paper radius="lg" p={{ base: 'lg', sm: 'xl' }} shadow="md" withBorder>
       <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack gap="lg">
-          <Title order={2}>{t('profile.editProfile')}</Title>
+        <Stack gap="xl">
 
           {error && (
-            <Alert color="red" icon={<IconAlertCircle />} title={t('common.error')}>
+            <Alert color="red" icon={<IconAlertCircle size={16} />} variant="light" radius="md">
               {error}
             </Alert>
           )}
 
-          {/* Profile Picture */}
-          <div>
-            <Text fw={500} mb="sm">
-              {t('profile.edit.profilePicture')}
-            </Text>
-            <Group>
+          {/* Profile Picture - centered */}
+          <Stack align="center" gap="sm" py="md">
+            <div className="relative">
               <Avatar
                 src={previewUrl}
-                size={96}
-                radius="xl"
+                size={120}
+                radius={120}
                 imageProps={{ referrerPolicy: 'no-referrer' }}
+                className="border-4 border-eco-primary/20"
               >
-                <IconUser size={48} />
+                <IconUser size={56} className="text-gray-400" />
               </Avatar>
-              <div>
-                <FileButton onChange={handleImageChange} accept="image/*">
-                  {(props) => (
-                    <Button {...props} variant="outline" size="sm">
-                      {t('profile.edit.changePhoto')}
-                    </Button>
-                  )}
-                </FileButton>
-                <Text size="xs" c="dimmed" mt={4}>
-                  {t('profile.edit.imageHint')}
-                </Text>
-              </div>
-            </Group>
-          </div>
+              <FileButton onChange={handleImageChange} accept="image/png,image/jpeg,image/jpg">
+                {(props) => (
+                  <Button
+                    {...props}
+                    variant="filled"
+                    color="eco-primary"
+                    size="xs"
+                    radius="xl"
+                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 shadow-md"
+                  >
+                    {t('profile.edit.changePhoto')}
+                  </Button>
+                )}
+              </FileButton>
+            </div>
+            <Text size="xs" c="dimmed">{t('profile.edit.imageHint')}</Text>
+          </Stack>
 
           {/* Basic Info */}
-          <Grid>
-            <Grid.Col span={{ base: 12, md: 6 }}>
-              <TextInput
-                label={t('profile.edit.firstName')}
-                {...form.getInputProps('firstName')}
-              />
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, md: 6 }}>
-              <TextInput
-                label={t('profile.edit.lastName')}
-                {...form.getInputProps('lastName')}
-              />
-            </Grid.Col>
-          </Grid>
+          <Stack gap="md">
+            <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+              {t('profile.personalInfo')}
+            </Text>
+            <Grid>
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <TextInput
+                  label={t('profile.edit.firstName')}
+                  radius="md"
+                  size="md"
+                  {...form.getInputProps('firstName')}
+                />
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <TextInput
+                  label={t('profile.edit.lastName')}
+                  radius="md"
+                  size="md"
+                  {...form.getInputProps('lastName')}
+                />
+              </Grid.Col>
+            </Grid>
 
-          {/* Date of Birth */}
-          <DateOfBirthSelect
-            values={{ dob_day: form.values.dob_day, dob_month: form.values.dob_month, dob_year: form.values.dob_year }}
-            onChange={(field, value) => form.setFieldValue(field, value)}
-            error={form.errors.dob_year ? String(form.errors.dob_year) : null}
-            variant="profile"
-          />
+            {/* Date of Birth */}
+            <DateOfBirthSelect
+              values={{ dob_day: form.values.dob_day, dob_month: form.values.dob_month, dob_year: form.values.dob_year }}
+              onChange={(field, value) => form.setFieldValue(field, value)}
+              error={form.errors.dob_year ? String(form.errors.dob_year) : null}
+              variant="profile"
+            />
 
-          {/* Bio */}
-          <Textarea
-            label={t('profile.bio')}
-            placeholder={t('profile.bioPlaceholder')}
-            minRows={4}
-            maxLength={1000}
-            {...form.getInputProps('bio')}
-            description={`${form.values.bio.length} / 1000 ${t('profile.edit.characters')}`}
-          />
+            {/* Bio */}
+            <Textarea
+              label={t('profile.bio')}
+              placeholder={t('profile.bioPlaceholder')}
+              minRows={4}
+              maxLength={1000}
+              radius="md"
+              size="md"
+              {...form.getInputProps('bio')}
+              description={`${form.values.bio.length} / 1000 ${t('profile.edit.characters')}`}
+            />
+          </Stack>
 
-          {/* Location - City Autocomplete */}
-          <div>
-            <Group mb="sm">
-              <IconMapPin size={20} color="var(--mantine-color-blue-6)" />
-              <Text fw={500}>{t('profile.location')}</Text>
-            </Group>
-
+          {/* Location */}
+          <Stack gap="md">
+            <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+              {t('profile.location')}
+            </Text>
             <Combobox
               store={combobox}
               onOptionSubmit={(val) => {
@@ -406,15 +428,16 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
             >
               <Combobox.Target>
                 <InputBase
-                  label={t('profile.edit.city')}
                   placeholder={t('profile.edit.cityPlaceholder')}
                   value={cityDisplay}
                   onChange={(e) => {
                     handleCitySearch(e.currentTarget.value);
                   }}
                   onBlur={() => combobox.closeDropdown()}
-                  leftSection={<IconSearch size={16} />}
+                  leftSection={<IconMapPin size={18} className="text-eco-terracotta" />}
                   rightSection={isSearchingCity ? <Loader size={16} /> : null}
+                  radius="md"
+                  size="md"
                 />
               </Combobox.Target>
 
@@ -433,26 +456,31 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
                 </Combobox.Dropdown>
               )}
             </Combobox>
-          </div>
+          </Stack>
 
           {/* Languages */}
-          <MultiSelect
-            label={t('profile.languages') || 'Languages'}
-            placeholder={t('profile.edit.languagesPlaceholder') || 'Select languages you speak'}
-            data={availableLanguages}
-            value={form.values.languages}
-            onChange={(val) => form.setFieldValue('languages', val)}
-            searchable
-            clearable
-          />
+          <Stack gap="md">
+            <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+              {t('profile.languages')}
+            </Text>
+            <MultiSelect
+              placeholder={t('profile.edit.languagesPlaceholder')}
+              data={availableLanguages}
+              value={form.values.languages}
+              onChange={(val) => form.setFieldValue('languages', val)}
+              searchable
+              clearable
+              radius="md"
+              size="md"
+            />
+          </Stack>
 
           {/* Skills */}
-          <div>
-            <Group mb="sm">
-              <IconTools size={20} color="var(--mantine-color-blue-6)" />
-              <Text fw={500}>{t('profile.edit.yourSkills')}</Text>
-            </Group>
-            <Text size="sm" c="dimmed" mb="md">
+          <Stack gap="md">
+            <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+              {t('profile.edit.yourSkills')}
+            </Text>
+            <Text size="sm" c="dimmed">
               {t('profile.edit.skillsHint')}
             </Text>
 
@@ -465,16 +493,16 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
                 ))}
               </Grid>
             ) : (
-              <Stack gap="md">
+              <Stack gap="lg">
                 {/* Natural Building */}
                 {allSkills.filter(s => s.category === 'NATB').length > 0 && (
                   <div>
-                    <Group gap="xs" mb="xs">
+                    <Group gap="xs" mb="sm">
                       <IconHome2 size={16} className="text-eco-primary" />
                       <Text size="sm" fw={600} c="dimmed">{t('projects.naturalBuilding')}</Text>
                     </Group>
                     <Grid gutter="xs">
-                      {allSkills.filter(s => s.category === 'NATB').map((skill) => renderSkillCard(skill, 'blue'))}
+                      {allSkills.filter(s => s.category === 'NATB').map((skill) => renderSkillCard(skill, 'NATB'))}
                     </Grid>
                   </div>
                 )}
@@ -482,37 +510,50 @@ export function EditProfileForm({ user, onSave, onCancel }: EditProfileFormProps
                 {/* Permaculture */}
                 {allSkills.filter(s => s.category === 'PERM').length > 0 && (
                   <div>
-                    <Group gap="xs" mb="xs">
+                    <Group gap="xs" mb="sm">
                       <IconLeaf size={16} className="text-eco-terracotta" />
                       <Text size="sm" fw={600} c="dimmed">{t('projects.permaculture')}</Text>
                     </Group>
                     <Grid gutter="xs">
-                      {allSkills.filter(s => s.category === 'PERM').map((skill) => renderSkillCard(skill, 'orange'))}
+                      {allSkills.filter(s => s.category === 'PERM').map((skill) => renderSkillCard(skill, 'PERM'))}
                     </Grid>
                   </div>
                 )}
               </Stack>
             )}
-            <Text size="sm" c="dimmed" mt="xs">
+            <Text size="sm" c="dimmed">
               {t('profile.edit.skillsSelected', { count: form.values.skills.length })}
             </Text>
-          </div>
+          </Stack>
 
           {/* Actions */}
-          <Group justify="flex-end" mt="md">
-            <Button variant="default" onClick={onCancel} disabled={isSubmitting}>
+          <Group justify="flex-end" pt="md" className="border-t border-gray-100">
+            <Button variant="default" onClick={onCancel} disabled={isSubmitting} radius="md" size="md">
               {t('common.cancel')}
             </Button>
             <Button
               type="submit"
               loading={isSubmitting}
               leftSection={<IconDeviceFloppy size={18} />}
+              color="eco-blue"
+              radius="md"
+              size="md"
             >
               {t('common.save')}
             </Button>
           </Group>
         </Stack>
       </form>
-    </Card>
+    </Paper>
+
+    <ImageCropModal
+      opened={cropModalOpen}
+      onClose={() => setCropModalOpen(false)}
+      imageSrc={rawImageSrc}
+      onCropComplete={handleCropComplete}
+      cropShape="round"
+      aspect={1}
+    />
+    </>
   );
 }

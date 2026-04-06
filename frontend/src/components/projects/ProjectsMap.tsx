@@ -144,10 +144,8 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
 
         map.current.on('load', () => {
             setIsMapLoaded(true);
-            const bounds = getBounds();
-            if (bounds && onBoundsChangeRef.current) {
-                onBoundsChangeRef.current(bounds);
-            }
+            // Don't call onBoundsChange here — initial bounds are set before projects load,
+            // which causes the list to show 0 results. Let moveend (after fitBounds) set bounds.
         });
 
         // Handle map move/zoom - use refs to get latest callbacks
@@ -401,7 +399,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
               onmouseover="this.style.background='var(--color-eco-primaryDark)'"
               onmouseout="this.style.background='var(--color-eco-primary)'"
             >
-              ${t('projects.viewProject') || 'Voir le projet'}
+              ${t('projects.viewProject')}
             </a>
           </div>
         </div>

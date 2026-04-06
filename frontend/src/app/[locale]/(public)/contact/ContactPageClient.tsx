@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useMutation } from 'convex/react';
+import { api } from '../../../../../convex/_generated/api';
 import {
   Container,
   Title,
@@ -27,19 +29,27 @@ export function ContactPageClient() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const submitContact = useMutation(api.contact.submit);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // TODO: Implement actual email sending via backend
-    setTimeout(() => {
+    try {
+      await submitContact({
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+      });
       setSubmitSuccess(true);
-      setIsSubmitting(false);
       setFormData({ name: '', email: '', subject: '', message: '' });
-
       setTimeout(() => setSubmitSuccess(false), 5000);
-    }, 1000);
+    } catch {
+      // Error handled silently - form stays filled
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

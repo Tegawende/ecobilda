@@ -240,13 +240,17 @@ export function ProjectCard({
               size="xs"
               radius="xl"
               variant="light"
-              color={project.isActive ? 'green' : 'gray'}
+              color={project.status === 'PENDING' ? 'yellow' : project.isActive ? 'green' : 'gray'}
               tt="uppercase"
               fw={700}
               mt={4}
               styles={{ root: { flexShrink: 0 } }}
             >
-              {project.isActive ? (t('common.active') || 'Active') : (t('common.inactive') || 'Inactive')}
+              {project.status === 'PENDING'
+                ? t('common.pending')
+                : project.isActive
+                ? t('common.active')
+                : t('common.inactive')}
             </Badge>
           )}
         </Group>
@@ -260,13 +264,13 @@ export function ProjectCard({
           <Group gap={4}>
             <IconUsers size={14} className="text-gray-500" />
             <Text size="sm" c="dimmed">
-              {project.maxHelpers} {t('projects.volunteers') || 'volunteers'}
+              {project.maxHelpers} {t('projects.volunteers')}
             </Text>
           </Group>
           <Group gap={4}>
             <IconClock size={14} className="text-gray-500" />
             <Text size="sm" c="dimmed">
-              {project.hoursPerDay}h/{t('common.day') || 'day'}
+              {project.hoursPerDay}h/{t('common.day')}
             </Text>
           </Group>
         </Group>
@@ -280,12 +284,12 @@ export function ProjectCard({
           )}
           {project.familyFriendly && (
             <Badge size="xs" variant="light" color="gray" leftSection={<IconBabyCarriage size={10} />} radius="xl">
-              {t('projects.familyFriendly') || 'Family'}
+              {t('projects.familyFriendly')}
             </Badge>
           )}
           {project.petsAllowed && (
             <Badge size="xs" variant="light" color="gray" leftSection={<IconDog size={10} />} radius="xl">
-              {t('projects.petsAllowed') || 'Pets'}
+              {t('projects.petsAllowed')}
             </Badge>
           )}
         </Group>

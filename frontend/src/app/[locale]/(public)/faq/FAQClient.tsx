@@ -119,10 +119,6 @@ const FAQ = () => {
                 <Title order={2} mb="lg">{category.title}</Title>
                 <Accordion
                   variant="separated"
-                  styles={{
-                    control: { '&[data-active]': { color: 'var(--color-eco-terracotta)' } },
-                    chevron: { '&[data-active]': { color: 'var(--color-eco-terracotta)' } }
-                  }}
                 >
                   {category.questions.map((item, qIndex) => (
                     <Accordion.Item key={qIndex} value={`${categoryIndex}-${qIndex}`}>
@@ -145,12 +141,12 @@ const FAQ = () => {
         )}
 
         {/* Contact CTA */}
-        <Paper className="bg-eco-terracotta" c="white" p="xl" radius="md" mt={64} ta="center" style={{ backgroundColor: 'var(--color-eco-terracotta)' }}>
+        <Paper c="white" p="xl" radius="md" mt={64} ta="center" style={{ backgroundColor: 'var(--color-eco-blue)' }}>
           <Title order={3} mb="xs">{t('faq.stillHaveQuestions')}</Title>
           <Text opacity={0.9} mb="lg">
             {t('faq.cantFindAnswer')}
           </Text>
-          <Button variant="white" className="text-eco-terracotta hover:bg-gray-100" style={{ color: 'var(--color-eco-terracotta)' }}>
+          <Button variant="white" style={{ color: 'var(--color-eco-blue)' }}>
             {t('faq.contactSupport')}
           </Button>
         </Paper>

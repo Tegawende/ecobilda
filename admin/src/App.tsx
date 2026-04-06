@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
+import { ThemeProvider } from './hooks/useTheme';
 import { Layout } from './components/Layout';
 import { Toaster } from './components/ui/toaster';
 import { LoginPage } from './pages/LoginPage';
@@ -9,6 +10,7 @@ import { ReportsPage } from './pages/ReportsPage';
 import { UsersPage } from './pages/UsersPage';
 import { UserDetailPage } from './pages/UserDetailPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { ContactsPage } from './pages/ContactsPage';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -27,7 +29,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   // Check if user is admin/staff
-  if (!user.is_staff && !user.is_superuser) {
+  if (!user.isStaff && !user.isSuperuser) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -53,7 +55,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (user && (user.is_staff || user.is_superuser)) {
+  if (user && (user.isStaff || user.isSuperuser)) {
     return <Navigate to="/" replace />;
   }
 
@@ -87,6 +89,7 @@ function AppRoutes() {
         <Route path="reports" element={<ReportsPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="users/:id" element={<UserDetailPage />} />
+        <Route path="contacts" element={<ContactsPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
 
@@ -98,9 +101,11 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppRoutes />
-      <Toaster />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppRoutes />
+        <Toaster />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

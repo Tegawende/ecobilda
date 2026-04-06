@@ -17,7 +17,7 @@ export function ProjectImageGallery({ images, title }: ProjectImageGalleryProps)
   if (!images || images.length === 0) {
     return (
       <div className="w-full h-[500px] bg-gray-200 rounded-2xl flex items-center justify-center">
-        <p className="text-gray-500">No images available</p>
+        <p className="text-gray-500">{t('projects.noImages')}</p>
       </div>
     );
   }

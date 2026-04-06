@@ -15,23 +15,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "http",
         hostname: "localhost",
-        port: "8000",
+        port: "3210",
       },
       { protocol: "https", hostname: "api.ecobilda.org" },
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
     ],
   },
-  ...(process.env.NODE_ENV === "development"
-    ? {
-        async rewrites() {
-          return [
-            {
-              source: "/api/:path*",
-              destination: "http://localhost:8000/api/:path*",
-            },
-          ];
-        },
-      }
-    : {}),
 };
 
 export default withNextIntl(nextConfig);

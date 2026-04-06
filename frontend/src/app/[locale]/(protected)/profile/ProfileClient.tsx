@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
 import { useTranslations, useLocale } from 'next-intl';
 import { Container, Title, Text, Paper, Button, Group, Stack, Avatar, Badge, Rating, TextInput, Textarea, ThemeIcon, Alert } from '@mantine/core';
 import {
@@ -9,7 +10,7 @@ import {
   IconMapPin,
   IconMail,
   IconMessage,
-  IconHammer,
+  IconHome2,
   IconLeaf,
   IconGift,
   IconArrowLeft,
@@ -38,6 +39,7 @@ function getLocalizedLanguageName(code: string, locale: string): string {
 // Review Card Component using Mantine
 function ReviewCard({ review }: { review: Review }) {
   const t = useTranslations();
+  const locale = useLocale();
 
   return (
     <Paper radius="lg" p="lg" withBorder>
@@ -57,7 +59,7 @@ function ReviewCard({ review }: { review: Review }) {
             <Rating value={review.rating} readOnly size="sm" color="eco-terracotta" />
           </Group>
           <Text size="sm" c="dimmed">
-            {review._creationTime ? new Date(review._creationTime).toLocaleDateString('fr-FR', {
+            {review._creationTime ? new Date(review._creationTime).toLocaleDateString(locale, {
               year: 'numeric',
               month: 'long',
               day: 'numeric',
@@ -68,7 +70,7 @@ function ReviewCard({ review }: { review: Review }) {
           {review.response && (
             <Paper radius="md" p="sm" bg="var(--mantine-color-eco-primary-light)" className="border-l-2 border-eco-primary">
               <Text size="sm" fw={600} c="eco-primary" mb={4}>
-                {t('profile.yourResponse') || 'Your response'}
+                {t('profile.yourResponse')}
               </Text>
               <Text size="sm" c="dimmed">{review.response}</Text>
             </Paper>
@@ -95,20 +97,23 @@ export function ProfileClient() {
     import('@/services/profile').then(({ profileService }) => {
       profileService.getProfile()
         .then(data => { setUser(data); setLoading(false); })
-        .catch(err => { setError('Failed to load profile'); setLoading(false); });
+        .catch(err => { setError(t('profile.loadError')); setLoading(false); });
     });
   }, []);
 
-  const handleSave = (data: any) => {
+  const { refreshUser } = useAuth();
+
+  const handleSave = useCallback(async (data: any) => {
     setUser({ ...user, ...data });
     setIsEditing(false);
-  };
+    await refreshUser();
+  }, [user, refreshUser]);
 
   if (loading) {
     return (
       <Layout>
         <div className="bg-stone-50 min-h-screen py-12 flex items-center justify-center">
-          <div className="animate-pulse text-gray-400">Loading...</div>
+          <div className="animate-pulse text-gray-400">{t('common.loading')}</div>
         </div>
       </Layout>
     );
@@ -119,8 +124,8 @@ export function ProfileClient() {
       <Layout>
         <div className="bg-stone-50 min-h-screen py-12">
           <Container size="sm">
-            <Alert icon={<IconAlertCircle size={16} />} color="red" title={t('common.error') || 'Error'}>
-              {error || t('profile.loadError') || 'Could not load profile'}
+            <Alert icon={<IconAlertCircle size={16} />} color="red" title={t('common.error')}>
+              {error || t('profile.loadError')}
             </Alert>
           </Container>
         </div>
@@ -140,7 +145,7 @@ export function ProfileClient() {
               onClick={() => setIsEditing(false)}
               mb="md"
             >
-              {t('profile.backToProfile') || 'Back to Profile'}
+              {t('profile.backToProfile')}
             </Button>
             <EditProfileForm user={user} onSave={handleSave} onCancel={() => setIsEditing(false)} />
           </Container>
@@ -161,33 +166,16 @@ export function ProfileClient() {
               </ThemeIcon>
               <Stack gap={4}>
                 <Title order={1} className="font-display">
-                  {t('profile.title') || 'My Profile'}
+                  {t('profile.title')}
                 </Title>
                 <Text c="dimmed">
-                  {t('profile.subtitle') || 'Your personal information'}
+                  {t('profile.subtitle')}
                 </Text>
               </Stack>
             </Group>
 
             {/* Profile Header Card */}
             <Paper radius="lg" p="lg" withBorder>
-              <Group gap="sm" mb="lg" pb="md" className="border-b border-gray-100">
-                <IconInfoCircle size={24} className="text-eco-primary" />
-                <Title order={4} className="font-display">
-                  {t('profile.personalInfo') || 'Personal Information'}
-                </Title>
-                <div className="flex-1" />
-                <Button
-                  variant="outline"
-                  radius="xl"
-                  size="xs"
-                  leftSection={<IconPencil size={16} />}
-                  onClick={() => setIsEditing(true)}
-                >
-                  {t('profile.editProfile') || 'Edit Profile'}
-                </Button>
-              </Group>
-
               <Stack gap="md">
                 <Group align="flex-start" gap="lg" wrap="wrap">
                   {/* Avatar */}
@@ -201,19 +189,49 @@ export function ProfileClient() {
 
                   {/* User Info */}
                   <Stack gap="xs" className="flex-1" style={{ minWidth: 200 }}>
-                    <Title order={2} className="font-display">
-                      {user.firstName} {user.lastName}
-                    </Title>
+                    <Group justify="space-between" align="flex-start">
+                      <Title order={2} className="font-display">
+                        {user.firstName} {user.lastName}
+                      </Title>
+                      <Button
+                        variant="outline"
+                        radius="xl"
+                        size="xs"
+                        leftSection={<IconPencil size={16} />}
+                        onClick={() => setIsEditing(true)}
+                      >
+                        {t('profile.editProfile')}
+                      </Button>
+                    </Group>
                     <Group gap="xs">
                       <IconMail size={16} className="text-gray-500" />
                       <Text c="dimmed">{user.email}</Text>
                     </Group>
+                    {user.dateOfBirth && (
+                      <Group gap="xs">
+                        <IconGift size={16} className="text-gray-500" />
+                        <Text c="dimmed">
+                          {new Date(user.dateOfBirth).toLocaleDateString(locale, {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}
+                          {' '}({Math.floor((Date.now() - new Date(user.dateOfBirth).getTime()) / (365.25 * 24 * 60 * 60 * 1000))} {t('profile.yearsOld')})
+                        </Text>
+                      </Group>
+                    )}
+                    {user.address?.city && (
+                      <Group gap="xs">
+                        <IconMapPin size={16} className="text-gray-500" />
+                        <Text c="dimmed">{[user.address.city, user.address.country?.name].filter(Boolean).join(', ')}</Text>
+                      </Group>
+                    )}
 
                     {user.reviewCount > 0 && (
                       <Group gap="xs" mt="xs">
                         <Rating value={user.averageRating} readOnly fractions={2} color="eco-terracotta" />
                         <Text size="sm" c="dimmed">
-                          ({user.reviewCount} {user.reviewCount === 1 ? (t('profile.review') || 'review') : (t('profile.reviews') || 'reviews')})
+                          ({user.reviewCount} {user.reviewCount === 1 ? t('profile.review') : t('profile.reviews')})
                         </Text>
                       </Group>
                     )}
@@ -221,113 +239,80 @@ export function ProfileClient() {
                 </Group>
 
                 {/* Bio */}
-                <Stack gap="xs" pt="md" className="border-t border-gray-100">
-                  <Group gap="xs">
-                    <IconUser size={16} className="text-gray-500" />
-                    <Text size="sm" fw={700} c="dimmed" tt="uppercase">
-                      {t('profile.about') || 'About'}
-                    </Text>
-                  </Group>
-                  <Text className="whitespace-pre-wrap">{user.bio || t('profile.noBio') || 'No bio yet'}</Text>
-                </Stack>
-
-                {/* Details Grid */}
-                <div className="pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {/* Location */}
-                  {user.address && (
-                    <Stack gap="xs">
-                      <Group gap="xs">
-                        <IconMapPin size={16} className="text-eco-terracotta" />
-                        <Text size="sm" fw={700} c="dimmed" tt="uppercase">
-                          {t('profile.location') || 'Location'}
-                        </Text>
-                      </Group>
-                      <Text fw={500}>{user.address.city}, {user.address.country?.name}</Text>
-                    </Stack>
-                  )}
-
-                  {/* Date of Birth */}
-                  {user.dateOfBirth && (
-                    <Stack gap="xs">
-                      <Group gap="xs">
-                        <IconGift size={16} className="text-eco-terracotta" />
-                        <Text size="sm" fw={700} c="dimmed" tt="uppercase">
-                          {t('profile.birthday') || 'Birthday'}
-                        </Text>
-                      </Group>
-                      <Text fw={500}>
-                        {new Date(user.dateOfBirth).toLocaleDateString('fr-FR', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
+                {user.bio && (
+                  <Stack gap="xs" pt="md" className="border-t border-gray-100">
+                    <Group gap="xs">
+                      <IconUser size={16} className="text-gray-500" />
+                      <Text size="sm" fw={700} c="dimmed" tt="uppercase">
+                        {t('profile.about')}
                       </Text>
-                    </Stack>
-                  )}
+                    </Group>
+                    <Text className="whitespace-pre-wrap">{user.bio}</Text>
+                  </Stack>
+                )}
 
-                  {/* Languages */}
-                  {user.languages && user.languages.length > 0 && (
-                    <Stack gap="xs">
-                      <Group gap="xs">
-                        <IconLanguage size={16} className="text-eco-terracotta" />
-                        <Text size="sm" fw={700} c="dimmed" tt="uppercase">
-                          {t('profile.languages') || 'Languages'}
-                        </Text>
-                      </Group>
-                      <Group gap="xs">
-                        {user.languages.map((lang: any) => (
-                          <Badge key={lang.code} variant="light" color="eco-primary" size="sm">
-                            {getLocalizedLanguageName(lang.code, locale)}
+                {/* Languages */}
+                {user.languages && user.languages.length > 0 && (
+                  <Stack gap="xs" pt="md" className="border-t border-gray-100">
+                    <Group gap="xs">
+                      <IconLanguage size={16} className="text-eco-terracotta" />
+                      <Text size="sm" fw={700} c="dimmed" tt="uppercase">
+                        {t('profile.languages')}
+                      </Text>
+                    </Group>
+                    <Group gap="xs">
+                      {user.languages.map((lang: any) => (
+                        <Badge key={lang.code} variant="light" color="eco-primary" size="sm">
+                          {getLocalizedLanguageName(lang.code, locale)}
+                        </Badge>
+                      ))}
+                    </Group>
+                  </Stack>
+                )}
+
+                {/* Skills - Natural Building */}
+                {user.skills && user.skills.filter((s: any) => s.category === 'NATB').length > 0 && (
+                  <Stack gap="xs" pt="md" className="border-t border-gray-100">
+                    <Group gap="xs">
+                      <IconHome2 size={16} className="text-eco-primary" />
+                      <Text size="sm" fw={700} c="dimmed" tt="uppercase">
+                        {t('projects.naturalBuilding')}
+                      </Text>
+                    </Group>
+                    <Group gap="xs" wrap="wrap">
+                      {user.skills.filter((s: any) => s.category === 'NATB').map((skill: any) => {
+                        const SkillIcon = getSkillIcon(skill.icon);
+                        return (
+                          <Badge key={skill.code} variant="light" color="eco-primary" size="sm" leftSection={<SkillIcon size={14} />}>
+                            {getSkillDisplayName(skill, locale)}
                           </Badge>
-                        ))}
-                      </Group>
-                    </Stack>
-                  )}
+                        );
+                      })}
+                    </Group>
+                  </Stack>
+                )}
 
-                  {/* Skills - Natural Building */}
-                  {user.skills && user.skills.filter((s: any) => s.category === 'NATB').length > 0 && (
-                    <Stack gap="xs">
-                      <Group gap="xs">
-                        <IconHammer size={16} className="text-eco-terracotta" />
-                        <Text size="sm" fw={700} c="dimmed" tt="uppercase">
-                          {t('projects.naturalBuilding') || 'Natural Building'}
-                        </Text>
-                      </Group>
-                      <Group gap="xs">
-                        {user.skills.filter((s: any) => s.category === 'NATB').map((skill: any) => {
-                          const SkillIcon = getSkillIcon(skill.icon);
-                          return (
-                            <Badge key={skill.code} variant="light" color="eco-primary" size="sm" leftSection={<SkillIcon size={14} />}>
-                              {getSkillDisplayName(skill, locale)}
-                            </Badge>
-                          );
-                        })}
-                      </Group>
-                    </Stack>
-                  )}
-
-                  {/* Skills - Permaculture */}
-                  {user.skills && user.skills.filter((s: any) => s.category === 'PERM').length > 0 && (
-                    <Stack gap="xs">
-                      <Group gap="xs">
-                        <IconLeaf size={16} className="text-eco-terracotta" />
-                        <Text size="sm" fw={700} c="dimmed" tt="uppercase">
-                          {t('projects.permaculture') || 'Permaculture'}
-                        </Text>
-                      </Group>
-                      <Group gap="xs">
-                        {user.skills.filter((s: any) => s.category === 'PERM').map((skill: any) => {
-                          const SkillIcon = getSkillIcon(skill.icon);
-                          return (
-                            <Badge key={skill.code} variant="light" color="eco-terracotta" size="sm" leftSection={<SkillIcon size={14} />}>
-                              {getSkillDisplayName(skill, locale)}
-                            </Badge>
-                          );
-                        })}
-                      </Group>
-                    </Stack>
-                  )}
-                </div>
+                {/* Skills - Permaculture */}
+                {user.skills && user.skills.filter((s: any) => s.category === 'PERM').length > 0 && (
+                  <Stack gap="xs" pt="md" className="border-t border-gray-100">
+                    <Group gap="xs">
+                      <IconLeaf size={16} className="text-eco-terracotta" />
+                      <Text size="sm" fw={700} c="dimmed" tt="uppercase">
+                        {t('projects.permaculture')}
+                      </Text>
+                    </Group>
+                    <Group gap="xs" wrap="wrap">
+                      {user.skills.filter((s: any) => s.category === 'PERM').map((skill: any) => {
+                        const SkillIcon = getSkillIcon(skill.icon);
+                        return (
+                          <Badge key={skill.code} variant="light" color="eco-terracotta" size="sm" leftSection={<SkillIcon size={14} />}>
+                            {getSkillDisplayName(skill, locale)}
+                          </Badge>
+                        );
+                      })}
+                    </Group>
+                  </Stack>
+                )}
               </Stack>
             </Paper>
 
@@ -337,7 +322,7 @@ export function ProfileClient() {
                 <Group gap="sm" mb="lg" pb="md" className="border-b border-gray-100">
                   <IconMessage size={24} className="text-eco-primary" />
                   <Title order={4} className="font-display">
-                    {t('profile.reviewsTitle') || 'Reviews'} ({reviews.length})
+                    {t('profile.reviewsTitle')} ({reviews.length})
                   </Title>
                 </Group>
                 <Stack gap="md">

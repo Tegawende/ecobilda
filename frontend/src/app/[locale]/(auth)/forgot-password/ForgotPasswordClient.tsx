@@ -23,7 +23,7 @@ export function ForgotPasswordClient() {
       await authService.requestPasswordReset(email);
       setSuccess(true);
     } catch {
-      setError(t('auth.resetPasswordError') || 'Failed to send reset email. Please try again.');
+      setError(t('auth.resetPasswordError'));
     } finally {
       setIsLoading(false);
     }
@@ -41,30 +41,30 @@ export function ForgotPasswordClient() {
                 </div>
               </div>
               <h1 className="text-2xl font-display font-bold text-gray-900 mb-2">
-                {t('auth.resetEmailSent') || 'Check your email'}
+                {t('auth.resetEmailSent')}
               </h1>
               <p className="text-gray-500 mb-8">
-                {t('auth.resetEmailSentDesc') || 'We sent a password reset link to your email address.'}
+                {t('auth.resetEmailSentDesc')}
               </p>
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center w-full px-6 py-3 rounded-full bg-eco-primary text-white font-semibold hover:bg-eco-primaryDark transition-all"
+                className="inline-flex items-center justify-center w-full px-6 py-3 rounded-full bg-eco-blue text-white font-semibold hover:bg-eco-blueDark transition-all"
               >
-                {t('auth.backToLogin') || 'Back to login'}
+                {t('auth.backToLogin')}
               </Link>
             </>
           ) : (
             <>
               <div className="flex justify-center mb-6">
-                <div className="w-16 h-16 rounded-full bg-eco-primary/10 flex items-center justify-center">
-                  <IconMail size={32} className="text-eco-primary" strokeWidth={1.5} />
+                <div className="w-16 h-16 rounded-full bg-eco-blue/10 flex items-center justify-center">
+                  <IconMail size={32} className="text-eco-blue" strokeWidth={1.5} />
                 </div>
               </div>
               <h1 className="text-2xl font-display font-bold text-gray-900 mb-2">
-                {t('auth.forgotPassword') || 'Forgot your password?'}
+                {t('auth.forgotPassword')}
               </h1>
               <p className="text-gray-500 mb-8">
-                {t('auth.forgotPasswordDesc') || 'Enter your email and we will send you a reset link.'}
+                {t('auth.forgotPasswordDesc')}
               </p>
 
               {error && (
@@ -80,24 +80,24 @@ export function ForgotPasswordClient() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={t('auth.email')}
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-eco-primary focus:ring-1 focus:ring-eco-primary outline-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-eco-blue focus:ring-1 focus:ring-eco-blue outline-none"
                 />
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full px-6 py-3 rounded-full bg-eco-primary text-white font-semibold hover:bg-eco-primaryDark transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full px-6 py-3 rounded-full bg-eco-blue text-white font-semibold hover:bg-eco-blueDark transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isLoading ? <IconLoader2 size={18} className="animate-spin" /> : null}
-                  {t('auth.sendResetLink') || 'Send reset link'}
+                  {t('auth.sendResetLink')}
                 </button>
               </form>
 
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 mt-6 text-sm text-gray-500 hover:text-eco-primary"
+                className="inline-flex items-center gap-2 mt-6 text-sm text-gray-500 hover:text-eco-blue"
               >
                 <IconArrowLeft size={16} />
-                {t('auth.backToLogin') || 'Back to login'}
+                {t('auth.backToLogin')}
               </Link>
             </>
           )}

@@ -1,397 +1,286 @@
-import axios from 'axios';
+import { convexClient, getSessionToken, setSessionToken, clearSessionToken } from '@/lib/convexClient';
+import { api } from '@convex/_generated/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+// Re-export for auth hooks
+export { setSessionToken as setAuthTokens, clearSessionToken as clearAuthTokens, getSessionToken as getAccessToken };
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+// ============================================
+// Types (camelCase, matching Convex returns)
+// ============================================
 
-// Token management
-let accessToken: string | null = localStorage.getItem('admin_access_token');
-
-export function setAuthTokens(tokens: { access: string; refresh: string }) {
-  accessToken = tokens.access;
-  localStorage.setItem('admin_access_token', tokens.access);
-  localStorage.setItem('admin_refresh_token', tokens.refresh);
-}
-
-export function clearAuthTokens() {
-  accessToken = null;
-  localStorage.removeItem('admin_access_token');
-  localStorage.removeItem('admin_refresh_token');
-}
-
-export function getAccessToken() {
-  return accessToken;
-}
-
-// Request interceptor
-api.interceptors.request.use(
-  (config) => {
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// Response interceptor for token refresh
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      const refreshToken = localStorage.getItem('admin_refresh_token');
-      if (refreshToken) {
-        try {
-          const response = await axios.post(`${API_BASE_URL}/auth/token/refresh/`, {
-            refresh: refreshToken,
-          });
-
-          const { access } = response.data;
-          accessToken = access;
-          localStorage.setItem('admin_access_token', access);
-          originalRequest.headers.Authorization = `Bearer ${access}`;
-
-          return api(originalRequest);
-        } catch (refreshError) {
-          clearAuthTokens();
-          window.location.href = '/login';
-          return Promise.reject(refreshError);
-        }
-      }
-    }
-
-    return Promise.reject(error);
-  }
-);
-
-export default api;
-
-// API types
 export interface DashboardStats {
   users: {
     total: number;
-    new_this_month: number;
-    with_projects: number;
+    newThisMonth: number;
+    withProjects: number;
   };
   projects: {
     total: number;
     active: number;
     pending: number;
     rejected: number;
-    new_this_month: number;
+    newThisMonth: number;
   };
   participations: {
     total: number;
     pending: number;
     accepted: number;
     refused: number;
-    new_this_month: number;
-    conversion_rate: number;
   };
   reviews: {
     total: number;
-    average_rating: number;
-    new_this_month: number;
+    averageRating: number;
   };
   reports: {
     total: number;
     pending: number;
-    resolved: number;
-    dismissed: number;
   };
-  messages: {
-    total: number;
-  };
-  favorites: {
-    total: number;
-  };
-  top_countries: Array<{
-    address__country__name: string;
-    address__country__code: string;
-    count: number;
-  }>;
-  popular_skills: Array<{
-    code: string;
-    display_name_en: string;
-    display_name_fr: string;
-    project_count: number;
-  }>;
-  activity: {
-    users_by_day: Array<{ date: string; count: number }>;
-    projects_by_day: Array<{ date: string; count: number }>;
-  };
+  messages: { total: number };
+  favorites: { total: number };
 }
 
 export interface PendingProject {
-  id: number;
+  _id: string;
   title: string;
   owner: {
-    id: number;
+    _id: string;
     email: string;
-    full_name: string;
-  };
-  project_type: string;
-  created_at: string;
-  city?: string;
-  country?: string;
+    firstName: string;
+    lastName: string;
+    profilePictureUrl?: string | null;
+  } | null;
+  projectType: string;
+  _creationTime: number;
+  address?: {
+    city?: string;
+    country?: { name: string; code: string } | null;
+  } | null;
+  skills: Array<{
+    code: string;
+    displayNameEn: string;
+    displayNameFr: string;
+    category: string;
+  }>;
+  images: Array<{
+    _id: string;
+    storageId: string;
+    url?: string | null;
+    order: number;
+  }>;
+}
+
+export interface ProjectDetail extends PendingProject {
+  description: string;
+  status: string;
+  hoursPerDay: number;
+  daysPerWeek: number;
+  maxHelpers: number;
+  internetProvided: boolean;
+  petsAllowed: boolean;
+  smokingAllowed: boolean;
+  familyFriendly: boolean;
+  accommodationDetails?: string;
+  foodDetails?: string;
+  validatedAt?: number;
+}
+
+export interface ContactMessage {
+  _id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  status: string; // "new" | "read" | "resolved"
+  _creationTime: number;
 }
 
 export interface Report {
-  id: number;
-  reporter_email: string;
-  reporter_name: string;
-  target_type: string;
-  target_type_display: string;
-  target_id: number;
+  _id: string;
+  reporterId: string;
+  reporterEmail?: string;
+  reporterName: string;
+  targetType: string;
+  targetId: string;
   reason: string;
-  reason_display: string;
-  details: string;
+  details?: string;
   status: string;
-  status_display: string;
-  created_at: string;
-}
-
-export interface ProjectImage {
-  id: number;
-  image: string;
-  is_cover: boolean;
-  order: number;
-  uploaded_at: string;
-}
-
-export interface ProjectDetail {
-  id: number;
-  title: string;
-  description: string;
-  project_type: string;
-  project_type_display: string;
-  status: string;
-  status_display: string;
-  owner: {
-    id: number;
-    email: string;
-    first_name: string;
-    last_name: string;
-    profile_picture?: string;
-  };
-  address: {
-    street?: string;
-    city: string;
-    postal_code?: string;
-    country: {
-      code: string;
-      name: string;
-    };
-    latitude?: number;
-    longitude?: number;
-  };
-  images: ProjectImage[];
-  skills: Array<{
-    code: string;
-    display_name_en: string;
-    display_name_fr: string;
-    category: string;
-  }>;
-  // Work details
-  hours_per_day?: number;
-  days_per_week?: number;
-  min_stay_weeks?: number;
-  max_helpers?: number;
-  // Amenities
-  wifi_available: boolean;
-  pets_allowed: boolean;
-  smoking_allowed: boolean;
-  family_friendly: boolean;
-  wheelchair_accessible: boolean;
-  // Accommodation
-  accommodation_provided: boolean;
-  accommodation_description?: string;
-  meals_provided: boolean;
-  meals_description?: string;
-  // Dates
-  created_at: string;
-  updated_at: string;
-  validated_at?: string;
-}
-
-export interface AdminNotificationSettings {
-  notify_new_user: boolean;
-  notify_new_project: boolean;
-  notify_new_report: boolean;
-  notify_new_participation: boolean;
+  _creationTime: number;
 }
 
 export interface AdminUserDetail {
-  id: number;
+  _id: string;
   email: string;
-  first_name: string;
-  last_name: string;
-  date_of_birth: string | null;
-  gender: string;
-  bio: string;
-  profile_picture: string | null;
-  profile_picture_url: string | null;
-  email_verified: boolean;
-  is_staff: boolean;
-  is_superuser: boolean;
-  is_active: boolean;
-  email_notifications: boolean;
+  firstName: string;
+  lastName: string;
+  dateOfBirth?: string;
+  gender?: string;
+  bio?: string;
+  profilePictureUrl?: string | null;
+  emailVerified: boolean;
+  isStaff: boolean;
+  isSuperuser: boolean;
+  isActive: boolean;
+  emailNotifications: boolean;
   newsletter: boolean;
-  in_app_notifications: boolean;
-  notification_language: string;
-  average_rating: number;
-  review_count: number;
-  date_joined: string;
-  last_login: string | null;
-  created_at: string;
-  updated_at: string;
-  address: {
-    id: number;
-    city: string;
-    street: string;
-    street_number: string;
-    postal_code: string;
-    country: { code: string; name: string } | null;
-    latitude: string;
-    longitude: string;
-    formatted_address: string;
+  inAppNotifications: boolean;
+  notificationLanguage?: string;
+  averageRating?: number;
+  reviewCount?: number;
+  _creationTime: number;
+  lastLoginAt?: number;
+  address?: {
+    city?: string;
+    country?: { code: string; name: string } | null;
   } | null;
   languages: Array<{ code: string; name: string }>;
-  skills: Array<{
-    code: string;
-    display_name_en: string;
-    display_name_fr: string;
-    category: string;
-  }>;
-  projects_count: number;
-  projects: Array<{
-    id: number;
-    title: string;
-    status: string;
-    project_type: string;
-    created_at: string;
-  }>;
-  reviews_received: Array<{
-    id: number;
-    writer: string;
-    rating: number;
-    feedback: string;
-    created_at: string;
-  }>;
-  favorites_count: number;
+  skills: Array<{ code: string; displayNameEn: string; category: string }>;
+  projects: Array<{ _id: string; title: string; status: string; projectType: string; _creationTime: number }>;
+  reviewsReceived: Array<{ _id: string; writerId: string; rating: number; feedback: string }>;
 }
 
-// Admin API functions
-export const adminApi = {
-  // Generic get for flexible queries
-  async get<T>(url: string): Promise<T> {
-    const response = await api.get(url);
-    return response.data;
-  },
+// ============================================
+// Admin API (Convex-based)
+// ============================================
 
+export const adminApi = {
   // Dashboard
   async getStats(): Promise<DashboardStats> {
-    const response = await api.get('/admin/stats/dashboard/');
-    return response.data;
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    return await convexClient.query(api.admin.dashboard.getStats, { token }) as any;
   },
 
   // Projects
   async getPendingProjects(): Promise<PendingProject[]> {
-    const response = await api.get('/admin/projects/pending/');
-    return response.data;
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    return await convexClient.query(api.admin.projects.getPending, { token }) as any;
   },
 
   async getValidatedProjects(): Promise<PendingProject[]> {
-    const response = await api.get('/admin/projects/validated/');
-    return response.data;
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    return await convexClient.query(api.admin.projects.getValidated, { token }) as any;
   },
 
-  async validateProject(id: number): Promise<void> {
-    await api.post(`/admin/projects/${id}/validate/`);
+  async validateProject(id: string): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.admin.projects.validate, { token, id: id as any });
   },
 
-  async invalidateProject(id: number, reason?: string): Promise<void> {
-    await api.post(`/admin/projects/${id}/invalidate/`, { reason });
+  async invalidateProject(id: string): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.admin.projects.invalidate, { token, id: id as any });
   },
 
-  async rejectProject(id: number, reason: string): Promise<void> {
-    await api.post(`/admin/projects/${id}/reject/`, { reason });
+  async rejectProject(id: string, reason: string): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.admin.projects.reject, { token, id: id as any, reason });
   },
 
-  async getProjectDetail(id: number): Promise<ProjectDetail> {
-    const response = await api.get(`/admin/projects/${id}/`);
-    return response.data;
+  async getProjectDetail(id: string): Promise<ProjectDetail> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    return await convexClient.query(api.admin.projects.getDetail, { token, id: id as any }) as any;
   },
 
   // Reports
-  async getReports(status?: string): Promise<{ count: number; results: Report[] }> {
-    const params = status ? { status } : {};
-    const response = await api.get('/admin/reports/', { params });
-    return response.data;
+  async getReports(status?: string): Promise<Report[]> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    return await convexClient.query(api.admin.reports.list, { token, status }) as any;
   },
 
-  async getPendingReports(): Promise<{ count: number; results: Report[] }> {
-    const response = await api.get('/admin/reports/pending/');
-    return response.data;
+  async getPendingReports(): Promise<Report[]> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    return await convexClient.query(api.admin.reports.getPending, { token }) as any;
   },
 
-  async resolveReport(id: number, action: 'resolve' | 'dismiss', notes?: string): Promise<void> {
-    await api.post(`/admin/reports/${id}/resolve/`, { action, notes });
+  async resolveReport(id: string, status: 'RESOLVED' | 'DISMISSED', notes?: string): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.admin.reports.resolve, { token, id: id as any, status, notes });
   },
 
   // Users
-  async getUserDetail(id: number): Promise<AdminUserDetail> {
-    const response = await api.get(`/admin/users/${id}/detail/`);
-    return response.data;
+  async getUsers(search?: string, emailVerified?: boolean) {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    return await convexClient.query(api.admin.users.list, { token, search, emailVerified }) as any;
   },
 
-  async blockUser(id: number, reason?: string): Promise<void> {
-    await api.post(`/admin/users/${id}/block/`, { reason });
+  async getUserDetail(id: string): Promise<AdminUserDetail> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    return await convexClient.query(api.admin.users.getDetail, { token, id: id as any }) as any;
   },
 
-  async unblockUser(id: number): Promise<void> {
-    await api.post(`/admin/users/${id}/unblock/`);
+  async blockUser(id: string): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.admin.users.block, { token, id: id as any });
   },
 
-  async deleteUser(id: number): Promise<void> {
-    await api.delete(`/admin/users/${id}/`);
+  async unblockUser(id: string): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.admin.users.unblock, { token, id: id as any });
   },
 
-  async verifyUserEmail(id: number): Promise<void> {
-    await api.post(`/admin/users/${id}/verify-email/`);
+  async deleteUser(id: string): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.admin.users.remove, { token, id: id as any });
   },
 
-  async unverifyUserEmail(id: number): Promise<void> {
-    await api.post(`/admin/users/${id}/unverify-email/`);
+  async verifyUserEmail(id: string): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.admin.users.verifyEmail, { token, id: id as any });
+  },
+
+  async unverifyUserEmail(id: string): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.admin.users.unverifyEmail, { token, id: id as any });
+  },
+
+  // Contact messages
+  async getContactMessages(status?: string): Promise<ContactMessage[]> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    return await convexClient.query(api.admin.contacts.list, { token, status }) as any;
+  },
+
+  async markContactAsRead(id: string): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.admin.contacts.markAsRead, { token, id: id as any });
+  },
+
+  async markContactAsResolved(id: string): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.admin.contacts.markAsResolved, { token, id: id as any });
   },
 
   // Auth
-  async login(email: string, password: string): Promise<{ tokens: { access: string; refresh: string }; user: unknown }> {
-    const response = await api.post('/auth/login/', { email, password });
-    return response.data;
+  async login(email: string, password: string): Promise<{ token: string }> {
+    const result = await convexClient.mutation(api.auth.adminLogin, { email, password });
+    const token = (result as any).token;
+    setSessionToken(token);
+    return { token };
   },
 
   async getCurrentUser(): Promise<unknown> {
-    const response = await api.get('/auth/me/');
-    return response.data;
-  },
-
-  // Settings
-  async getNotificationSettings(): Promise<AdminNotificationSettings> {
-    const response = await api.get('/admin/settings/notifications/');
-    return response.data;
-  },
-
-  async updateNotificationSettings(settings: AdminNotificationSettings): Promise<void> {
-    await api.put('/admin/settings/notifications/', settings);
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    return await convexClient.query(api.auth.me, { token });
   },
 };
+
+export default convexClient;

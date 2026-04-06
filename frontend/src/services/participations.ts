@@ -9,6 +9,12 @@ export interface CreateParticipationData {
 }
 
 export const participationsService = {
+  async getParticipationById(id: string): Promise<any> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    return await convexClient.query(api.participations.getById, { token, id: id as any });
+  },
+
   async getMyParticipations(): Promise<any[]> {
     const token = getSessionToken();
     if (!token) return [];

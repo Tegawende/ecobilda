@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { Link, useRouter } from '@/i18n/navigation';
-import logger from '@/lib/logger';
 import {
   Container,
   Title,
@@ -16,63 +16,30 @@ import {
   Paper,
   Button,
 } from '@mantine/core';
-import { IconFolder, IconPlus, IconAlertCircle } from '@tabler/icons-react';
+import { IconFolder, IconPlus, IconCheck } from '@tabler/icons-react';
 import type { Project } from '@/types';
 import { ProjectCard, ProjectCardSkeleton } from '@/components/projects/ProjectCard';
-import { projectsService } from '@/services/projects';
+import { useMyProjects } from '@/hooks/useConvex';
 import { Layout } from '@/components/common/Layout';
 
-function FilterTabs({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
-  return (
-    <div className="flex bg-gray-100/80 rounded-xl w-full p-1">
-      {options.map((option) => (
-        <button
-          key={option.value}
-          onClick={() => onChange(option.value)}
-          className={`flex-1 px-4 py-3 rounded-lg text-sm font-bold transition-all cursor-pointer whitespace-nowrap text-center ${value === option.value
-            ? 'bg-white text-eco-primary shadow-sm'
-            : 'text-gray-500 hover:text-gray-700'
-            }`}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 export function MyProjectsClient() {
   const t = useTranslations();
   const router = useRouter();
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [projectStatus, setProjectStatus] = useState<'active' | 'past'>('active');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const initialTab = searchParams?.get('tab');
+  const [projectStatus, setProjectStatus] = useState<'pending' | 'active' | 'past'>(
+    initialTab === 'pending' || initialTab === 'active' || initialTab === 'past' ? initialTab : 'active'
+  );
+  const [showCreatedAlert, setShowCreatedAlert] = useState(searchParams?.get('created') === 'true');
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const response = await projectsService.getMyProjects();
-        const projectList = Array.isArray(response) ? response : ((response as any).results || []);
-        setProjects(projectList);
-      } catch (err) {
-        logger.error('Failed to fetch my projects:', err);
-        setError(t('myProjects.fetchError') || 'Failed to load projects');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const { projects: rawProjects, isLoading } = useMyProjects();
+  const projects = (rawProjects || []) as Project[];
 
-    fetchProjects();
-  }, [t]);
-
-  const filteredProjects = projects.filter(project => {
-    if (projectStatus === 'active' && !project.isActive) return false;
-    if (projectStatus === 'past' && project.isActive) return false;
-    return true;
-  });
+  const pendingProjects = projects.filter(p => p.status === 'PENDING');
+  const activeProjects = projects.filter(p => p.status === 'ACTIVE');
+  const pastProjects = projects.filter(p => p.status === 'REJECTED' || (!p.isActive && p.status !== 'PENDING'));
+  const filteredProjects = projectStatus === 'pending' ? pendingProjects : projectStatus === 'active' ? activeProjects : pastProjects;
 
   const handleEdit = (id: string) => {
     router.push(`/projects/${id}/edit`);
@@ -91,55 +58,74 @@ export function MyProjectsClient() {
                 </ThemeIcon>
                 <Stack gap={4}>
                   <Title order={1} className="font-display">
-                    {t('myProjects.title') || 'My Projects'}
+                    {t('myProjects.title')}
                   </Title>
                   <Text c="dimmed">
-                    {t('myProjects.subtitle') || 'Manage your published projects'}
+                    {t('myProjects.subtitle')}
                   </Text>
                 </Stack>
               </Group>
 
               <Button
                 component={Link}
-                href="/projects/new"
+                href="/create-project"
                 radius="xl"
                 color="eco-primary"
                 size="md"
                 leftSection={<IconPlus size={20} />}
                 className="shadow-lg shadow-eco-primary/20"
               >
-                {t('myProjects.createNew') || 'Create New Project'}
+                {t('myProjects.createNew')}
               </Button>
             </Group>
 
-            {/* Filter Tabs */}
-            <Paper radius="lg" p="lg" withBorder>
-              <FilterTabs
-                value={projectStatus}
-                onChange={(v: any) => setProjectStatus(v)}
-                options={[
-                  { value: 'active', label: t('projects.activeProjects') || 'Active projects' },
-                  { value: 'past', label: t('projects.pastProjects') || 'Past projects' }
-                ]}
-              />
-            </Paper>
-
-            {/* Error */}
-            {error && (
-              <Alert icon={<IconAlertCircle size={16} />} color="red" onClose={() => setError(null)} withCloseButton>
-                {error}
+            {/* Project Created Alert */}
+            {showCreatedAlert && (
+              <Alert
+                icon={<IconCheck size={18} />}
+                color="green"
+                variant="light"
+                withCloseButton
+                onClose={() => setShowCreatedAlert(false)}
+                radius="md"
+              >
+                <Text fw={500}>{t('myProjects.projectCreated')}</Text>
+                <Text size="sm" c="dimmed" mt={4}>
+                  {t('myProjects.projectCreatedDesc')}
+                </Text>
               </Alert>
             )}
 
+            {/* Filter Tabs */}
+            <div className="inline-flex w-fit items-center rounded-md bg-gray-100 p-1 gap-0.5">
+              {[
+                { value: 'pending', label: t('myProjects.pendingTab') },
+                { value: 'active', label: t('myProjects.activeTab') },
+                { value: 'past', label: t('myProjects.pastTab') },
+              ].map((tab) => (
+                <button
+                  key={tab.value}
+                  onClick={() => setProjectStatus(tab.value as 'pending' | 'active' | 'past')}
+                  className={`px-3 py-1.5 rounded-sm text-sm font-medium transition-all cursor-pointer whitespace-nowrap ${
+                    projectStatus === tab.value
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
             {/* Content */}
             {isLoading ? (
-              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-                {[1, 2, 3, 4].map((i) => (
+              <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
                   <ProjectCardSkeleton key={i} />
                 ))}
               </SimpleGrid>
             ) : filteredProjects.length > 0 ? (
-              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
+              <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
                 {filteredProjects.map((project) => (
                   <ProjectCard key={project._id} project={project} showEdit onEdit={handleEdit} showStatus />
                 ))}
@@ -149,25 +135,29 @@ export function MyProjectsClient() {
                 <Stack align="center" gap="md">
                   <IconFolder size={64} className="text-gray-300" />
                   <Title order={3} className="font-display">
-                    {projectStatus === 'active'
-                      ? (t('myProjects.noActive') || 'No active projects')
-                      : (t('myProjects.noPast') || 'No past projects')}
+                    {projectStatus === 'pending'
+                      ? t('myProjects.noPending')
+                      : projectStatus === 'active'
+                      ? t('myProjects.noActive')
+                      : t('myProjects.noPast')}
                   </Title>
                   <Text c="dimmed" maw={400}>
-                    {projectStatus === 'active'
-                      ? (t('myProjects.noActiveDesc') || 'You have no active projects at the moment.')
-                      : (t('myProjects.noPastDesc') || 'You have no past projects yet.')}
+                    {projectStatus === 'pending'
+                      ? t('myProjects.noPendingDesc')
+                      : projectStatus === 'active'
+                      ? t('myProjects.noActiveDesc')
+                      : t('myProjects.noPastDesc')}
                   </Text>
-                  {projectStatus === 'active' && (
+                  {(projectStatus === 'active' || projectStatus === 'pending') && (
                     <Button
                       component={Link}
-                      href="/projects/new"
+                      href="/create-project"
                       radius="xl"
                       size="md"
                       color="eco-primary"
                       leftSection={<IconPlus size={18} />}
                     >
-                      {t('myProjects.createFirst') || 'Create Your First Project'}
+                      {t('myProjects.createFirst')}
                     </Button>
                   )}
                 </Stack>

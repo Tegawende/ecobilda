@@ -99,7 +99,7 @@ export function ReviewForm({ receiver, onSubmit, onCancel }: ReviewFormProps) {
             minRows={5}
             maxLength={1000}
             {...form.getInputProps('feedback')}
-            description={`${form.values.feedback.length} / 1000 characters`}
+            description={`${form.values.feedback.length} ${t('reviews.characterCount')}`}
           />
 
           {/* Guidelines */}

@@ -38,7 +38,7 @@ export function DashboardPage() {
     {
       title: t('dashboard.totalUsers'),
       value: stats?.users.total || 0,
-      subtitle: `+${stats?.users.new_this_month || 0} ${t('common.thisMonth')}`,
+      subtitle: `+${stats?.users.newThisMonth || 0} ${t('common.thisMonth')}`,
       icon: Users,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
@@ -58,8 +58,8 @@ export function DashboardPage() {
     },
     {
       title: t('dashboard.conversionRate'),
-      value: `${stats?.participations.conversion_rate || 0}%`,
-      subtitle: t('dashboard.conversionRateDesc'),
+      value: `${stats?.participations.total || 0}`,
+      subtitle: `${stats?.participations.accepted || 0} ${t('dashboard.accepted')}`,
       icon: TrendingUp,
       color: 'text-emerald-600',
       bgColor: 'bg-emerald-100',
@@ -98,7 +98,7 @@ export function DashboardPage() {
     },
     {
       title: t('dashboard.hostsWithProjects'),
-      value: stats?.users.with_projects || 0,
+      value: stats?.users.withProjects || 0,
       icon: UserCheck,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100',
@@ -106,7 +106,7 @@ export function DashboardPage() {
     },
     {
       title: t('dashboard.averageRating'),
-      value: stats?.reviews.average_rating ? stats.reviews.average_rating.toFixed(1) : '-',
+      value: stats?.reviews.averageRating ? stats.reviews.averageRating.toFixed(1) : '-',
       subtitle: `${stats?.reviews.total || 0} ${t('dashboard.totalReviews')}`,
       icon: Star,
       color: 'text-yellow-600',
@@ -236,8 +236,8 @@ export function DashboardPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={(() => {
-                      const usersByDay = stats.activity.users_by_day || [];
-                      const projectsByDay = stats.activity.projects_by_day || [];
+                      const usersByDay = stats.activity.usersByDay || [];
+                      const projectsByDay = stats.activity.projectsByDay || [];
                       const dateMap = new Map<string, { date: string; users: number; projects: number }>();
 
                       usersByDay.forEach((d) => {
@@ -377,12 +377,12 @@ export function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {stats?.top_countries && stats.top_countries.length > 0 ? (
+              {stats?.topCountries && stats.topCountries.length > 0 ? (
                 <div className="space-y-3">
-                  {stats.top_countries.map((country, index) => (
-                    <div key={country.address__country__code || index} className="flex justify-between items-center">
+                  {stats.topCountries.map((country, index) => (
+                    <div key={country.code || index} className="flex justify-between items-center">
                       <span className="text-sm">
-                        {country.address__country__name || t('dashboard.unknown')}
+                        {country.name || t('dashboard.unknown')}
                       </span>
                       <span className="text-sm font-medium bg-gray-100 px-2 py-0.5 rounded">
                         {country.count} {country.count === 1 ? t('dashboard.project') : t('dashboard.projects')}
@@ -404,15 +404,15 @@ export function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {stats?.popular_skills && stats.popular_skills.length > 0 ? (
+              {stats?.popularSkills && stats.popularSkills.length > 0 ? (
                 <div className="space-y-3">
-                  {stats.popular_skills.map((skill) => (
+                  {stats.popularSkills.map((skill) => (
                     <div key={skill.code} className="flex justify-between items-center">
                       <span className="text-sm">
-                        {i18n.language === 'fr' ? skill.display_name_fr : skill.display_name_en}
+                        {i18n.language === 'fr' ? skill.displayNameFr : skill.displayNameEn}
                       </span>
                       <span className="text-sm font-medium bg-gray-100 px-2 py-0.5 rounded">
-                        {skill.project_count} {skill.project_count === 1 ? t('dashboard.project') : t('dashboard.projects')}
+                        {skill.count} {skill.count === 1 ? t('dashboard.project') : t('dashboard.projects')}
                       </span>
                     </div>
                   ))}

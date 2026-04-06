@@ -42,8 +42,8 @@ export function ParticipationRequestModal({
       });
 
       notifications.show({
-        title: t('participations.requestSent') || 'Request sent',
-        message: t('participations.requestSentDesc') || 'Your participation request has been sent to the host.',
+        title: t('participations.requestSent'),
+        message: t('participations.requestSentDesc'),
         color: 'eco-primary',
       });
 
@@ -54,8 +54,8 @@ export function ParticipationRequestModal({
       onSuccess?.();
     } catch {
       notifications.show({
-        title: t('common.error') || 'Error',
-        message: t('participations.requestError') || 'Failed to send request. Please try again.',
+        title: t('common.error'),
+        message: t('participations.requestError'),
         color: 'red',
       });
     } finally {
@@ -67,19 +67,19 @@ export function ParticipationRequestModal({
     <Modal
       opened={opened}
       onClose={onClose}
-      title={t('participations.applyTitle') || 'Apply to participate'}
+      title={t('participations.applyTitle')}
       size="lg"
       radius="lg"
     >
       <Stack gap="md">
         <Text size="sm" c="dimmed">
-          {t('participations.applyDesc') || 'Tell the host why you want to join this project.'}
+          {t('participations.applyDesc')}
         </Text>
         <Text size="sm" fw={600}>{projectTitle}</Text>
 
         <Textarea
-          label={t('participations.motivation') || 'Motivation'}
-          placeholder={t('participations.motivationPlaceholder') || 'Describe your motivation and relevant experience...'}
+          label={t('participations.motivation')}
+          placeholder={t('participations.motivationPlaceholder')}
           value={motivation}
           onChange={(e) => setMotivation(e.target.value)}
           minRows={4}
@@ -90,14 +90,14 @@ export function ParticipationRequestModal({
 
         <Group grow>
           <DateInput
-            label={t('participations.startDate') || 'Proposed start date'}
+            label={t('participations.startDate')}
             value={startDate}
             onChange={setStartDate}
             radius="lg"
             clearable
           />
           <DateInput
-            label={t('participations.endDate') || 'Proposed end date'}
+            label={t('participations.endDate')}
             value={endDate}
             onChange={setEndDate}
             radius="lg"
@@ -107,7 +107,7 @@ export function ParticipationRequestModal({
 
         <Group justify="flex-end" mt="md">
           <Button variant="default" onClick={onClose} radius="xl">
-            {t('common.cancel') || 'Cancel'}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -117,7 +117,7 @@ export function ParticipationRequestModal({
             radius="xl"
             leftSection={<IconSend size={16} />}
           >
-            {t('participations.sendRequest') || 'Send Request'}
+            {t('participations.sendRequest')}
           </Button>
         </Group>
       </Stack>

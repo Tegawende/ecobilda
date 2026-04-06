@@ -198,7 +198,6 @@ CONVEX_SELF_HOSTED_URL=http://127.0.0.1:3210
 CONVEX_SELF_HOSTED_ADMIN_KEY=<generated key>
 NEXT_PUBLIC_MAPBOX_TOKEN=your_mapbox_token
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api  # Legacy, being removed
 ```
 
 ## Deployment

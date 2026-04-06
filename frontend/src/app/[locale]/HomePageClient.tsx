@@ -47,7 +47,7 @@ export function HomePageClient() {
       <div className="relative isolate h-screen w-full overflow-hidden">
         <img
           src="/images/home_cover.jpeg"
-          alt="Eco-construction site"
+          alt={t('home.heroAlt')}
           className="absolute inset-0 -z-10 h-full w-full object-cover object-center"
         />
         <div className="absolute inset-0 -z-10 bg-black/40" />
@@ -172,7 +172,7 @@ export function HomePageClient() {
                   >
                     {item.icon}
                   </ThemeIcon>
-                  <span className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-eco-terracotta text-xs font-bold text-white shadow">
+                  <span className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white shadow" style={{ backgroundColor: 'var(--color-eco-blue)' }}>
                     {item.step}
                   </span>
                 </div>
@@ -202,7 +202,8 @@ export function HomePageClient() {
               <Group mt="sm">
                 <Link
                   href="/register"
-                  className="inline-flex items-center gap-2 rounded-full bg-eco-terracotta px-7 py-3.5 text-base font-bold text-white shadow-md hover:bg-eco-terracotta/90 transform hover:-translate-y-0.5 transition-all duration-300"
+                  className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-base font-bold text-white shadow-md transform hover:-translate-y-0.5 transition-all duration-300"
+                  style={{ backgroundColor: 'var(--color-eco-blue)' }}
                 >
                   <IconUserPlus size={20} />
                   {t('home.forHosts.cta')}
@@ -242,20 +243,6 @@ export function HomePageClient() {
           <Accordion
             variant="separated"
             radius="lg"
-            styles={{
-              item: {
-                border: '1px solid var(--mantine-color-gray-2)',
-                backgroundColor: 'var(--mantine-color-gray-0)',
-              },
-              control: {
-                fontWeight: 600,
-                fontSize: '0.95rem',
-              },
-              panel: {
-                fontSize: '0.9rem',
-                color: 'var(--mantine-color-gray-7)',
-              },
-            }}
           >
             {faqItems.map((item, i) => (
               <Accordion.Item key={i} value={`faq-${i}`}>

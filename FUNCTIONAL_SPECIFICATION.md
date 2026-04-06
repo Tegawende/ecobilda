@@ -2,9 +2,9 @@
 
 > **Document de reference** pour le developpement de la plateforme Ecobilda.
 >
-> **Version** : 2.0
-> **Date** : 22 mars 2026
-> **Statut** : Mise a jour refletant l'etat reel du code
+> **Version** : 3.0
+> **Date** : 5 avril 2026
+> **Statut** : Mise a jour refletant la migration Convex
 
 ---
 
@@ -24,7 +24,7 @@
 12. [Signalements](#12-signalements)
 13. [Support Multi-langue](#13-support-multi-langue)
 14. [Annexes](#14-annexes)
-15. [Differences avec la specification originale](#15-differences-avec-la-specification-originale)
+15. [Differences avec les versions precedentes](#15-differences-avec-les-versions-precedentes)
 
 ---
 
@@ -54,10 +54,11 @@ Ce modele offre une flexibilite similaire a Airbnb.
 
 | Composant | Technologie |
 |-----------|------------|
-| Backend | Django 5.0, Django REST Framework 3.14, PostgreSQL 15, Redis 7, Django Channels 4 (WebSocket), Celery 5 |
-| Frontend | Next.js 16 + React 19 + TypeScript 5, Mantine v7, TanStack Query, next-intl, Tailwind CSS 4, Mapbox GL |
+| Backend | Convex self-hosted (TypeScript, base de donnees reactive temps reel) |
+| Frontend | Next.js 16 + React 19 + TypeScript 5, Mantine v7, next-intl, Tailwind CSS 4, Mapbox GL |
 | Admin Panel | React 18 + TypeScript 5, Vite 5, Radix UI (shadcn/ui), TanStack Query, React Router 6 |
-| Auth | JWT (SimpleJWT) + Google OAuth |
+| Auth | Session tokens (Convex) + Google OAuth |
+| Stockage fichiers | Convex File Storage (_storage) |
 | Langues | EN, FR, ES, DE, NL, PT |
 
 ---
@@ -85,12 +86,12 @@ Ce modele offre une flexibilite similaire a Airbnb.
 **Date de naissance :**
 - Obligatoire a l'inscription (3 selects : jour / mois / annee)
 - Age minimum : 18 ans (validation cote client ET serveur)
-- Champ `date_of_birth` de type `DateField` dans le modele `User`
+- Champ `dateOfBirth` de type string dans le schema Convex
 
 ### 2.3 Validation email [OK]
 
 - **Obligatoire** avant de pouvoir se connecter
-- L'utilisateur recoit un email avec un lien de confirmation contenant un token
+- L'utilisateur recoit un token de verification (`emailVerificationToken`)
 - Tant que l'email n'est pas valide, l'utilisateur ne peut pas acceder a son compte
 - **Pas d'auto-login apres inscription** : l'utilisateur doit d'abord verifier son email
 
@@ -98,14 +99,14 @@ Ce modele offre une flexibilite similaire a Airbnb.
 
 ```
 Inscription -> Email de verification -> Clic sur le lien -> Connexion
--> JWT (access + refresh) stocke en localStorage
--> Intercepteur axios pour refresh automatique sur 401
+-> Session token stocke en localStorage
+-> Session valide 7 jours (table `sessions` avec `expiresAt`)
 ```
 
 ### 2.5 Recuperation de mot de passe [OK]
 
 1. L'utilisateur saisit son email
-2. Un lien de reinitialisation est envoye (avec token)
+2. Un token de reinitialisation est genere (expiration 1 heure)
 3. L'utilisateur definit un nouveau mot de passe
 4. Reponse identique que l'email existe ou non (securite anti-enumeration)
 
@@ -113,9 +114,16 @@ Inscription -> Email de verification -> Clic sur le lien -> Connexion
 
 - Accessible depuis les parametres du compte
 - Requiert l'ancien mot de passe
-- Nouveaux tokens JWT generes apres changement
+- Nouveau hash genere avec PBKDF2
 
-### 2.7 Permissions par type d'utilisateur
+### 2.7 Securite des mots de passe [OK]
+
+- **Algorithme** : PBKDF2 (600 000 iterations, SHA-256) via Web Crypto API
+- **Format** : `pbkdf2$600000$<salt_hex>$<hash_hex>`
+- **Backward compat** : Les anciens hashes SHA-256 (`sha256$<salt>$<hash>`) sont verifies et automatiquement re-hashes en PBKDF2 au prochain login
+- **Implementation** : `convex/auth.ts`
+
+### 2.8 Permissions par type d'utilisateur
 
 | Action | Non connecte | Connecte |
 |--------|--------------|----------|
@@ -146,7 +154,13 @@ Inscription -> Email de verification -> Clic sur le lien -> Connexion
 | Competences | Non | Non |
 | Genre | Non | Non |
 
-**Adresse simplifiee :** Le profil utilisateur utilise ville + pays uniquement (pas d'adresse complete). Le modele `Address` est utilise via une relation OneToOne, mais seuls la ville et le pays sont pertinents pour le profil public.
+**Photo de profil :**
+- Upload via Convex File Storage (`generateUploadUrl` + `updateProfilePicture`)
+- Stockee comme `storageId` (v.id("_storage")) dans le champ `profilePicture`
+- URL externe possible via `profilePictureUrl` (Google OAuth)
+- Resolution automatique : si `profilePicture` existe et pas de `profilePictureUrl`, le backend resout via `ctx.storage.getUrl()`
+
+**Adresse simplifiee :** Le profil utilisateur utilise ville + pays uniquement (pas d'adresse complete). Le modele `addresses` est utilise via une relation, mais seuls la ville et le pays sont pertinents pour le profil public.
 
 ### 3.2 Donnees affichees sur le profil public [OK]
 
@@ -195,7 +209,7 @@ Un projet peut etre lie aux deux types via les competences selectionnees.
 | Titre | Oui | Nom du projet (max 200 caracteres) |
 | Description | Oui | Description detaillee du projet |
 | Type | Oui | Permaculture ou Eco-construction |
-| Langues du projet | Oui | Langues parlees sur le projet (ManyToMany vers Language) |
+| Langues du projet | Oui | Langues parlees sur le projet (via `languageIds`) |
 
 #### Etape 2 - Localisation
 
@@ -207,7 +221,7 @@ Un projet peut etre lie aux deux types via les competences selectionnees.
 | Code postal | Optionnel | Code postal |
 | Coordonnees GPS | Oui | Latitude/Longitude (saisie via carte ou geocodage) |
 
-**Note :** Pas de geocodage automatique PostGIS. Les coordonnees sont stockees dans le modele `Address` avec des champs `DecimalField` (latitude/longitude). La recherche geographique se fait cote frontend via les limites de la carte Mapbox (viewport bounds), pas par rayon.
+**Note :** Les coordonnees sont stockees dans le modele `addresses` avec des champs `latitude`/`longitude` (number). La recherche geographique se fait cote frontend via les limites de la carte Mapbox (viewport bounds), pas par rayon.
 
 #### Etape 3 - Details du travail
 
@@ -235,7 +249,7 @@ Un projet peut etre lie aux deux types via les competences selectionnees.
 
 Mode flexible par mois :
 - Le hote selectionne les mois disponibles (interface grille de mois cliquables)
-- Stockage : modele `Availability` avec une ligne par annee et un boolean par mois
+- Stockage : table `availability` avec une ligne par annee et un boolean par mois
 - Le volontaire propose un range de dates dans sa demande de participation
 
 **Images :**
@@ -247,7 +261,8 @@ Mode flexible par mois :
 | Taille max par image | 5 MB |
 | Image de couverture | Premiere image (order=0) |
 | Reordonnancement | Boutons fleches (haut/bas), pas de drag-and-drop |
-| Stockage | Local (MEDIA_ROOT), pas S3 |
+| Stockage | Convex File Storage (_storage) via `generateUploadUrl` + `saveProjectImage` |
+| Resolution URL | Le backend resout `storageId` -> URL publique via `ctx.storage.getUrl()` |
 
 ### 4.3 Workflow de publication [OK]
 
@@ -314,8 +329,6 @@ Taxonomie fixe, non configurable par les utilisateurs. Donnees de reference avec
 | `hempcrete` | Hempcrete | Beton chanvre |
 | `tadelakt_plaster` | Tadelakt plaster | Tadelakt |
 
-**Difference avec la spec originale :** Les skills ont ete completement revus. Les 8 skills permaculture originaux (Beekeeping, Food Forest, Seed Saving, Natural Farming, Water Management, Animal Husbandry) et eco-construction (Natural Insulation, Green Roofing, Solar Energy, Rainwater Harvesting) ont ete remplaces par des competences plus specifiques et concretes.
-
 ### 4.5 Edition et suppression de projet [OK]
 
 - Le proprietaire peut editer son projet a tout moment
@@ -335,21 +348,17 @@ Taxonomie fixe, non configurable par les utilisateurs. Donnees de reference avec
 | Competences | Multi-select | Parmi les 16 skills |
 | Langue du projet | Multi-select | Langues parlees sur le projet |
 | Pays | Select | Filtrer par pays |
-| Mots-cles | Texte libre | Recherche dans titre + description |
+| Mots-cles | Texte libre | Recherche dans titre (index de recherche Convex `search_title`) |
 | Internet | Toggle | Projets avec internet |
 | Animaux acceptes | Toggle | Projets acceptant les animaux |
 | Familles | Toggle | Projets family-friendly |
 | Non-fumeur | Toggle | Projets strictement non-fumeur |
 
-**[SUPPRIME] Filtre par rayon (km) :** PostGIS a ete retire. Le filtrage geographique se fait via les limites de la carte Mapbox (viewport bounds) cote frontend, pas par recherche de rayon cote backend.
-
-**[PREVU] Filtre par plage de dates :** L'API backend le supporte mais le frontend ne l'implemente pas encore.
-
 ### 5.2 Recherche textuelle [OK]
 
-- Recherche dans : **Titre** + **Description** du projet
+- Recherche dans le **Titre** via l'index de recherche Convex `search_title`
+- Filtrage additionnel par description cote client
 - Recherche insensible a la casse
-- Recherche partielle (contient)
 
 ### 5.3 Tri des resultats
 
@@ -387,6 +396,7 @@ Pas de tri manuel ni algorithmique pour le MVP.
 
 - Icone coeur sur les cards projets et page detail
 - Page "Mes favoris" accessible depuis le menu utilisateur
+- La page favoris charge les projets via `projects.getByIds` a partir des IDs favoris
 
 ---
 
@@ -418,8 +428,6 @@ Page detail projet
 | Message de motivation | Oui | Toujours |
 | Dates souhaitees (debut + fin) | Oui | Seulement si projet flexible |
 
-Pour un projet a **dates fixes**, le volontaire postule pour les dates definies par le hote.
-
 **Verification anti-doublon :** Un volontaire ne peut pas envoyer deux demandes au meme projet tant qu'une demande est en attente ou acceptee.
 
 ### 7.4 Parcours utilisateur - Hote [OK]
@@ -441,7 +449,7 @@ Le hote recoit les demandes dans une section dediee ("Demandes recues").
 | Acceptee | `ACCEPTED` | Hote a accepte - conversation ouverte |
 | Refusee | `REFUSED` | Hote a refuse - pas de conversation |
 | Annulee | `CANCELLED` | Volontaire a annule sa demande |
-| Expiree | `EXPIRED` | Aucune reponse apres 14 jours (automatique via Celery) |
+| Expiree | `EXPIRED` | Aucune reponse apres 14 jours (automatique via cron Convex) |
 
 ### 7.6 Scenarios detailles
 
@@ -463,9 +471,8 @@ Le hote recoit les demandes dans une section dediee ("Demandes recues").
 #### Scenario C : Pas de reponse [OK]
 
 1. La demande reste en `PENDING`
-2. **Rappel email a J+10** (via Celery Beat)
-3. **Expiration automatique a J+14** (via Celery Beat)
-4. Le volontaire peut annuler sa demande a tout moment
+2. **Expiration automatique a J+14** (via cron Convex quotidien)
+3. Le volontaire peut annuler sa demande a tout moment
 
 ### 7.7 Regle fondamentale
 
@@ -484,24 +491,21 @@ Une fois la conversation ouverte (apres acceptation) :
 - Badge nombre de messages non lus
 
 **Vue conversation :**
-- Historique des messages (temps reel via WebSocket)
-- Indicateur de frappe ("X est en train d'ecrire...")
+- Historique des messages (temps reel via Convex reactive queries)
 - Champ de saisie + bouton envoi
 - Menu : Voir profil, Muter/Demuter, Supprimer
-- Fallback HTTP si WebSocket indisponible
 
-**Canaux WebSocket :**
-- `ws://host/ws/chat/?token={jwt}` - Chat temps reel
-- `ws://host/ws/notifications/?token={jwt}` - Notifications temps reel
+**Temps reel :**
+Convex fournit le temps reel nativement via ses reactive queries (`useQuery`). Les messages, conversations et notifications se mettent a jour automatiquement sans WebSocket explicite.
 
 ### 7.9 Anti-spam email (Regle 24h) [OK]
 
 > **Maximum 1 email par conversation toutes les 24 heures**
 
-Logique (implementee dans `messaging/models.py:should_send_email_to`) :
-1. Verifier si l'utilisateur a les notifications email activees (`user.email_notifications`)
-2. Verifier si la conversation n'est pas "muted" (`user1_muted` / `user2_muted`)
-3. Verifier si le dernier email envoye date de plus de 24h (`last_email_sent_to_userX`)
+Logique (implementee dans `convex/messages.ts`) :
+1. Verifier si l'utilisateur a les notifications email activees (`emailNotifications`)
+2. Verifier si la conversation n'est pas "muted" (`user1Muted` / `user2Muted`)
+3. Verifier si le dernier email envoye date de plus de 24h (`lastEmailSentToUser1` / `lastEmailSentToUser2`)
 4. Si toutes les conditions sont remplies, envoyer l'email et mettre a jour le timestamp
 
 **Ne jamais contourner cette logique** - c'est une fonctionnalite centrale anti-spam.
@@ -517,16 +521,14 @@ Logique (implementee dans `messaging/models.py:should_send_email_to`) :
 | Participation acceptee | La demande doit avoir le statut `ACCEPTED` |
 | Activite recente | Les DEUX utilisateurs doivent avoir envoye au moins 1 message dans les 180 derniers jours |
 
-**Regle des 180 jours** (implementee dans `reviews/utils.py`) : Ceci previent les faux avis provenant de conversations inactives. Les deux parties doivent avoir ete actives recemment.
+**Regle des 180 jours** (implementee dans `convex/reviews.ts:checkEligibility`) : Ceci previent les faux avis provenant de conversations inactives. Les deux parties doivent avoir ete actives recemment.
 
 ### 8.2 Delai et expiration
 
 | Parametre | Valeur |
 |-----------|--------|
 | Delai pour laisser une review | 30 jours |
-| Notification review disponible | J+2 apres la fin de la participation |
-| Rappel review | J+7 si pas de review soumise |
-| Publication automatique | Apres expiration du delai de 30 jours (via Celery) |
+| Publication automatique | Apres expiration du delai de 30 jours (via cron Convex) |
 
 ### 8.3 Bidirectionnalite [OK]
 
@@ -548,7 +550,7 @@ Logique (implementee dans `messaging/models.py:should_send_email_to`) :
 
 | Champ | Obligatoire | Description |
 |-------|-------------|-------------|
-| Note globale | Oui | 1.0 a 5.0 (stocke en DecimalField) |
+| Note globale | Oui | 1 a 5 (number) |
 | Commentaire | Oui | Texte libre |
 
 Note : Une seule note globale. Criteres multiples possibles en V2.
@@ -556,7 +558,7 @@ Note : Une seule note globale. Criteres multiples possibles en V2.
 ### 8.6 Reponse aux reviews [OK]
 
 - Le destinataire d'un avis peut y repondre (une seule reponse)
-- Champ `response` + `response_date` sur le modele `Review`
+- Champ `response` + `responseDate` sur le document review
 - La reponse est publique
 
 ### 8.7 Suppression d'un avis [OK]
@@ -567,7 +569,7 @@ Note : Une seule note globale. Criteres multiples possibles en V2.
 ### 8.8 Affichage des reviews [OK]
 
 - Sur le profil de l'utilisateur
-- Note moyenne + nombre de reviews (valeurs cachees sur le modele `User` : `average_rating`, `review_count`)
+- Note moyenne + nombre de reviews (valeurs cachees sur le document user : `averageRating`, `reviewCount`)
 - Liste des dernieres reviews recues
 - Contrainte d'unicite : une seule review par paire writer/receiver
 
@@ -582,34 +584,22 @@ Note : Une seule note globale. Criteres multiples possibles en V2.
 - Conditions : utilisateur connecte + au moins un filtre actif
 
 **Donnees sauvegardees :**
-- Type de projet
-- Localisation (pays)
-- Competences
-- Langues
-- Toggles (internet, animaux, familles, etc.)
-- Mots-cles
+- Filtres (JSON stringify des filtres actifs)
+- Nom optionnel
+
+**Implementation :**
+- Table `savedSearches` dans le schema Convex
+- Functions : `savedSearches.list`, `savedSearches.save`, `savedSearches.remove`
 
 ### 9.2 Limites [OK]
 
 - Maximum **5 recherches** par utilisateur
-- Nom genere automatiquement (ex: "Permaculture - France")
 
-### 9.3 Notifications intelligentes [OK]
+### 9.3 Notifications intelligentes [PREVU V2]
 
-**Declencheur :**
-- Nouveau projet publie (statut ACTIVE apres validation admin)
-- Matching avec une recherche sauvegardee
-
-**Frequence :**
-- Maximum 1 email par **semaine** par recherche
-- Regroupement possible : "3 nouveaux projets correspondent a ta recherche"
-
-**Logique de matching :**
-- Matching strict (booleen)
-- Pas d'IA, pas de scoring
-- Fiable, explicable, previsible
-
-**Verification quotidienne** via Celery Beat.
+Les notifications de nouveaux projets correspondant aux recherches sauvegardees ne sont pas encore implementees. Prevu pour V2 :
+- Verification quotidienne via cron
+- Maximum 1 email par semaine par recherche
 
 ### 9.4 Interface [OK]
 
@@ -617,8 +607,7 @@ Menu utilisateur : "Mes recherches sauvegardees"
 
 Chaque recherche affiche :
 - Resume des filtres
-- Date de derniere notification
-- Actions : Voir les resultats, Supprimer, Desactiver les notifications
+- Actions : Voir les resultats, Supprimer
 
 ---
 
@@ -632,24 +621,21 @@ Chaque recherche affiche :
 | Demande acceptee | Volontaire | Hote accepte |
 | Demande refusee | Volontaire | Hote refuse |
 | Nouveau message | Destinataire | Message recu dans conversation |
-| Review disponible | Les deux | J+2 apres fin participation |
-| Rappel review | Les deux | J+7 si pas de review |
 | Projet valide | Hote | Admin valide le projet |
 | Projet refuse | Hote | Admin refuse (avec motif) |
-| Nouvelle correspondance recherche | Utilisateur | Nouveau projet correspondant a une recherche sauvegardee |
 
 ### 10.2 Canaux de notification
 
 | Canal | Statut |
 |-------|--------|
 | In-app (cloche + badge + compteur non-lu) | [OK] |
-| Email (avec regle anti-spam 24h) | [OK] |
-| Temps reel (WebSocket) | [OK] |
+| Email (avec regle anti-spam 24h) | [SCAFFOLDING] Timestamps geres, envoi reel non implemente |
+| Temps reel (Convex reactive queries) | [OK] |
 | Push mobile | [PREVU V2] |
 
 ### 10.3 Modele de notification
 
-Types definis dans le backend (`NotificationType`) :
+Types definis dans le backend (`convex/notifications.ts`) :
 
 | Code | Description |
 |------|-------------|
@@ -663,28 +649,27 @@ Types definis dans le backend (`NotificationType`) :
 
 | Parametre | Description |
 |-----------|-------------|
-| Desactiver toutes les notifications email | Switch global (`email_notifications`) |
-| Notifications in-app | Switch global (`in_app_notifications`) |
+| Desactiver toutes les notifications email | Switch global (`emailNotifications`) |
+| Notifications in-app | Switch global (`inAppNotifications`) |
 | Muter une conversation | Desactiver les notifs pour une conversation specifique |
 
 ---
 
 ## 11. Panel Administrateur
 
-Application React separee (pas le Django admin) accessible a `http://localhost:5174`.
+Application React separee (Vite + Radix UI + Tailwind CSS) accessible a `http://localhost:5174`.
+Communique avec le backend Convex via `ConvexHttpClient` (memes fonctions que le frontend).
 
 ### 11.1 Authentification admin [OK]
 
-- JWT separee (memes tokens que le backend principal)
-- Requiert `is_staff=True` ou `is_superuser=True`
-- API dediee sous `/api/admin/...`
+- Session token Convex (meme systeme que le frontend)
+- Requiert `isStaff=true` ou `isSuperuser=true`
+- Fonctions dediees sous `convex/admin/`
 
 ### 11.2 Dashboard [OK]
 
-- 8 cartes de statistiques : utilisateurs, projets actifs, taux de conversion, signalements en attente, messages, favoris, hotes, note moyenne
-- Graphique d'activite (courbes Recharts : nouveaux utilisateurs + nouveaux projets par jour)
-- Top pays (distribution des projets)
-- Skills populaires
+- Cartes de statistiques : utilisateurs, projets actifs, participations, reviews, signalements, messages, favoris
+- Top pays et skills populaires
 - Actions rapides (liens vers projets, signalements, utilisateurs)
 
 ### 11.3 Validation des projets [OK]
@@ -709,7 +694,6 @@ Application React separee (pas le Django admin) accessible a `http://localhost:5
 - **Onglet "En attente"** : signalements non traites
   - Actions : Marquer resolu (avec notes admin) ou Rejeter
 - **Onglet "Tous"** : historique complet
-- Badges de severite par raison (rouge : harcelement/securite, jaune : spam/faux, gris : autre)
 - Recherche par nom/email du rapporteur ou details
 - Filtre par raison de signalement
 
@@ -719,7 +703,7 @@ Application React separee (pas le Django admin) accessible a `http://localhost:5
 |----------|-------------|
 | Utilisateurs | Total, nouveaux ce mois, par pays |
 | Projets | Total actifs, en attente, par type |
-| Participations | Total, acceptees, refusees, taux de conversion |
+| Participations | Total, acceptees, refusees |
 | Reviews | Total, note moyenne globale |
 | Messages | Volume d'echanges |
 
@@ -730,13 +714,7 @@ Application React separee (pas le Django admin) accessible a `http://localhost:5
 
 ### 11.8 Systeme de newsletters [PREVU V2]
 
-Le systeme de newsletters et campagnes email interne au panel admin n'est **pas implemente** dans le MVP. Prevu pour une version ulterieure :
-
-- Campagnes email avec segmentation avancee
-- Editeur de contenu structure
-- Templates responsive
-- Previsualisation et tests
-- Planification d'envoi
+Le systeme de newsletters et campagnes email interne au panel admin n'est **pas implemente** dans le MVP.
 
 ---
 
@@ -765,7 +743,6 @@ Le systeme de newsletters et campagnes email interne au panel admin n'est **pas 
 
 ### 12.3 Suivi [OK]
 
-- L'utilisateur peut voir ses signalements soumis
 - L'admin resout ou rejette avec des notes
 - Historique complet accessible dans le panel admin
 
@@ -784,14 +761,12 @@ Le systeme de newsletters et campagnes email interne au panel admin n'est **pas 
 | `nl` | Nederlands | [OK] |
 | `pt` | Portugues | [OK] |
 
-**Difference avec la spec originale :** 6 langues au lieu de 4. Nederlands (NL) et Portugues (PT) ont ete ajoutes.
-
 ### 13.2 Implementation
 
 - **Frontend :** next-intl avec fichiers de traduction par locale (`locales/{code}/translation.json`)
 - **Admin :** Systeme de traduction interne (EN, FR, ES, DE, PT - pas de NL dans l'admin)
-- **Backend :** Traductions des skills dans les fixtures (EN, FR, ES, DE)
-- **Emails :** Envoyes dans la langue de communication de l'utilisateur (`notification_language`)
+- **Backend :** Traductions des skills dans le seed (EN, FR, ES, DE)
+- **Emails :** Envoyes dans la langue de communication de l'utilisateur (`notificationLanguage`)
 
 ### 13.3 Langue de l'utilisateur
 
@@ -803,7 +778,7 @@ Le systeme de newsletters et campagnes email interne au panel admin n'est **pas 
 
 ### 13.4 Langues des projets [OK]
 
-- Chaque projet a une ou plusieurs langues (ManyToMany vers `Language`)
+- Chaque projet a une ou plusieurs langues (via `languageIds`)
 - Permet de filtrer les projets par langue
 - Indique les langues parlees sur place
 
@@ -811,172 +786,177 @@ Le systeme de newsletters et campagnes email interne au panel admin n'est **pas 
 
 ## 14. Annexes
 
-### 14.1 Modele de donnees
+### 14.1 Modele de donnees (Convex schema)
 
 ```
-User
-|-- id, email, first_name, last_name
-|-- date_of_birth, gender
-|-- profile_picture, bio
-|-- address (FK Address -> city, country)
-|-- languages[] (ManyToMany Language)
-|-- skills[] (via related_name)
-|-- average_rating, review_count (cached)
-|-- email_notifications, newsletter, in_app_notifications
-|-- notification_language
-|-- is_profile_visible
-|-- created_at, updated_at, last_login_at
+users
+|-- _id, email, firstName, lastName
+|-- dateOfBirth, gender
+|-- profilePicture (storageId), profilePictureUrl (external URL)
+|-- bio, addressId (-> addresses)
+|-- languageIds[] (-> languages)
+|-- skillIds[] (-> skills)
+|-- averageRating, reviewCount (cached)
+|-- emailNotifications, newsletter, inAppNotifications
+|-- notificationLanguage
+|-- isProfileVisible, isActive, isStaff, isSuperuser
+|-- emailVerified, emailVerificationToken
+|-- legacyPasswordHash, hasPassword
+|-- lastLoginAt, updatedAt, _creationTime
 
-Project
-|-- id, owner (FK User)
-|-- title, description, project_type (PERM/NATB)
-|-- address (FK Address)
-|-- hours_per_day, days_per_week, max_helpers
-|-- accommodation_details, food_details
-|-- internet_provided, family_friendly, pets_allowed, smoking_allowed
-|-- skills[] (ManyToMany Skill)
-|-- languages[] (ManyToMany Language)
-|-- is_active, flagged_count
-|-- availabilities[] (OneToMany Availability)
-|-- images[] (OneToMany ProjectImage)
-|-- created_at, updated_at
+projects
+|-- _id, ownerId (-> users)
+|-- title, description, projectType (PERM/NATB)
+|-- addressId (-> addresses)
+|-- hoursPerDay, daysPerWeek, maxHelpers
+|-- accommodationDetails, foodDetails
+|-- internetProvided, familyFriendly, petsAllowed, smokingAllowed
+|-- skillIds[] (-> skills)
+|-- isActive, flaggedCount
+|-- status (DRAFT/PENDING/ACTIVE/REJECTED)
+|-- rejectionReason, validatedAt, validatedBy
+|-- updatedAt, _creationTime
 
-Availability
-|-- project (FK Project)
+availability
+|-- projectId (-> projects)
 |-- year
-|-- january..december (12 BooleanField)
+|-- january..december (12 booleans)
 
-ProjectImage
-|-- project (FK Project)
-|-- image (ImageField -> projects/%Y/%m/)
+projectImages
+|-- projectId (-> projects)
+|-- storageId (-> _storage)
 |-- order (0 = couverture)
-|-- uploaded_at
 
-ParticipationRequest
-|-- id
-|-- volunteer (FK User)
-|-- project (FK Project)
+participationRequests
+|-- volunteerId (-> users)
+|-- projectId (-> projects)
 |-- message
-|-- requested_start_date, requested_end_date
+|-- requestedStartDate, requestedEndDate
 |-- status (PENDING, ACCEPTED, REFUSED, CANCELLED, EXPIRED)
-|-- created_at, updated_at
+|-- hostMessage
+|-- _creationTime
 
-Conversation
-|-- id
-|-- participation_request (FK ParticipationRequest)
-|-- user1, user2 (FK User)
-|-- last_message_text, last_message_at
-|-- unread_count_user1, unread_count_user2
-|-- last_email_sent_to_user1, last_email_sent_to_user2
-|-- user1_muted, user2_muted
-|-- created_at, updated_at
+conversations
+|-- participationRequestId (-> participationRequests)
+|-- user1Id, user2Id (-> users)
+|-- lastMessageText, lastMessageAt
+|-- unreadCountUser1, unreadCountUser2
+|-- lastEmailSentToUser1, lastEmailSentToUser2
+|-- user1Muted, user2Muted
+|-- _creationTime
 
-Message
-|-- id
-|-- conversation (FK Conversation)
-|-- sender (FK User)
+messages
+|-- conversationId (-> conversations)
+|-- senderId (-> users)
 |-- body
-|-- created_at
+|-- _creationTime
 
-Review
-|-- id
-|-- writer (FK User, related_name=reviews_given)
-|-- receiver (FK User, related_name=reviews_received)
-|-- rating (DecimalField 1.0-5.0)
+reviews
+|-- writerId (-> users)
+|-- receiverId (-> users)
+|-- rating (1-5 number)
 |-- feedback (texte)
 |-- response (texte, optionnel)
-|-- response_date
-|-- is_published
-|-- created_at, updated_at
-|-- unique_together: [writer, receiver]
+|-- responseDate
+|-- isPublished
+|-- _creationTime
+|-- unique: [writerId, receiverId]
 
-Notification
-|-- id
-|-- recipient (FK User)
+notifications
+|-- recipientId (-> users)
 |-- type (REVIEW, MESSAGE, ADMIN, PROJECT, SYSTEM)
 |-- title, message
-|-- link_url
-|-- is_read, read_at
-|-- created_at
+|-- linkUrl
+|-- isRead, readAt
+|-- _creationTime
 
-Report (Signalement)
-|-- id
-|-- reporter (FK User)
-|-- target_type (PROJECT, REVIEW, USER)
-|-- target_id
-|-- reason
-|-- admin_notes, status (PENDING, RESOLVED, REJECTED)
-|-- created_at
+reports
+|-- reporterId (-> users)
+|-- targetType (PROJECT, REVIEW, USER)
+|-- targetId
+|-- reason, details
+|-- status (PENDING, RESOLVED, DISMISSED)
+|-- resolvedBy, resolvedAt, resolutionNotes
+|-- _creationTime
 
-SavedSearch
-|-- id
-|-- user (FK User)
-|-- name (genere automatiquement)
-|-- filters (JSONField)
-|-- notifications_enabled
-|-- last_notified_at
-|-- created_at
+savedSearches
+|-- userId (-> users)
+|-- name
+|-- filters (JSON string)
 
-Favorite
-|-- id
-|-- user (FK User)
-|-- project (FK Project)
-|-- created_at
+contactMessages
+|-- name, email, subject, message
+|-- status (new, read, resolved)
 
-Address
-|-- id
-|-- city, street, street_number, postal_code
-|-- country (FK Country)
-|-- latitude, longitude (DecimalField)
-|-- formatted_address
-|-- created_at, updated_at
+favorites
+|-- userId (-> users)
+|-- projectId (-> projects)
+|-- _creationTime
 
-Country
-|-- code (PK, ISO 3166-1 alpha-2)
+addresses
+|-- city, street, streetNumber, postalCode
+|-- countryId (-> countries)
+|-- latitude, longitude
+|-- formattedAddress
+
+countries
+|-- code (ISO 3166-1 alpha-2)
 |-- name
 
-Language
-|-- code (PK, ISO 639-1)
+languages
+|-- code (ISO 639-1)
 |-- name
 
-Skill
-|-- code (PK)
+skills
+|-- code
 |-- category (PERM/NATB)
-|-- display_name_en, display_name_fr, display_name_es, display_name_de
+|-- displayNameEn, displayNameFr, displayNameEs, displayNameDe
+|-- displayNameNl, displayNamePt
+|-- icon
+
+sessions
+|-- userId (-> users)
+|-- token
+|-- expiresAt (timestamp)
 ```
 
 ### 14.2 Recapitulatif des regles metier critiques
 
 | Regle | Description | Localisation |
 |-------|-------------|-------------|
-| Validation email | Obligatoire avant connexion | `authentication/` |
-| Age minimum 18 ans | Date de naissance requise a l'inscription | `users/models.py` |
-| Profil complet | Requis pour creer un projet (bio, photo, adresse, langues) | `users/models.py:has_complete_profile` |
-| 5 images minimum | Pour soumettre un projet a validation | `projects/views.py` |
-| Validation admin | Projets valides avant publication | `projects/` |
-| Pas de DM libre | Contact uniquement via demande de participation | `participations/` |
-| Conversation apres acceptation | Hote doit accepter pour ouvrir le chat | `participations/` |
-| Anti-doublon participation | Une seule demande active par projet/volontaire | `participations/` |
-| Expiration demande J+14 | Expiration automatique sans reponse | Celery Beat |
-| Rappel demande J+10 | Email de rappel au hote | Celery Beat |
-| Anti-spam email 24h | Max 1 email/conversation/24h | `messaging/models.py:should_send_email_to` |
-| Eligibilite review 180 jours | Les 2 doivent avoir envoye des messages dans les 180 derniers jours | `reviews/utils.py` |
-| Delai review 30 jours | Fenetre limitee pour noter | Celery Beat |
-| Publication review simultanee | Publiees ensemble ou a expiration du delai | Celery Beat |
-| 16 skills fixes | Donnees de reference, pas configurable | `skills/fixtures/initial_skills.json` |
-| Max 5 recherches sauvegardees | Limite par utilisateur | `searches/` |
+| Validation email | Obligatoire avant connexion | `convex/auth.ts` |
+| Age minimum 18 ans | Date de naissance requise a l'inscription | `convex/auth.ts` |
+| Profil complet | Requis pour creer un projet (bio, photo, adresse, langues) | Verification frontend |
+| 5 images minimum | Pour soumettre un projet a validation | Verification frontend |
+| Validation admin | Projets valides avant publication | `convex/admin/projects.ts` |
+| Pas de DM libre | Contact uniquement via demande de participation | `convex/participations.ts` |
+| Conversation apres acceptation | Hote doit accepter pour ouvrir le chat | `convex/participations.ts` |
+| Anti-doublon participation | Une seule demande active par projet/volontaire | `convex/participations.ts` |
+| Expiration demande J+14 | Expiration automatique sans reponse | `convex/crons.ts` |
+| Anti-spam email 24h | Max 1 email/conversation/24h | `convex/messages.ts` |
+| Eligibilite review 180 jours | Les 2 doivent avoir envoye des messages dans les 180 derniers jours | `convex/reviews.ts` |
+| Delai review 30 jours | Fenetre limitee pour noter | `convex/crons.ts` |
+| Publication review simultanee | Publiees ensemble ou a expiration du delai | `convex/crons.ts` |
+| 16 skills fixes | Donnees de reference, pas configurable | `convex/seed.ts` |
+| Max 5 recherches sauvegardees | Limite par utilisateur | `convex/savedSearches.ts` |
+| PBKDF2 password hashing | 600k iterations SHA-256 | `convex/auth.ts` |
 
-### 14.3 Taches Celery planifiees (Celery Beat)
+### 14.3 Taches planifiees (Convex Crons)
 
 | Tache | Frequence | Description |
 |-------|-----------|-------------|
-| Expiration des demandes | Quotidienne | Expire les demandes PENDING de plus de 14 jours |
-| Rappel demande hote | Quotidienne | Email de rappel a J+10 |
-| Publication auto reviews | Quotidienne | Publie les reviews apres 30 jours |
-| Rappel review | Quotidienne | Rappel a J+7 si pas de review soumise |
-| Verification recherches sauvegardees | Quotidienne | Verifie les nouveaux projets correspondant aux recherches |
+| `expireParticipationRequests` | Quotidienne (3h UTC) | Expire les demandes PENDING de plus de 14 jours |
+| `autoPublishReviews` | Quotidienne (4h UTC) | Publie les reviews apres 30 jours |
+| `cleanupSessions` | Quotidienne (5h UTC) | Supprime les sessions expirees |
 
-### 14.4 Pages publiques du frontend [OK]
+**Prevu V2 :**
+- Rappel demande hote J+10
+- Rappel review J+7
+- Verification recherches sauvegardees (matching nouveaux projets)
+
+### 14.4 Pages du frontend [OK]
+
+**Pages publiques :**
 
 | Page | Route | Description |
 |------|-------|-------------|
@@ -986,59 +966,64 @@ Skill
 | Pour les hotes | `/for-hosts` | Avantages pour les hotes |
 | Pour les volontaires | `/for-volunteers` | Avantages pour les volontaires |
 | FAQ | `/faq` | Foire aux questions |
-| Contact | `/contact` | Formulaire de contact |
+| Contact | `/contact` | Formulaire de contact (stocke dans `contactMessages`) |
 | Conditions d'utilisation | `/terms` | Mentions legales |
 | Politique de confidentialite | `/privacy` | Politique RGPD |
-| Page 404 | `/*` | Page non trouvee |
+| Projets | `/projects` | Liste + carte Mapbox |
+| Detail projet | `/projects/[id]` | Page detail avec images, skills, carte |
+| Recherche | `/search` | Recherche avancee |
+
+**Pages authentifiees :**
+
+| Page | Route | Description |
+|------|-------|-------------|
+| Creer un projet | `/create-project` | Formulaire multi-etapes |
+| Mes favoris | `/favorites` | Projets favoris |
+| Messages | `/messages` | Liste des conversations |
+| Conversation | `/messages/[id]` | Chat temps reel |
+| Mes projets | `/my-projects` | Projets du proprietaire |
+| Notifications | `/notifications` | Centre de notifications |
+| Participations | `/participations` | Demandes envoyees/recues |
+| Profil | `/profile` | Visualisation/edition du profil |
+| Parametres | `/settings` | Parametres du compte |
+
+**Pages auth :**
+
+| Page | Route | Description |
+|------|-------|-------------|
+| Connexion | `/login` | Email/password + Google |
+| Inscription | `/register` | Formulaire d'inscription |
+| Mot de passe oublie | `/forgot-password` | Demande de reinitialisation |
+| Reinitialisation | `/reset-password/[uid]/[token]` | Nouveau mot de passe |
+| Verification email | `/verify-email/[token]` | Confirmation email |
 
 ---
 
-## 15. Differences avec la specification originale
+## 15. Differences avec les versions precedentes
 
-Ce document remplace la specification v1.0 du 15 janvier 2026. Voici les differences significatives :
+### v3.0 (5 avril 2026) - Migration Convex
 
-### Ajouts
+| Element | Avant (v2.0 Django) | Maintenant (v3.0 Convex) |
+|---------|---------------------|--------------------------|
+| Backend | Django 5.0 + DRF + PostgreSQL | Convex self-hosted (TypeScript) |
+| Auth | JWT (SimpleJWT) access+refresh | Session tokens (table `sessions`, 7 jours) |
+| Password hashing | SHA-256 simple | PBKDF2 (600k iterations) |
+| Temps reel | Django Channels WebSocket | Convex reactive queries (natif) |
+| Taches planifiees | Celery Beat (5 taches) | Convex crons (3 taches) |
+| File storage | MEDIA_ROOT local | Convex File Storage (_storage) |
+| Data model | snake_case | camelCase |
+| Admin API | Django REST endpoints | Convex admin/ module |
+| TanStack Query | Utilise pour data fetching | Remplace par Convex `useQuery` |
+| Axios | HTTP client | Supprime (Convex client natif) |
 
-| Element | Detail |
-|---------|--------|
-| Date de naissance obligatoire | Requise a l'inscription (3 selects jour/mois/annee, minimum 18 ans). Etait marquee "supprimee" dans la v1. |
-| 2 langues supplementaires | NL (Nederlands) et PT (Portugues) ajoutes. 6 langues au total au lieu de 4. |
-| Panel admin separe | Application React distincte au lieu d'un Django admin. Dashboard, validation projets, gestion users, moderation signalements. |
-| Recherches sauvegardees | Systeme complet : max 5/utilisateur, notifications hebdomadaires, matching strict. |
-| Signalement d'utilisateurs | Possibilite de signaler un utilisateur (en plus des projets et reviews). |
-| Statut DRAFT des projets | Ajout d'un statut brouillon avant soumission. |
-| Expiration automatique J+14 | Demandes de participation expirent automatiquement apres 14 jours sans reponse. |
-| Rappels automatiques | Email de rappel a J+10 pour le hote, J+7 pour les reviews. |
-| WebSocket temps reel | Chat et notifications en temps reel via Django Channels. |
-| Celery Beat | 5 taches planifiees pour l'automatisation (expirations, rappels, publication reviews, matching recherches). |
+### v2.0 (22 mars 2026)
 
-### Suppressions
+Ajouts : NL+PT, panel admin separe, recherches sauvegardees, skills revises, Celery Beat.
+Suppressions : Apple OAuth, PostGIS, filtre par rayon.
 
-| Element | Detail |
-|---------|--------|
-| Apple OAuth | [SUPPRIME] Complexite sans valeur ajoutee pour le MVP. |
-| PostGIS / Geocodage backend | [SUPPRIME] Pas de recherche par rayon. Le filtrage geographique se fait via viewport bounds Mapbox cote frontend. |
-| Filtre par rayon (km) | [SUPPRIME] Consequence de la suppression de PostGIS. |
-| Systeme de newsletters admin | [PREVU V2] Non implemente. Campagnes email, segmentation, editeur de contenu reportes. |
+### v1.0 (15 janvier 2026)
 
-### Modifications
-
-| Element | Avant (v1.0) | Maintenant (v2.0) |
-|---------|-------------|-------------------|
-| Skills Permaculture | Beekeeping, Food Forest, Seed Saving, Natural Farming, Water Management, Animal Husbandry | Grafting, Pruning, Harvesting, Weeding, Propagating, Seeds harvesting |
-| Skills Eco-construction | Natural Insulation, Green Roofing, Solar Energy, Rainwater Harvesting | Strawbale building, Cob building, Lime plaster, Hempcrete, Tadelakt plaster |
-| Garden maintenance | Oui (conserve) | Oui (conserve) |
-| Composting | Oui (conserve) | Oui (conserve) |
-| Carpentry | Oui (conserve) | Oui (conserve) |
-| Stone Masonry -> Masonry | Stone Masonry | Masonry (simplifie) |
-| Earthen Plaster | Oui (conserve) | Oui (conserve) |
-| Natural Building (skill) | Existait comme skill | Remplace par des skills plus specifiques |
-| Localisation | Adresse complete + geocodage automatique | Coordonnees GPS + ville/pays (saisie simplifiee) |
-| Note review | 1 a 5 etoiles (integer) | 1.0 a 5.0 (DecimalField) |
-| Commentaire review | Optionnel | Obligatoire |
-| Expiration demande | Optionnelle | Automatique a J+14 |
-| Texte bouton contact | "Rejoindre / S'inscrire au projet" | "Contacter l'hote" |
-| Stockage images | S3 / presigned URLs (prevu) | Stockage local (MEDIA_ROOT) |
+Version initiale (specification de design).
 
 ---
 
@@ -1047,7 +1032,8 @@ Ce document remplace la specification v1.0 du 15 janvier 2026. Voici les differe
 | Version | Date | Modifications |
 |---------|------|---------------|
 | 1.0 | 15/01/2026 | Version initiale (specification de design) |
-| 2.0 | 22/03/2026 | Mise a jour complete refletant l'etat reel du code. Ajout NL+PT, suppression Apple OAuth et PostGIS, skills revises, admin panel separe, recherches sauvegardees, Celery Beat, WebSocket, signalements etendus. |
+| 2.0 | 22/03/2026 | Mise a jour complete refletant l'etat reel du code Django |
+| 3.0 | 05/04/2026 | Migration Convex : backend, auth, password hashing, storage, admin panel, data model camelCase, suppression Django/Celery/WebSocket |
 
 ---
 

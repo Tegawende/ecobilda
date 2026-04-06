@@ -5,34 +5,39 @@ export interface SavedSearch {
   _id: string;
   name: string;
   filters: Record<string, unknown>;
-  _creationTime: string;
+  _creationTime: number;
 }
 
-// Note: savedSearches table exists in schema but no Convex functions yet
-// These are placeholder implementations using localStorage as fallback
 export const searchesService = {
   async getSavedSearches(): Promise<SavedSearch[]> {
-    // TODO: Implement via Convex query
-    const saved = localStorage.getItem("ecobilda_saved_searches");
-    return saved ? JSON.parse(saved) : [];
+    const token = getSessionToken();
+    if (!token) return [];
+
+    const results = await convexClient.query(api.savedSearches.list, { token });
+    return results.map((r: any) => ({
+      ...r,
+      filters: JSON.parse(r.filters),
+    }));
   },
 
-  async saveSearch(name: string, filters: Record<string, unknown>): Promise<SavedSearch> {
-    const search: SavedSearch = {
-      _id: Date.now().toString(),
+  async saveSearch(name: string, filters: Record<string, unknown>): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+
+    await convexClient.mutation(api.savedSearches.save, {
+      token,
       name,
-      filters,
-      _creationTime: new Date().toISOString(),
-    };
-    const existing = await this.getSavedSearches();
-    existing.push(search);
-    localStorage.setItem("ecobilda_saved_searches", JSON.stringify(existing));
-    return search;
+      filters: JSON.stringify(filters),
+    });
   },
 
-  async deleteSearch(id: number | string): Promise<void> {
-    const existing = await this.getSavedSearches();
-    const filtered = existing.filter((s) => s._id !== String(id));
-    localStorage.setItem("ecobilda_saved_searches", JSON.stringify(filtered));
+  async deleteSearch(id: string): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+
+    await convexClient.mutation(api.savedSearches.remove, {
+      token,
+      id: id as any,
+    });
   },
 };

@@ -72,6 +72,9 @@ export default defineSchema({
     averageRating: v.number(),
     reviewCount: v.number(),
 
+    // Public profile ID (16-digit numeric string, Airbnb-style URL)
+    publicId: v.optional(v.string()),
+
     // Admin
     isStaff: v.boolean(),
     isSuperuser: v.boolean(),
@@ -83,6 +86,7 @@ export default defineSchema({
   })
     .index("by_email", ["email"])
     .index("by_isActive", ["isActive"])
+    .index("by_public_id", ["publicId"])
     .searchIndex("search_name", {
       searchField: "firstName",
       filterFields: ["isActive"],
@@ -164,7 +168,8 @@ export default defineSchema({
 
   projectImages: defineTable({
     projectId: v.id("projects"),
-    storageId: v.id("_storage"), // Convex file storage
+    storageId: v.optional(v.id("_storage")), // Convex file storage (user uploads)
+    url: v.optional(v.string()), // Direct URL (seed/static images)
     order: v.number(), // 0 = cover image
   }).index("by_project", ["projectId"]),
 
@@ -213,12 +218,14 @@ export default defineSchema({
     .index("by_user1", ["user1Id"])
     .index("by_user2", ["user2Id"])
     .index("by_user1_lastMessage", ["user1Id", "lastMessageAt"])
-    .index("by_user2_lastMessage", ["user2Id", "lastMessageAt"]),
+    .index("by_user2_lastMessage", ["user2Id", "lastMessageAt"])
+    .index("by_participation_request", ["participationRequestId"]),
 
   messages: defineTable({
     conversationId: v.id("conversations"),
     senderId: v.id("users"),
     body: v.string(),
+    isSystem: v.optional(v.boolean()),
   }).index("by_conversation", ["conversationId"]),
 
   // ============================================
@@ -293,6 +300,18 @@ export default defineSchema({
     name: v.optional(v.string()),
     filters: v.string(), // JSON stringified filters
   }).index("by_user", ["userId"]),
+
+  // ============================================
+  // Contact Messages
+  // ============================================
+
+  contactMessages: defineTable({
+    name: v.string(),
+    email: v.string(),
+    subject: v.string(),
+    message: v.string(),
+    status: v.optional(v.string()), // "new", "read", "resolved"
+  }),
 
   // ============================================
   // Auth Sessions

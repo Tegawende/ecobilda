@@ -30,7 +30,8 @@
     "users": "Gebruikers",
     "adminPanel": "Beheerderspaneel",
     "settings": "Instellingen",
-    "logout": "Uitloggen"
+    "logout": "Uitloggen",
+    "contacts": "Contactberichten"
   },
   "login": {
     "title": "Ecobilda Admin",
@@ -174,6 +175,8 @@
   "users": {
     "title": "Gebruikersbeheer",
     "subtitle": "Bekijk en beheer platformgebruikers",
+    "usersTab": "Gebruikers",
+    "adminsTab": "Beheerders",
     "searchPlaceholder": "Zoek op naam of e-mail...",
     "user": "Gebruiker",
     "email": "E-mail",
@@ -301,5 +304,26 @@
     "emailUnverified": "E-mail niet geverifieerd",
     "emailUnverifiedDesc": "Het e-mailadres van de gebruiker is als niet-geverifieerd gemarkeerd.",
     "emailUnverifyError": "E-mailverificatie kon niet ongedaan worden gemaakt. Probeer het opnieuw."
+  },
+  "contacts": {
+    "title": "Contactberichten",
+    "subtitle": "Berichten ontvangen via het contactformulier",
+    "tabNew": "Nieuw",
+    "tabAll": "Alle berichten",
+    "statusNew": "Nieuw",
+    "statusRead": "Gelezen",
+    "statusResolved": "Opgelost",
+    "markRead": "Markeren als gelezen",
+    "markResolved": "Markeren als opgelost",
+    "markedAsRead": "Gemarkeerd als gelezen",
+    "markedAsResolved": "Gemarkeerd als opgelost",
+    "reply": "Beantwoorden",
+    "showMore": "Meer tonen",
+    "showLess": "Minder tonen",
+    "noNewMessages": "Geen nieuwe berichten",
+    "noMessages": "Nog geen berichten",
+    "noMatchingMessages": "Geen berichten komen overeen met uw zoekopdracht",
+    "failedToLoad": "Contactberichten konden niet worden geladen",
+    "searchPlaceholder": "Zoeken op naam, e-mail of onderwerp..."
   }
 }

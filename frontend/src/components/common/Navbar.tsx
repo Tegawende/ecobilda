@@ -63,7 +63,7 @@ export function Navbar() {
             className="flex items-center no-underline gap-2 z-50 relative"
           >
             <img
-              src={isTransparent ? "/images/logo-white.png" : "/images/logo-black.png"}
+              src="/images/logo-white.png"
               alt="Ecobilda"
               className="h-14 w-auto object-contain transition-all duration-300"
             />
@@ -75,7 +75,7 @@ export function Navbar() {
               href="/projects"
               className="text-sm font-semibold px-6 py-2.5 rounded-full transition-all hidden sm:block shadow-lg hover:-translate-y-0.5 bg-eco-primary text-white hover:bg-eco-primaryDark shadow-eco-primary/20 border border-transparent"
             >
-              {t('home.hero.browseProjects') || "Browse Projects"}
+              {t('home.hero.browseProjects')}
             </Link>
 
             {isAuthenticated ? (
@@ -134,7 +134,10 @@ export function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="text-sm font-semibold px-6 py-2.5 rounded-full transition-all hidden sm:block shadow-lg hover:-translate-y-0.5 bg-[#55a6cd] text-white hover:bg-[#4a95ba] shadow-[#55a6cd]/20 border border-transparent"
+                  className="text-sm font-semibold px-6 py-2.5 rounded-full transition-all hidden sm:block shadow-lg hover:-translate-y-0.5 text-white border border-transparent"
+                  style={{ backgroundColor: '#677DA3' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#4d6080')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#677DA3')}
                 >
                   {t('common.login')}
                 </Link>
@@ -154,7 +157,7 @@ export function Navbar() {
         <Stack gap="md">
           <Group justify="space-between" mb="lg">
             <Link href="/" onClick={close}>
-              <img src="/images/logo-black.png" alt="Ecobilda" className="h-10 w-auto object-contain" />
+              <img src="/images/logo-white.png" alt="Ecobilda" className="h-10 w-auto object-contain" />
             </Link>
             <Burger opened={opened} onClick={toggle} size="sm" />
           </Group>
@@ -224,12 +227,11 @@ export function Navbar() {
                 component={Link}
                 href="/login"
                 variant="filled"
-                color="eco-primary"
+                color="eco-blue"
                 size="lg"
                 radius="xl"
                 fullWidth
                 onClick={close}
-                className="bg-eco-primary hover:bg-eco-primaryDark"
               >
                 {t('common.login')}
               </Button>

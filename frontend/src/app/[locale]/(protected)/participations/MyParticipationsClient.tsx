@@ -47,12 +47,12 @@ function StatusBadge({ status }: { status: ParticipationRequest['status'] }) {
   const displayStatus = mapStatus(status);
 
   const config: Record<DisplayStatus, { bg: string; text: string; icon: typeof IconClock; label: string }> = {
-    pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', icon: IconClock, label: t('participations.pending') || 'Pending' },
-    accepted: { bg: 'bg-green-100', text: 'text-green-800', icon: IconCircleCheck, label: t('participations.accepted') || 'Accepted' },
-    rejected: { bg: 'bg-red-100', text: 'text-red-800', icon: IconX, label: t('participations.rejected') || 'Rejected' },
-    completed: { bg: 'bg-blue-100', text: 'text-blue-800', icon: IconCircleCheck, label: t('participations.completed') || 'Completed' },
-    cancelled: { bg: 'bg-gray-100', text: 'text-gray-800', icon: IconX, label: t('participations.cancelled') || 'Cancelled' },
-    expired: { bg: 'bg-gray-100', text: 'text-gray-600', icon: IconClock, label: t('participations.expired') || 'Expired' },
+    pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', icon: IconClock, label: t('participations.pending') },
+    accepted: { bg: 'bg-green-100', text: 'text-green-800', icon: IconCircleCheck, label: t('participations.accepted') },
+    rejected: { bg: 'bg-red-100', text: 'text-red-800', icon: IconX, label: t('participations.rejected') },
+    completed: { bg: 'bg-blue-100', text: 'text-blue-800', icon: IconCircleCheck, label: t('participations.completed') },
+    cancelled: { bg: 'bg-gray-100', text: 'text-gray-800', icon: IconX, label: t('participations.cancelled') },
+    expired: { bg: 'bg-gray-100', text: 'text-gray-600', icon: IconClock, label: t('participations.expired') },
   };
 
   const { bg, text, icon: Icon, label } = config[displayStatus];
@@ -99,7 +99,7 @@ function ParticipationCard({ participation }: { participation: ParticipationRequ
 
           {participation.hostResponseMessage && (
             <Paper radius="md" p="sm" bg="gray.0">
-              <Text size="sm" fw={600} c="dimmed">{t('participations.hostResponse') || 'Host response'}:</Text>
+              <Text size="sm" fw={600} c="dimmed">{t('participations.hostResponse')}:</Text>
               <Text size="sm" c="dimmed" mt={4}>{participation.hostResponseMessage}</Text>
             </Paper>
           )}
@@ -107,13 +107,13 @@ function ParticipationCard({ participation }: { participation: ParticipationRequ
 
         <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
           <Text size="xs" c="dimmed">
-            {t('participations.host') || 'Host'}
+            {t('participations.host')}
           </Text>
           <Link
             href={`/projects/${participation.project?._id}`}
             className="inline-flex items-center gap-1 text-xs font-bold text-eco-primary hover:text-eco-primaryDark"
           >
-            {t('participations.viewProject') || 'View Project'}
+            {t('participations.viewProject')}
             <IconArrowRight size={14} />
           </Link>
         </div>
@@ -122,24 +122,6 @@ function ParticipationCard({ participation }: { participation: ParticipationRequ
   );
 }
 
-function FilterTabs({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
-  return (
-    <div className="flex bg-gray-100/80 rounded-xl w-full p-1">
-      {options.map((option) => (
-        <button
-          key={option.value}
-          onClick={() => onChange(option.value)}
-          className={`flex-1 px-4 py-3 rounded-lg text-sm font-bold transition-all cursor-pointer whitespace-nowrap text-center ${value === option.value
-            ? 'bg-white text-eco-primary shadow-sm'
-            : 'text-gray-500 hover:text-gray-700'
-            }`}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 export function MyParticipationsClient() {
   const t = useTranslations();
@@ -162,7 +144,7 @@ export function MyParticipationsClient() {
           setParticipations([]);
         } else {
           logger.error('Failed to fetch participations:', err);
-          setError(t('participations.fetchError') || 'Failed to load participations');
+          setError(t('participations.fetchError'));
         }
       } finally {
         setIsLoading(false);
@@ -172,17 +154,13 @@ export function MyParticipationsClient() {
     fetchParticipations();
   }, [t]);
 
-  const filterOptions = [
-    { value: 'all', label: t('participations.all') || 'All' },
-    { value: 'PENDING', label: t('participations.pending') || 'Pending' },
-    { value: 'ACCEPTED', label: t('participations.accepted') || 'Accepted' },
-    { value: 'REFUSED', label: t('participations.rejected') || 'Rejected' },
-  ];
-
   const filteredParticipations = participations.filter(p => {
     if (filter === 'all') return true;
     return p.status === filter;
   });
+
+  const countByStatus = (status: string) =>
+    status === 'all' ? participations.length : participations.filter(p => p.status === status).length;
 
   return (
     <Layout>
@@ -196,18 +174,35 @@ export function MyParticipationsClient() {
               </ThemeIcon>
               <Stack gap={4}>
                 <Title order={1} className="font-display">
-                  {t('participations.title') || 'My Participations'}
+                  {t('participations.title')}
                 </Title>
                 <Text c="dimmed">
-                  {t('participations.subtitle') || 'Projects you applied to join'}
+                  {t('participations.subtitle')}
                 </Text>
               </Stack>
             </Group>
 
             {/* Filter Tabs */}
-            <Paper radius="lg" p="lg" withBorder>
-              <FilterTabs value={filter} onChange={setFilter} options={filterOptions} />
-            </Paper>
+            <div className="inline-flex w-fit items-center rounded-md bg-gray-100 p-1 gap-0.5">
+              {[
+                { value: 'all', label: t('participations.all') },
+                { value: 'PENDING', label: t('participations.pending') },
+                { value: 'ACCEPTED', label: t('participations.accepted') },
+                { value: 'REFUSED', label: t('participations.rejected') },
+              ].map((tab) => (
+                <button
+                  key={tab.value}
+                  onClick={() => setFilter(tab.value)}
+                  className={`px-3 py-1.5 rounded-sm text-sm font-medium transition-all cursor-pointer whitespace-nowrap ${
+                    filter === tab.value
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
 
             {/* Error */}
             {error && (
@@ -234,10 +229,10 @@ export function MyParticipationsClient() {
                 <Stack align="center" gap="md">
                   <IconCompass size={64} className="text-gray-300" />
                   <Title order={3} className="font-display">
-                    {t('participations.noParticipations') || 'No participations yet'}
+                    {t('participations.noParticipations')}
                   </Title>
                   <Text c="dimmed" maw={400}>
-                    {t('participations.noParticipationsDesc') || 'Start exploring projects and apply to join them!'}
+                    {t('participations.noParticipationsDesc')}
                   </Text>
                   <Button
                     component={Link}
@@ -246,7 +241,7 @@ export function MyParticipationsClient() {
                     size="md"
                     color="eco-primary"
                   >
-                    {t('participations.browseProjects') || 'Browse Projects'}
+                    {t('participations.browseProjects')}
                   </Button>
                 </Stack>
               </Paper>

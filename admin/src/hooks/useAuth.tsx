@@ -1,13 +1,14 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { adminApi, setAuthTokens, clearAuthTokens, getAccessToken } from '@/services/api';
+import { adminApi, clearAuthTokens, getAccessToken } from '@/services/api';
+import { setSessionToken } from '@/lib/convexClient';
 
 interface User {
-  id: number;
+  _id: string;
   email: string;
-  first_name: string;
-  last_name: string;
-  is_staff: boolean;
-  is_superuser: boolean;
+  firstName: string;
+  lastName: string;
+  isStaff: boolean;
+  isSuperuser: boolean;
 }
 
 interface AuthContextType {
@@ -29,10 +30,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const token = getAccessToken();
       if (token) {
         try {
-          const userData = await adminApi.getCurrentUser();
-          const typedUser = userData as User;
-          if (typedUser.is_staff) {
-            setUser(typedUser);
+          const userData = await adminApi.getCurrentUser() as User;
+          if (userData?.isStaff) {
+            setUser(userData);
           } else {
             clearAuthTokens();
           }
@@ -48,13 +48,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const response = await adminApi.login(email, password);
-    const userData = response.user as User;
+    setSessionToken(response.token);
 
-    if (!userData.is_staff) {
+    const userData = await adminApi.getCurrentUser() as User;
+    if (!userData?.isStaff) {
+      clearAuthTokens();
       throw new Error('Access denied. Admin privileges required.');
     }
 
-    setAuthTokens(response.tokens);
     setUser(userData);
   };
 

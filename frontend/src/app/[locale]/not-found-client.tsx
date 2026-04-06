@@ -27,7 +27,7 @@ export function NotFoundClient() {
 
                     {/* Title & Description */}
                     <Title order={1} ta="center" className="text-2xl sm:text-3xl font-display">
-                        {t('errors.notFound.title') || 'Page not found'}
+                        {t('errors.notFound.title')}
                     </Title>
                     <Text c="dimmed" ta="center" size="lg">
                         {t('errors.notFound.description')}

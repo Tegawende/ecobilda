@@ -262,15 +262,15 @@ export function MobileSearchModal({
                 {step === 'location' && (
                     <Stack p="md" gap="md">
                         <Box>
-                            <Title order={2} className="font-display" mb={4}>{t('projects.filters.whereToGo') || 'Ou allez-vous ?'}</Title>
-                            <Text c="dimmed">{t('projects.filters.searchByLocation') || 'Recherchez par ville, region ou pays'}</Text>
+                            <Title order={2} className="font-display" mb={4}>{t('projects.filters.whereToGo')}</Title>
+                            <Text c="dimmed">{t('projects.filters.searchByLocation')}</Text>
                         </Box>
 
                         <TextInput
                             ref={inputRef}
                             value={locationQuery}
                             onChange={(e) => handleLocationSearch(e.currentTarget.value)}
-                            placeholder={t('projects.filters.locationPlaceholder') || 'Ex: Bruxelles, Ardennes...'}
+                            placeholder={t('projects.filters.locationPlaceholder')}
                             size="lg"
                             radius="xl"
                             leftSection={isSearching ? (
@@ -322,8 +322,8 @@ export function MobileSearchModal({
                                     <IconSearch size={18} className="text-eco-primary" />
                                 </Center>
                                 <Box>
-                                    <Text fw={500}>{t('projects.filters.flexible') || 'Je suis flexible'}</Text>
-                                    <Text size="sm" c="dimmed">{t('projects.filters.searchEverywhere') || 'Rechercher partout'}</Text>
+                                    <Text fw={500}>{t('projects.filters.flexible')}</Text>
+                                    <Text size="sm" c="dimmed">{t('projects.filters.searchEverywhere')}</Text>
                                 </Box>
                             </Group>
                         </UnstyledButton>
@@ -334,8 +334,8 @@ export function MobileSearchModal({
                 {step === 'dates' && (
                     <Stack p="md" gap="md">
                         <Box>
-                            <Title order={2} className="font-display" mb={4}>{t('projects.filters.whenToGo') || 'Quand partez-vous ?'}</Title>
-                            <Text c="dimmed">{t('projects.filters.selectDates') || 'Selectionnez vos dates'}</Text>
+                            <Title order={2} className="font-display" mb={4}>{t('projects.filters.whenToGo')}</Title>
+                            <Text c="dimmed">{t('projects.filters.selectDates')}</Text>
                         </Box>
 
                         {/* Calendar */}
@@ -405,7 +405,7 @@ export function MobileSearchModal({
 
                         {/* Skip option */}
                         <UnstyledButton onClick={skipDates} className="w-full py-3 text-gray-600 font-medium hover:text-gray-900 transition-colors" ta="center">
-                            {t('projects.filters.skipDates') || 'Dates flexibles'}
+                            {t('projects.filters.skipDates')}
                         </UnstyledButton>
                     </Stack>
                 )}
@@ -414,8 +414,8 @@ export function MobileSearchModal({
                 {step === 'type' && (
                     <Stack p="md" gap="md">
                         <Box>
-                            <Title order={2} className="font-display" mb={4}>{t('projects.filters.whatType') || 'Quel type de projet ?'}</Title>
-                            <Text c="dimmed">{t('projects.filters.chooseType') || 'Choisissez le type de projet'}</Text>
+                            <Title order={2} className="font-display" mb={4}>{t('projects.filters.whatType')}</Title>
+                            <Text c="dimmed">{t('projects.filters.chooseType')}</Text>
                         </Box>
 
                         <Stack gap="sm">
@@ -434,7 +434,7 @@ export function MobileSearchModal({
                                     </Center>
                                     <Box className="flex-1">
                                         <Text fw={600}>{t('projects.filters.all')}</Text>
-                                        <Text size="sm" c="dimmed">{t('projects.filters.allDescription') || 'Tous les types de projets'}</Text>
+                                        <Text size="sm" c="dimmed">{t('projects.filters.allDescription')}</Text>
                                     </Box>
                                     {tempFilters.projectType === 'all' && (
                                         <IconCheck size={22} className="text-eco-primary" />
@@ -457,7 +457,7 @@ export function MobileSearchModal({
                                     </Center>
                                     <Box className="flex-1">
                                         <Text fw={600}>{t('projects.naturalBuilding')}</Text>
-                                        <Text size="sm" c="dimmed">{t('projects.filters.natbDescription') || 'Construction ecologique'}</Text>
+                                        <Text size="sm" c="dimmed">{t('projects.filters.natbDescription')}</Text>
                                     </Box>
                                     {tempFilters.projectType === 'NATB' && (
                                         <IconCheck size={22} className="text-eco-primary" />
@@ -480,7 +480,7 @@ export function MobileSearchModal({
                                     </Center>
                                     <Box className="flex-1">
                                         <Text fw={600}>{t('projects.permaculture')}</Text>
-                                        <Text size="sm" c="dimmed">{t('projects.filters.permDescription') || 'Jardins et agriculture durable'}</Text>
+                                        <Text size="sm" c="dimmed">{t('projects.filters.permDescription')}</Text>
                                     </Box>
                                     {tempFilters.projectType === 'PERM' && (
                                         <IconCheck size={22} className="text-eco-terracotta" />
@@ -502,7 +502,7 @@ export function MobileSearchModal({
                         onClick={() => setStep('dates')}
                         className="bg-eco-primary hover:bg-eco-primaryDark shadow-lg transition-all"
                     >
-                        {t('common.continue') || 'Continuer'}
+                        {t('common.continue')}
                     </Button>
                 )}
                 {step === 'dates' && (
@@ -513,7 +513,7 @@ export function MobileSearchModal({
                         onClick={confirmDates}
                         className="bg-eco-primary hover:bg-eco-primaryDark shadow-lg transition-all"
                     >
-                        {t('common.continue') || 'Continuer'}
+                        {t('common.continue')}
                     </Button>
                 )}
                 {step === 'type' && (
@@ -525,7 +525,7 @@ export function MobileSearchModal({
                         leftSection={<IconSearch size={20} />}
                         className="bg-eco-primary hover:bg-eco-primaryDark shadow-lg transition-all"
                     >
-                        {t('projects.filters.search') || 'Rechercher'}
+                        {t('projects.filters.search')}
                     </Button>
                 )}
             </Box>

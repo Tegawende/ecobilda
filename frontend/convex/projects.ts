@@ -34,11 +34,17 @@ async function enrichProject(ctx: any, project: any) {
     if (skill) skills.push(skill);
   }
 
-  // Images
-  const images = await ctx.db
+  // Images (resolve storage IDs to URLs, or use direct URL)
+  const rawImages = await ctx.db
     .query("projectImages")
     .withIndex("by_project", (q: any) => q.eq("projectId", project._id))
     .collect();
+  const images = await Promise.all(
+    rawImages.map(async (img: any) => ({
+      ...img,
+      url: img.url ?? (img.storageId ? await ctx.storage.getUrl(img.storageId) : null),
+    }))
+  );
 
   // Availabilities
   const availabilities = await ctx.db
@@ -46,15 +52,21 @@ async function enrichProject(ctx: any, project: any) {
     .withIndex("by_project", (q: any) => q.eq("projectId", project._id))
     .collect();
 
+  // Resolve owner profile picture
+  let ownerProfilePictureUrl = owner?.profilePictureUrl ?? null;
+  if (owner?.profilePicture && !ownerProfilePictureUrl) {
+    ownerProfilePictureUrl = await ctx.storage.getUrl(owner.profilePicture);
+  }
+
   return {
     ...project,
     owner: owner
       ? {
           _id: owner._id,
+          publicId: owner.publicId,
           firstName: owner.firstName,
           lastName: owner.lastName,
-          profilePicture: owner.profilePicture,
-          profilePictureUrl: owner.profilePictureUrl,
+          profilePictureUrl: ownerProfilePictureUrl,
           averageRating: owner.averageRating,
           reviewCount: owner.reviewCount,
         }
@@ -177,6 +189,24 @@ export const getById = query({
     const project = await ctx.db.get(args.id);
     if (!project) return null;
     return await enrichProject(ctx, project);
+  },
+});
+
+// ============================================
+// Get Projects by IDs (for favorites page)
+// ============================================
+
+export const getByIds = query({
+  args: { ids: v.array(v.id("projects")) },
+  handler: async (ctx, args) => {
+    const enriched = [];
+    for (const id of args.ids) {
+      const project = await ctx.db.get(id);
+      if (project && project.isActive) {
+        enriched.push(await enrichProject(ctx, project));
+      }
+    }
+    return enriched;
   },
 });
 
@@ -492,6 +522,56 @@ export const generateUploadUrl = mutation({
     const user = await getUserFromToken(ctx, args.token);
     if (!user) throw new Error("Not authenticated.");
     return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const removeProjectImage = mutation({
+  args: {
+    token: v.string(),
+    imageId: v.id("projectImages"),
+  },
+  handler: async (ctx, args) => {
+    const user = await getUserFromToken(ctx, args.token);
+    if (!user) throw new Error("Not authenticated.");
+
+    const image = await ctx.db.get(args.imageId);
+    if (!image) throw new Error("Image not found.");
+
+    const project = await ctx.db.get(image.projectId);
+    if (!project || project.ownerId !== user._id) {
+      throw new Error("Not authorized.");
+    }
+
+    // Delete from Convex storage if it's an uploaded file
+    if (image.storageId) {
+      await ctx.storage.delete(image.storageId);
+    }
+
+    await ctx.db.delete(args.imageId);
+    return { success: true };
+  },
+});
+
+export const reorderProjectImages = mutation({
+  args: {
+    token: v.string(),
+    projectId: v.id("projects"),
+    imageIds: v.array(v.id("projectImages")),
+  },
+  handler: async (ctx, args) => {
+    const user = await getUserFromToken(ctx, args.token);
+    if (!user) throw new Error("Not authenticated.");
+
+    const project = await ctx.db.get(args.projectId);
+    if (!project || project.ownerId !== user._id) {
+      throw new Error("Not authorized.");
+    }
+
+    // Update order based on position in array
+    for (let i = 0; i < args.imageIds.length; i++) {
+      await ctx.db.patch(args.imageIds[i], { order: i });
+    }
+    return { success: true };
   },
 });
 

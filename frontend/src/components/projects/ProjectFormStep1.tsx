@@ -15,7 +15,7 @@ import {
   Alert,
   List,
 } from '@mantine/core';
-import { IconPlant, IconHammer, IconBulb } from '@tabler/icons-react';
+import { IconLeaf, IconHome, IconBulb } from '@tabler/icons-react';
 import type { ProjectFormData } from '@/app/[locale]/(protected)/create-project/CreateProjectClient';
 
 interface Step1FormData {
@@ -60,10 +60,15 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
   };
 
   return (
-    <form onSubmit={form.onSubmit(handleFormSubmit)}>
+    <form onSubmit={form.onSubmit(handleFormSubmit, () => {
+      setTimeout(() => {
+        const firstError = document.querySelector('[data-error="true"]');
+        firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 50);
+    })}>
       <Stack gap="xl">
         <div>
-          <Title order={2} mb="md">
+          <Title order={2} mb="xs">
             {t('createProject.step1.title')}
           </Title>
           <Text c="dimmed">
@@ -78,44 +83,46 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
         >
           <Group mt="sm" grow>
             <Card
-              padding="md"
+              padding="lg"
               withBorder
               style={{
                 cursor: 'pointer',
                 borderWidth: 2,
-                borderColor: form.values.projectType === 'PERM' ? 'var(--mantine-color-eco-terracotta-5)' : undefined,
-                backgroundColor: form.values.projectType === 'PERM' ? 'var(--mantine-color-eco-terracotta-0)' : undefined,
-              }}
-              onClick={() => form.setFieldValue('projectType', 'PERM')}
-            >
-              <Stack gap="xs" align="center">
-                <IconPlant size={40} color="var(--mantine-color-green-6)" />
-                <Text fw={600}>{t('createProject.step1.permaculture')}</Text>
-                <Text size="sm" c="dimmed" ta="center">
-                  {t('createProject.step1.permacultureDesc')}
-                </Text>
-                <Radio value="PERM" styles={{ root: { display: 'none' } }} />
-              </Stack>
-            </Card>
-
-            <Card
-              padding="md"
-              withBorder
-              style={{
-                cursor: 'pointer',
-                borderWidth: 2,
-                borderColor: form.values.projectType === 'NATB' ? 'var(--mantine-color-eco-terracotta-5)' : undefined,
-                backgroundColor: form.values.projectType === 'NATB' ? 'var(--mantine-color-eco-terracotta-0)' : undefined,
+                borderColor: form.values.projectType === 'NATB' ? '#70A771' : '#e5e7eb',
+                backgroundColor: form.values.projectType === 'NATB' ? '#70A77115' : undefined,
+                transition: 'all 0.15s ease',
               }}
               onClick={() => form.setFieldValue('projectType', 'NATB')}
             >
               <Stack gap="xs" align="center">
-                <IconHammer size={40} color="var(--mantine-color-orange-6)" />
+                <IconHome size={40} style={{ color: '#70A771' }} />
                 <Text fw={600}>{t('createProject.step1.naturalBuilding')}</Text>
                 <Text size="sm" c="dimmed" ta="center">
                   {t('createProject.step1.naturalBuildingDesc')}
                 </Text>
                 <Radio value="NATB" styles={{ root: { display: 'none' } }} />
+              </Stack>
+            </Card>
+
+            <Card
+              padding="lg"
+              withBorder
+              style={{
+                cursor: 'pointer',
+                borderWidth: 2,
+                borderColor: form.values.projectType === 'PERM' ? '#c9696b' : '#e5e7eb',
+                backgroundColor: form.values.projectType === 'PERM' ? '#c9696b15' : undefined,
+                transition: 'all 0.15s ease',
+              }}
+              onClick={() => form.setFieldValue('projectType', 'PERM')}
+            >
+              <Stack gap="xs" align="center">
+                <IconLeaf size={40} style={{ color: '#c9696b' }} />
+                <Text fw={600}>{t('createProject.step1.permaculture')}</Text>
+                <Text size="sm" c="dimmed" ta="center">
+                  {t('createProject.step1.permacultureDesc')}
+                </Text>
+                <Radio value="PERM" styles={{ root: { display: 'none' } }} />
               </Stack>
             </Card>
           </Group>
@@ -126,6 +133,7 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
           label={t('createProject.step1.projectTitle')}
           placeholder={t('createProject.step1.projectTitlePlaceholder')}
           description={t('createProject.step1.projectTitleDescription')}
+          size="md"
           {...form.getInputProps('title')}
         />
 
@@ -133,7 +141,8 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
         <Textarea
           label={t('createProject.step1.projectDescription')}
           placeholder={t('createProject.step1.projectDescriptionPlaceholder')}
-          minRows={8}
+          minRows={12}
+          size="md"
           {...form.getInputProps('description')}
           description={
             <span style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'var(--mantine-spacing-xs)' }}>
@@ -143,11 +152,7 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
               <Text
                 component="span"
                 size="sm"
-                c={
-                  descriptionLength < 50 || descriptionLength > 2000
-                    ? 'red'
-                    : 'dimmed'
-                }
+                c={descriptionLength < 50 || descriptionLength > 2000 ? 'red' : 'dimmed'}
               >
                 {t('createProject.step1.projectDescriptionCounter', { count: descriptionLength })}
               </Text>
@@ -156,7 +161,7 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
         />
 
         {/* Tips */}
-        <Alert color="eco-terracotta" title={t('createProject.step1.tipsTitle')} icon={<IconBulb />}>
+        <Alert color="blue" variant="light" title={t('createProject.step1.tipsTitle')} icon={<IconBulb size={18} />} styles={{ body: { flex: 1 } }}>
           <List size="sm">
             <List.Item>{t('createProject.step1.tip1')}</List.Item>
             <List.Item>{t('createProject.step1.tip2')}</List.Item>
@@ -166,8 +171,8 @@ export function ProjectFormStep1({ data, onUpdate, onNext }: ProjectFormStep1Pro
         </Alert>
 
         {/* Navigation */}
-        <Group justify="flex-end" pt="md" style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}>
-          <Button type="submit" color="eco-terracotta">
+        <Group justify="flex-end" pt="md" className="border-t border-gray-200">
+          <Button type="submit" color="eco-blue">
             {t('createProject.step1.next')}
           </Button>
         </Group>

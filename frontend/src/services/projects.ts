@@ -114,6 +114,25 @@ export const projectsService = {
     return await convexClient.query(api.projects.getMapData);
   },
 
+  async saveAvailability(
+    projectId: string,
+    year: number,
+    months: {
+      january: boolean; february: boolean; march: boolean; april: boolean;
+      may: boolean; june: boolean; july: boolean; august: boolean;
+      september: boolean; october: boolean; november: boolean; december: boolean;
+    }
+  ): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.projects.setAvailabilities, {
+      token,
+      projectId: projectId as any,
+      year,
+      months,
+    });
+  },
+
   async uploadImage(projectId: number | string, file: File, isCover = false): Promise<void> {
     const token = getSessionToken();
     if (!token) throw new Error("Not authenticated");

@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -54,40 +55,66 @@ import {
 } from 'lucide-react';
 
 interface User {
-  id: number;
+  _id: string;
   email: string;
-  first_name: string;
-  last_name: string;
-  full_name: string;
-  profile_picture: string | null;
-  is_active: boolean;
-  is_staff: boolean;
-  email_verified: boolean;
-  average_rating: number;
-  review_count: number;
-  created_at: string;
-  last_login_at: string | null;
+  firstName: string;
+  lastName: string;
+  profilePictureUrl: string | null;
+  isActive: boolean;
+  isStaff: boolean;
+  emailVerified: boolean;
+  averageRating: number;
+  reviewCount: number;
+  _creationTime: number;
+  lastLoginAt?: number | null;
 }
 
-interface UsersResponse {
+interface PaginatedUsers {
   count: number;
   page: number;
-  page_size: number;
-  total_pages: number;
+  pageSize: number;
+  totalPages: number;
   results: User[];
 }
 
-type SortField = 'created_at' | 'last_login_at' | 'average_rating' | 'full_name';
+interface UsersData {
+  admins: PaginatedUsers;
+  users: PaginatedUsers;
+}
+
+type SortField = '_creationTime' | 'lastLoginAt' | 'averageRating' | 'name';
 type SortOrder = 'asc' | 'desc';
+
+function sortUsers(users: User[], sortField: SortField, sortOrder: SortOrder): User[] {
+  return [...users].sort((a, b) => {
+    let cmp = 0;
+    if (sortField === 'name') {
+      cmp = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+    } else if (sortField === 'averageRating') {
+      cmp = (a.averageRating ?? 0) - (b.averageRating ?? 0);
+    } else {
+      cmp = ((a as any)[sortField] ?? 0) - ((b as any)[sortField] ?? 0);
+    }
+    return sortOrder === 'desc' ? -cmp : cmp;
+  });
+}
+
+function paginateUsers(users: User[], page: number, pageSize: number): PaginatedUsers {
+  const total = users.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const start = (page - 1) * pageSize;
+  return { count: total, page, pageSize, totalPages, results: users.slice(start, start + pageSize) };
+}
 
 export function UsersPage() {
   const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState<'users' | 'admins'>('users');
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
   const [verifiedFilter, setVerifiedFilter] = useState<boolean | null>(null);
-  const [sortField, setSortField] = useState<SortField>('created_at');
+  const [sortField, setSortField] = useState<SortField>('_creationTime');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -96,22 +123,24 @@ export function UsersPage() {
   const queryClient = useQueryClient();
 
   // Fetch users
-  const { data, isLoading, error } = useQuery<UsersResponse>({
-    queryKey: ['admin-users', search, page, pageSize, verifiedFilter, sortField, sortOrder],
+  const { data: allData, isLoading, error } = useQuery<UsersData>({
+    queryKey: ['admin-users', search, page, pageSize, verifiedFilter, sortField, sortOrder, activeTab],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      if (search) params.append('search', search);
-      if (verifiedFilter !== null) params.append('email_verified', String(verifiedFilter));
-      params.append('page', String(page));
-      params.append('page_size', String(pageSize));
-      params.append('ordering', sortOrder === 'desc' ? `-${sortField}` : sortField);
-      return adminApi.get<UsersResponse>(`/admin/users/?${params.toString()}`);
+      const allUsers = await adminApi.getUsers(search || undefined, verifiedFilter ?? undefined) as User[];
+      const adminUsers = sortUsers(allUsers.filter(u => u.isStaff), sortField, sortOrder);
+      const normalUsers = sortUsers(allUsers.filter(u => !u.isStaff), sortField, sortOrder);
+      return {
+        admins: paginateUsers(adminUsers, activeTab === 'admins' ? page : 1, pageSize),
+        users: paginateUsers(normalUsers, activeTab === 'users' ? page : 1, pageSize),
+      };
     },
   });
 
+  const data = allData ? allData[activeTab] : undefined;
+
   // Delete user mutation
   const deleteMutation = useMutation({
-    mutationFn: (userId: number) => adminApi.deleteUser(userId),
+    mutationFn: (userId: string) => adminApi.deleteUser(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       setUserToDelete(null);
@@ -123,8 +152,8 @@ export function UsersPage() {
       });
     },
     onError: (error: unknown) => {
-      const err = error as { response?: { data?: { error?: string } } };
-      setDeleteError(err.response?.data?.error || t('users.failedToDelete'));
+      const err = error as Error;
+      setDeleteError(err.message || t('users.failedToDelete'));
       toast({
         title: t('toast.error'),
         description: t('toast.userDeleteError'),
@@ -135,7 +164,7 @@ export function UsersPage() {
 
   // Verify email mutation (one-way: only verify, no unverify)
   const verifyEmailMutation = useMutation({
-    mutationFn: async (userId: number) => {
+    mutationFn: async (userId: string) => {
       await adminApi.verifyUserEmail(userId);
     },
     onSuccess: () => {
@@ -157,21 +186,21 @@ export function UsersPage() {
 
   // Block user mutation (with confirmation dialog)
   const blockMutation = useMutation({
-    mutationFn: (userId: number) => adminApi.blockUser(userId),
+    mutationFn: (userId: string) => adminApi.blockUser(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       setUserToBlock(null);
       setBlockError(null);
     },
     onError: (error: unknown) => {
-      const err = error as { response?: { data?: { error?: string } } };
-      setBlockError(err.response?.data?.error || t('users.failedToBlock'));
+      const err = error as Error;
+      setBlockError(err.message || t('users.failedToBlock'));
     },
   });
 
   // Unblock user mutation (no confirmation needed)
   const unblockMutation = useMutation({
-    mutationFn: (userId: number) => adminApi.unblockUser(userId),
+    mutationFn: (userId: string) => adminApi.unblockUser(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
     },
@@ -179,7 +208,7 @@ export function UsersPage() {
 
   const handleBlockUser = useCallback(() => {
     if (userToBlock) {
-      blockMutation.mutate(userToBlock.id);
+      blockMutation.mutate(userToBlock._id);
     }
   }, [userToBlock, blockMutation]);
 
@@ -191,7 +220,7 @@ export function UsersPage() {
 
   const handleDeleteUser = useCallback(() => {
     if (userToDelete) {
-      deleteMutation.mutate(userToDelete.id);
+      deleteMutation.mutate(userToDelete._id);
     }
   }, [userToDelete, deleteMutation]);
 
@@ -216,9 +245,9 @@ export function UsersPage() {
       : <ArrowDown className="w-4 h-4 ml-1" />;
   }, [sortField, sortOrder]);
 
-  const formatDate = useCallback((dateString: string | null) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('fr-FR', {
+  const formatDate = useCallback((dateValue: string | number | null | undefined) => {
+    if (!dateValue) return '-';
+    return new Date(dateValue).toLocaleDateString('fr-FR', {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
@@ -250,8 +279,8 @@ export function UsersPage() {
   };
 
   // Calculate pagination info
-  const startItem = data ? (data.page - 1) * data.page_size + 1 : 0;
-  const endItem = data ? Math.min(data.page * data.page_size, data.count) : 0;
+  const startItem = data ? (data.page - 1) * data.pageSize + 1 : 0;
+  const endItem = data ? Math.min(data.page * data.pageSize, data.count) : 0;
 
   return (
     <div className="space-y-6">
@@ -314,6 +343,26 @@ export function UsersPage() {
         </div>
       </div>
 
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as 'users' | 'admins'); setPage(1); }}>
+        <TabsList>
+          <TabsTrigger value="users" className="flex items-center gap-2">
+            <Users className="w-4 h-4" />
+            {t('users.usersTab')}
+            {allData && (
+              <Badge variant="secondary" className="ml-1">{allData.users.count}</Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="admins" className="flex items-center gap-2">
+            <Crown className="w-4 h-4" />
+            {t('users.adminsTab')}
+            {allData && (
+              <Badge variant="secondary" className="ml-1">{allData.admins.count}</Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+
       {/* Users Table */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
@@ -364,38 +413,38 @@ export function UsersPage() {
                   <TableHead className="w-[250px]">
                     <button
                       className="flex items-center hover:text-foreground transition-colors"
-                      onClick={() => handleSort('full_name')}
+                      onClick={() => handleSort('name')}
                     >
                       {t('users.user')}
-                      {getSortIcon('full_name')}
+                      {getSortIcon('name')}
                     </button>
                   </TableHead>
                   <TableHead>{t('users.email')}</TableHead>
                   <TableHead className="text-center">
                     <button
                       className="flex items-center justify-center w-full hover:text-foreground transition-colors"
-                      onClick={() => handleSort('average_rating')}
+                      onClick={() => handleSort('averageRating')}
                     >
                       {t('users.rating')}
-                      {getSortIcon('average_rating')}
+                      {getSortIcon('averageRating')}
                     </button>
                   </TableHead>
                   <TableHead>
                     <button
                       className="flex items-center hover:text-foreground transition-colors"
-                      onClick={() => handleSort('created_at')}
+                      onClick={() => handleSort('_creationTime')}
                     >
                       {t('users.joined')}
-                      {getSortIcon('created_at')}
+                      {getSortIcon('_creationTime')}
                     </button>
                   </TableHead>
                   <TableHead>
                     <button
                       className="flex items-center hover:text-foreground transition-colors"
-                      onClick={() => handleSort('last_login_at')}
+                      onClick={() => handleSort('lastLoginAt')}
                     >
                       {t('users.lastLogin')}
-                      {getSortIcon('last_login_at')}
+                      {getSortIcon('lastLoginAt')}
                     </button>
                   </TableHead>
                   <TableHead className="text-center">{t('users.status')}</TableHead>
@@ -404,14 +453,14 @@ export function UsersPage() {
               </TableHeader>
               <TableBody>
                 {data?.results.map((user) => (
-                  <TableRow key={user.id}>
+                  <TableRow key={user._id}>
                     {/* User */}
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        {user.profile_picture ? (
+                        {user.profilePictureUrl ? (
                           <img
-                            src={user.profile_picture}
-                            alt={user.full_name}
+                            src={user.profilePictureUrl}
+                            alt={`${user.firstName} ${user.lastName}`}
                             className="w-8 h-8 rounded-full object-cover"
                           />
                         ) : (
@@ -422,12 +471,12 @@ export function UsersPage() {
                         <div>
                           <div className="flex items-center gap-1.5">
                             <Link
-                              to={`/users/${user.id}`}
+                              to={`/users/${user._id}`}
                               className="font-medium hover:text-primary hover:underline transition-colors"
                             >
-                              {user.full_name}
+                              {`${user.firstName} ${user.lastName}`}
                             </Link>
-                            {user.is_staff && (
+                            {user.isStaff && (
                               <Crown className="w-4 h-4 text-yellow-500" aria-label={t('users.staff')} />
                             )}
                           </div>
@@ -442,29 +491,29 @@ export function UsersPage() {
 
                     {/* Rating */}
                     <TableCell>
-                      <RatingDisplay rating={user.average_rating} reviewCount={user.review_count} />
+                      <RatingDisplay rating={user.averageRating} reviewCount={user.reviewCount} />
                     </TableCell>
 
                     {/* Joined */}
                     <TableCell className="text-muted-foreground text-sm">
-                      {formatDate(user.created_at)}
+                      {formatDate(user._creationTime)}
                     </TableCell>
 
                     {/* Last Login */}
                     <TableCell className="text-muted-foreground text-sm">
-                      {formatDate(user.last_login_at)}
+                      {formatDate(user.lastLoginAt)}
                     </TableCell>
 
                     {/* Status */}
                     <TableCell className="text-center">
                       <div className="flex flex-col items-center gap-1">
-                        {!user.is_active && (
+                        {!user.isActive && (
                           <Badge variant="destructive" className="bg-red-600">
                             <ShieldBan className="w-3 h-3 mr-1" />
                             {t('users.blocked')}
                           </Badge>
                         )}
-                        {user.email_verified ? (
+                        {user.emailVerified ? (
                           <Badge variant="default" className="bg-green-500">
                             <MailCheck className="w-3 h-3 mr-1" />
                             {t('users.verified')}
@@ -489,16 +538,16 @@ export function UsersPage() {
                           title={t('userDetail.title')}
                           className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                         >
-                          <Link to={`/users/${user.id}`}>
+                          <Link to={`/users/${user._id}`}>
                             <Eye className="w-4 h-4" />
                           </Link>
                         </Button>
                         {/* Verify email (only shown for unverified users) */}
-                        {!user.email_verified && (
+                        {!user.emailVerified && (
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => verifyEmailMutation.mutate(user.id)}
+                            onClick={() => verifyEmailMutation.mutate(user._id)}
                             disabled={verifyEmailMutation.isPending}
                             title={t('users.clickToVerify')}
                             className="text-green-600 hover:text-green-700 hover:bg-green-50"
@@ -507,8 +556,8 @@ export function UsersPage() {
                           </Button>
                         )}
                         {/* Block / Unblock toggle */}
-                        {user.email.toLowerCase() !== 'aurelien_lef@hotmail.fr' && !user.is_staff && (
-                          user.is_active ? (
+                        {user.email.toLowerCase() !== 'aurelien_lef@hotmail.fr' && !user.isStaff && (
+                          user.isActive ? (
                             <Button
                               variant="ghost"
                               size="sm"
@@ -525,7 +574,7 @@ export function UsersPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => unblockMutation.mutate(user.id)}
+                              onClick={() => unblockMutation.mutate(user._id)}
                               disabled={unblockMutation.isPending}
                               title={t('users.clickToUnblock')}
                               className="text-green-600 hover:text-green-700 hover:bg-green-50"
@@ -589,14 +638,14 @@ export function UsersPage() {
 
                 {/* Page numbers */}
                 <div className="flex items-center gap-1 mx-2">
-                  {Array.from({ length: Math.min(5, data.total_pages) }, (_, i) => {
+                  {Array.from({ length: Math.min(5, data.totalPages) }, (_, i) => {
                     let pageNum: number;
-                    if (data.total_pages <= 5) {
+                    if (data.totalPages <= 5) {
                       pageNum = i + 1;
                     } else if (page <= 3) {
                       pageNum = i + 1;
-                    } else if (page >= data.total_pages - 2) {
-                      pageNum = data.total_pages - 4 + i;
+                    } else if (page >= data.totalPages - 2) {
+                      pageNum = data.totalPages - 4 + i;
                     } else {
                       pageNum = page - 2 + i;
                     }
@@ -620,8 +669,8 @@ export function UsersPage() {
                   variant="outline"
                   size="icon"
                   className="h-8 w-8"
-                  onClick={() => setPage((p) => Math.min(data.total_pages, p + 1))}
-                  disabled={page >= data.total_pages}
+                  onClick={() => setPage((p) => Math.min(data.totalPages, p + 1))}
+                  disabled={page >= data.totalPages}
                   title={t('common.next')}
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -631,8 +680,8 @@ export function UsersPage() {
                   variant="outline"
                   size="icon"
                   className="h-8 w-8"
-                  onClick={() => setPage(data.total_pages)}
-                  disabled={page >= data.total_pages}
+                  onClick={() => setPage(data.totalPages)}
+                  disabled={page >= data.totalPages}
                   title={t('users.lastPage')}
                 >
                   <ChevronsRight className="w-4 h-4" />
@@ -654,7 +703,7 @@ export function UsersPage() {
           </DialogHeader>
           <div className="py-4">
             <p className="mb-4">
-              {t('users.deleteConfirmation')} <strong>{userToDelete?.full_name}</strong>?
+              {t('users.deleteConfirmation')} <strong>{userToDelete?.firstName} {userToDelete?.lastName}</strong>?
             </p>
             <p className="text-sm text-muted-foreground mb-2">{t('users.deleteWarning')}</p>
             <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
@@ -712,7 +761,7 @@ export function UsersPage() {
           </DialogHeader>
           <div className="py-4">
             <p className="mb-4">
-              {t('users.blockConfirmation')} <strong>{userToBlock?.full_name}</strong>?
+              {t('users.blockConfirmation')} <strong>{userToBlock?.firstName} {userToBlock?.lastName}</strong>?
             </p>
             <p className="text-sm text-muted-foreground">
               {t('users.blockWarning')}

@@ -1,6 +1,7 @@
 'use client';
 
 import { Link } from '@/i18n/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 import { Box, Group, Avatar, Text, Badge } from '@mantine/core';
 import { IconVolume3, IconMapPin } from '@tabler/icons-react';
 import type { Conversation, User } from '@/types';
@@ -12,6 +13,8 @@ interface ConversationCardProps {
 }
 
 export function ConversationCard({ conversation, currentUserId, onClick }: ConversationCardProps) {
+  const t = useTranslations();
+  const locale = useLocale();
   // Determine the other user (recipient)
   const otherUser = conversation.otherUser;
 
@@ -29,16 +32,16 @@ export function ConversationCard({ conversation, currentUserId, onClick }: Conve
 
     // Less than 1 day - show time
     if (diff < 24 * 60 * 60 * 1000) {
-      return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
     }
 
     // Less than 7 days - show day
     if (diff < 7 * 24 * 60 * 60 * 1000) {
-      return date.toLocaleDateString('en-US', { weekday: 'short' });
+      return date.toLocaleDateString(locale, { weekday: 'short' });
     }
 
     // Older - show date
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return date.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
   };
 
   const commonStyle = {
@@ -89,7 +92,7 @@ export function ConversationCard({ conversation, currentUserId, onClick }: Conve
               lineClamp={1}
               style={{ flex: 1 }}
             >
-              {conversation.lastMessageText || 'No messages yet'}
+              {conversation.lastMessageText || t('messaging.noMessagesYet')}
             </Text>
           </Group>
         </Box>

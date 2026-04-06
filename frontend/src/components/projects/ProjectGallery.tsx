@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Box,
   Image,
@@ -23,6 +24,7 @@ interface ProjectGalleryProps {
 }
 
 export function ProjectGallery({ images, title }: ProjectGalleryProps) {
+  const t = useTranslations();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -38,7 +40,7 @@ export function ProjectGallery({ images, title }: ProjectGalleryProps) {
       <Center h={384} bg="gray.2" style={{ borderRadius: 8 }}>
         <Stack align="center" gap="xs">
           <IconPhoto size={64} color="gray" />
-          <Text c="dimmed">No images available</Text>
+          <Text c="dimmed">{t('projects.noImages')}</Text>
         </Stack>
       </Center>
     );
@@ -114,7 +116,7 @@ export function ProjectGallery({ images, title }: ProjectGalleryProps) {
                 bg="rgba(0,0,0,0.6)"
               >
                 <Text c="white" fw={600} size="xl">
-                  +{sortedImages.length - 5} more
+                  {t('projects.moreImages', { count: sortedImages.length - 5 })}
                 </Text>
               </Center>
             )}

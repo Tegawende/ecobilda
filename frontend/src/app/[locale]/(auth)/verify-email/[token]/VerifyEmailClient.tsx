@@ -23,7 +23,7 @@ export function VerifyEmailClient({ token }: { token: string }) {
       verifyEmail(token);
     } else {
       setStatus('error');
-      setMessage(t('auth.verification.noToken') || 'Missing verification token.');
+      setMessage(t('auth.verification.noToken'));
     }
   }, [token, t]);
 
@@ -69,8 +69,8 @@ export function VerifyEmailClient({ token }: { token: string }) {
         {/* Status Icon */}
         <div className="flex justify-center mb-6">
           {status === 'loading' && (
-            <div className="w-16 h-16 rounded-full bg-eco-primary/10 flex items-center justify-center">
-              <IconLoader2 size={32} className="text-eco-primary animate-spin" strokeWidth={1.5} />
+            <div className="w-16 h-16 rounded-full bg-eco-blue/10 flex items-center justify-center">
+              <IconLoader2 size={32} className="text-eco-blue animate-spin" strokeWidth={1.5} />
             </div>
           )}
           {status === 'success' && (
@@ -97,11 +97,11 @@ export function VerifyEmailClient({ token }: { token: string }) {
 
         {/* Title */}
         <h1 className="text-2xl font-display font-bold text-gray-900 mb-2">
-          {status === 'loading' && (t('auth.verification.verifying') || 'Verifying...')}
-          {status === 'success' && (t('auth.verification.successTitle') || 'Email verified!')}
-          {status === 'already_verified' && (t('auth.verification.alreadyVerifiedTitle') || 'Already verified')}
-          {status === 'error' && (t('auth.verification.errorTitle') || 'Verification error')}
-          {status === 'expired' && (t('auth.verification.expiredTitle') || 'Link expired')}
+          {status === 'loading' && t('auth.verification.verifying')}
+          {status === 'success' && t('auth.verification.successTitle')}
+          {status === 'already_verified' && t('auth.verification.alreadyVerifiedTitle')}
+          {status === 'error' && t('auth.verification.errorTitle')}
+          {status === 'expired' && t('auth.verification.expiredTitle')}
         </h1>
 
         {/* Message */}
@@ -113,9 +113,9 @@ export function VerifyEmailClient({ token }: { token: string }) {
         {(status === 'success' || status === 'already_verified' || status === 'error') && (
           <Link
             href="/login"
-            className="inline-flex items-center justify-center w-full px-6 py-3 rounded-full bg-eco-primary text-white font-semibold hover:bg-eco-primaryDark transition-all shadow-lg hover:-translate-y-0.5"
+            className="inline-flex items-center justify-center w-full px-6 py-3 rounded-full bg-eco-blue text-white font-semibold hover:bg-eco-blueDark transition-all shadow-lg hover:-translate-y-0.5"
           >
-            {t('auth.verification.goToLogin') || 'Log in'}
+            {t('auth.verification.goToLogin')}
           </Link>
         )}
 
@@ -123,20 +123,20 @@ export function VerifyEmailClient({ token }: { token: string }) {
           <button
             onClick={handleResendEmail}
             disabled={resendLoading}
-            className="inline-flex items-center justify-center w-full gap-2 px-6 py-3 rounded-full bg-eco-primary text-white font-semibold hover:bg-eco-primaryDark transition-all shadow-lg hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center w-full gap-2 px-6 py-3 rounded-full bg-eco-blue text-white font-semibold hover:bg-eco-blueDark transition-all shadow-lg hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {resendLoading ? (
               <IconLoader2 size={18} className="animate-spin" />
             ) : (
               <IconMail size={18} />
             )}
-            {t('auth.verification.resendEmail') || 'Resend email'}
+            {t('auth.verification.resendEmail')}
           </button>
         )}
 
         {resendSuccess && (
           <p className="text-green-600 font-medium">
-            {t('auth.verification.emailSent') || 'A new verification email has been sent!'}
+            {t('auth.verification.emailSent')}
           </p>
         )}
       </div>

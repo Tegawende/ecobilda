@@ -42,15 +42,20 @@ export const listForUser = query({
       const isMuted =
         conv.user1Id === user._id ? conv.user1Muted : conv.user2Muted;
 
+      let otherUserPictureUrl = otherUser?.profilePictureUrl ?? null;
+      if (otherUser?.profilePicture && !otherUserPictureUrl) {
+        otherUserPictureUrl = await ctx.storage.getUrl(otherUser.profilePicture);
+      }
+
       enriched.push({
         ...conv,
         otherUser: otherUser
           ? {
               _id: otherUser._id,
+              publicId: otherUser.publicId,
               firstName: otherUser.firstName,
               lastName: otherUser.lastName,
-              profilePicture: otherUser.profilePicture,
-              profilePictureUrl: otherUser.profilePictureUrl,
+              profilePictureUrl: otherUserPictureUrl,
             }
           : null,
         unreadCount,
@@ -82,15 +87,20 @@ export const getById = query({
     const otherUserId = conv.user1Id === user._id ? conv.user2Id : conv.user1Id;
     const otherUser = await ctx.db.get(otherUserId);
 
+    let otherUserPictureUrl = otherUser?.profilePictureUrl ?? null;
+    if (otherUser?.profilePicture && !otherUserPictureUrl) {
+      otherUserPictureUrl = await ctx.storage.getUrl(otherUser.profilePicture);
+    }
+
     return {
       ...conv,
       otherUser: otherUser
         ? {
             _id: otherUser._id,
+            publicId: otherUser.publicId,
             firstName: otherUser.firstName,
             lastName: otherUser.lastName,
-            profilePicture: otherUser.profilePicture,
-            profilePictureUrl: otherUser.profilePictureUrl,
+            profilePictureUrl: otherUserPictureUrl,
           }
         : null,
     };
@@ -115,6 +125,37 @@ export const markAsRead = mutation({
     } else if (conv.user2Id === user._id) {
       await ctx.db.patch(args.id, { unreadCountUser2: 0 });
     }
+    return { success: true };
+  },
+});
+
+// ============================================
+// Delete Conversation
+// ============================================
+
+export const deleteConversation = mutation({
+  args: { token: v.string(), id: v.id("conversations") },
+  handler: async (ctx, args) => {
+    const user = await getUserFromToken(ctx, args.token);
+    if (!user) throw new Error("Not authenticated.");
+
+    const conv = await ctx.db.get(args.id);
+    if (!conv) throw new Error("Conversation not found.");
+    if (conv.user1Id !== user._id && conv.user2Id !== user._id) {
+      throw new Error("Not authorized.");
+    }
+
+    // Delete all messages in this conversation
+    const messages = await ctx.db
+      .query("messages")
+      .withIndex("by_conversation", (q) => q.eq("conversationId", args.id))
+      .collect();
+    for (const msg of messages) {
+      await ctx.db.delete(msg._id);
+    }
+
+    // Delete the conversation
+    await ctx.db.delete(args.id);
     return { success: true };
   },
 });

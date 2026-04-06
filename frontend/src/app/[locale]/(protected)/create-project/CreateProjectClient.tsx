@@ -20,6 +20,7 @@ import { ProjectFormStep1 } from '@/components/projects/ProjectFormStep1';
 import { ProjectFormStep2 } from '@/components/projects/ProjectFormStep2';
 import { ProjectFormStep3 } from '@/components/projects/ProjectFormStep3';
 import { ProjectFormStep4 } from '@/components/projects/ProjectFormStep4';
+import { ProjectPreviewStep } from '@/components/projects/ProjectPreviewStep';
 import { projectsService } from '@/services/projects';
 
 export interface ProjectFormData {
@@ -108,7 +109,7 @@ export function CreateProjectClient() {
     images: [],
   });
 
-  const totalSteps = 4;
+  const totalSteps = 5;
 
   const handleNext = () => {
     if (currentStep < totalSteps - 1) {
@@ -152,15 +153,18 @@ export function CreateProjectClient() {
 
       const project = await projectsService.createProject(projectPayload as any);
 
-      // Upload images if any
-      if (formData.images.length > 0) {
-        for (let i = 0; i < formData.images.length; i++) {
-          const isCover = i === 0;
-          await projectsService.uploadImage(project._id, formData.images[i], isCover);
-        }
+      // Upload images in order
+      for (let i = 0; i < formData.images.length; i++) {
+        await projectsService.uploadImage(project._id, formData.images[i], i === 0);
       }
 
-      router.push(`/projects/${project._id}`);
+      // Save availabilities per year
+      for (const avail of formData.availabilities) {
+        const { year, ...months } = avail;
+        await projectsService.saveAvailability(project._id, year, months as any);
+      }
+
+      router.push(`/my-projects?tab=pending&created=true`);
     } catch (err: any) {
       console.error('Failed to create project:', err);
       const errorMessage =
@@ -180,6 +184,7 @@ export function CreateProjectClient() {
     t('createProject.steps.locationWork'),
     t('createProject.steps.skillsAmenities'),
     t('createProject.steps.availabilityImages'),
+    t('createProject.steps.preview'),
   ];
 
   return (
@@ -195,42 +200,17 @@ export function CreateProjectClient() {
       </Box>
 
       <Container size="md" py="xl">
-        {/* Progress */}
-        <Box mb="xl">
-          <Group justify="space-between" mb="xs">
-            <Text size="sm" fw={500}>
-              {t('createProject.step', { current: currentStep + 1, total: totalSteps })}
-            </Text>
-            <Text size="sm" c="dimmed">
-              {t('createProject.complete', { percent: Math.round(((currentStep + 1) / totalSteps) * 100) })}
-            </Text>
-          </Group>
-          <Progress
-            value={((currentStep + 1) / totalSteps) * 100}
-            size="sm"
-            radius="xl"
-            color="eco-terracotta"
-          />
-        </Box>
-
         {/* Stepper */}
         <Stepper
           active={currentStep}
           mb="xl"
           size="sm"
-          color="eco-terracotta"
+          color="eco-blue"
         >
-          {stepLabels.map((label, index) => (
-            <Stepper.Step key={index} label={label} />
+          {stepLabels.map((_, index) => (
+            <Stepper.Step key={index} />
           ))}
         </Stepper>
-
-        {/* Error Message */}
-        {error && (
-          <Alert icon={<IconAlertCircle size={18} />} color="red" mb="lg">
-            {error}
-          </Alert>
-        )}
 
         {/* Step Content */}
         <Paper shadow="sm" p="xl" radius="md" withBorder mb="lg">
@@ -264,17 +244,23 @@ export function CreateProjectClient() {
             <ProjectFormStep4
               data={formData}
               onUpdate={updateFormData}
+              onNext={handleNext}
+              onBack={handleBack}
+            />
+          )}
+
+          {currentStep === 4 && (
+            <ProjectPreviewStep
+              data={formData}
+              onUpdate={updateFormData}
               onSubmit={handleSubmit}
               onBack={handleBack}
               isSubmitting={isSubmitting}
+              error={error}
             />
           )}
         </Paper>
 
-        {/* Step Label */}
-        <Text ta="center" size="sm" c="dimmed">
-          {stepLabels[currentStep]}
-        </Text>
       </Container>
     </Layout>
   );

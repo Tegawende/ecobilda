@@ -8,6 +8,8 @@
   :root {
     --color-eco-primary: #70A771;
     --color-eco-primaryDark: #558356;
+    --color-eco-blue: #677DA3;
+    --color-eco-blueDark: #4d6080;
     --color-eco-secondary: #97BC62;
     --color-eco-accent: #D4A373;
     --color-eco-terracotta: #c9696b;
@@ -23,6 +25,8 @@
 @theme {
   --color-eco-primary: var(--color-eco-primary);
   --color-eco-primaryDark: var(--color-eco-primaryDark);
+  --color-eco-blue: var(--color-eco-blue);
+  --color-eco-blueDark: var(--color-eco-blueDark);
   --color-eco-secondary: var(--color-eco-secondary);
   --color-eco-accent: var(--color-eco-accent);
   --color-eco-terracotta: var(--color-eco-terracotta);

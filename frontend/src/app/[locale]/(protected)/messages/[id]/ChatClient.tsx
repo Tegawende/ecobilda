@@ -17,188 +17,93 @@ import {
   Center,
   Stack,
   Loader,
+  Paper,
 } from '@mantine/core';
 import {
   IconMessages,
   IconSend,
   IconArrowLeft,
   IconAlertCircle,
+  IconCheck,
+  IconX,
 } from '@tabler/icons-react';
 import { Layout } from '@/components/common/Layout';
 import { messagingService } from '@/services/messaging';
 import { profileService } from '@/services/profile';
+import { participationsService } from '@/services/participations';
+import { useMessages } from '@/hooks/useConvex';
 import { MessageBubble } from '@/components/messaging/MessageBubble';
-import type { Conversation, Message, User } from '@/types';
+import type { Conversation, User } from '@/types';
 import logger from '@/lib/logger';
 
-export function ChatClient({ conversationId: propConversationId }: { conversationId?: string }) {
+export function ChatClient({ conversationId: propConversationId, noLayout = false }: { conversationId?: string; noLayout?: boolean }) {
   const t = useTranslations();
   const { id } = useParams<{ id: string }>();
+  const conversationId = propConversationId || id;
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const wsRef = useRef<WebSocket | null>(null);
 
   const [conversation, setConversation] = useState<Conversation | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [participationRequest, setParticipationRequest] = useState<any>(null);
   const [messageInput, setMessageInput] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
+  const [isActing, setIsActing] = useState(false);
   const [error, setError] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
 
-  // Fetch initial data
+  // Real-time reactive messages from Convex
+  const { messages } = useMessages(conversationId || null);
+
+  // Fetch conversation metadata + current user + participation request (one-time)
   useEffect(() => {
-    fetchData();
-    return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
-    };
-  }, [id]);
+    if (!conversationId) return;
 
-  // Setup WebSocket connection
-  useEffect(() => {
-    if (!conversation || !currentUser) return;
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [conv, user] = await Promise.all([
+          messagingService.getConversation(conversationId as any),
+          profileService.getProfile(),
+        ]);
+        setConversation(conv);
+        setCurrentUser(user);
+        await messagingService.markAsRead(conversationId as any);
 
-    const token = localStorage.getItem('access_token');
-    if (!token) return;
-
-    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsHost = process.env.NEXT_PUBLIC_API_URL?.replace('http://', '').replace('https://', '') || 'localhost:8000';
-    const wsUrl = `${wsProtocol}//${wsHost}/ws/chat/${conversation._id}/?token=${token}`;
-
-    try {
-      const ws = new WebSocket(wsUrl);
-      wsRef.current = ws;
-
-      ws.onopen = () => {
-        logger.ws('connected', 'Chat');
-        setIsConnected(true);
-      };
-
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-
-        if (data.type === 'new_message') {
-          setMessages((prev) => [...prev, data.message]);
-
-          if (data.message.senderId !== currentUser._id) {
-            messagingService.markAsRead(conversation._id).catch(err => logger.error('Mark as read error:', err));
-          }
-        } else if (data.type === 'typing_indicator') {
-          if (data.user_id !== currentUser._id) {
-            setIsTyping(true);
-            setTimeout(() => setIsTyping(false), 3000);
+        // Fetch participation request if present
+        if (conv?.participationRequestId) {
+          try {
+            const req = await participationsService.getParticipationById(conv.participationRequestId);
+            setParticipationRequest(req);
+          } catch {
+            // ignore
           }
         }
-      };
-
-      ws.onerror = (error) => {
-        logger.error('Chat WebSocket error:', error);
-        setIsConnected(false);
-      };
-
-      ws.onclose = () => {
-        logger.ws('disconnected', 'Chat');
-        setIsConnected(false);
-      };
-    } catch (err) {
-      logger.error('Failed to create Chat WebSocket:', err);
-    }
-
-    return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
+      } catch (err: any) {
+        logger.error('Failed to fetch conversation:', err);
+        setError(t('messaging.loadError'));
+      } finally {
+        setIsLoading(false);
       }
     };
-  }, [conversation, currentUser]);
 
-  // Auto-scroll to bottom
+    fetchData();
+  }, [conversationId, t]);
+
+  // Auto-scroll when new messages arrive
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const fetchData = async () => {
-    if (!id) return;
-
-    try {
-      setIsLoading(true);
-      const [conv, msgs, user] = await Promise.all([
-        messagingService.getConversation(parseInt(id)),
-        messagingService.getMessages(parseInt(id)),
-        profileService.getProfile(),
-      ]);
-      setConversation(conv);
-      setMessages(msgs);
-      setCurrentUser(user);
-
-      await messagingService.markAsRead(parseInt(id));
-    } catch (err: any) {
-      logger.error('Failed to fetch conversation:', err);
-      if (err.response?.status === 404) {
-        // If conversation not found, try to create one with the ID as recipient_id
-        // This handles the case where someone navigated with a user ID instead of conversation ID
-        try {
-          const conversation = await messagingService.getOrCreateConversation(parseInt(id));
-          // Update URL to use conversation ID
-          router.replace(`/messages/${conversation._id}`);
-          // Recursively fetch data with the correct conversation ID
-          return;
-        } catch (createErr: any) {
-          logger.error('Failed to create conversation:', createErr);
-          // If it's a 400 or 500 error, the conversation might already exist
-          // Try to fetch it again or show a more helpful error message
-          if (createErr.response?.status === 400 || createErr.response?.status === 500) {
-            // The conversation might have been created by another request
-            // Try to fetch conversations list and find the one with this user
-            try {
-              const conversations = await messagingService.getConversations();
-              // Find conversation where the other user is the one we're trying to contact
-              const conversation = conversations.find(
-                (c) => c._id === id
-              );
-              if (conversation) {
-                router.replace(`/messages/${conversation._id}`);
-                return;
-              }
-            } catch (fetchErr) {
-              logger.error('Failed to fetch conversations:', fetchErr);
-            }
-          }
-          setError(
-            createErr.response?.data?.detail ||
-            createErr.response?.data?.recipient_id?.[0] ||
-            t('messaging.conversationNotFound')
-          );
-        }
-      } else {
-        setError(err.response?.data?.detail || t('messaging.loadError'));
-      }
-    } finally {
-      setIsLoading(false);
+  // Mark as read when new messages come in
+  useEffect(() => {
+    if (conversationId && messages.length > 0) {
+      messagingService.markAsRead(conversationId as any).catch(() => {});
     }
-  };
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const sendTypingIndicator = () => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(
-        JSON.stringify({
-          type: 'typing_indicator',
-          user_id: currentUser?._id,
-        })
-      );
-    }
-  };
+  }, [messages.length, conversationId]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!messageInput.trim() || !conversation || !currentUser) return;
 
     const messageText = messageInput.trim();
@@ -206,20 +111,7 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
     setIsSending(true);
 
     try {
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.send(
-          JSON.stringify({
-            type: 'send_message',
-            body: messageText,
-            senderId: currentUser._id,
-          })
-        );
-      } else {
-        const newMessage = await messagingService.sendMessage(conversation._id, {
-          body: messageText,
-        });
-        setMessages((prev) => [...prev, newMessage]);
-      }
+      await messagingService.sendMessage(conversation._id, { body: messageText });
     } catch (err) {
       logger.error('Failed to send message:', err);
       setError(t('messaging.sendError'));
@@ -229,123 +121,195 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessageInput(e.target.value);
-    sendTypingIndicator();
+  const handleAccept = async () => {
+    if (!participationRequest) return;
+    setIsActing(true);
+    try {
+      await participationsService.acceptRequest(participationRequest._id);
+      setParticipationRequest({ ...participationRequest, status: 'ACCEPTED' });
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsActing(false);
+    }
   };
 
-  // Determine other user
-  const otherUser = conversation
-    ? conversation.otherUser
-    : null;
+  const handleRefuse = async () => {
+    if (!participationRequest) return;
+    setIsActing(true);
+    try {
+      await participationsService.refuseRequest(participationRequest._id);
+      setParticipationRequest({ ...participationRequest, status: 'REFUSED' });
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsActing(false);
+    }
+  };
+
+  const otherUser = conversation?.otherUser;
+
+  // Is the current user the host? (user1 = host in our convention)
+  const isHost = conversation && currentUser
+    ? (conversation as any).user1Id === currentUser._id
+    : false;
+
+  const isPendingRequest = participationRequest?.status === 'PENDING';
 
   if (isLoading) {
-    return (
-      <Layout>
-        <Center mih="80vh">
-          <Stack align="center" gap="md">
-            <Loader size="lg" />
-            <Text c="dimmed">{t('messaging.loading')}</Text>
-          </Stack>
-        </Center>
-      </Layout>
+    const loadingContent = (
+      <Center mih="80vh">
+        <Stack align="center" gap="md">
+          <Loader size="lg" />
+          <Text c="dimmed">{t('messaging.loading')}</Text>
+        </Stack>
+      </Center>
     );
+    return noLayout ? loadingContent : <Layout>{loadingContent}</Layout>;
   }
 
   if (error) {
-    return (
-      <Layout>
-        <Container size="md" py="xl">
-          <Alert color="red" icon={<IconAlertCircle size={18} />} title={t('messaging.error')}>
-            <Text mb="md">{error}</Text>
-            <Button variant="subtle" onClick={() => router.push('/messages')}>
-              {t('messaging.backToMessages')}
-            </Button>
-          </Alert>
-        </Container>
-      </Layout>
+    const errorContent = (
+      <Container size="md" py="xl">
+        <Alert color="red" icon={<IconAlertCircle size={18} />} title={t('messaging.error')}>
+          <Text mb="md">{error}</Text>
+          <Button variant="subtle" onClick={() => router.push('/messages')}>
+            {t('messaging.backToMessages')}
+          </Button>
+        </Alert>
+      </Container>
     );
+    return noLayout ? errorContent : <Layout>{errorContent}</Layout>;
   }
 
   if (!conversation || !otherUser || !currentUser) {
     return null;
   }
 
-  return (
-    <Layout>
-      <Flex direction="column" h="100vh" bg="gray.0">
+  const chatContent = (
+    <Flex direction="column" style={{ height: noLayout ? '100%' : '100vh' }} bg="gray.0">
         {/* Header */}
         <Box bg="white" px="md" py="sm" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
           <Container size="md">
             <Group justify="space-between">
               <Group>
-                <Button
-                  variant="subtle"
-                  leftSection={<IconArrowLeft size={18} />}
-                  onClick={() => router.push('/messages')}
-                  hiddenFrom="sm"
-                  size="sm"
-                >
-                  {t('common.back')}
-                </Button>
+                {!noLayout && (
+                  <Button
+                    variant="subtle"
+                    leftSection={<IconArrowLeft size={18} />}
+                    onClick={() => router.push('/messages')}
+                    size="sm"
+                  >
+                    {t('common.back')}
+                  </Button>
+                )}
 
                 <Avatar
-                  src={otherUser?.profilePictureUrl || otherUser?.profilePicture}
+                  src={otherUser?.profilePictureUrl || (otherUser as any)?.profilePicture}
                   size="md"
                   radius="xl"
                   color="blue"
                 >
-                  {!otherUser?.profilePictureUrl || otherUser?.profilePicture &&
-                    `${otherUser?.firstName[0]}${otherUser?.lastName[0]}`}
+                  {`${otherUser?.firstName?.[0] || ''}${otherUser?.lastName?.[0] || ''}`}
                 </Avatar>
 
                 <Box>
                   <Text fw={600}>
                     {otherUser?.firstName} {otherUser?.lastName}
                   </Text>
-                  <Text size="xs" c={isConnected ? 'green' : 'dimmed'}>
-                    {isConnected ? `● ${t('messaging.online')}` : `○ ${t('messaging.offline')}`}
-                  </Text>
                 </Box>
               </Group>
 
-              <Button variant="subtle" onClick={() => router.push(`/users/${otherUser._id}`)}>
+              <Button
+                variant="subtle"
+                onClick={() => {
+                  const profileId = (otherUser as any)?.publicId ?? otherUser._id;
+                  router.push(`/users/${profileId}`);
+                }}
+              >
                 {t('messaging.viewProfile')}
               </Button>
             </Group>
           </Container>
         </Box>
 
+        {/* Accept/Refuse banner — shown to host when request is PENDING */}
+        {isHost && isPendingRequest && (
+          <Box bg="eco-primary.0" px="md" py="sm" style={{ borderBottom: '1px solid var(--mantine-color-eco-primary-2)' }}>
+            <Container size="md">
+              <Group justify="space-between" wrap="nowrap">
+                <Text size="sm" fw={500} c="eco-primary.8">
+                  {t('messaging.pendingApplication', {
+                    name: `${otherUser.firstName} ${otherUser.lastName}`,
+                  })}
+                </Text>
+                <Group gap="sm" wrap="nowrap">
+                  <Button
+                    size="sm"
+                    radius="xl"
+                    color="red"
+                    variant="light"
+                    leftSection={<IconX size={14} />}
+                    loading={isActing}
+                    onClick={handleRefuse}
+                  >
+                    {t('messaging.refuse')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    radius="xl"
+                    color="eco-primary"
+                    leftSection={<IconCheck size={14} />}
+                    loading={isActing}
+                    onClick={handleAccept}
+                  >
+                    {t('messaging.accept')}
+                  </Button>
+                </Group>
+              </Group>
+            </Container>
+          </Box>
+        )}
+
+        {/* Accepted/Refused status banner */}
+        {isHost && participationRequest && !isPendingRequest && (
+          <Box
+            bg={participationRequest.status === 'ACCEPTED' ? 'green.0' : 'red.0'}
+            px="md"
+            py="xs"
+            style={{
+              borderBottom: `1px solid var(--mantine-color-${participationRequest.status === 'ACCEPTED' ? 'green' : 'red'}-2)`,
+            }}
+          >
+            <Container size="md">
+              <Text size="sm" fw={500} c={participationRequest.status === 'ACCEPTED' ? 'green.8' : 'red.8'}>
+                {participationRequest.status === 'ACCEPTED'
+                  ? t('messaging.applicationAccepted')
+                  : t('messaging.applicationRefused')}
+              </Text>
+            </Container>
+          </Box>
+        )}
+
         {/* Messages Container */}
         <Box style={{ flex: 1, overflowY: 'auto' }} px="md" py="xl">
           <Container size="md">
             {messages.length > 0 ? (
               <>
-                {messages.map((message) => (
+                {messages.map((message: any) => (
                   <MessageBubble
                     key={message._id}
                     message={message}
                     isOwnMessage={message.senderId === currentUser._id}
                   />
                 ))}
-
-                {/* Typing Indicator */}
-                {isTyping && (
-                  <Group gap="xs" mb="md" c="dimmed">
-                    <Text size="sm">●</Text>
-                    <Text size="sm">●</Text>
-                    <Text size="sm">●</Text>
-                    <Text size="sm">{t('messaging.typing', { name: otherUser?.firstName })}</Text>
-                  </Group>
-                )}
-
                 <div ref={messagesEndRef} />
               </>
             ) : (
-              <Center py={48}>
-                <Stack align="center" gap="md">
-                  <IconMessages size={64} color="var(--mantine-color-blue-6)" />
-                  <Text c="dimmed">{t('messaging.noMessagesYet')}</Text>
+              <Center h="100%">
+                <Stack align="center" gap="md" c="dimmed">
+                  <IconMessages size={48} stroke={1.5} />
+                  <Text>{t('messaging.noMessages')}</Text>
                 </Stack>
               </Center>
             )}
@@ -353,42 +317,40 @@ export function ChatClient({ conversationId: propConversationId }: { conversatio
         </Box>
 
         {/* Message Input */}
-        <Box bg="white" px="md" py="md" style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}>
+        <Box bg="white" px="md" py="sm" style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}>
           <Container size="md">
             <form onSubmit={handleSendMessage}>
-              <Group align="flex-end" gap="sm">
+              <Group gap="sm">
                 <Textarea
+                  style={{ flex: 1 }}
+                  placeholder={t('messaging.typeMessage')}
                   value={messageInput}
-                  onChange={handleInputChange}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                  minRows={1}
+                  maxRows={4}
+                  autosize
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
                       handleSendMessage(e);
                     }
                   }}
-                  placeholder={t('messaging.typePlaceholder')}
-                  minRows={1}
-                  maxRows={4}
-                  autosize
-                  disabled={isSending}
-                  style={{ flex: 1 }}
                 />
                 <Button
                   type="submit"
+                  color="eco-primary"
+                  radius="xl"
                   disabled={!messageInput.trim() || isSending}
                   loading={isSending}
-                  leftSection={<IconSend size={18} />}
                 >
-                  {t('messaging.send')}
+                  <IconSend size={18} />
                 </Button>
               </Group>
-              <Text size="xs" c="dimmed" mt="xs">
-                {t('messaging.enterToSend')}
-              </Text>
             </form>
           </Container>
         </Box>
       </Flex>
-    </Layout>
   );
+
+  return noLayout ? chatContent : <Layout>{chatContent}</Layout>;
 }

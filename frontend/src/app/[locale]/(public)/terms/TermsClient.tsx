@@ -83,10 +83,6 @@ export function TermsClient() {
         <Accordion
           variant="separated"
           radius="lg"
-          styles={{
-            control: { '&[data-active]': { color: 'var(--color-eco-terracotta)' } },
-            chevron: { '&[data-active]': { color: 'var(--color-eco-terracotta)' } },
-          }}
         >
           {sections.map((section) => {
             const Icon = section.icon;
@@ -125,22 +121,6 @@ export function TermsClient() {
           })}
         </Accordion>
 
-        {/* Contact CTA */}
-        <Paper
-          c="white"
-          p="xl"
-          radius="md"
-          mt={48}
-          ta="center"
-          style={{ backgroundColor: 'var(--color-eco-terracotta)' }}
-        >
-          <Title order={3} mb="xs" c="white">
-            {t('contact.title')}
-          </Title>
-          <Text opacity={0.9}>
-            {t('contact.desc')}
-          </Text>
-        </Paper>
       </Container>
     </Layout>
   );

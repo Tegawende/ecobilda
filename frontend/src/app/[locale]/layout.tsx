@@ -7,7 +7,7 @@ import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { theme } from '@/theme';
 import { AuthProvider } from '@/providers/AuthProvider';
-import { QueryProvider } from '@/providers/QueryProvider';
+
 import { GoogleOAuthWrapper } from '@/providers/GoogleOAuthWrapper';
 import { ConvexClientProvider } from '@/providers/ConvexClientProvider';
 import { SetLocale } from './SetLocale';
@@ -43,12 +43,10 @@ export default async function LocaleLayout({
         <Notifications position="top-right" />
         <ConvexClientProvider>
           <GoogleOAuthWrapper>
-            <QueryProvider>
               <AuthProvider>
                 <SetLocale locale={locale} />
                 {children}
               </AuthProvider>
-            </QueryProvider>
           </GoogleOAuthWrapper>
         </ConvexClientProvider>
       </MantineProvider>

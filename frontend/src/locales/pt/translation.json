@@ -1,1150 +1,1391 @@
 {
-    "common": {
-        "welcome": "Bem-vindo ao Ecobilda",
-        "loading": "A carregar...",
-        "error": "Ocorreu um erro",
-        "save": "Guardar",
-        "cancel": "Cancelar",
-        "delete": "Eliminar",
-        "edit": "Editar",
-        "search": "Pesquisar",
-        "filter": "Filtrar",
-        "submit": "Submeter",
-        "login": "Entrar ou registar",
-        "active": "Ativo",
-        "inactive": "Inativo",
-        "back": "Voltar",
-        "day": "dia",
-        "by": "por",
-        "apply": "Aplicar",
-        "clear": "Limpar",
-        "continue": "Continuar",
-        "hide": "Ocultar",
-        "reset": "Repor",
-        "show": "Mostrar",
-        "next": "Seguinte",
-        "previous": "Anterior",
-        "no": "Não",
-        "yes": "Sim",
-        "accepted": "Aceite",
-        "allowed": "Permitido",
-        "included": "Incluído",
-        "all": "Todos",
-        "online": "Online",
-        "offline": "Offline"
+  "common": {
+    "welcome": "Bem-vindo ao Ecobilda",
+    "loading": "A carregar...",
+    "error": "Ocorreu um erro",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "search": "Pesquisar",
+    "filter": "Filtrar",
+    "submit": "Submeter",
+    "login": "Entrar ou registar",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "back": "Voltar",
+    "day": "dia",
+    "by": "por",
+    "apply": "Aplicar",
+    "clear": "Limpar",
+    "continue": "Continuar",
+    "hide": "Ocultar",
+    "reset": "Repor",
+    "show": "Mostrar",
+    "next": "Seguinte",
+    "previous": "Anterior",
+    "no": "Não",
+    "yes": "Sim",
+    "accepted": "Aceite",
+    "allowed": "Permitido",
+    "included": "Incluído",
+    "all": "Todos",
+    "online": "Online",
+    "offline": "Offline",
+    "more": "restantes",
+    "pending": "Pendente"
+  },
+  "errors": {
+    "notFound": {
+      "title": "Página não encontrada",
+      "description": "Ops! A página que procura não existe ou foi movida.",
+      "browseProjects": "Explorar projetos",
+      "goBack": "Voltar"
     },
-    "errors": {
-        "notFound": {
-            "title": "Página não encontrada",
-            "description": "Ops! A página que procura não existe ou foi movida.",
-            "browseProjects": "Explorar projetos",
-            "goBack": "Voltar"
-        },
-        "generic": {
-            "title": "Algo correu mal",
-            "description": "Desculpe, algo correu mal. Por favor, tente novamente.",
-            "retry": "Tentar novamente",
-            "goHome": "Ir para o início"
-        }
+    "generic": {
+      "title": "Algo correu mal",
+      "description": "Desculpe, algo correu mal. Por favor, tente novamente.",
+      "retry": "Tentar novamente",
+      "goHome": "Ir para o início",
+      "webglLost": "Contexto WebGL perdido. Por favor, atualize a página.",
+      "mapLoadFailed": "Falha ao carregar o mapa. Por favor, atualize a página."
+    }
+  },
+  "a11y": {
+    "skipToContent": "Ir para o conteúdo principal",
+    "closeModal": "Fechar",
+    "previousImage": "Imagem anterior",
+    "nextImage": "Próxima imagem",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu",
+    "loading": "A carregar..."
+  },
+  "nav": {
+    "home": "Início",
+    "projects": "Projetos",
+    "messages": "Mensagens",
+    "profile": "Perfil",
+    "login": "Entrar",
+    "register": "Registar",
+    "logout": "Sair",
+    "userMenu": {
+      "favorites": "Favoritos",
+      "myProjects": "Os meus projetos",
+      "participations": "As minhas participações",
+      "messages": "Mensagens",
+      "profile": "O meu perfil",
+      "settings": "Definições da conta"
+    }
+  },
+  "auth": {
+    "registrationSuccess": {
+      "title": "Verifique o seu e-mail",
+      "message": "Enviámos um link de verificação para",
+      "spamNote": "Se não vir o e-mail, verifique a pasta de spam.",
+      "backToLogin": "Voltar ao login"
     },
-    "a11y": {
-        "skipToContent": "Ir para o conteúdo principal",
-        "closeModal": "Fechar",
-        "previousImage": "Imagem anterior",
-        "nextImage": "Próxima imagem",
-        "openMenu": "Abrir menu",
-        "closeMenu": "Fechar menu",
-        "loading": "A carregar..."
+    "emailNotVerified": {
+      "title": "E-mail não verificado",
+      "message": "Deve verificar o seu endereço de e-mail antes de poder iniciar sessão. Clique abaixo para receber um novo e-mail de verificação.",
+      "resendButton": "Reenviar e-mail de verificação",
+      "resendSuccess": "E-mail de verificação enviado! Verifique a sua caixa de entrada.",
+      "backToLogin": "Voltar ao login"
     },
-    "nav": {
-        "home": "Início",
-        "projects": "Projetos",
-        "messages": "Mensagens",
-        "profile": "Perfil",
-        "login": "Entrar",
-        "register": "Registar",
-        "logout": "Sair",
-        "userMenu": {
-            "favorites": "Favoritos",
-            "myProjects": "Os meus projetos",
-            "participations": "As minhas participações",
-            "messages": "Mensagens",
-            "profile": "O meu perfil",
-            "settings": "Definições da conta"
-        }
+    "errorResendVerification": "Não foi possível reenviar o e-mail de verificação. Tente novamente.",
+    "verification": {
+      "verifying": "A verificar...",
+      "success": "O seu e-mail foi verificado com sucesso.",
+      "successTitle": "E-mail verificado!",
+      "error": "Não foi possível verificar o seu e-mail. O link pode ser inválido.",
+      "errorTitle": "Erro de verificação",
+      "expired": "Este link de verificação expirou.",
+      "expiredTitle": "Link expirado",
+      "goToLogin": "Entrar",
+      "resendEmail": "Reenviar e-mail de verificação",
+      "emailSent": "Um novo e-mail de verificação foi enviado!",
+      "alreadyVerified": "O seu e-mail já foi verificado.",
+      "alreadyVerifiedTitle": "Já verificado",
+      "noToken": "Token de verificação em falta.",
+      "redirecting": "A redirecionar em {seconds}s..."
     },
-    "auth": {
-        "registrationSuccess": {
-            "title": "Verifique o seu e-mail",
-            "message": "Enviámos um link de verificação para",
-            "spamNote": "Se não vir o e-mail, verifique a pasta de spam.",
-            "backToLogin": "Voltar ao login"
-        },
-        "verification": {
-            "verifying": "A verificar...",
-            "success": "O seu e-mail foi verificado com sucesso.",
-            "successTitle": "E-mail verificado!",
-            "error": "Não foi possível verificar o seu e-mail. O link pode ser inválido.",
-            "errorTitle": "Erro de verificação",
-            "expired": "Este link de verificação expirou.",
-            "expiredTitle": "Link expirado",
-            "goToLogin": "Entrar",
-            "resendEmail": "Reenviar e-mail de verificação",
-            "emailSent": "Um novo e-mail de verificação foi enviado!",
-            "alreadyVerified": "O seu e-mail já foi verificado.",
-            "alreadyVerifiedTitle": "Já verificado",
-            "noToken": "Token de verificação em falta.",
-            "redirecting": "A redirecionar em {seconds}s..."
-        },
-        "agreeAndContinue": "Concordar e continuar",
-        "backToLogin": "Voltar ao login",
-        "contactInfo": "Informações de contacto",
-        "continue": "Continuar",
-        "dateOfBirth": "Data de nascimento",
-        "dobDay": "Dia",
-        "dobDesc": "Para se registar, precisa ter pelo menos 18 anos.",
-        "dobInvalidDate": "Esta data não existe.",
-        "dobMonth": "Mês",
-        "dobYear": "Ano",
-        "dobMonths": [
-            "Janeiro",
-            "Fevereiro",
-            "Março",
-            "Abril",
-            "Maio",
-            "Junho",
-            "Julho",
-            "Agosto",
-            "Setembro",
-            "Outubro",
-            "Novembro",
-            "Dezembro"
-        ],
-        "errorLogin": "Falha no login. Verifique as suas credenciais.",
-        "errorRegister": "Falha no registo. Tente novamente.",
-        "googleOnlyAccount": "Esta conta foi criada com o Google. Inicie sess\u00e3o com o Google ou defina uma palavra-passe atrav\u00e9s do link abaixo.",
-        "setPasswordViaReset": "Definir palavra-passe para esta conta",
-        "finishSignup": "Finalizar registo",
-        "firstName": "Nome",
-        "forgotPassword": "Esqueceu a palavra-passe?",
-        "forgotPasswordDesc": "Introduza o seu e-mail e enviaremos um link para redefinir a sua palavra-passe.",
-        "googleLogin": "Continuar com Google",
-        "lastName": "Apelido",
-        "legalName": "Nome legal",
-        "loggingIn": "A iniciar sessão...",
-        "login": "Iniciar sessão",
-        "loginOrSignup": "Iniciar sessão ou registar",
-        "password": "Palavra-passe",
-        "registering": "A criar conta...",
-        "resetEmailSent": "E-mail enviado!",
-        "resetEmailSentDesc": "Verifique a sua caixa de entrada para um link de redefinição.",
-        "resetPasswordError": "Não foi possível enviar o e-mail. Tente novamente.",
-        "sendResetLink": "Enviar link",
-        "resetYourPassword": "Defina a sua nova palavra-passe",
-        "resetYourPasswordDesc": "Introduza a sua nova palavra-passe abaixo.",
-        "resetPassword": "Redefinir palavra-passe",
-        "passwordChanged": "Palavra-passe atualizada!",
-        "passwordChangedDesc": "A sua palavra-passe foi alterada com sucesso. J\u00e1 pode iniciar sess\u00e3o.",
-        "or": "ou",
-        "termsAgreement": "Ao selecionar <bold>{action}</bold>, concordo com os <termsLink>Termos de Serviço</termsLink> da Ecobilda e reconheço a <privacyLink>Política de Privacidade</privacyLink>.",
-        "errorCheckEmail": "Erro ao verificar o e-mail",
-        "validation": {
-            "ageRequirement": "Deve ter pelo menos 18 anos",
-            "birthDateRequired": "Data de nascimento obrigatória",
-            "email": "E-mail inválido",
-            "firstName": "O nome deve ter pelo menos 2 caracteres",
-            "lastName": "O apelido deve ter pelo menos 2 caracteres",
-            "password": "A palavra-passe deve ter pelo menos 8 caracteres",
-            "passwordComplexity": "Mín. 8 caracteres e 1 número ou símbolo",
-            "terms": "Deve aceitar os termos"
-        },
-        "welcome": "Bem-vindo ao Ecobilda"
+    "agreeAndContinue": "Concordar e continuar",
+    "backToLogin": "Voltar ao login",
+    "contactInfo": "Informações de contacto",
+    "continue": "Continuar",
+    "emailInfo": "Enviaremos confirmações de viagem e recibos por e-mail.",
+    "nameDesc": "Certifique-se de que corresponde ao nome no seu documento de identificação.",
+    "marketingOptOut": "Não quero receber mensagens de marketing do Ecobilda.",
+    "agreementText": "Ao selecionar Concordar e continuar, concordo com os Termos de Serviço, Termos de Pagamento e a Política de Não Discriminação do Ecobilda e reconheço a Política de Privacidade.",
+    "loginTitle": "Bem-vindo de volta!",
+    "registerTitle": "Criar uma conta",
+    "loginSubtitle": "Inicie sessão para aceder ao seu espaço.",
+    "registerSubtitle": "Junte-se à comunidade Ecobilda hoje.",
+    "email": "E-mail",
+    "confirmPassword": "Confirmar palavra-passe",
+    "orContinueWith": "Ou continuar com",
+    "orContinueWithEmail": "Ou continuar com e-mail",
+    "continueWithEmail": "Continuar com e-mail",
+    "appleLogin": "Continuar com Apple",
+    "noAccount": "Não tem uma conta?",
+    "hasAccount": "Já tem uma conta?",
+    "register": "Criar conta",
+    "termsAccept": "Aceito os",
+    "termsLink": "Termos e Condições",
+    "dateOfBirth": "Data de nascimento",
+    "dobDay": "Dia",
+    "dobDesc": "Para se registar, precisa ter pelo menos 18 anos.",
+    "dobInvalidDate": "Esta data não existe.",
+    "dobMonth": "Mês",
+    "dobYear": "Ano",
+    "dobMonths": [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro"
+    ],
+    "errorLogin": "Falha no login. Verifique as suas credenciais.",
+    "errorRegister": "Falha no registo. Tente novamente.",
+    "googleOnlyAccount": "Esta conta foi criada com o Google. Inicie sessão com o Google ou defina uma palavra-passe através do link abaixo.",
+    "setPasswordViaReset": "Definir palavra-passe para esta conta",
+    "finishSignup": "Finalizar registo",
+    "firstName": "Nome",
+    "forgotPassword": "Esqueceu a palavra-passe?",
+    "forgotPasswordDesc": "Introduza o seu e-mail e enviaremos um link para redefinir a sua palavra-passe.",
+    "googleLogin": "Continuar com Google",
+    "lastName": "Apelido",
+    "legalName": "Nome legal",
+    "loggingIn": "A iniciar sessão...",
+    "login": "Iniciar sessão",
+    "loginOrSignup": "Iniciar sessão ou registar",
+    "password": "Palavra-passe",
+    "registering": "A criar conta...",
+    "resetEmailSent": "E-mail enviado!",
+    "resetEmailSentDesc": "Verifique a sua caixa de entrada para um link de redefinição.",
+    "resetPasswordError": "Não foi possível enviar o e-mail. Tente novamente.",
+    "sendResetLink": "Enviar link",
+    "resetYourPassword": "Defina a sua nova palavra-passe",
+    "resetYourPasswordDesc": "Introduza a sua nova palavra-passe abaixo.",
+    "resetPassword": "Redefinir palavra-passe",
+    "passwordChanged": "Palavra-passe atualizada!",
+    "passwordChangedDesc": "A sua palavra-passe foi alterada com sucesso. Já pode iniciar sessão.",
+    "or": "ou",
+    "termsAgreement": "Ao selecionar <bold>{action}</bold>, concordo com os <termsLink>Termos de Serviço</termsLink> da Ecobilda e reconheço a <privacyLink>Política de Privacidade</privacyLink>.",
+    "errorCheckEmail": "Erro ao verificar o e-mail",
+    "validation": {
+      "ageRequirement": "Deve ter pelo menos 18 anos",
+      "birthDateRequired": "Data de nascimento obrigatória",
+      "email": "E-mail inválido",
+      "firstName": "O nome deve ter pelo menos 2 caracteres",
+      "lastName": "O apelido deve ter pelo menos 2 caracteres",
+      "password": "A palavra-passe deve ter pelo menos 8 caracteres",
+      "passwordMatch": "As palavras-passe não coincidem",
+      "passwordComplexity": "Mín. 8 caracteres e 1 número ou símbolo",
+      "terms": "Deve aceitar os termos"
     },
-    "home": {
-        "hero": {
-            "title": "Construção Natural em Todo o Mundo",
-            "subtitle": "Conecte-se com projetos de eco-construção e permacultura em todo o mundo. Aprenda novas competências enquanto contribui para comunidades sustentáveis.",
-            "browseProjects": "Ver Projetos",
-            "register": "Começar"
-        },
-        "about": {
-            "title": "Bem-vindo ao Ecobilda",
-            "intro": "O Ecobilda é dedicado à construção natural e à permacultura, mas sobretudo às conexões humanas. Uma plataforma para viajar, conhecer e aprender."
-        },
-        "naturalBuilding": {
-            "title": "Construção Natural",
-            "content": "Aprenda fazendo. Construa habitats ecológicos e sustentáveis com materiais locais como terra, palha e madeira."
-        },
-        "permaculture": {
-            "title": "Permacultura",
-            "content": "Crie sistemas resilientes. Cresça em harmonia com a natureza, observando e imitando os seus ecossistemas."
-        },
-        "community": {
-            "title": "Comunidade",
-            "content": "Conheça pessoas apaixonadas. Partilhe momentos de vida, conhecimento e refeições. A aventura humana está no centro de cada projeto."
-        },
-        "howItWorks": {
-            "title": "Como Funciona",
-            "subtitle": "Três passos simples para começar a sua aventura em eco-construção.",
-            "step1": {
-                "title": "Explorar projetos",
-                "desc": "Descubra projetos de eco-construção e permacultura em todo o mundo. Filtre por localização, competências e disponibilidade."
-            },
-            "step2": {
-                "title": "Candidatar-se a participar",
-                "desc": "Envie uma mensagem de motivação ao anfitrião explicando porque quer participar. Mostre o seu entusiasmo e vontade de aprender."
-            },
-            "step3": {
-                "title": "Aprender e contribuir",
-                "desc": "Uma vez aceite, adquira competências práticas enquanto ajuda a construir projetos sustentáveis. Uma experiência transformadora espera por si."
-            }
-        },
-        "forHosts": {
-            "title": "É anfitrião de um projeto?",
-            "desc": "Publique o seu projeto de eco-construção ou permacultura e encontre voluntários motivados de todo o mundo. O Ecobilda facilita a gestão de candidaturas e a comunicação com os participantes.",
-            "cta": "Criar o seu projeto",
-            "benefit1": "Alcance uma comunidade global de voluntários apaixonados por sustentabilidade e construção natural.",
-            "benefit2": "Gerencie facilmente os pedidos de participação e converse diretamente com os voluntários aceites.",
-            "benefit3": "É completamente gratuito. Sem taxas, sem comissões, sem custos ocultos."
-        },
-        "faq": {
-            "title": "Perguntas Frequentes",
-            "q1": "O Ecobilda é gratuito?",
-            "a1": "Sim, o Ecobilda é completamente gratuito para voluntários e anfitriões de projetos. Sem taxas, subscrições ou custos ocultos.",
-            "q2": "Que tipos de projetos posso encontrar?",
-            "a2": "O Ecobilda concentra-se em duas áreas principais: construção natural (palha, adobe, rebocos de terra, carpintaria, etc.) e permacultura (design de jardins, compostagem, colheita, etc.).",
-            "q3": "Quanto tempo duram as estadias?",
-            "a3": "A duração é flexível e varia conforme o projeto. Alguns duram poucos dias, outros várias semanas ou até meses. Cada anúncio especifica a duração esperada.",
-            "q4": "Preciso de experiência prévia?",
-            "a4": "De todo! A maioria dos projetos aceita principiantes e oferece formação no local. O objetivo é aprender fazendo, ao lado de anfitriões experientes.",
-            "q5": "Como é que o anfitrião me aceita?",
-            "a5": "Envia um pedido de participação com uma mensagem de motivação. O anfitrião analisa o seu perfil e mensagem, depois aceita ou recusa. Uma vez aceite, pode conversar diretamente para organizar os detalhes."
-        },
-        "cta": {
-            "title": "Pronto para começar a sua aventura?",
-            "subtitle": "Junte-se à nossa comunidade de eco-construtores e entusiastas de permacultura hoje.",
-            "button": "Registar-se gratuitamente"
-        }
-    },
-    "notifications": {
-        "title": "Notificações",
-        "markAllRead": "Marcar todas como lidas",
-        "noNew": "Sem novas notificações",
-        "noNotifications": "Nenhuma notificação ainda",
-        "unreadCount": "{count} não lida(s)",
-        "allRead": "Tudo em dia",
-        "viewAll": "Ver tudo",
-        "viewAllMessages": "Ver todas as mensagens"
-    },
-    "footer": {
-        "copyright": "© {year} Ecobilda. Todos os direitos reservados.",
-        "about": {
-            "title": "Sobre",
-            "us": "Sobre Nós",
-            "contact": "Contacto",
-            "faq": "FAQ"
-        },
-        "projects": {
-            "title": "Projetos",
-            "browse": "Ver Projetos",
-            "howItWorks": "Como Funciona",
-            "forHosts": "Para Anfitriões"
-        },
-        "legal": {
-            "title": "Jurídico"
-        },
-        "links": {
-            "terms": "Termos",
-            "privacy": "Privacidade"
-        }
-    },
-    "projects": {
-        "title": "Projetos",
-        "explore": "Explorar projetos",
-        "found": "projetos encontrados",
-        "searchPlaceholder": "Pesquisar projetos ou localizações...",
-        "noResults": "Nenhum projeto encontrado",
-        "noResultsDesc": "Tente ajustar os seus filtros ou termos de pesquisa para encontrar o que procura.",
-        "clearFilters": "Limpar todos os filtros",
-        "clearSkills": "Limpar competências",
-        "spotsLeft": "{count} lugares restantes",
-        "full": "Completo",
-        "createProject": "Criar projeto",
-        "projectType": "Tipo de projeto",
-        "permaculture": "Permacultura",
-        "naturalBuilding": "Construção natural",
-        "activeProjects": "Projetos ativos",
-        "pastProjects": "Projetos passados",
-        "volunteers": "voluntários",
-        "internetProvided": "Internet fornecido",
-        "familyFriendly": "Adequado para famílias",
-        "petsAllowed": "Animais permitidos",
-        "smokingAllowed": "Fumar permitido",
-        "wifi": "WiFi",
-        "max": "máx",
-        "hoursPerDayShort": "h/dia",
-        "filters": {
-            "all": "Todos",
-            "construction": "Construção",
-            "permaculture": "Permacultura",
-            "renovation": "Renovação",
-            "community": "Comunidade",
-            "categories": "Categorias",
-            "locations": "Localizações",
-            "applyFilters": "Aplicar filtros",
-            "showResults": "Mostrar {count} projetos",
-            "allDescription": "Todos os tipos de projeto",
-            "amenities": "Comodidades e condições",
-            "anywhere": "Em qualquer lugar",
-            "chooseType": "Escolha o tipo de projeto",
-            "dates": "Datas",
-            "family": "Adequado para famílias",
-            "flexible": "Sou flexível",
-            "locationPlaceholder": "ex. Lisboa, Algarve...",
-            "maxVolunteers": "Máx. voluntários",
-            "natbDescription": "Construção ecológica",
-            "noResultsFor": "Sem resultados para",
-            "permDescription": "Jardins e agricultura sustentável",
-            "pets": "Animais permitidos",
-            "search": "Pesquisar",
-            "searchByLocation": "Pesquisar por cidade, região ou país",
-            "searchEverywhere": "Pesquisar em todo o lado",
-            "searchPlaceholder": "Para onde vai?",
-            "searching": "A pesquisar...",
-            "selectDates": "Selecione as suas datas",
-            "skipDates": "Datas flexíveis",
-            "smoking": "Permitido fumar",
-            "startingFrom": "A partir de",
-            "whatType": "Que tipo de projeto?",
-            "whenToGo": "Quando vai?",
-            "whereToGo": "Para onde vai?",
-            "wifi": "WiFi incluído",
-            "workDetails": "Detalhes do trabalho"
-        },
-        "helpersMax": "voluntários máx",
-        "daysPerWeek": "Dias por semana",
-        "daysPerWeekShort": "d/sem",
-        "familiesWelcome": "Famílias bem-vindas",
-        "foundSingle": "projeto encontrado",
-        "host": "Anfitrião",
-        "hoursPerDay": "Horas por dia",
-        "loadingMap": "A carregar mapa...",
-        "petsAccepted": "Animais permitidos",
-        "viewGrid": "Vista grelha",
-        "viewList": "Ver lista",
-        "viewMap": "Ver mapa",
-        "viewMode": "Modo de vista",
-        "viewProject": "Ver projeto",
-        "wifiIncluded": "WiFi incluído",
-        "reviews": "avaliações",
-        "yourHost": "Seu anfitrião"
-    },
-    "projectDetail": {
-        "notFound": "Projeto não encontrado",
-        "backToProjects": "Voltar aos projetos",
-        "about": "Sobre o projeto",
-        "details": "Detalhes do projeto",
-        "status": "Estado",
-        "startDate": "Data de início",
-        "volunteers": "Voluntários",
-        "volunteersNeeded": "{count} necessários",
-        "apply": "Candidatar",
-        "freeForMembers": "Gratuito para membros.",
-        "showAllPhotos": "Mostrar todas as fotos",
-        "showAllXPhotos": "Mostrar todas as {count} fotos",
-        "availability": "Disponibilidade",
-        "languages": "Idiomas",
-        "accommodation": "Alojamento",
-        "accommodationType": "Tipo de alojamento",
-        "amenities": "Comodidades",
-        "daysPerWeek": "Dias por semana",
-        "hoursPerDay": "Horas por dia",
-        "location": "Localização",
-        "maxVolunteers": "Máx. voluntários",
-        "meals": "Refeições",
-        "skills": "Competências",
-        "workDetails": "Detalhes do trabalho",
-        "pickDates": "Chegada - Partida",
-        "reviews": "avaliações",
-        "selectDates": "Selecione as suas datas",
-        "yourHost": "O seu anfitrião"
-    },
-    "createProject": {
-        "title": "Criar novo projeto",
-        "subtitle": "Partilhe o seu projeto de eco-construção ou permacultura com a comunidade",
-        "step": "Passo {current} de {total}",
-        "complete": "{percent}% completo",
-        "steps": {
-            "basicInfo": "Informação básica",
-            "locationWork": "Localização e detalhes do trabalho",
-            "skillsAmenities": "Competências e comodidades",
-            "availabilityImages": "Disponibilidade e imagens"
-        },
-        "error": {
-            "createFailed": "Falha ao criar projeto. Por favor, tente novamente."
-        },
-        "step1": {
-            "title": "Informação básica",
-            "description": "Conte-nos sobre o seu projeto. Seja descritivo e envolvente para atrair os voluntários certos.",
-            "projectType": "Tipo de projeto *",
-            "permaculture": "Permacultura",
-            "permacultureDesc": "Jardim, compostagem, colheita, etc.",
-            "naturalBuilding": "Construção natural",
-            "naturalBuildingDesc": "Carpintaria, alvenaria, reboco de terra, etc.",
-            "projectTitle": "Título do projeto *",
-            "projectTitlePlaceholder": "ex., Quinta orgânica nos Alpes franceses",
-            "projectTitleDescription": "Escolha um título apelativo que descreva o seu projeto",
-            "projectDescription": "Descrição do projeto *",
-            "projectDescriptionPlaceholder": "Descreva o seu projeto em detalhe. Inclua:\n• O que os voluntários farão\n• O que aprenderão\n• A missão e valores do seu projeto\n• Rotina diária e atmosfera\n• Qualquer outra coisa que torne o seu projeto único",
-            "projectDescriptionHint": "Seja detalhado e autêntico. Esta é a sua oportunidade de atrair as pessoas certas!",
-            "projectDescriptionCounter": "{count} / 2000",
-            "tipsTitle": "💡 Dicas para uma ótima descrição:",
-            "tip1": "Seja específico sobre tarefas diárias e oportunidades de aprendizagem",
-            "tip2": "Mencione os seus valores e o que torna o seu projeto especial",
-            "tip3": "Descreva a localização, arredores e condições de vida",
-            "tip4": "Partilhe a sua visão e o que espera alcançar juntos",
-            "next": "Seguinte: Localização e detalhes do trabalho →",
-            "validation": {
-                "titleMin": "O título deve ter pelo menos 10 caracteres",
-                "titleMax": "O título é muito longo",
-                "descriptionMin": "A descrição deve ter pelo menos 50 caracteres",
-                "descriptionMax": "A descrição é muito longa"
-            }
-        },
-        "step2": {
-            "title": "Localização e detalhes do trabalho",
-            "description": "Ajude os voluntários a encontrá-lo e a entender o arranjo de trabalho.",
-            "location": "Localização",
-            "city": "Cidade *",
-            "cityPlaceholder": "ex., Lyon",
-            "postalCode": "Código postal *",
-            "postalCodePlaceholder": "ex., 69000",
-            "country": "País *",
-            "countryPlaceholder": "Selecionar um país",
-            "privacyNote": "O endereço exato não é necessário para privacidade. Cidade e país são suficientes.",
-            "workArrangement": "Arranjo de trabalho",
-            "hoursPerDay": "Horas por dia *",
-            "hoursPerDayDesc": "1-10 horas",
-            "daysPerWeek": "Dias por semana *",
-            "daysPerWeekDesc": "1-7 dias",
-            "maxVolunteers": "Máx. voluntários *",
-            "maxVolunteersDesc": "1-20 pessoas",
-            "accommodationDetails": "Detalhes do alojamento *",
-            "accommodationPlaceholder": "Descreva onde os voluntários dormirão. Por exemplo:\n• Quarto privado, quarto partilhado, tenda, caravana, etc.\n• Casa de banho partilhada ou privada\n• Roupa de cama e toalhas fornecidas?\n• Aquecimento/arrefecimento\n• Quaisquer outros detalhes relevantes",
-            "foodDetails": "Detalhes da comida *",
-            "foodPlaceholder": "Descreva o arranjo alimentar. Por exemplo:\n• Quantas refeições por dia são fornecidas?\n• Tipo de comida (vegetariana, vegana, omnívora)\n• Fonte (produzida em casa, orgânica, mercado local)\n• Os voluntários cozinham juntos ou refeições fornecidas?\n• Acesso à cozinha para voluntários?",
-            "back": "← Voltar",
-            "next": "Seguinte: Competências e comodidades →",
-            "validation": {
-                "cityRequired": "A cidade é obrigatória",
-                "postalCodeRequired": "O código postal é obrigatório",
-                "countryRequired": "O país é obrigatório",
-                "hoursRange": "Deve estar entre 1 e 10",
-                "daysRange": "Deve estar entre 1 e 7",
-                "maxVolunteersRange": "Deve estar entre 1 e 20",
-                "accommodationMin": "Por favor, forneça detalhes sobre o alojamento (mín. 20 caracteres)",
-                "foodMin": "Por favor, forneça detalhes sobre a comida (mín. 20 caracteres)"
-            }
-        },
-        "step3": {
-            "title": "Competências e comodidades",
-            "description": "Selecione as competências que os voluntários usarão e as comodidades que fornece.",
-            "skillsTitle": "Competências {type} *",
-            "skillsDescription": "Selecione todas as competências com as quais os voluntários trabalharão. Escolha pelo menos uma.",
-            "selected": "Selecionado: {count} competência(s)",
-            "amenities": "Comodidades",
-            "amenitiesDescription": "Selecione as comodidades e preferências para o seu projeto.",
-            "internetProvided": "Internet fornecido",
-            "internetProvidedDesc": "WiFi ou acesso à internet está disponível para voluntários",
-            "familyFriendly": "Adequado para famílias",
-            "familyFriendlyDesc": "Adequado para famílias com crianças",
-            "petsAllowed": "Animais permitidos",
-            "petsAllowedDesc": "Os voluntários podem trazer os seus animais",
-            "smokingAllowed": "Fumar permitido",
-            "smokingAllowedDesc": "Fumar é permitido na propriedade",
-            "back": "← Voltar",
-            "next": "Seguinte: Disponibilidade e imagens →",
-            "validation": {
-                "skillsRequired": "Por favor, selecione pelo menos uma competência"
-            }
-        },
-        "step4": {
-            "title": "Disponibilidade e imagens",
-            "description": "Quando está disponível para receber voluntários? Adicione algumas fotos para mostrar o seu projeto.",
-            "availability": "Disponibilidade (Opcional)",
-            "availabilityDescription": "Selecione os meses em que pode receber voluntários. Pode ignorar isto e adicionar mais tarde.",
-            "year": "Ano:",
-            "monthsSelected": "{count} mês(es) selecionado(s) para {year}",
-            "images": "Imagens do projeto (Opcional)",
-            "imagesDescription": "Carregue imagens do seu projeto. Use os botões de setas para reordená-las. A primeira imagem será a capa.",
-            "uploadButton": "Clique para carregar imagens",
-            "uploadHint": "PNG, JPG até 10MB cada",
-            "cover": "Capa",
-            "imagesUploaded": "{count} / 10 imagens carregadas",
-            "maxImagesAlert": "Máximo de 10 imagens permitidas",
-            "reviewTitle": "✨ Revise o seu projeto",
-            "reviewProject": "Projeto {type}",
-            "reviewTitleLabel": "Título: {title}",
-            "reviewLocation": "Localização: {city}, {country}",
-            "reviewWork": "Trabalho: {hours}h/dia, {days} dias/semana, máx. {max} voluntários",
-            "reviewSkills": "Competências: {count} selecionadas",
-            "reviewImages": "Imagens: {count} carregadas",
-            "reviewNotSet": "(não definido)",
-            "back": "← Voltar",
-            "create": "Criar projeto",
-            "creating": "A criar projeto...",
-            "monthLabels": {
-                "jan": "Jan",
-                "feb": "Fev",
-                "mar": "Mar",
-                "apr": "Abr",
-                "may": "Mai",
-                "jun": "Jun",
-                "jul": "Jul",
-                "aug": "Ago",
-                "sep": "Set",
-                "oct": "Out",
-                "nov": "Nov",
-                "dec": "Dez"
-            }
-        }
-    },
-    "dashboard": {
-        "welcome": "Bem-vindo de volta, {name}!",
-        "stats": {
-            "projects": "Os meus projetos",
-            "rating": "Classificação",
-            "reviews": "Avaliações",
-            "messages": "Novas mensagens"
-        },
-        "quickActions": "Ações rápidas",
-        "actions": {
-            "browse": "Explorar projetos",
-            "browseDesc": "Encontrar novas oportunidades",
-            "myProjects": "Os meus projetos",
-            "myProjectsDesc": "Gerir os seus anúncios",
-            "messages": "Mensagens",
-            "messagesDesc": "Conversar com a comunidade",
-            "create": "Criar projeto",
-            "createDesc": "Começar algo novo"
-        },
-        "myProjects": "Os meus projetos",
-        "viewAll": "Ver tudo",
-        "helpers": "voluntários máx",
-        "noProjects": "Ainda sem projetos",
-        "noProjectsDesc": "Crie o seu primeiro projeto para começar",
-        "createFirst": "Criar projeto",
-        "notifications": "Notificações",
-        "quickLinks": "Links rápidos",
-        "links": {
-            "profile": "O meu perfil",
-            "profileDesc": "Ver e editar o seu perfil",
-            "favorites": "Os meus favoritos",
-            "favoritesDesc": "Projetos que guardou",
-            "participations": "As minhas participações",
-            "participationsDesc": "Projetos em que participou",
-            "settings": "Definições da conta",
-            "settingsDesc": "Gerir a sua conta"
-        }
-    },
-    "myProjects": {
-        "title": "Os meus projetos",
-        "subtitle": "Gerir os seus projetos publicados",
-        "createNew": "Criar novo projeto",
-        "noProjects": "Ainda sem projetos",
-        "noProjectsDesc": "Ainda não criou nenhum projeto. Crie o seu primeiro projeto e conecte-se com voluntários!",
-        "createFirst": "Crie o seu primeiro projeto",
-        "fetchError": "Não foi possível carregar os seus projetos. Tente novamente.",
-        "noActive": "Sem projetos ativos",
-        "noActiveDesc": "Não tem nenhum projeto ativo neste momento.",
-        "noPast": "Sem projetos passados",
-        "noPastDesc": "Ainda não tem projetos passados."
-    },
-    "participations": {
-        "title": "As minhas participações",
-        "subtitle": "Projetos a que se candidatou",
-        "all": "Todos",
-        "pending": "Pendente",
-        "accepted": "Aceite",
-        "rejected": "Rejeitado",
-        "completed": "Concluído",
-        "hostedBy": "Alojado por",
-        "viewProject": "Ver projeto",
-        "noParticipations": "Ainda sem participações",
-        "noParticipationsDesc": "Comece a explorar projetos e candidate-se para participar!",
-        "browseProjects": "Explorar projetos",
-        "applyDesc": "Envie um pedido de participação ao anfitrião.",
-        "applyTitle": "Candidatar-se a este projeto",
-        "cancelled": "Cancelado",
-        "endDate": "Data de fim",
-        "expired": "Expirado",
-        "fetchError": "Não foi possível carregar as participações. Tente novamente.",
-        "host": "Anfitrião",
-        "hostResponse": "Resposta do anfitrião",
-        "motivation": "Motivação",
-        "motivationPlaceholder": "Explique ao anfitrião porque gostaria de participar neste projeto...",
-        "requestError": "Não foi possível enviar o pedido. Tente novamente.",
-        "requestSent": "Pedido enviado!",
-        "requestSentDesc": "O anfitrião irá analisar o seu pedido e responder-lhe.",
-        "sendRequest": "Enviar pedido",
-        "startDate": "Data de início"
-    },
-    "favorites": {
-        "title": "Os meus favoritos",
-        "subtitle": "Projetos que guardou",
-        "remove": "Remover dos favoritos",
-        "noFavorites": "Ainda sem favoritos",
-        "noFavoritesDesc": "Comece a explorar projetos e guarde os que gostar!",
-        "browseProjects": "Explorar projetos",
-        "addLabel": "Adicionar aos favoritos",
-        "addedMessage": "Projeto adicionado aos seus favoritos",
-        "addedTitle": "Adicionado aos favoritos",
-        "errorMessage": "Não foi possível atualizar os favoritos",
-        "errorTitle": "Erro",
-        "removeLabel": "Remover dos favoritos",
-        "removedMessage": "Projeto removido dos seus favoritos",
-        "removedTitle": "Removido dos favoritos"
-    },
-    "profile": {
-        "editProfile": "Editar perfil",
-        "backToProfile": "Voltar ao perfil",
-        "about": "Sobre",
-        "location": "Localização",
-        "birthday": "Aniversário",
-        "languages": "Idiomas",
-        "skills": "Competências",
-        "bio": "Sobre mim",
-        "bioPlaceholder": "Conte aos outros sobre si...",
-        "review": "avaliação",
-        "reviews": "avaliações",
-        "reviewsTitle": "Avaliações",
-        "yourResponse": "A sua resposta",
-        "edit": {
-            "bioError": "A biografia deve ter menos de 500 caracteres",
-            "changePhoto": "Mudar foto",
-            "characters": "caracteres",
-            "city": "Cidade",
-            "cityPlaceholder": "ex. Lisboa",
-            "firstName": "Nome",
-            "firstNameError": "O nome é obrigatório",
-            "imageHint": "JPG, PNG até 5MB",
-            "imageTooLarge": "A imagem é demasiado grande. Máximo 5MB.",
-            "invalidImage": "Formato de imagem inválido. Use JPG ou PNG.",
-            "languagesPlaceholder": "Selecione idiomas",
-            "lastName": "Apelido",
-            "lastNameError": "O apelido é obrigatório",
-            "noResults": "Sem resultados",
-            "profilePicture": "Foto de perfil",
-            "saveChanges": "Guardar alterações",
-            "skillsHint": "Selecione as competências que tem ou quer aprender",
-            "skillsSelected": "{count} competências selecionadas",
-            "updateFailed": "Não foi possível atualizar o perfil. Tente novamente.",
-            "yourSkills": "As suas competências"
-        }
-    },
-    "settings": {
-        "title": "Definições da conta",
-        "subtitle": "Gerir as suas preferências e segurança",
-        "saved": "Definições guardadas!",
-        "notifications": "Notificações",
-        "emailNotifications": "Notificações por email",
-        "emailNotificationsDesc": "Receber notificações por email para atualizações importantes",
-        "projectUpdates": "Atualizações de projetos",
-        "projectUpdatesDesc": "Ser notificado sobre projetos que o interessam",
-        "messageNotifications": "Notificações de mensagens",
-        "messageNotificationsDesc": "Receber notificações para novas mensagens",
-        "marketingEmails": "Emails de marketing",
-        "marketingEmailsDesc": "Receber notícias e conteúdo promocional",
-        "saveChanges": "Guardar alterações",
-        "language": "Idioma",
-        "preferredLanguage": "Idioma preferido",
-        "saveLanguage": "Guardar idioma",
-        "changePassword": "Alterar palavra-passe",
-        "currentPassword": "Palavra-passe atual",
-        "newPassword": "Nova palavra-passe",
-        "confirmPassword": "Confirmar nova palavra-passe",
-        "showPassword": "Mostrar palavras-passe",
-        "updatePassword": "Atualizar palavra-passe",
-        "logout": "Sair",
-        "logoutDesc": "Sair da sua conta",
-        "logoutBtn": "Sair",
-        "dangerZone": "Zona de perigo",
-        "deleteWarning": "Assim que eliminar a sua conta, não há volta atrás. Por favor, tenha certeza.",
-        "deleteAccount": "Eliminar conta",
-        "deleteConfirm": "Tem a certeza de que deseja eliminar a sua conta? Esta ação não pode ser desfeita.",
-        "deleteConfirmInstruction": "Digite EXCLUIR para confirmar"
+    "welcome": "Bem-vindo ao Ecobilda"
+  },
+  "home": {
+    "heroAlt": "Obra de eco-construção",
+    "hero": {
+      "title": "Construção Natural em Todo o Mundo",
+      "subtitle": "Conecte-se com projetos de eco-construção e permacultura em todo o mundo. Aprenda novas competências enquanto contribui para comunidades sustentáveis.",
+      "browseProjects": "Ver Projetos",
+      "register": "Começar"
     },
     "about": {
-        "hero": {
-            "subtitle": "Conectando voluntários com projetos de construção natural e permacultura em todo o mundo",
-            "title": "Sobre o Ecobilda"
-        },
-        "howItWorks": {
-            "step1": {
-                "desc": "Explore projetos de construção natural e permacultura de todo o mundo",
-                "title": "Descubra projetos"
-            },
-            "step2": {
-                "desc": "Entre em contacto com os proprietários dos projetos e discuta oportunidades",
-                "title": "Conecte-se com anfitriões"
-            },
-            "step3": {
-                "desc": "Ganhe experiência prática enquanto ajuda projetos sustentáveis",
-                "title": "Aprenda e contribua"
-            },
-            "step4": {
-                "desc": "Deixe avaliações e ajude outros a encontrar grandes oportunidades",
-                "title": "Partilhe a sua experiência"
-            },
-            "title": "Como funciona"
-        },
-        "mission": {
-            "description1": "O Ecobilda é uma plataforma dedicada a promover a vida sustentável através da construção natural e permacultura. Conectamos voluntários apaixonados com projetos ecológicos em todo o mundo.",
-            "description2": "O nosso objetivo é criar uma comunidade global de indivíduos comprometidos com a sustentabilidade ambiental.",
-            "title": "A nossa missão"
-        },
-        "values": {
-            "collaboration": {
-                "desc": "Promover a troca de conhecimentos e o apoio mútuo",
-                "title": "Colaboração"
-            },
-            "community": {
-                "desc": "Construir uma rede global de pessoas com ideais semelhantes",
-                "title": "Comunidade"
-            },
-            "globalImpact": {
-                "desc": "Fazer uma diferença positiva em todo o mundo",
-                "title": "Impacto global"
-            },
-            "naturalBuilding": {
-                "desc": "Criar estruturas ecológicas com materiais naturais",
-                "title": "Construção natural"
-            },
-            "permaculture": {
-                "desc": "Projetar ecossistemas agrícolas sustentáveis",
-                "title": "Permacultura"
-            },
-            "sustainability": {
-                "desc": "Promover práticas ecológicas e soluções de vida sustentável",
-                "title": "Sustentabilidade"
-            },
-            "title": "Os nossos valores"
-        }
+      "title": "Bem-vindo ao Ecobilda",
+      "intro": "O Ecobilda é dedicado à construção natural e à permacultura, mas sobretudo às conexões humanas. Uma plataforma para viajar, conhecer e aprender.",
+      "mission": "O Ecobilda liga quem constrói naturalmente a quem quer viajar e aprender."
     },
-    "contact": {
-        "form": {
-            "email": "E-mail",
-            "emailPlaceholder": "seu.email@exemplo.com",
-            "message": "Mensagem",
-            "messagePlaceholder": "Conte-nos mais...",
-            "name": "Nome",
-            "namePlaceholder": "O seu nome",
-            "subject": "Assunto",
-            "subjectPlaceholder": "Sobre o que se trata?",
-            "submit": "Enviar mensagem"
-        },
-        "formTitle": "Envie-nos uma mensagem",
-        "subtitle": "Tem uma pergunta ou quer entrar em contacto? Gostaríamos de ouvir de si!",
-        "successMessage": "A sua mensagem foi enviada com sucesso! Responderemos em breve.",
-        "title": "Contacte-nos"
+    "naturalBuilding": {
+      "title": "Construção Natural",
+      "content": "Aprenda fazendo. Construa habitats ecológicos e sustentáveis com materiais locais como terra, palha e madeira."
     },
-    "faq": {
-        "cantFindAnswer": "Não encontra a resposta? A nossa equipa está aqui para ajudar.",
-        "categories": {
-            "forHosts": {
-                "a1": "Após iniciar sessão, clique em \"Criar projeto\" e preencha os detalhes.",
-                "a2": "Pode especificar o número máximo de voluntários ao criar o seu projeto.",
-                "a3": "Sim, pode editar os detalhes do seu projeto a qualquer momento.",
-                "q1": "Como crio um projeto?",
-                "q2": "Quantos voluntários posso alojar?",
-                "q3": "Posso editar o meu projeto depois de publicar?",
-                "title": "Para anfitriões"
-            },
-            "forVolunteers": {
-                "a1": "Use a página de Projetos para explorar as oportunidades disponíveis.",
-                "a2": "Cada projeto tem requisitos diferentes. Consulte a página do projeto.",
-                "a3": "Sim! Após um projeto, voluntários e anfitriões podem deixar avaliações.",
-                "q1": "Como encontro projetos?",
-                "q2": "O que devo levar?",
-                "q3": "Posso deixar uma avaliação?",
-                "title": "Para voluntários"
-            },
-            "gettingStarted": {
-                "a1": "O Ecobilda é uma plataforma que conecta voluntários com projetos de eco-construção e permacultura.",
-                "a2": "Clique em \"Registar\", preencha os seus dados e comece a explorar projetos.",
-                "a3": "Sim, criar uma conta e explorar projetos é completamente gratuito.",
-                "q1": "O que é o Ecobilda?",
-                "q2": "Como crio uma conta?",
-                "q3": "O Ecobilda é gratuito?",
-                "title": "Primeiros passos"
-            }
-        },
-        "contactSupport": "Contactar suporte",
-        "noResults": "Nenhuma pergunta encontrada para \"{term}\"",
-        "searchPlaceholder": "Procurar respostas...",
-        "stillHaveQuestions": "Ainda tem perguntas?",
-        "subtitle": "Encontre respostas para perguntas frequentes sobre o Ecobilda",
-        "title": "Perguntas frequentes"
+    "permaculture": {
+      "title": "Permacultura",
+      "content": "Crie sistemas resilientes. Cresça em harmonia com a natureza, observando e imitando os seus ecossistemas."
     },
-    "forHosts": {
-        "create": {
-            "desc": "Descreva o seu projeto e o que os voluntários aprenderão.",
-            "title": "Crie o seu projeto"
-        },
-        "cta": "Começar a alojar",
-        "receive": {
-            "desc": "Receba voluntários e partilhe os seus conhecimentos.",
-            "title": "Receba voluntários"
-        },
-        "subtitle": "Partilhe o seu projeto de eco-construção ou permacultura e receba voluntários apaixonados.",
-        "title": "Para anfitriões",
-        "trust": {
-            "desc": "Construa confiança através de avaliações e perfis verificados.",
-            "title": "Construa confiança"
-        }
-    },
-    "forVolunteers": {
-        "cta": "Encontrar um projeto",
-        "find": {
-            "desc": "Descubra projetos de construção natural e permacultura em todo o mundo.",
-            "title": "Encontre projetos"
-        },
-        "learn": {
-            "desc": "Ganhe experiência prática em eco-construção e permacultura.",
-            "title": "Aprenda novas competências"
-        },
-        "subtitle": "Viaje pelo mundo enquanto aprende técnicas de construção sustentável e permacultura.",
-        "title": "Para voluntários",
-        "travel": {
-            "desc": "Explore novos lugares enquanto contribui para projetos significativos.",
-            "title": "Viaje e descubra"
-        }
+    "community": {
+      "title": "Comunidade",
+      "content": "Conheça pessoas apaixonadas. Partilhe momentos de vida, conhecimento e refeições. A aventura humana está no centro de cada projeto."
     },
     "howItWorks": {
-        "step1": {
-            "desc": "Crie a sua conta gratuita e complete o seu perfil.",
-            "title": "Registe-se"
-        },
-        "step2": {
-            "desc": "Descubra projetos de eco-construção e permacultura em todo o mundo.",
-            "title": "Explore projetos"
-        },
-        "step3": {
-            "desc": "Envie um pedido de participação e conecte-se com o seu anfitrião.",
-            "title": "Candidate-se e conecte-se"
-        },
-        "step4": {
-            "desc": "Aprenda novas competências e deixe uma avaliação para ajudar a comunidade.",
-            "title": "Participe e avalie"
-        },
-        "subtitle": "Começar com o Ecobilda é fácil",
-        "title": "Como funciona"
+      "title": "Como Funciona",
+      "subtitle": "Três passos simples para começar a sua aventura em eco-construção.",
+      "step1": {
+        "title": "Explorar projetos",
+        "desc": "Descubra projetos de eco-construção e permacultura em todo o mundo. Filtre por localização, competências e disponibilidade."
+      },
+      "step2": {
+        "title": "Candidatar-se a participar",
+        "desc": "Envie uma mensagem de motivação ao anfitrião explicando porque quer participar. Mostre o seu entusiasmo e vontade de aprender."
+      },
+      "step3": {
+        "title": "Aprender e contribuir",
+        "desc": "Uma vez aceite, adquira competências práticas enquanto ajuda a construir projetos sustentáveis. Uma experiência transformadora espera por si."
+      }
+    },
+    "forHosts": {
+      "title": "É anfitrião de um projeto?",
+      "desc": "Publique o seu projeto de eco-construção ou permacultura e encontre voluntários motivados de todo o mundo. O Ecobilda facilita a gestão de candidaturas e a comunicação com os participantes.",
+      "cta": "Criar o seu projeto",
+      "benefit1": "Alcance uma comunidade global de voluntários apaixonados por sustentabilidade e construção natural.",
+      "benefit2": "Gerencie facilmente os pedidos de participação e converse diretamente com os voluntários aceites.",
+      "benefit3": "É completamente gratuito. Sem taxas, sem comissões, sem custos ocultos."
+    },
+    "faq": {
+      "title": "Perguntas Frequentes",
+      "q1": "O Ecobilda é gratuito?",
+      "a1": "Sim, o Ecobilda é completamente gratuito para voluntários e anfitriões de projetos. Sem taxas, subscrições ou custos ocultos.",
+      "q2": "Que tipos de projetos posso encontrar?",
+      "a2": "O Ecobilda concentra-se em duas áreas principais: construção natural (palha, adobe, rebocos de terra, carpintaria, etc.) e permacultura (design de jardins, compostagem, colheita, etc.).",
+      "q3": "Quanto tempo duram as estadias?",
+      "a3": "A duração é flexível e varia conforme o projeto. Alguns duram poucos dias, outros várias semanas ou até meses. Cada anúncio especifica a duração esperada.",
+      "q4": "Preciso de experiência prévia?",
+      "a4": "De todo! A maioria dos projetos aceita principiantes e oferece formação no local. O objetivo é aprender fazendo, ao lado de anfitriões experientes.",
+      "q5": "Como é que o anfitrião me aceita?",
+      "a5": "Envia um pedido de participação com uma mensagem de motivação. O anfitrião analisa o seu perfil e mensagem, depois aceita ou recusa. Uma vez aceite, pode conversar diretamente para organizar os detalhes."
+    },
+    "cta": {
+      "title": "Pronto para começar a sua aventura?",
+      "subtitle": "Junte-se à nossa comunidade de eco-construtores e entusiastas de permacultura hoje.",
+      "button": "Registar-se gratuitamente"
+    }
+  },
+  "notifications": {
+    "title": "Notificações",
+    "markAllRead": "Marcar todas como lidas",
+    "noNew": "Sem novas notificações",
+    "noNotifications": "Nenhuma notificação ainda",
+    "loading": "A carregar notificações...",
+    "unreadCount": "{count} não lida(s)",
+    "allRead": "Tudo em dia",
+    "viewAll": "Ver tudo",
+    "viewAllMessages": "Ver todas as mensagens",
+    "newMessage": "Nova mensagem",
+    "mockMessage": "Olá! Estou muito interessado/a no seu projeto de permacultura em Lyon.",
+    "recentActivity": "Atividade recente"
+  },
+  "footer": {
+    "about": {
+      "title": "Sobre",
+      "us": "Quem somos",
+      "contact": "Contacto",
+      "faq": "FAQ"
+    },
+    "projects": {
+      "title": "Plataforma",
+      "forHosts": "Para anfitriões",
+      "forHelpers": "Para helpers"
+    },
+    "legal": {
+      "title": "Legal"
+    },
+    "links": {
+      "terms": "Termos",
+      "privacy": "Privacidade"
+    },
+    "copyright": "© {year} Ecobilda. Todos os direitos reservados."
+  },
+  "projects": {
+    "title": "Projetos",
+    "explore": "Explorar projetos",
+    "found": "projetos encontrados",
+    "searchPlaceholder": "Pesquisar projetos ou localizações...",
+    "loading": "A carregar projetos...",
+    "noResults": "Nenhum projeto encontrado",
+    "noResultsDesc": "Tente ajustar os seus filtros ou termos de pesquisa para encontrar o que procura.",
+    "clearFilters": "Limpar todos os filtros",
+    "clearSkills": "Limpar competências",
+    "spotsLeft": "{count} lugares restantes",
+    "full": "Completo",
+    "createProject": "Criar projeto",
+    "projectType": "Tipo de projeto",
+    "permaculture": "Permacultura",
+    "naturalBuilding": "Construção natural",
+    "activeProjects": "Projetos ativos",
+    "pastProjects": "Projetos passados",
+    "volunteers": "voluntários",
+    "availability": "Disponibilidade",
+    "skills": "Competências",
+    "location": "Localização",
+    "maxHelpers": "Máx. voluntários",
+    "accommodation": "Alojamento",
+    "food": "Alimentação",
+    "amenities": "Comodidades",
+    "internetProvided": "Internet fornecido",
+    "familyFriendly": "Adequado para famílias",
+    "petsAllowed": "Animais permitidos",
+    "smokingAllowed": "Fumar permitido",
+    "wifi": "WiFi",
+    "max": "máx",
+    "hoursPerDayShort": "h/dia",
+    "filters": {
+      "all": "Todos",
+      "construction": "Construção",
+      "permaculture": "Permacultura",
+      "renovation": "Renovação",
+      "community": "Comunidade",
+      "categories": "Categorias",
+      "locations": "Localizações",
+      "applyFilters": "Aplicar filtros",
+      "showResults": "Mostrar {count} projetos",
+      "allDescription": "Todos os tipos de projeto",
+      "amenities": "Comodidades e condições",
+      "anyDate": "Qualquer data",
+      "anywhere": "Em qualquer lugar",
+      "chooseType": "Escolha o tipo de projeto",
+      "dates": "Datas",
+      "family": "Adequado para famílias",
+      "flexible": "Sou flexível",
+      "locationPlaceholder": "ex. Lisboa, Algarve...",
+      "maxVolunteers": "Máx. voluntários",
+      "natbDescription": "Construção ecológica",
+      "noResultsFor": "Sem resultados para",
+      "permDescription": "Jardins e agricultura sustentável",
+      "pets": "Animais permitidos",
+      "search": "Pesquisar",
+      "searchByLocation": "Pesquisar por cidade, região ou país",
+      "searchEverywhere": "Pesquisar em todo o lado",
+      "searchPlaceholder": "Para onde vai?",
+      "searching": "A pesquisar...",
+      "selectDates": "Selecione as suas datas",
+      "skipDates": "Datas flexíveis",
+      "smoking": "Permitido fumar",
+      "startingFrom": "A partir de",
+      "whatType": "Que tipo de projeto?",
+      "whenToGo": "Quando vai?",
+      "whereToGo": "Para onde vai?",
+      "wifi": "WiFi incluído",
+      "workDetails": "Detalhes do trabalho",
+      "accommodation": "Alojamento incluído",
+      "food": "Refeições incluídas"
+    },
+    "helpersMax": "voluntários máx",
+    "daysPerWeek": "Dias por semana",
+    "daysPerWeekShort": "d/sem",
+    "families": "Famílias",
+    "pets": "Animais",
+    "smoking": "Fumadores",
+    "familiesWelcome": "Famílias bem-vindas",
+    "foundSingle": "projeto encontrado",
+    "host": "Anfitrião",
+    "hoursPerDay": "Horas por dia",
+    "loadingMap": "A carregar mapa...",
+    "petsAccepted": "Animais permitidos",
+    "viewGrid": "Vista grelha",
+    "viewList": "Ver lista",
+    "viewMap": "Ver mapa",
+    "viewMode": "Modo de vista",
+    "viewProject": "Ver projeto",
+    "wifiIncluded": "WiFi incluído",
+    "reviews": "avaliações",
+    "yourHost": "Seu anfitrião",
+    "noImages": "Sem imagens disponíveis",
+    "moreImages": "+{count} mais",
+    "mapView": "Vista do mapa"
+  },
+  "projectDetail": {
+    "notFound": "Projeto não encontrado",
+    "backToProjects": "Voltar aos projetos",
+    "about": "Sobre o projeto",
+    "details": "Detalhes do projeto",
+    "status": "Estado",
+    "startDate": "Data de início",
+    "volunteers": "Voluntários",
+    "volunteersNeeded": "{count} necessários",
+    "apply": "Candidatar-se",
+    "applySuccess": "A sua candidatura foi enviada! O anfitrião irá analisá-la.",
+    "applyError": "Falha ao enviar a candidatura. Tente novamente.",
+    "alreadyApplied": "Já se candidatou a este projeto. O anfitrião irá analisar a sua candidatura.",
+    "applicationAccepted": "A sua candidatura foi aceite! Pode agora conversar com o anfitrião.",
+    "applicationRefused": "A sua candidatura foi recusada pelo anfitrião.",
+    "loginToApply": "Inicie sessão para se candidatar",
+    "loginRequired": "Deve estar conectado para se candidatar.",
+    "applyModalTitle": "Candidatar-se a este projeto",
+    "applyModalDesc": "Envie uma mensagem ao anfitrião. Pode editar o texto pré-preenchido abaixo.",
+    "sendApplication": "Enviar candidatura",
+    "defaultMotivation": "Olá!\n\nEstou muito interessado/a no seu projeto \"{projectTitle}\".\n\nGostaria de participar e contribuir com as minhas competências enquanto aprendo novas. Sou flexível com as datas e estou motivado/a para ajudar.\n\nPoderia contar-me mais sobre a rotina diária e o que esperar?\n\nObrigado/a!",
+    "motivationMin": "Escreva pelo menos 20 caracteres.",
+    "freeForMembers": "Gratuito para membros.",
+    "showAllPhotos": "Mostrar todas as fotos",
+    "showAllXPhotos": "Mostrar todas as {count} fotos",
+    "availability": "Disponibilidade",
+    "languages": "Idiomas",
+    "accommodation": "Alojamento",
+    "accommodationType": "Tipo de alojamento",
+    "amenities": "Comodidades",
+    "daysPerWeek": "Dias por semana",
+    "hoursPerDay": "Horas por dia",
+    "location": "Localização",
+    "maxVolunteers": "Máx. voluntários",
+    "meals": "Refeições",
+    "skills": "Competências",
+    "workDetails": "Detalhes do trabalho",
+    "pickDates": "Chegada - Partida",
+    "reviews": "avaliações",
+    "selectDates": "Selecione as suas datas",
+    "yourHost": "O seu anfitrião",
+    "notSpecified": "Não especificado"
+  },
+  "createProject": {
+    "title": "Criar novo projeto",
+    "subtitle": "Partilhe o seu projeto de eco-construção ou permacultura com a comunidade",
+    "step": "Passo {current} de {total}",
+    "complete": "{percent}% completo",
+    "steps": {
+      "basicInfo": "Informação básica",
+      "locationWork": "Localização & Condições",
+      "skillsAmenities": "Competências e comodidades",
+      "availabilityImages": "Disponibilidade e imagens",
+      "preview": "Pre-visualizacao"
+    },
+    "error": {
+      "createFailed": "Falha ao criar projeto. Por favor, tente novamente."
+    },
+    "step1": {
+      "title": "Informação básica",
+      "description": "Conte-nos sobre o seu projeto. Seja descritivo e envolvente para atrair os voluntários certos.",
+      "projectType": "Tipo de projeto *",
+      "permaculture": "Permacultura",
+      "permacultureDesc": "Jardim, compostagem, colheita, etc.",
+      "naturalBuilding": "Construção natural",
+      "naturalBuildingDesc": "Carpintaria, alvenaria, reboco de terra, etc.",
+      "projectTitle": "Título do projeto *",
+      "projectTitlePlaceholder": "ex., Quinta orgânica nos Alpes franceses",
+      "projectTitleDescription": "Escolha um título apelativo que descreva o seu projeto",
+      "projectDescription": "Descrição do projeto *",
+      "projectDescriptionPlaceholder": "Descreva o seu projeto em detalhe. Inclua:\n• O que os voluntários farão\n• O que aprenderão\n• A missão e valores do seu projeto\n• Rotina diária e atmosfera\n• Qualquer outra coisa que torne o seu projeto único",
+      "projectDescriptionHint": "Seja detalhado e autêntico. Esta é a sua oportunidade de atrair as pessoas certas!",
+      "projectDescriptionCounter": "{count} / 2000",
+      "tipsTitle": "Dicas para uma ótima descrição:",
+      "tip1": "Seja específico sobre tarefas diárias e oportunidades de aprendizagem",
+      "tip2": "Mencione os seus valores e o que torna o seu projeto especial",
+      "tip3": "Descreva a localização, arredores e condições de vida",
+      "tip4": "Partilhe a sua visão e o que espera alcançar juntos",
+      "next": "Seguinte",
+      "validation": {
+        "titleMin": "O título deve ter pelo menos 10 caracteres",
+        "titleMax": "O título é muito longo",
+        "descriptionMin": "A descrição deve ter pelo menos 50 caracteres",
+        "descriptionMax": "A descrição é muito longa"
+      }
+    },
+    "step2": {
+      "title": "Localização & Condições",
+      "description": "Indique onde está e o que os voluntários podem esperar.",
+      "location": "Localização",
+      "city": "Cidade *",
+      "cityPlaceholder": "ex. Rua Principal 12, Lisboa",
+      "postalCode": "Código postal *",
+      "postalCodePlaceholder": "ex., 69000",
+      "country": "País *",
+      "countryPlaceholder": "Selecionar um país",
+      "privacyNote": "O endereço exato não é necessário para privacidade. Cidade e país são suficientes.",
+      "workArrangement": "Arranjo de trabalho",
+      "hoursPerDay": "Horas por dia *",
+      "hoursPerDayDesc": "1-10 horas",
+      "daysPerWeek": "Dias por semana *",
+      "daysPerWeekDesc": "1-7 dias",
+      "maxVolunteers": "Máx. voluntários *",
+      "maxVolunteersDesc": "1-20 pessoas",
+      "accommodationDetails": "Detalhes do alojamento *",
+      "accommodationProvided": "Alojamento fornecido",
+      "accommodationProvidedDesc": "Fornece alojamento aos voluntários?",
+      "accommodationPlaceholder": "Descreva onde os voluntários dormirão. Por exemplo:\n• Quarto privado, quarto partilhado, tenda, caravana, etc.\n• Casa de banho partilhada ou privada\n• Roupa de cama e toalhas fornecidas?\n• Aquecimento/arrefecimento\n• Quaisquer outros detalhes relevantes",
+      "foodDetails": "Detalhes da comida *",
+      "foodProvided": "Refeições fornecidas",
+      "foodProvidedDesc": "Fornece refeições aos voluntários?",
+      "foodPlaceholder": "Descreva o arranjo alimentar. Por exemplo:\n• Quantas refeições por dia são fornecidas?\n• Tipo de comida (vegetariana, vegana, omnívora)\n• Fonte (produzida em casa, orgânica, mercado local)\n• Os voluntários cozinham juntos ou refeições fornecidas?\n• Acesso à cozinha para voluntários?",
+      "back": "Voltar",
+      "next": "Seguinte",
+      "validation": {
+        "cityRequired": "A cidade é obrigatória",
+        "postalCodeRequired": "O código postal é obrigatório",
+        "countryRequired": "O país é obrigatório",
+        "hoursRange": "Deve estar entre 1 e 10",
+        "daysRange": "Deve estar entre 1 e 7",
+        "maxVolunteersRange": "Deve estar entre 1 e 20",
+        "accommodationMin": "Por favor, forneça detalhes sobre o alojamento (mín. 20 caracteres)",
+        "foodMin": "Por favor, forneça detalhes sobre a comida (mín. 20 caracteres)"
+      }
+    },
+    "step3": {
+      "title": "Competências e comodidades",
+      "description": "Selecione as competências que os voluntários usarão e as comodidades que fornece.",
+      "skillsTitle": "Competências {type} *",
+      "skillsDescription": "Selecione todas as competências com as quais os voluntários trabalharão. Escolha pelo menos uma.",
+      "selected": "Selecionado: {count} competência(s)",
+      "amenities": "Comodidades",
+      "amenitiesDescription": "Selecione as comodidades e preferências para o seu projeto.",
+      "internetProvided": "Internet fornecido",
+      "internetProvidedDesc": "WiFi ou acesso à internet está disponível para voluntários",
+      "familyFriendly": "Adequado para famílias",
+      "familyFriendlyDesc": "Adequado para famílias com crianças",
+      "petsAllowed": "Animais permitidos",
+      "petsAllowedDesc": "Os voluntários podem trazer os seus animais",
+      "smokingAllowed": "Fumar permitido",
+      "smokingAllowedDesc": "Fumar é permitido na propriedade",
+      "back": "Voltar",
+      "next": "Seguinte",
+      "validation": {
+        "skillsRequired": "Por favor, selecione pelo menos uma competência"
+      }
+    },
+    "step4": {
+      "title": "Disponibilidade e imagens",
+      "description": "Quando está disponível para receber voluntários? Adicione algumas fotos para mostrar o seu projeto.",
+      "availability": "Disponibilidade",
+      "availabilityDescription": "Selecione os meses em que pode receber voluntários. Pode ignorar isto e adicionar mais tarde.",
+      "year": "Ano:",
+      "monthsSelected": "{count} mês(es) selecionado(s) para {year}",
+      "monthsMode": "Por meses",
+      "datesMode": "Datas específicas",
+      "dateRange": "Selecionar intervalo de datas",
+      "dateRangePlaceholder": "Escolher datas de início e fim",
+      "images": "Imagens do projeto (Opcional)",
+      "imagesDescription": "Carregue imagens do seu projeto. Use os botões de setas para reordená-las. A primeira imagem será a capa.",
+      "uploadButton": "Clique para carregar imagens",
+      "uploadHint": "PNG, JPG até 10MB cada",
+      "cover": "Capa",
+      "imagesUploaded": "{count} / 10 imagens carregadas",
+      "maxImagesAlert": "Máximo de 10 imagens permitidas",
+      "imagesMin": "Mínimo de 5 imagens necessárias. Formatos aceites: JPG, PNG.",
+      "imagesMinRequired": "Mais {count} necessária(s)",
+      "minImagesAlert": "Precisa de pelo menos 5 imagens para submeter o seu projeto.",
+      "reviewTitle": "Revise o seu projeto",
+      "reviewProject": "Projeto {type}",
+      "reviewTitleLabel": "Título: {title}",
+      "reviewLocation": "Localização: {city}, {country}",
+      "reviewWork": "Trabalho: {hours}h/dia, {days} dias/semana, máx. {max} voluntários",
+      "reviewSkills": "Competências: {count} selecionadas",
+      "reviewImages": "Imagens: {count} carregadas",
+      "reviewNotSet": "(não definido)",
+      "back": "Voltar",
+      "create": "Criar projeto",
+      "creating": "A criar projeto...",
+      "monthLabels": {
+        "jan": "Jan",
+        "feb": "Fev",
+        "mar": "Mar",
+        "apr": "Abr",
+        "may": "Mai",
+        "jun": "Jun",
+        "jul": "Jul",
+        "aug": "Ago",
+        "sep": "Set",
+        "oct": "Out",
+        "nov": "Nov",
+        "dec": "Dez"
+      },
+      "availabilityRequired": "Por favor selecione sua disponibilidade.",
+      "nextPreview": "Pre-visualizar"
+    },
+    "step5": {
+      "title": "Pre-visualizacao do seu projeto",
+      "description": "E assim que o seu cartao aparecera para os voluntarios.",
+      "reorderImages": "Reordenar imagens",
+      "reorderHint": "Arraste e solte para mudar a ordem. A primeira imagem sera a capa.",
+      "back": "Voltar"
+    }
+  },
+  "dashboard": {
+    "welcome": "Bem-vindo de volta, {name}!",
+    "stats": {
+      "projects": "Os meus projetos",
+      "rating": "Classificação",
+      "reviews": "Avaliações",
+      "messages": "Novas mensagens"
+    },
+    "quickActions": "Ações rápidas",
+    "actions": {
+      "browse": "Explorar projetos",
+      "browseDesc": "Encontrar novas oportunidades",
+      "myProjects": "Os meus projetos",
+      "myProjectsDesc": "Gerir os seus anúncios",
+      "messages": "Mensagens",
+      "messagesDesc": "Conversar com a comunidade",
+      "create": "Criar projeto",
+      "createDesc": "Começar algo novo"
+    },
+    "myProjects": "Os meus projetos",
+    "viewAll": "Ver tudo",
+    "helpers": "voluntários máx",
+    "noProjects": "Ainda sem projetos",
+    "noProjectsDesc": "Crie o seu primeiro projeto para começar",
+    "createFirst": "Criar projeto",
+    "notifications": "Notificações",
+    "quickLinks": "Links rápidos",
+    "links": {
+      "profile": "O meu perfil",
+      "profileDesc": "Ver e editar o seu perfil",
+      "favorites": "Os meus favoritos",
+      "favoritesDesc": "Projetos que guardou",
+      "participations": "As minhas participações",
+      "participationsDesc": "Projetos em que participou",
+      "settings": "Definições da conta",
+      "settingsDesc": "Gerir a sua conta"
+    }
+  },
+  "myProjects": {
+    "title": "Os meus projetos",
+    "subtitle": "Gerir os seus projetos publicados",
+    "createNew": "Criar novo projeto",
+    "noProjects": "Ainda sem projetos",
+    "noProjectsDesc": "Ainda não criou nenhum projeto. Crie o seu primeiro projeto e conecte-se com voluntários!",
+    "createFirst": "Crie o seu primeiro projeto",
+    "editProject": "Editar projeto",
+    "editProjectDesc": "Atualizar as informações do seu projeto",
+    "fetchError": "Não foi possível carregar os seus projetos. Tente novamente.",
+    "pendingTab": "Pendentes",
+    "activeTab": "Ativos",
+    "pastTab": "Passados",
+    "noPending": "Sem projetos pendentes",
+    "noPendingDesc": "Nenhum projeto aguarda validação.",
+    "noActive": "Sem projetos ativos",
+    "noActiveDesc": "Não tem nenhum projeto ativo neste momento.",
+    "noPast": "Sem projetos passados",
+    "noPastDesc": "Ainda não tem projetos passados.",
+    "projectCreated": "O seu projeto foi submetido com sucesso!",
+    "projectCreatedDesc": "Será analisado por um administrador antes de ser publicado. Receberá uma notificação assim que for aprovado. O seu projeto não será visível para os utilizadores até ser validado."
+  },
+  "participations": {
+    "title": "As minhas participações",
+    "subtitle": "Projetos a que se candidatou",
+    "all": "Todos",
+    "pending": "Pendente",
+    "accepted": "Aceite",
+    "rejected": "Rejeitado",
+    "completed": "Concluído",
+    "hostedBy": "Alojado por",
+    "viewProject": "Ver projeto",
+    "noParticipations": "Ainda sem participações",
+    "noParticipationsDesc": "Comece a explorar projetos e candidate-se para participar!",
+    "browseProjects": "Explorar projetos",
+    "applyDesc": "Envie um pedido de participação ao anfitrião.",
+    "applyTitle": "Candidatar-se a este projeto",
+    "cancelled": "Cancelado",
+    "endDate": "Data de fim",
+    "expired": "Expirado",
+    "fetchError": "Não foi possível carregar as participações. Tente novamente.",
+    "host": "Anfitrião",
+    "hostResponse": "Resposta do anfitrião",
+    "motivation": "Motivação",
+    "motivationPlaceholder": "Explique ao anfitrião porque gostaria de participar neste projeto...",
+    "requestError": "Não foi possível enviar o pedido. Tente novamente.",
+    "requestSent": "Pedido enviado!",
+    "requestSentDesc": "O anfitrião irá analisar o seu pedido e responder-lhe.",
+    "sendRequest": "Enviar pedido",
+    "startDate": "Data de início"
+  },
+  "favorites": {
+    "title": "Os meus favoritos",
+    "subtitle": "Projetos que guardou",
+    "remove": "Remover dos favoritos",
+    "noFavorites": "Ainda sem favoritos",
+    "noFavoritesDesc": "Comece a explorar projetos e guarde os que gostar!",
+    "browseProjects": "Explorar projetos",
+    "addLabel": "Adicionar aos favoritos",
+    "addedMessage": "Projeto adicionado aos seus favoritos",
+    "addedTitle": "Adicionado aos favoritos",
+    "errorMessage": "Não foi possível atualizar os favoritos",
+    "errorTitle": "Erro",
+    "removeLabel": "Remover dos favoritos",
+    "removedMessage": "Projeto removido dos seus favoritos",
+    "removedTitle": "Removido dos favoritos"
+  },
+  "profile": {
+    "personalInfo": "Informações pessoais",
+    "loadError": "Não foi possível carregar o perfil",
+    "editProfile": "Editar perfil",
+    "backToProfile": "Voltar ao perfil",
+    "about": "Sobre",
+    "location": "Localização",
+    "birthday": "Aniversário",
+    "languages": "Idiomas",
+    "skills": "Competências",
+    "bio": "Sobre mim",
+    "bioPlaceholder": "Conte aos outros sobre si...",
+    "review": "avaliação",
+    "reviews": "avaliações",
+    "reviewsTitle": "Avaliações",
+    "yourResponse": "A sua resposta",
+    "title": "Meu perfil",
+    "subtitle": "As suas informações pessoais",
+    "noBio": "Sem biografia ainda",
+    "noLocation": "Não especificado",
+    "noBirthday": "Não especificado",
+    "noLanguages": "Não especificado",
+    "noSkills": "Nenhuma competência selecionada",
+    "yearsOld": "anos",
+    "edit": {
+      "bioError": "A biografia deve ter menos de 500 caracteres",
+      "changePhoto": "Mudar foto",
+      "cropPhoto": "Recortar foto",
+      "characters": "caracteres",
+      "city": "Cidade",
+      "cityPlaceholder": "ex. Lisboa",
+      "firstName": "Nome",
+      "firstNameError": "O nome é obrigatório",
+      "imageHint": "JPG, PNG até 5MB",
+      "imageTooLarge": "A imagem é demasiado grande. Máximo 5MB.",
+      "invalidImage": "Formato de imagem inválido. Use JPG ou PNG.",
+      "languagesPlaceholder": "Selecione idiomas",
+      "lastName": "Apelido",
+      "lastNameError": "O apelido é obrigatório",
+      "noResults": "Sem resultados",
+      "profilePicture": "Foto de perfil",
+      "saveChanges": "Guardar alterações",
+      "skillsHint": "Selecione as competências que tem ou quer aprender",
+      "skillsSelected": "{count} competências selecionadas",
+      "updateFailed": "Não foi possível atualizar o perfil. Tente novamente.",
+      "yourSkills": "As suas competências"
+    }
+  },
+  "settings": {
+    "title": "Definições da conta",
+    "subtitle": "Gerir as suas preferências e segurança",
+    "saved": "Definições guardadas!",
+    "notifications": "Notificações",
+    "emailNotifications": "Notificações por email",
+    "emailNotificationsDesc": "Receber notificações por email para atualizações importantes",
+    "projectUpdates": "Atualizações de projetos",
+    "projectUpdatesDesc": "Ser notificado sobre projetos que o interessam",
+    "messageNotifications": "Notificações de mensagens",
+    "messageNotificationsDesc": "Receber notificações para novas mensagens",
+    "marketingEmails": "Emails de marketing",
+    "marketingEmailsDesc": "Receber notícias e conteúdo promocional",
+    "saveChanges": "Guardar alterações",
+    "language": "Idioma",
+    "preferredLanguage": "Idioma preferido",
+    "saveLanguage": "Guardar idioma",
+    "changePassword": "Alterar palavra-passe",
+    "currentPassword": "Palavra-passe atual",
+    "newPassword": "Nova palavra-passe",
+    "confirmPassword": "Confirmar nova palavra-passe",
+    "showPassword": "Mostrar palavras-passe",
+    "updatePassword": "Atualizar palavra-passe",
+    "logout": "Sair",
+    "logoutDesc": "Sair da sua conta",
+    "logoutBtn": "Sair",
+    "dangerZone": "Zona de perigo",
+    "deleteWarning": "Assim que eliminar a sua conta, não há volta atrás. Por favor, tenha certeza.",
+    "deleteAccount": "Eliminar conta",
+    "deleteConfirm": "Tem a certeza de que deseja eliminar a sua conta? Esta ação não pode ser desfeita.",
+    "deleteConfirmWord": "EXCLUIR",
+    "deleteTypeConfirm": "Para confirmar, digite {word} abaixo.",
+    "deleteConfirmInstruction": "Digite EXCLUIR para confirmar"
+  },
+  "about": {
+    "hero": {
+      "title": "Feito por pessoas que adoram barro, madeira e boas ideias",
+      "subtitle": "O Ecobilda é uma pequena plataforma com um grande objetivo: ligar quem quer construir de forma sustentável com quem quer aprender a fazê-lo."
+    },
+    "story": {
+      "title": "Um pouco de história",
+      "p1": "Tudo começou em 2017, quando Matthias e Aurélien lançaram a primeira versão do Ecobilda. A ideia era simples: a construção natural e a permacultura são incríveis — mas encontrar um projeto para pôr as mãos na massa era demasiado complicado.",
+      "p2": "A pandemia de COVID interferiu e o projeto teve de parar. Mas a ideia nunca desapareceu de vez. Porque o problema continua lá: demasiadas pessoas querem aprender, demasiados proprietários de projetos agradeceriam uma ajuda, e nenhum lugar de verdade para juntar tudo isso.",
+      "p3": "Então cá estamos. O Ecobilda voltou, reconstruído a sério, e desta vez ficamos."
+    },
+    "founders": {
+      "matthias": "Co-fundador & CEO",
+      "matthiasQuote": "«Queria criar um espaço onde fazer e aprender são a mesma coisa. A ecoconstrução merece a sua própria comunidade.»",
+      "aurelien": "Co-fundador & CTO",
+      "aurelienQuote": "«A tecnologia deve servir as pessoas e o planeta. O Ecobilda é a nossa forma de colocar ambos no centro.»"
+    },
+    "mission": {
+      "title": "Para que existimos",
+      "description1": "Queremos tornar a ecoconstrução e a permacultura acessíveis a todos — não só a quem já conhece alguém no meio. Seja para aprender, ensinar ou simplesmente construir algo, o Ecobilda é o teu lugar."
+    },
+    "values": {
+      "title": "O que nos importa",
+      "sustainability": {
+        "title": "Sustentabilidade",
+        "desc": "Construir com e para a natureza, não contra ela"
+      },
+      "community": {
+        "title": "Comunidade",
+        "desc": "Uma rede de pessoas que realmente se envolvem"
+      },
+      "collaboration": {
+        "title": "Colaboração",
+        "desc": "Competências partilhadas são competências multiplicadas"
+      },
+      "permaculture": {
+        "title": "Permacultura",
+        "desc": "Trabalhar com os sistemas naturais, não à volta deles"
+      },
+      "naturalBuilding": {
+        "title": "Construção Natural",
+        "desc": "Palha, adobe, madeira, pedra — as coisas boas"
+      },
+      "globalImpact": {
+        "title": "Impacto Global",
+        "desc": "Ações locais que juntas somam algo maior"
+      }
+    },
+    "impact": {
+      "title": "Queres fazer parte disto?",
+      "description": "Quer tenhas um projeto para partilhar ou estejas à procura da tua próxima aventura, há um lugar para ti aqui. Vem construir algo connosco."
+    }
+  },
+  "contact": {
+    "form": {
+      "email": "E-mail",
+      "emailPlaceholder": "seu.email@exemplo.com",
+      "message": "Mensagem",
+      "messagePlaceholder": "Conte-nos mais...",
+      "name": "Nome",
+      "namePlaceholder": "O seu nome",
+      "subject": "Assunto",
+      "subjectPlaceholder": "Sobre o que se trata?",
+      "submit": "Enviar mensagem"
+    },
+    "formTitle": "Envie-nos uma mensagem",
+    "subtitle": "Tem uma pergunta ou quer entrar em contacto? Gostaríamos de ouvir de si!",
+    "successMessage": "A sua mensagem foi enviada com sucesso! Responderemos em breve.",
+    "title": "Contacte-nos"
+  },
+  "faq": {
+    "cantFindAnswer": "Não encontra a resposta? A nossa equipa está aqui para ajudar.",
+    "categories": {
+      "forHosts": {
+        "a1": "Após iniciar sessão, clique em \"Criar projeto\" e preencha os detalhes.",
+        "a2": "Pode especificar o número máximo de voluntários ao criar o seu projeto.",
+        "a3": "Sim, pode editar os detalhes do seu projeto a qualquer momento.",
+        "q1": "Como crio um projeto?",
+        "q2": "Quantos voluntários posso alojar?",
+        "q3": "Posso editar o meu projeto depois de publicar?",
+        "title": "Para anfitriões"
+      },
+      "forVolunteers": {
+        "a1": "Use a página de Projetos para explorar as oportunidades disponíveis.",
+        "a2": "Cada projeto tem requisitos diferentes. Consulte a página do projeto.",
+        "a3": "Sim! Após um projeto, voluntários e anfitriões podem deixar avaliações.",
+        "q1": "Como encontro projetos?",
+        "q2": "O que devo levar?",
+        "q3": "Posso deixar uma avaliação?",
+        "title": "Para voluntários"
+      },
+      "gettingStarted": {
+        "a1": "O Ecobilda é uma plataforma que conecta voluntários com projetos de eco-construção e permacultura.",
+        "a2": "Clique em \"Registar\", preencha os seus dados e comece a explorar projetos.",
+        "a3": "Sim, criar uma conta e explorar projetos é completamente gratuito.",
+        "q1": "O que é o Ecobilda?",
+        "q2": "Como crio uma conta?",
+        "q3": "O Ecobilda é gratuito?",
+        "title": "Primeiros passos"
+      }
+    },
+    "contactSupport": "Contactar suporte",
+    "noResults": "Nenhuma pergunta encontrada para \"{term}\"",
+    "searchPlaceholder": "Procurar respostas...",
+    "stillHaveQuestions": "Ainda tem perguntas?",
+    "subtitle": "Encontre respostas para perguntas frequentes sobre o Ecobilda",
+    "title": "Perguntas frequentes"
+  },
+  "forHosts": {
+    "eyebrow": "Para proprietários de projetos",
+    "title": "Partilhe o seu projeto, desenvolva a sua comunidade",
+    "subtitle": "Publique o seu projeto de ecoconstrução ou permacultura e receba voluntários motivados com vontade de aprender e contribuir.",
+    "cta": "Criar um projeto",
+    "benefits": {
+      "title": "O que ganha como anfitrião",
+      "subtitle": "Ser anfitrião no Ecobilda é muito mais do que receber ajuda — é construir algo com significado em conjunto.",
+      "hands": {
+        "title": "Mãos motivadas",
+        "desc": "Receba voluntários que realmente querem ajudar o seu projeto a avançar."
+      },
+      "knowledge": {
+        "title": "Partilhe a sua experiência",
+        "desc": "Transmita as suas competências em construção natural, permacultura ou vida sustentável à próxima geração."
+      },
+      "community": {
+        "title": "Expanda a sua rede",
+        "desc": "Conecte-se com pessoas apaixonadas de todo o mundo que partilham os seus valores."
+      },
+      "visibility": {
+        "title": "Ganhe visibilidade",
+        "desc": "O seu projeto aparece no Ecobilda e constrói reputação através de avaliações verificadas."
+      }
+    },
+    "howItWorks": {
+      "title": "Como funciona ser anfitrião",
+      "subtitle": "Começar demora apenas alguns minutos.",
+      "create": {
+        "title": "Crie o seu projeto",
+        "desc": "Descreva o seu projeto, as competências que irá ensinar, o horário de trabalho e o que oferece em troca (alojamento, refeições)."
+      },
+      "receive": {
+        "title": "Receba candidaturas",
+        "desc": "Voluntários motivados exploram o seu projeto e enviam pedidos de participação com uma mensagem de motivação."
+      },
+      "connect": {
+        "title": "Selecione e converse",
+        "desc": "Reveja perfis, aceite os voluntários que melhor se adequam e converse para planear a chegada."
+      },
+      "review": {
+        "title": "Acolha e avalie",
+        "desc": "O voluntário chega, o trabalho começa. Após a experiência, ambas as partes deixam uma avaliação."
+      }
+    },
+    "included": {
+      "title": "As suas responsabilidades como anfitrião",
+      "desc": "O modelo Ecobilda baseia-se numa troca: o seu conhecimento e projeto em troca de ajuda. Eis o que geralmente se espera dos anfitriões:",
+      "item1": "Uma descrição do projeto clara e honesta",
+      "item2": "Alojamento durante a estadia (quando possível)",
+      "item3": "Refeições ou acesso a cozinha",
+      "item4": "Orientação prática e transferência de conhecimento",
+      "item5": "Um ambiente de trabalho seguro e acolhedor"
+    },
+    "expectations": {
+      "hours": {
+        "title": "Horário de trabalho",
+        "desc": "Normalmente 4 a 6 horas por dia, 5 dias por semana. Você define o horário no seu projeto."
+      },
+      "accommodation": {
+        "title": "Alojamento",
+        "desc": "A maioria dos anfitriões oferece um quarto, espaço para tenda ou espaço partilhado. Não precisa de ser luxo — apenas honesto e confortável."
+      },
+      "duration": {
+        "title": "Duração da estadia",
+        "desc": ""
+      }
+    },
+    "finalCta": {
+      "title": "Pronto para receber o seu primeiro voluntário?",
+      "desc": "Junte-se à comunidade Ecobilda e comece a construir algo que importa — um voluntário de cada vez."
+    }
+  },
+  "forVolunteers": {
+    "cta": "Encontrar um projeto",
+    "find": {
+      "desc": "Descubra projetos de construção natural e permacultura em todo o mundo.",
+      "title": "Encontre projetos"
+    },
+    "learn": {
+      "desc": "Ganhe experiência prática em eco-construção e permacultura.",
+      "title": "Aprenda novas competências"
+    },
+    "subtitle": "Viaje pelo mundo enquanto aprende técnicas de construção sustentável e permacultura.",
+    "title": "Para voluntários",
+    "travel": {
+      "desc": "Explore novos lugares enquanto contribui para projetos significativos.",
+      "title": "Viaje e descubra"
+    }
+  },
+  "howItWorks": {
+    "step1": {
+      "desc": "Crie a sua conta gratuita e complete o seu perfil.",
+      "title": "Registe-se"
+    },
+    "step2": {
+      "desc": "Descubra projetos de eco-construção e permacultura em todo o mundo.",
+      "title": "Explore projetos"
+    },
+    "step3": {
+      "desc": "Envie um pedido de participação e conecte-se com o seu anfitrião.",
+      "title": "Candidate-se e conecte-se"
+    },
+    "step4": {
+      "desc": "Aprenda novas competências e deixe uma avaliação para ajudar a comunidade.",
+      "title": "Participe e avalie"
+    },
+    "subtitle": "Começar com o Ecobilda é fácil",
+    "title": "Como funciona"
+  },
+  "messaging": {
+    "delete": "Eliminar conversa",
+    "mute": "Silenciar notificações",
+    "noConversations": "Sem conversas ainda",
+    "placeholder": "Escreva a sua mensagem...",
+    "selectConversation": "Selecione uma conversa",
+    "selectConversationDesc": "Escolha das suas conversas existentes",
+    "title": "Mensagens",
+    "unmute": "Ativar notificações",
+    "viewProfile": "Ver perfil",
+    "loading": "A carregar conversa...",
+    "pendingApplication": "{name} candidatou-se ao seu projeto. Aceitar ou recusar?",
+    "accept": "Aceitar",
+    "refuse": "Recusar",
+    "applicationAccepted": "Você aceitou esta candidatura.",
+    "applicationRefused": "Você recusou esta candidatura.",
+    "online": "Online",
+    "offline": "Offline",
+    "typing": "{name} está a escrever...",
+    "noMessagesYet": "Sem mensagens ainda. Comece a conversa!",
+    "searchConversations": "Pesquisar conversas...",
+    "all": "Todas",
+    "unread": "Não lidas",
+    "noMessagesDefault": "Sem mensagens ainda",
+    "noConversationsFound": "Nenhuma conversa encontrada",
+    "noUnreadMessages": "Sem mensagens não lidas",
+    "back": "Voltar",
+    "backToMessages": "Voltar a mensagens",
+    "send": "Enviar",
+    "enterToSend": "Prima Enter para enviar, Shift+Enter para nova linha",
+    "writePlaceholder": "Escreva uma mensagem...",
+    "typePlaceholder": "Escreva uma mensagem...",
+    "error": "Erro",
+    "loadError": "Não foi possível carregar a conversa",
+    "sendError": "Não foi possível enviar a mensagem. Tente novamente.",
+    "conversationNotFound": "Conversa não encontrada e não pôde ser criada",
+    "conversationNotFoundShort": "Conversa não encontrada",
+    "details": "Detalhes",
+    "viewFullProfile": "Ver perfil completo",
+    "about": "Sobre",
+    "memberSince": "Membro desde {date}",
+    "skills": "Competências",
+    "languages": "Idiomas",
+    "more": "+{count} mais",
+    "muteConversation": "Silenciar conversa",
+    "unmuteConversation": "Ativar conversa",
+    "deleteConversation": "Eliminar conversa",
+    "deleteConfirm": "Eliminar conversa",
+    "deleteConfirmText": "Tem a certeza de que deseja eliminar esta conversa? Esta ação não pode ser desfeita.",
+    "inbox": "Caixa de entrada",
+    "newMessage": "Nova mensagem",
+    "sendMessage": "Enviar mensagem",
+    "noMessages": "Sem mensagens ainda",
+    "typeMessage": "Escreva uma mensagem...",
+    "conversationOptions": "Opções"
+  },
+  "privacy": {
+    "title": "Política de privacidade",
+    "lastUpdated": "Última atualização: março de 2026",
+    "intro": "No Ecobilda, comprometemo-nos a proteger a sua privacidade e os seus dados pessoais. Esta Política de privacidade explica como recolhemos, utilizamos, armazenamos e protegemos as suas informações quando utiliza a nossa plataforma. Cumprimos o Regulamento Geral sobre a Proteção de Dados (RGPD) e outras leis aplicáveis de proteção de dados.",
+    "dataCollection": {
+      "title": "1. Dados que recolhemos",
+      "desc": "Recolhemos vários tipos de informações para fornecer e melhorar os nossos serviços:",
+      "accountData": {
+        "title": "Informações da conta",
+        "desc": "Ao criar a sua conta, recolhemos o seu nome e apelido, endereço de e-mail, data de nascimento, foto de perfil (opcional), idiomas falados, biografia/descrição, país de residência e competências. Se se registar através do Google OAuth, recebemos o seu nome, e-mail e foto de perfil do Google."
+      },
+      "projectData": {
+        "title": "Dados de projetos e atividade",
+        "desc": "Recolhemos descrições de projetos, fotos, localizações (morada e coordenadas), datas de disponibilidade, pedidos de participação e o seu estado, mensagens trocadas entre utilizadores, avaliações e classificações, denúncias e conteúdo sinalizado, e pesquisas guardadas e favoritos."
+      },
+      "technicalData": {
+        "title": "Dados técnicos",
+        "desc": "Recolhemos automaticamente o seu endereço IP, tipo e versão do navegador, informações do dispositivo, páginas visitadas e tempo de permanência, website de referência, e cookies e tecnologias semelhantes (ver secção de Cookies)."
+      }
+    },
+    "dataUse": {
+      "title": "2. Como utilizamos os seus dados",
+      "desc": "Utilizamos os dados recolhidos para os seguintes fins:",
+      "purpose1": "Criar e gerir a sua conta e autenticar a sua identidade.",
+      "purpose2": "Conectar voluntários com anfitriões de projetos e facilitar os pedidos de participação.",
+      "purpose3": "Permitir a comunicação entre utilizadores após a aceitação de um pedido de participação.",
+      "purpose4": "Enviar notificações transacionais (atualizações de participação, novas mensagens, lembretes de avaliação).",
+      "purpose5": "Manter a segurança da plataforma, prevenir fraudes e fazer cumprir os nossos Termos de serviço.",
+      "purpose6": "Melhorar e otimizar a nossa plataforma, funcionalidades e experiência do utilizador."
+    },
+    "legalBasis": {
+      "title": "3. Base legal do tratamento",
+      "desc": "Tratamos os seus dados pessoais com base em: (a) o seu consentimento, fornecido ao criar uma conta e aceitar os nossos termos; (b) a execução de um contrato, uma vez que o tratamento é necessário para prestar os nossos serviços; (c) os nossos interesses legítimos, como a segurança da plataforma, prevenção de fraudes e melhoria do serviço; (d) obrigações legais, quando somos obrigados a tratar dados para cumprir as leis aplicáveis."
+    },
+    "sharing": {
+      "title": "4. Partilha de dados",
+      "desc": "Podemos partilhar os seus dados nas seguintes circunstâncias limitadas:",
+      "case1": "Com outros utilizadores: as suas informações de perfil público, detalhes de projetos e avaliações são visíveis para outros utilizadores da plataforma. As mensagens são partilhadas apenas com os participantes da conversa.",
+      "case2": "Com prestadores de serviços: utilizamos serviços de terceiros para alojamento (Hetzner), envio de e-mails, serviços de mapas (Mapbox) e autenticação (Google OAuth). Estes prestadores tratam dados apenas em nosso nome e sob obrigações contratuais rigorosas.",
+      "case3": "Por razões legais: podemos divulgar dados se exigido por lei, ordem judicial ou pedido governamental, ou para proteger os direitos, segurança ou propriedade do Ecobilda ou dos seus utilizadores.",
+      "noSell": "Nunca vendemos os seus dados pessoais a terceiros para fins de publicidade ou marketing."
+    },
+    "cookies": {
+      "title": "5. Cookies",
+      "desc": "O Ecobilda utiliza cookies essenciais necessários para o funcionamento da plataforma (tokens de autenticação, gestão de sessões, preferências de idioma). Não utilizamos cookies de publicidade ou rastreamento. Não é necessário banner de consentimento para cookies estritamente necessários ao abrigo do RGPD."
+    },
+    "dataProtection": {
+      "title": "6. Segurança dos dados",
+      "desc": "Implementamos medidas técnicas e organizacionais adequadas para proteger os seus dados pessoais, incluindo transmissão encriptada de dados (HTTPS/TLS), hashing seguro de palavras-passe, autenticação JWT com expiração de tokens, controlos de acesso e permissões baseadas em funções, e revisões de segurança regulares. Embora nos esforcemos por proteger os seus dados, nenhum método de transmissão pela Internet é 100% seguro, e não podemos garantir segurança absoluta."
+    },
+    "retention": {
+      "title": "7. Retenção de dados",
+      "desc": "Retemos os seus dados pessoais enquanto a sua conta estiver ativa ou conforme necessário para prestar os nossos serviços. Se eliminar a sua conta, removeremos os seus dados pessoais no prazo de 30 dias, exceto quando a retenção for exigida por lei ou necessária para fins comerciais legítimos (como resolução de litígios ou cumprimento dos nossos acordos). As mensagens nas conversas podem ser anonimizadas em vez de eliminadas para preservar a integridade dos registos do outro participante. As avaliações podem ser retidas em formato anonimizado."
+    },
+    "rights": {
+      "title": "8. Os seus direitos",
+      "desc": "Ao abrigo do RGPD, tem os seguintes direitos relativamente aos seus dados pessoais:",
+      "access": "Direito de acesso: pode solicitar uma cópia dos dados pessoais que detemos sobre si.",
+      "rectification": "Direito de retificação: pode atualizar ou corrigir os seus dados através das definições do perfil ou contactando-nos.",
+      "erasure": "Direito ao apagamento: pode solicitar a eliminação da sua conta e dados pessoais.",
+      "portability": "Direito à portabilidade: pode solicitar os seus dados num formato estruturado e legível por máquina.",
+      "restriction": "Direito à limitação: pode solicitar que limitemos o tratamento dos seus dados em determinadas circunstâncias.",
+      "objection": "Direito de oposição: pode opor-se ao tratamento de dados com base nos nossos interesses legítimos.",
+      "howTo": "Para exercer qualquer um destes direitos, contacte-nos em contact@ecobilda.com. Responderemos ao seu pedido no prazo de 30 dias. Tem também o direito de apresentar uma reclamação junto da sua autoridade local de proteção de dados."
+    },
+    "children": {
+      "title": "9. Privacidade de menores",
+      "desc": "O Ecobilda não se destina a crianças com menos de 18 anos. Não recolhemos conscientemente dados pessoais de crianças com menos de 18 anos. Se tomarmos conhecimento de que recolhemos dados pessoais de uma criança sem consentimento parental, tomaremos medidas para eliminar essas informações prontamente."
+    },
+    "international": {
+      "title": "10. Transferências internacionais de dados",
+      "desc": "Os seus dados são armazenados em servidores localizados na União Europeia (Hetzner, Alemanha). Se os dados precisarem de ser transferidos para fora da UE/EEE, asseguramos que estão em vigor salvaguardas adequadas, como as Cláusulas Contratuais Tipo aprovadas pela Comissão Europeia."
+    },
+    "changes": {
+      "title": "11. Alterações a esta política",
+      "desc": "Podemos atualizar esta Política de privacidade periodicamente. Notificá-lo-emos de alterações significativas por e-mail ou através de um aviso proeminente na plataforma. O seu uso continuado do Ecobilda após a publicação das alterações constitui a sua aceitação da política atualizada. Encorajamo-lo a rever esta política periodicamente."
+    },
+    "contact": {
+      "title": "12. Contacte-nos",
+      "desc": "Se tiver questões ou preocupações sobre esta Política de privacidade ou as nossas práticas de dados, contacte-nos em contact@ecobilda.com."
+    }
+  },
+  "search": {
+    "location": "Localização",
+    "whereTo": "Para onde vai?",
+    "dates": "Datas",
+    "addDates": "Adicionar datas",
+    "search": "Pesquisar",
+    "results": "{count} projeto",
+    "resultsPlural": "{count} projetos",
+    "clearFilters": "Limpar todos os filtros",
+    "filters": "Filtros",
+    "permaculture": "Permacultura",
+    "naturalBuilding": "Construção natural",
+    "free": "Gratuito",
+    "paid": "Pago",
+    "internet": "Internet",
+    "familyFriendly": "Familiar",
+    "pets": "Animais de estimação",
+    "smoking": "Fumar",
+    "projectType": "Tipo de projeto",
+    "price": "Preço",
+    "amenities": "Comodidades",
+    "policies": "Políticas",
+    "petsAllowed": "Animais permitidos",
+    "smokingAllowed": "Fumar permitido",
+    "noResults": "Nenhum projeto corresponde aos seus filtros",
+    "adjustCriteria": "Tente ajustar os seus critérios de pesquisa"
+  },
+  "reports": {
+    "details": "Detalhes adicionais",
+    "reason": "Motivo da denúncia",
+    "reasons": {
+      "inappropriate": "Conteúdo inapropriado",
+      "misleading": "Informação enganosa",
+      "other": "Outro",
+      "spam": "Spam"
+    },
+    "submit": "Enviar denúncia",
+    "submitError": "Não foi possível enviar a denúncia. Tente novamente.",
+    "submitted": "Denúncia enviada",
+    "submittedDesc": "Obrigado pela sua denúncia. A nossa equipa irá analisá-la em breve.",
+    "title": "Denunciar"
+  },
+  "terms": {
+    "title": "Termos de serviço",
+    "lastUpdated": "Última atualização: março de 2026",
+    "intro": "Bem-vindo ao Ecobilda. Estes Termos de serviço regem o seu acesso e utilização da plataforma Ecobilda, que conecta anfitriões de projetos de eco-construção e permacultura com voluntários. Ao criar uma conta ou utilizar os nossos serviços, concorda em ficar vinculado a estes termos.",
+    "acceptance": {
+      "title": "1. Aceitação dos termos",
+      "desc": "Ao aceder ou utilizar o Ecobilda, confirma que leu, compreendeu e concorda em ficar vinculado a estes Termos de serviço e à nossa Política de privacidade. Se não concordar com qualquer parte destes termos, não deve utilizar a plataforma."
+    },
+    "description": {
+      "title": "2. Descrição da plataforma",
+      "desc": "O Ecobilda é uma plataforma online que facilita as ligações entre anfitriões que gerem projetos de eco-construção e permacultura e voluntários que desejam aprender e contribuir. O Ecobilda atua exclusivamente como intermediário e não é parte de qualquer acordo celebrado entre anfitriões e voluntários. Não supervisionamos, dirigimos nem controlamos os projetos listados na plataforma."
+    },
+    "eligibility": {
+      "title": "3. Elegibilidade",
+      "desc": "Deve ter pelo menos 18 anos para criar uma conta no Ecobilda. Ao registar-se, declara e garante que cumpre este requisito de idade e que as informações que fornece são precisas e completas. Utilizadores menores de 18 anos só podem participar em projetos sob supervisão direta de um pai ou tutor legal que possua uma conta ativa no Ecobilda."
+    },
+    "accounts": {
+      "title": "4. Contas de utilizador",
+      "desc": "É responsável por manter a confidencialidade das suas credenciais de acesso e por todas as atividades que ocorram na sua conta. Deve fornecer informações precisas, atuais e completas durante o registo e manter o seu perfil atualizado. Deve notificar-nos imediatamente de qualquer utilização não autorizada da sua conta. O Ecobilda reserva-se o direito de suspender ou encerrar contas que contenham informações falsas ou enganosas."
+    },
+    "use": {
+      "title": "5. Utilização aceitável",
+      "desc": "Ao utilizar o Ecobilda, concorda com as seguintes regras:",
+      "rule1": "Utilizar a plataforma apenas para o seu propósito previsto: conectar anfitriões e voluntários para projetos de eco-construção e permacultura.",
+      "rule2": "Fornecer informações verdadeiras e precisas no seu perfil, anúncios de projetos e comunicações.",
+      "rule3": "Tratar todos os utilizadores com respeito e abster-se de assédio, discriminação ou comportamento abusivo.",
+      "rule4": "Não utilizar a plataforma para solicitação comercial, publicidade ou qualquer atividade não relacionada com a partilha de competências e voluntariado.",
+      "rule5": "Não tentar contornar funcionalidades da plataforma, manipular avaliações, criar múltiplas contas ou participar em qualquer forma de fraude."
+    },
+    "hosts": {
+      "title": "6. Responsabilidades dos anfitriões",
+      "desc": "Os anfitriões são responsáveis por fornecer descrições precisas dos seus projetos, incluindo o tipo de trabalho, competências necessárias, condições de alojamento e períodos de disponibilidade. Os anfitriões devem garantir um ambiente de trabalho seguro para os voluntários e cumprir todas as leis e regulamentos locais aplicáveis às suas atividades. Os anfitriões comprometem-se a aceitar ou recusar pedidos de participação atempadamente e a comunicar claramente com os voluntários aceites."
+    },
+    "volunteers": {
+      "title": "7. Responsabilidades dos voluntários",
+      "desc": "Os voluntários são responsáveis por fornecer informações precisas nos seus pedidos de participação, incluindo as suas competências, disponibilidade e motivações. Os voluntários comprometem-se a honrar os acordos de participação aceites e a realizar as tarefas acordadas com cuidado razoável. Os voluntários devem informar os anfitriões o mais cedo possível de quaisquer alterações nos seus planos. O Ecobilda não é um empregador; os voluntários participam por vontade própria e não existe relação de trabalho entre voluntários e anfitriões ou o Ecobilda."
+    },
+    "content": {
+      "title": "8. Conteúdo gerado pelos utilizadores",
+      "desc": "Mantém a propriedade do conteúdo que publica no Ecobilda (descrições de projetos, fotos, mensagens, avaliações). Ao publicar conteúdo, concede ao Ecobilda uma licença não exclusiva, mundial e isenta de royalties para utilizar, exibir e distribuir esse conteúdo em conexão com a operação da plataforma. É o único responsável pelo conteúdo que publica e garante que não infringe direitos de terceiros, não contém material ilegal nem viola estes termos."
     },
     "messaging": {
-        "delete": "Eliminar conversa",
-        "mute": "Silenciar notificações",
-        "noConversations": "Sem conversas ainda",
-        "placeholder": "Escreva a sua mensagem...",
-        "selectConversation": "Selecione uma conversa",
-        "selectConversationDesc": "Escolha das suas conversas existentes",
-        "title": "Mensagens",
-        "unmute": "Ativar notificações",
-        "viewProfile": "Ver perfil",
-        "loading": "A carregar conversa...",
-        "online": "Online",
-        "offline": "Offline",
-        "typing": "{name} está a escrever...",
-        "noMessagesYet": "Sem mensagens ainda. Comece a conversa!",
-        "searchConversations": "Pesquisar conversas...",
-        "all": "Todas",
-        "unread": "Não lidas",
-        "noMessagesDefault": "Sem mensagens ainda",
-        "noConversationsFound": "Nenhuma conversa encontrada",
-        "noUnreadMessages": "Sem mensagens não lidas",
-        "back": "Voltar",
-        "backToMessages": "Voltar a mensagens",
-        "send": "Enviar",
-        "enterToSend": "Prima Enter para enviar, Shift+Enter para nova linha",
-        "writePlaceholder": "Escreva uma mensagem...",
-        "typePlaceholder": "Escreva uma mensagem...",
-        "error": "Erro",
-        "loadError": "Não foi possível carregar a conversa",
-        "sendError": "Não foi possível enviar a mensagem. Tente novamente.",
-        "conversationNotFound": "Conversa não encontrada e não pôde ser criada",
-        "conversationNotFoundShort": "Conversa não encontrada",
-        "details": "Detalhes",
-        "viewFullProfile": "Ver perfil completo",
-        "about": "Sobre",
-        "memberSince": "Membro desde {date}",
-        "skills": "Competências",
-        "languages": "Idiomas",
-        "more": "+{count} mais",
-        "muteConversation": "Silenciar conversa",
-        "unmuteConversation": "Ativar conversa",
-        "deleteConversation": "Eliminar conversa",
-        "deleteConfirm": "Eliminar conversa",
-        "deleteConfirmText": "Tem a certeza de que deseja eliminar esta conversa? Esta ação não pode ser desfeita.",
-        "inbox": "Caixa de entrada",
-        "newMessage": "Nova mensagem",
-        "sendMessage": "Enviar mensagem",
-        "noMessages": "Sem mensagens ainda",
-        "typeMessage": "Escreva uma mensagem...",
-        "conversationOptions": "Opções"
-    },
-    "privacy": {
-        "title": "Política de privacidade",
-        "lastUpdated": "Última atualização: março de 2026",
-        "intro": "No Ecobilda, comprometemo-nos a proteger a sua privacidade e os seus dados pessoais. Esta Política de privacidade explica como recolhemos, utilizamos, armazenamos e protegemos as suas informações quando utiliza a nossa plataforma. Cumprimos o Regulamento Geral sobre a Proteção de Dados (RGPD) e outras leis aplicáveis de proteção de dados.",
-        "dataCollection": {
-            "title": "1. Dados que recolhemos",
-            "desc": "Recolhemos vários tipos de informações para fornecer e melhorar os nossos serviços:",
-            "accountData": {
-                "title": "Informações da conta",
-                "desc": "Ao criar a sua conta, recolhemos o seu nome e apelido, endereço de e-mail, data de nascimento, foto de perfil (opcional), idiomas falados, biografia/descrição, país de residência e competências. Se se registar através do Google OAuth, recebemos o seu nome, e-mail e foto de perfil do Google."
-            },
-            "projectData": {
-                "title": "Dados de projetos e atividade",
-                "desc": "Recolhemos descrições de projetos, fotos, localizações (morada e coordenadas), datas de disponibilidade, pedidos de participação e o seu estado, mensagens trocadas entre utilizadores, avaliações e classificações, denúncias e conteúdo sinalizado, e pesquisas guardadas e favoritos."
-            },
-            "technicalData": {
-                "title": "Dados técnicos",
-                "desc": "Recolhemos automaticamente o seu endereço IP, tipo e versão do navegador, informações do dispositivo, páginas visitadas e tempo de permanência, website de referência, e cookies e tecnologias semelhantes (ver secção de Cookies)."
-            }
-        },
-        "dataUse": {
-            "title": "2. Como utilizamos os seus dados",
-            "desc": "Utilizamos os dados recolhidos para os seguintes fins:",
-            "purpose1": "Criar e gerir a sua conta e autenticar a sua identidade.",
-            "purpose2": "Conectar voluntários com anfitriões de projetos e facilitar os pedidos de participação.",
-            "purpose3": "Permitir a comunicação entre utilizadores após a aceitação de um pedido de participação.",
-            "purpose4": "Enviar notificações transacionais (atualizações de participação, novas mensagens, lembretes de avaliação).",
-            "purpose5": "Manter a segurança da plataforma, prevenir fraudes e fazer cumprir os nossos Termos de serviço.",
-            "purpose6": "Melhorar e otimizar a nossa plataforma, funcionalidades e experiência do utilizador."
-        },
-        "legalBasis": {
-            "title": "3. Base legal do tratamento",
-            "desc": "Tratamos os seus dados pessoais com base em: (a) o seu consentimento, fornecido ao criar uma conta e aceitar os nossos termos; (b) a execução de um contrato, uma vez que o tratamento é necessário para prestar os nossos serviços; (c) os nossos interesses legítimos, como a segurança da plataforma, prevenção de fraudes e melhoria do serviço; (d) obrigações legais, quando somos obrigados a tratar dados para cumprir as leis aplicáveis."
-        },
-        "sharing": {
-            "title": "4. Partilha de dados",
-            "desc": "Podemos partilhar os seus dados nas seguintes circunstâncias limitadas:",
-            "case1": "Com outros utilizadores: as suas informações de perfil público, detalhes de projetos e avaliações são visíveis para outros utilizadores da plataforma. As mensagens são partilhadas apenas com os participantes da conversa.",
-            "case2": "Com prestadores de serviços: utilizamos serviços de terceiros para alojamento (Hetzner), envio de e-mails, serviços de mapas (Mapbox) e autenticação (Google OAuth). Estes prestadores tratam dados apenas em nosso nome e sob obrigações contratuais rigorosas.",
-            "case3": "Por razões legais: podemos divulgar dados se exigido por lei, ordem judicial ou pedido governamental, ou para proteger os direitos, segurança ou propriedade do Ecobilda ou dos seus utilizadores.",
-            "noSell": "Nunca vendemos os seus dados pessoais a terceiros para fins de publicidade ou marketing."
-        },
-        "cookies": {
-            "title": "5. Cookies",
-            "desc": "O Ecobilda utiliza cookies essenciais necessários para o funcionamento da plataforma (tokens de autenticação, gestão de sessões, preferências de idioma). Não utilizamos cookies de publicidade ou rastreamento. Não é necessário banner de consentimento para cookies estritamente necessários ao abrigo do RGPD."
-        },
-        "dataProtection": {
-            "title": "6. Segurança dos dados",
-            "desc": "Implementamos medidas técnicas e organizacionais adequadas para proteger os seus dados pessoais, incluindo transmissão encriptada de dados (HTTPS/TLS), hashing seguro de palavras-passe, autenticação JWT com expiração de tokens, controlos de acesso e permissões baseadas em funções, e revisões de segurança regulares. Embora nos esforcemos por proteger os seus dados, nenhum método de transmissão pela Internet é 100% seguro, e não podemos garantir segurança absoluta."
-        },
-        "retention": {
-            "title": "7. Retenção de dados",
-            "desc": "Retemos os seus dados pessoais enquanto a sua conta estiver ativa ou conforme necessário para prestar os nossos serviços. Se eliminar a sua conta, removeremos os seus dados pessoais no prazo de 30 dias, exceto quando a retenção for exigida por lei ou necessária para fins comerciais legítimos (como resolução de litígios ou cumprimento dos nossos acordos). As mensagens nas conversas podem ser anonimizadas em vez de eliminadas para preservar a integridade dos registos do outro participante. As avaliações podem ser retidas em formato anonimizado."
-        },
-        "rights": {
-            "title": "8. Os seus direitos",
-            "desc": "Ao abrigo do RGPD, tem os seguintes direitos relativamente aos seus dados pessoais:",
-            "access": "Direito de acesso: pode solicitar uma cópia dos dados pessoais que detemos sobre si.",
-            "rectification": "Direito de retificação: pode atualizar ou corrigir os seus dados através das definições do perfil ou contactando-nos.",
-            "erasure": "Direito ao apagamento: pode solicitar a eliminação da sua conta e dados pessoais.",
-            "portability": "Direito à portabilidade: pode solicitar os seus dados num formato estruturado e legível por máquina.",
-            "restriction": "Direito à limitação: pode solicitar que limitemos o tratamento dos seus dados em determinadas circunstâncias.",
-            "objection": "Direito de oposição: pode opor-se ao tratamento de dados com base nos nossos interesses legítimos.",
-            "howTo": "Para exercer qualquer um destes direitos, contacte-nos em contact@ecobilda.com. Responderemos ao seu pedido no prazo de 30 dias. Tem também o direito de apresentar uma reclamação junto da sua autoridade local de proteção de dados."
-        },
-        "children": {
-            "title": "9. Privacidade de menores",
-            "desc": "O Ecobilda não se destina a crianças com menos de 18 anos. Não recolhemos conscientemente dados pessoais de crianças com menos de 18 anos. Se tomarmos conhecimento de que recolhemos dados pessoais de uma criança sem consentimento parental, tomaremos medidas para eliminar essas informações prontamente."
-        },
-        "international": {
-            "title": "10. Transferências internacionais de dados",
-            "desc": "Os seus dados são armazenados em servidores localizados na União Europeia (Hetzner, Alemanha). Se os dados precisarem de ser transferidos para fora da UE/EEE, asseguramos que estão em vigor salvaguardas adequadas, como as Cláusulas Contratuais Tipo aprovadas pela Comissão Europeia."
-        },
-        "changes": {
-            "title": "11. Alterações a esta política",
-            "desc": "Podemos atualizar esta Política de privacidade periodicamente. Notificá-lo-emos de alterações significativas por e-mail ou através de um aviso proeminente na plataforma. O seu uso continuado do Ecobilda após a publicação das alterações constitui a sua aceitação da política atualizada. Encorajamo-lo a rever esta política periodicamente."
-        },
-        "contact": {
-            "title": "12. Contacte-nos",
-            "desc": "Se tiver questões ou preocupações sobre esta Política de privacidade ou as nossas práticas de dados, contacte-nos em contact@ecobilda.com."
-        }
-    },
-    "search": {
-        "location": "Localização",
-        "whereTo": "Para onde vai?",
-        "dates": "Datas",
-        "addDates": "Adicionar datas",
-        "search": "Pesquisar",
-        "results": "{count} projeto",
-        "resultsPlural": "{count} projetos",
-        "clearFilters": "Limpar todos os filtros",
-        "filters": "Filtros",
-        "permaculture": "Permacultura",
-        "naturalBuilding": "Construção natural",
-        "free": "Gratuito",
-        "paid": "Pago",
-        "internet": "Internet",
-        "familyFriendly": "Familiar",
-        "pets": "Animais de estimação",
-        "smoking": "Fumar",
-        "projectType": "Tipo de projeto",
-        "price": "Preço",
-        "amenities": "Comodidades",
-        "policies": "Políticas",
-        "petsAllowed": "Animais permitidos",
-        "smokingAllowed": "Fumar permitido",
-        "noResults": "Nenhum projeto corresponde aos seus filtros",
-        "adjustCriteria": "Tente ajustar os seus critérios de pesquisa"
-    },
-    "reports": {
-        "details": "Detalhes adicionais",
-        "reason": "Motivo da denúncia",
-        "reasons": {
-            "inappropriate": "Conteúdo inapropriado",
-            "misleading": "Informação enganosa",
-            "other": "Outro",
-            "spam": "Spam"
-        },
-        "submit": "Enviar denúncia",
-        "submitError": "Não foi possível enviar a denúncia. Tente novamente.",
-        "submitted": "Denúncia enviada",
-        "submittedDesc": "Obrigado pela sua denúncia. A nossa equipa irá analisá-la em breve.",
-        "title": "Denunciar"
-    },
-    "terms": {
-        "title": "Termos de serviço",
-        "lastUpdated": "Última atualização: março de 2026",
-        "intro": "Bem-vindo ao Ecobilda. Estes Termos de serviço regem o seu acesso e utilização da plataforma Ecobilda, que conecta anfitriões de projetos de eco-construção e permacultura com voluntários. Ao criar uma conta ou utilizar os nossos serviços, concorda em ficar vinculado a estes termos.",
-        "acceptance": {
-            "title": "1. Aceitação dos termos",
-            "desc": "Ao aceder ou utilizar o Ecobilda, confirma que leu, compreendeu e concorda em ficar vinculado a estes Termos de serviço e à nossa Política de privacidade. Se não concordar com qualquer parte destes termos, não deve utilizar a plataforma."
-        },
-        "description": {
-            "title": "2. Descrição da plataforma",
-            "desc": "O Ecobilda é uma plataforma online que facilita as ligações entre anfitriões que gerem projetos de eco-construção e permacultura e voluntários que desejam aprender e contribuir. O Ecobilda atua exclusivamente como intermediário e não é parte de qualquer acordo celebrado entre anfitriões e voluntários. Não supervisionamos, dirigimos nem controlamos os projetos listados na plataforma."
-        },
-        "eligibility": {
-            "title": "3. Elegibilidade",
-            "desc": "Deve ter pelo menos 18 anos para criar uma conta no Ecobilda. Ao registar-se, declara e garante que cumpre este requisito de idade e que as informações que fornece são precisas e completas. Utilizadores menores de 18 anos só podem participar em projetos sob supervisão direta de um pai ou tutor legal que possua uma conta ativa no Ecobilda."
-        },
-        "accounts": {
-            "title": "4. Contas de utilizador",
-            "desc": "É responsável por manter a confidencialidade das suas credenciais de acesso e por todas as atividades que ocorram na sua conta. Deve fornecer informações precisas, atuais e completas durante o registo e manter o seu perfil atualizado. Deve notificar-nos imediatamente de qualquer utilização não autorizada da sua conta. O Ecobilda reserva-se o direito de suspender ou encerrar contas que contenham informações falsas ou enganosas."
-        },
-        "use": {
-            "title": "5. Utilização aceitável",
-            "desc": "Ao utilizar o Ecobilda, concorda com as seguintes regras:",
-            "rule1": "Utilizar a plataforma apenas para o seu propósito previsto: conectar anfitriões e voluntários para projetos de eco-construção e permacultura.",
-            "rule2": "Fornecer informações verdadeiras e precisas no seu perfil, anúncios de projetos e comunicações.",
-            "rule3": "Tratar todos os utilizadores com respeito e abster-se de assédio, discriminação ou comportamento abusivo.",
-            "rule4": "Não utilizar a plataforma para solicitação comercial, publicidade ou qualquer atividade não relacionada com a partilha de competências e voluntariado.",
-            "rule5": "Não tentar contornar funcionalidades da plataforma, manipular avaliações, criar múltiplas contas ou participar em qualquer forma de fraude."
-        },
-        "hosts": {
-            "title": "6. Responsabilidades dos anfitriões",
-            "desc": "Os anfitriões são responsáveis por fornecer descrições precisas dos seus projetos, incluindo o tipo de trabalho, competências necessárias, condições de alojamento e períodos de disponibilidade. Os anfitriões devem garantir um ambiente de trabalho seguro para os voluntários e cumprir todas as leis e regulamentos locais aplicáveis às suas atividades. Os anfitriões comprometem-se a aceitar ou recusar pedidos de participação atempadamente e a comunicar claramente com os voluntários aceites."
-        },
-        "volunteers": {
-            "title": "7. Responsabilidades dos voluntários",
-            "desc": "Os voluntários são responsáveis por fornecer informações precisas nos seus pedidos de participação, incluindo as suas competências, disponibilidade e motivações. Os voluntários comprometem-se a honrar os acordos de participação aceites e a realizar as tarefas acordadas com cuidado razoável. Os voluntários devem informar os anfitriões o mais cedo possível de quaisquer alterações nos seus planos. O Ecobilda não é um empregador; os voluntários participam por vontade própria e não existe relação de trabalho entre voluntários e anfitriões ou o Ecobilda."
-        },
-        "content": {
-            "title": "8. Conteúdo gerado pelos utilizadores",
-            "desc": "Mantém a propriedade do conteúdo que publica no Ecobilda (descrições de projetos, fotos, mensagens, avaliações). Ao publicar conteúdo, concede ao Ecobilda uma licença não exclusiva, mundial e isenta de royalties para utilizar, exibir e distribuir esse conteúdo em conexão com a operação da plataforma. É o único responsável pelo conteúdo que publica e garante que não infringe direitos de terceiros, não contém material ilegal nem viola estes termos."
-        },
-        "messaging": {
-            "title": "9. Mensagens e comunicação",
-            "desc": "O sistema de mensagens no Ecobilda está disponível apenas após a aceitação de um pedido de participação por um anfitrião. Esta medida destina-se a prevenir spam e garantir trocas significativas. Os utilizadores não devem utilizar o sistema de mensagens para enviar mensagens comerciais não solicitadas, partilhar conteúdo inapropriado ou praticar assédio. O Ecobilda reserva-se o direito de monitorizar mensagens para verificar o cumprimento destes termos."
-        },
-        "reviews": {
-            "title": "10. Avaliações e classificações",
-            "desc": "Após uma experiência de participação, tanto anfitriões como voluntários podem deixar avaliações. As avaliações só são publicadas quando ambas as partes tiverem submetido a sua avaliação ou após um prazo de 30 dias, o que ocorrer primeiro. Isto garante feedback justo e imparcial. As avaliações devem ser honestas, relevantes para a experiência e respeitosas. O Ecobilda reserva-se o direito de remover avaliações que violem estas diretrizes ou que sejam consideradas fraudulentas."
-        },
-        "ip": {
-            "title": "11. Propriedade intelectual",
-            "desc": "O nome Ecobilda, o logótipo, o design do website e todo o conteúdo, software e tecnologia associados são propriedade do Ecobilda e estão protegidos por leis de propriedade intelectual. Não pode copiar, modificar, distribuir ou criar obras derivadas com base em materiais do Ecobilda sem o nosso consentimento prévio por escrito."
-        },
-        "termination": {
-            "title": "12. Encerramento da conta",
-            "desc": "Pode eliminar a sua conta a qualquer momento através das definições da conta. O Ecobilda reserva-se o direito de suspender ou encerrar permanentemente contas que violem estes termos, participem em atividades fraudulentas ou sejam denunciadas por comportamento inapropriado, após investigação. Após o encerramento, o seu direito de utilizar a plataforma cessa imediatamente. Podemos reter determinados dados conforme exigido por lei ou para fins comerciais legítimos."
-        },
-        "liability": {
-            "title": "13. Limitação de responsabilidade",
-            "desc": "O Ecobilda serve como plataforma que conecta anfitriões e voluntários e não garante a qualidade, segurança ou legalidade dos projetos listados. Não somos responsáveis pela conduta dos utilizadores, pela precisão dos anúncios de projetos ou por quaisquer danos resultantes de interações entre utilizadores. O Ecobilda é fornecido \"tal como está\" e \"conforme disponível\". Na máxima extensão permitida por lei, o Ecobilda rejeita todas as garantias e não será responsável por danos indiretos, incidentais, especiais ou consequenciais decorrentes da sua utilização da plataforma."
-        },
-        "indemnification": {
-            "title": "14. Indemnização",
-            "desc": "Concorda em indemnizar e isentar de responsabilidade o Ecobilda, os seus fundadores, funcionários e agentes de quaisquer reclamações, danos, perdas ou despesas (incluindo honorários jurídicos) decorrentes da sua utilização da plataforma, da sua violação destes termos ou da sua violação de direitos de terceiros."
-        },
-        "modifications": {
-            "title": "15. Modificações dos termos",
-            "desc": "O Ecobilda reserva-se o direito de modificar estes Termos de serviço a qualquer momento. Notificaremos os utilizadores de alterações significativas por e-mail ou através de um aviso na plataforma. O seu uso continuado da plataforma após tais alterações constitui a sua aceitação dos termos modificados. Encorajamo-lo a rever estes termos periodicamente."
-        },
-        "governing": {
-            "title": "16. Lei aplicável",
-            "desc": "Estes Termos de serviço são regidos e interpretados de acordo com as leis da Bélgica. Quaisquer litígios decorrentes de ou relacionados com estes termos ou a sua utilização da plataforma estarão sujeitos à jurisdição exclusiva dos tribunais de Bruxelas, Bélgica."
-        },
-        "contact": {
-            "title": "17. Contacto",
-            "desc": "Se tiver questões sobre estes Termos de serviço, contacte-nos em contact@ecobilda.com."
-        }
-    },
-    "skills": {
-        "permaculture": {
-            "gardenMaintenance": "Manutenção de jardim",
-            "grafting": "Enxertia",
-            "pruning": "Poda",
-            "harvesting": "Colheita",
-            "composting": "Compostagem",
-            "weeding": "Monda",
-            "propagating": "Propagação",
-            "seedsHarvesting": "Colheita de sementes"
-        },
-        "naturalBuilding": {
-            "carpentry": "Carpintaria",
-            "masonry": "Alvenaria",
-            "strawbaleBuilding": "Construção com fardos de palha",
-            "cobBuilding": "Construção em cob",
-            "earthenPlaster": "Reboco de terra",
-            "limePlaster": "Reboco de cal",
-            "hempcrete": "Hempcrete",
-            "tadelaktPlaster": "Reboco tadelakt"
-        }
+      "title": "9. Mensagens e comunicação",
+      "desc": "O sistema de mensagens no Ecobilda está disponível apenas após a aceitação de um pedido de participação por um anfitrião. Esta medida destina-se a prevenir spam e garantir trocas significativas. Os utilizadores não devem utilizar o sistema de mensagens para enviar mensagens comerciais não solicitadas, partilhar conteúdo inapropriado ou praticar assédio. O Ecobilda reserva-se o direito de monitorizar mensagens para verificar o cumprimento destes termos."
     },
     "reviews": {
-        "title": "Avaliações",
-        "writeReview": "Escrever uma avaliação",
-        "rating": "Classificação",
-        "feedback": "Comentários",
-        "response": "Resposta",
-        "noReviews": "Sem avaliações ainda",
-        "leaveReview": "Deixar uma avaliação para {firstName} {lastName}",
-        "ratingRequired": "Por favor selecione uma classificação",
-        "feedbackMinLength": "O comentário deve ter pelo menos 20 caracteres",
-        "feedbackMaxLength": "O comentário deve ter menos de 1000 caracteres",
-        "ratingLabel": "Classificação *",
-        "ratingPoor": "Mau",
-        "ratingFair": "Razoável",
-        "ratingGood": "Bom",
-        "ratingVeryGood": "Muito bom",
-        "ratingExcellent": "Excelente",
-        "feedbackLabel": "O seu comentário *",
-        "feedbackPlaceholder": "Partilhe a sua experiência com esta pessoa. O que apreciou? O que poderia ser melhorado?",
-        "feedbackCount": "{count} / 1000 caracteres",
-        "guidelines": "Diretrizes de avaliação",
-        "guidelineHonest": "Seja honesto e construtivo",
-        "guidelinePersonal": "Concentre-se na sua experiência pessoal",
-        "guidelineRespectful": "Evite linguagem ofensiva ou discriminatória",
-        "guidelinePublic": "As avaliações são públicas e não podem ser editadas após a submissão",
-        "submitReview": "Submeter avaliação",
-        "responseFrom": "Resposta de {name}:",
-        "respondToReview": "Responder a esta avaliação",
-        "yourResponse": "A sua resposta",
-        "responsePlaceholder": "Escreva a sua resposta...",
-        "submitResponse": "Submeter resposta"
+      "title": "10. Avaliações e classificações",
+      "desc": "Após uma experiência de participação, tanto anfitriões como voluntários podem deixar avaliações. As avaliações só são publicadas quando ambas as partes tiverem submetido a sua avaliação ou após um prazo de 30 dias, o que ocorrer primeiro. Isto garante feedback justo e imparcial. As avaliações devem ser honestas, relevantes para a experiência e respeitosas. O Ecobilda reserva-se o direito de remover avaliações que violem estas diretrizes ou que sejam consideradas fraudulentas."
+    },
+    "ip": {
+      "title": "11. Propriedade intelectual",
+      "desc": "O nome Ecobilda, o logótipo, o design do website e todo o conteúdo, software e tecnologia associados são propriedade do Ecobilda e estão protegidos por leis de propriedade intelectual. Não pode copiar, modificar, distribuir ou criar obras derivadas com base em materiais do Ecobilda sem o nosso consentimento prévio por escrito."
+    },
+    "termination": {
+      "title": "12. Encerramento da conta",
+      "desc": "Pode eliminar a sua conta a qualquer momento através das definições da conta. O Ecobilda reserva-se o direito de suspender ou encerrar permanentemente contas que violem estes termos, participem em atividades fraudulentas ou sejam denunciadas por comportamento inapropriado, após investigação. Após o encerramento, o seu direito de utilizar a plataforma cessa imediatamente. Podemos reter determinados dados conforme exigido por lei ou para fins comerciais legítimos."
+    },
+    "liability": {
+      "title": "13. Limitação de responsabilidade",
+      "desc": "O Ecobilda serve como plataforma que conecta anfitriões e voluntários e não garante a qualidade, segurança ou legalidade dos projetos listados. Não somos responsáveis pela conduta dos utilizadores, pela precisão dos anúncios de projetos ou por quaisquer danos resultantes de interações entre utilizadores. O Ecobilda é fornecido \"tal como está\" e \"conforme disponível\". Na máxima extensão permitida por lei, o Ecobilda rejeita todas as garantias e não será responsável por danos indiretos, incidentais, especiais ou consequenciais decorrentes da sua utilização da plataforma."
+    },
+    "indemnification": {
+      "title": "14. Indemnização",
+      "desc": "Concorda em indemnizar e isentar de responsabilidade o Ecobilda, os seus fundadores, funcionários e agentes de quaisquer reclamações, danos, perdas ou despesas (incluindo honorários jurídicos) decorrentes da sua utilização da plataforma, da sua violação destes termos ou da sua violação de direitos de terceiros."
+    },
+    "modifications": {
+      "title": "15. Modificações dos termos",
+      "desc": "O Ecobilda reserva-se o direito de modificar estes Termos de serviço a qualquer momento. Notificaremos os utilizadores de alterações significativas por e-mail ou através de um aviso na plataforma. O seu uso continuado da plataforma após tais alterações constitui a sua aceitação dos termos modificados. Encorajamo-lo a rever estes termos periodicamente."
+    },
+    "governing": {
+      "title": "16. Lei aplicável",
+      "desc": "Estes Termos de serviço são regidos e interpretados de acordo com as leis da Bélgica. Quaisquer litígios decorrentes de ou relacionados com estes termos ou a sua utilização da plataforma estarão sujeitos à jurisdição exclusiva dos tribunais de Bruxelas, Bélgica."
+    },
+    "contact": {
+      "title": "17. Contacto",
+      "desc": "Se tiver questões sobre estes Termos de serviço, contacte-nos em contact@ecobilda.com."
     }
+  },
+  "skills": {
+    "permaculture": {
+      "gardenMaintenance": "Manutenção de jardim",
+      "grafting": "Enxertia",
+      "pruning": "Poda",
+      "harvesting": "Colheita",
+      "composting": "Compostagem",
+      "weeding": "Monda",
+      "propagating": "Propagação",
+      "seedsHarvesting": "Colheita de sementes"
+    },
+    "naturalBuilding": {
+      "carpentry": "Carpintaria",
+      "masonry": "Alvenaria",
+      "strawbaleBuilding": "Construção com fardos de palha",
+      "cobBuilding": "Construção em cob",
+      "earthenPlaster": "Reboco de terra",
+      "limePlaster": "Reboco de cal",
+      "hempcrete": "Hempcrete",
+      "tadelaktPlaster": "Reboco tadelakt"
+    }
+  },
+  "reviews": {
+    "title": "Avaliações",
+    "writeReview": "Escrever uma avaliação",
+    "rating": "Classificação",
+    "feedback": "Comentários",
+    "response": "Resposta",
+    "noReviews": "Sem avaliações ainda",
+    "leaveReview": "Deixar uma avaliação para {firstName} {lastName}",
+    "ratingRequired": "Por favor selecione uma classificação",
+    "feedbackMinLength": "O comentário deve ter pelo menos 20 caracteres",
+    "feedbackMaxLength": "O comentário deve ter menos de 1000 caracteres",
+    "ratingLabel": "Classificação *",
+    "ratingPoor": "Mau",
+    "ratingFair": "Razoável",
+    "ratingGood": "Bom",
+    "ratingVeryGood": "Muito bom",
+    "ratingExcellent": "Excelente",
+    "feedbackLabel": "O seu comentário *",
+    "feedbackPlaceholder": "Partilhe a sua experiência com esta pessoa. O que apreciou? O que poderia ser melhorado?",
+    "feedbackCount": "{count} / 1000 caracteres",
+    "guidelines": "Diretrizes de avaliação",
+    "guidelineHonest": "Seja honesto e construtivo",
+    "guidelinePersonal": "Concentre-se na sua experiência pessoal",
+    "guidelineRespectful": "Evite linguagem ofensiva ou discriminatória",
+    "guidelinePublic": "As avaliações são públicas e não podem ser editadas após a submissão",
+    "submitReview": "Submeter avaliação",
+    "responseFrom": "Resposta de {name}:",
+    "respondToReview": "Responder a esta avaliação",
+    "yourResponse": "A sua resposta",
+    "responsePlaceholder": "Escreva a sua resposta...",
+    "submitResponse": "Submeter resposta",
+    "characterCount": "/ 1000 caracteres"
+  },
+  "forHelpers": {
+    "eyebrow": "Para voluntários",
+    "title": "Aprenda fazendo em projetos reais",
+    "subtitle": "Junte-se a projetos de ecoconstrução e permacultura em todo o mundo, adquira competências práticas e faça parte do movimento de vida sustentável.",
+    "cta": "Ver projetos",
+    "benefits": {
+      "title": "O que ganha como helper",
+      "subtitle": "Cada projeto é uma oportunidade de crescer — como construtor, aprendiz e ser humano.",
+      "skills": {
+        "title": "Competências reais",
+        "desc": "Aprenda construção natural, permacultura, construção em adobe, florestas de alimentos e mais — diretamente no local, com anfitriões experientes."
+      },
+      "travel": {
+        "title": "Viagens com propósito",
+        "desc": "Descubra novos lugares enquanto contribui para algo real. Viaje com propósito, não apenas como turista."
+      },
+      "network": {
+        "title": "Uma rede global",
+        "desc": "Conecte-se com proprietários de projetos apaixonados, outros voluntários e uma comunidade comprometida com a vida sustentável."
+      },
+      "impact": {
+        "title": "Impacto positivo",
+        "desc": "Cada dia num projeto é um dia investido num mundo mais sustentável. A sua contribuição importa."
+      }
+    },
+    "howItWorks": {
+      "title": "Como funciona",
+      "subtitle": "Encontrar o seu primeiro projeto é simples.",
+      "profile": {
+        "title": "Crie o seu perfil",
+        "desc": "Registe-se, adicione as suas competências, idiomas e uma breve bio para que os anfitriões o possam conhecer."
+      },
+      "browse": {
+        "title": "Explore projetos",
+        "desc": "Filtre projetos por tipo (permacultura, construção natural), país, disponibilidade e competências ensinadas."
+      },
+      "apply": {
+        "title": "Envie um pedido",
+        "desc": "Escreva uma mensagem de motivação e envie o seu pedido de participação. O anfitrião irá rever o seu perfil e responder."
+      },
+      "participate": {
+        "title": "Vá e aprenda",
+        "desc": "Vá ao projeto, trabalhe ao lado do seu anfitrião, adquira experiência real e deixe uma avaliação para ajudar a comunidade."
+      }
+    },
+    "included": {
+      "title": "O que esperar",
+      "desc": "O Ecobilda funciona com um modelo de troca — você dá o seu tempo e energia, os anfitriões dão-lhe conhecimento e o básico.",
+      "item1": "Formação prática em ecoconstrução ou permacultura",
+      "item2": "Alojamento (quarto, espaço para tenda ou espaço partilhado)",
+      "item3": "Refeições ou acesso a cozinha",
+      "item4": "Uma comunidade de pessoas com os seus valores",
+      "item5": "Uma avaliação verificada para construir o seu perfil"
+    },
+    "expectations": {
+      "hours": {
+        "title": "Horário de trabalho",
+        "desc": "Normalmente 4 a 6 horas por dia, 5 dias por semana. Os horários exatos estão em cada projeto."
+      },
+      "provided": {
+        "title": "O que é fornecido",
+        "desc": "A maioria dos anfitriões oferece alojamento e refeições. Os detalhes estão claramente indicados em cada página de projeto."
+      },
+      "duration": {
+        "title": "Duração da estadia",
+        "desc": ""
+      }
+    },
+    "finalCta": {
+      "title": "Pronto para encontrar o seu primeiro projeto?",
+      "desc": "Centenas de projetos aguardam pessoas motivadas como você. Comece a explorar agora."
+    }
+  }
 }

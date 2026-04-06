@@ -1,5 +1,102 @@
 import { mutation } from "./_generated/server";
 
+export const clearAll = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const tables = [
+      "projectImages", "availability", "favorites", "messages",
+      "conversations", "participationRequests", "reviews", "notifications",
+      "reports", "savedSearches", "contactMessages", "sessions",
+      "passwordResetTokens", "projects", "users", "addresses",
+      "skills", "languages", "countries",
+    ];
+    let total = 0;
+    for (const table of tables) {
+      const docs = await ctx.db.query(table as any).collect();
+      for (const doc of docs) {
+        await ctx.db.delete(doc._id);
+        total++;
+      }
+    }
+    return { status: "cleared", deletedDocuments: total };
+  },
+});
+
+export const makeAdmin = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q: any) => q.eq("email", "admin2@ecobilda.org"))
+      .first();
+    if (!user) return { error: "User not found" };
+    await ctx.db.patch(user._id, {
+      isStaff: true,
+      isSuperuser: true,
+      emailVerified: true,
+    });
+    return { status: "done", userId: user._id };
+  },
+});
+
+export const seedLanguages = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const extraLanguages = [
+      { code: "pl", name: "Polski" },
+      { code: "ro", name: "Română" },
+      { code: "cs", name: "Čeština" },
+      { code: "hu", name: "Magyar" },
+      { code: "sv", name: "Svenska" },
+      { code: "da", name: "Dansk" },
+      { code: "no", name: "Norsk" },
+      { code: "fi", name: "Suomi" },
+      { code: "el", name: "Ελληνικά" },
+      { code: "bg", name: "Български" },
+      { code: "hr", name: "Hrvatski" },
+      { code: "sk", name: "Slovenčina" },
+      { code: "sl", name: "Slovenščina" },
+      { code: "et", name: "Eesti" },
+      { code: "lv", name: "Latviešu" },
+      { code: "lt", name: "Lietuvių" },
+      { code: "ga", name: "Gaeilge" },
+      { code: "mt", name: "Malti" },
+      { code: "sq", name: "Shqip" },
+      { code: "sr", name: "Српски" },
+      { code: "bs", name: "Bosanski" },
+      { code: "mk", name: "Македонски" },
+      { code: "uk", name: "Українська" },
+      { code: "ru", name: "Русский" },
+      { code: "tr", name: "Türkçe" },
+      { code: "ar", name: "العربية" },
+      { code: "ja", name: "日本語" },
+      { code: "zh", name: "中文" },
+      { code: "ko", name: "한국어" },
+      { code: "hi", name: "हिन्दी" },
+      { code: "th", name: "ไทย" },
+      { code: "vi", name: "Tiếng Việt" },
+      { code: "id", name: "Bahasa Indonesia" },
+      { code: "ms", name: "Bahasa Melayu" },
+      { code: "sw", name: "Kiswahili" },
+      { code: "he", name: "עברית" },
+      { code: "fa", name: "فارسی" },
+      { code: "ca", name: "Català" },
+      { code: "gl", name: "Galego" },
+      { code: "eu", name: "Euskara" },
+    ];
+    const existing = await ctx.db.query("languages").collect();
+    const existingCodes = new Set(existing.map((l) => l.code));
+    let added = 0;
+    for (const lang of extraLanguages) {
+      if (!existingCodes.has(lang.code)) {
+        await ctx.db.insert("languages", lang);
+        added++;
+      }
+    }
+    return { status: "done", added };
+  },
+});
+
 export const seedAll = mutation({
   args: {},
   handler: async (ctx) => {
@@ -56,6 +153,46 @@ export const seedAll = mutation({
       { code: "nl", name: "Nederlands" },
       { code: "pt", name: "Português" },
       { code: "it", name: "Italiano" },
+      { code: "pl", name: "Polski" },
+      { code: "ro", name: "Română" },
+      { code: "cs", name: "Čeština" },
+      { code: "hu", name: "Magyar" },
+      { code: "sv", name: "Svenska" },
+      { code: "da", name: "Dansk" },
+      { code: "no", name: "Norsk" },
+      { code: "fi", name: "Suomi" },
+      { code: "el", name: "Ελληνικά" },
+      { code: "bg", name: "Български" },
+      { code: "hr", name: "Hrvatski" },
+      { code: "sk", name: "Slovenčina" },
+      { code: "sl", name: "Slovenščina" },
+      { code: "et", name: "Eesti" },
+      { code: "lv", name: "Latviešu" },
+      { code: "lt", name: "Lietuvių" },
+      { code: "ga", name: "Gaeilge" },
+      { code: "mt", name: "Malti" },
+      { code: "sq", name: "Shqip" },
+      { code: "sr", name: "Српски" },
+      { code: "bs", name: "Bosanski" },
+      { code: "mk", name: "Македонски" },
+      { code: "uk", name: "Українська" },
+      { code: "ru", name: "Русский" },
+      { code: "tr", name: "Türkçe" },
+      { code: "ar", name: "العربية" },
+      { code: "ja", name: "日本語" },
+      { code: "zh", name: "中文" },
+      { code: "ko", name: "한국어" },
+      { code: "hi", name: "हिन्दी" },
+      { code: "th", name: "ไทย" },
+      { code: "vi", name: "Tiếng Việt" },
+      { code: "id", name: "Bahasa Indonesia" },
+      { code: "ms", name: "Bahasa Melayu" },
+      { code: "sw", name: "Kiswahili" },
+      { code: "he", name: "עברית" },
+      { code: "fa", name: "فارسی" },
+      { code: "ca", name: "Català" },
+      { code: "gl", name: "Galego" },
+      { code: "eu", name: "Euskara" },
     ];
     const langIds: Record<string, any> = {};
     for (const l of languagesData) {
@@ -200,133 +337,157 @@ export const seedAll = mutation({
     });
 
     // ============================================
-    // 6. Projects
+    // 6. Additional Addresses
+    // ============================================
+    const addr5 = await ctx.db.insert("addresses", {
+      city: "Alentejo", street: "Estrada da Serra", streetNumber: "3",
+      postalCode: "7100", countryId: countryIds["PT"],
+      latitude: 38.5667, longitude: -7.9,
+      formattedAddress: "Estrada da Serra 3, 7100 Alentejo, Portugal",
+    });
+    const addr6 = await ctx.db.insert("addresses", {
+      city: "Cork", street: "Green Lane", streetNumber: "17",
+      postalCode: "T12", countryId: countryIds["IE"],
+      latitude: 51.8969, longitude: -8.4863,
+      formattedAddress: "17 Green Lane, Cork, Ireland",
+    });
+    const addr7 = await ctx.db.insert("addresses", {
+      city: "Groningen", street: "Moestuinweg", streetNumber: "4",
+      postalCode: "9711", countryId: countryIds["NL"],
+      latitude: 53.2194, longitude: 6.5665,
+      formattedAddress: "Moestuinweg 4, 9711 Groningen, Netherlands",
+    });
+    const addr8 = await ctx.db.insert("addresses", {
+      city: "Dordogne", street: "Lieu-dit Les Chênes",
+      postalCode: "24200", countryId: countryIds["FR"],
+      latitude: 44.8604, longitude: 1.2516,
+      formattedAddress: "Lieu-dit Les Chênes, 24200 Dordogne, France",
+    });
+
+    // ============================================
+    // 7. Projects (8 total)
     // ============================================
     const now = Date.now();
 
     const project1 = await ctx.db.insert("projects", {
-      ownerId: user1,
-      title: "Ferme en permaculture - Aide au potager et construction paille",
+      ownerId: user1, title: "Ferme en permaculture - Aide au potager et construction paille",
       description: "Nous cherchons des volontaires pour nous aider dans notre ferme en permaculture. Les tâches incluent l'entretien du potager, la récolte, le compostage et la construction d'un nouveau bâtiment en paille. Logement dans une yourte confortable avec vue sur la campagne wallonne.",
-      projectType: "PERM",
-      addressId: addr1,
-      hoursPerDay: 5,
-      daysPerWeek: 5,
-      maxHelpers: 3,
+      projectType: "PERM", addressId: addr1, hoursPerDay: 5, daysPerWeek: 5, maxHelpers: 3,
       accommodationDetails: "Yourte privée avec électricité et chauffage. Douche et toilettes sèches partagées.",
       foodDetails: "Trois repas bio par jour, légumes du jardin. Régimes végétariens bienvenus.",
-      internetProvided: true,
-      familyFriendly: true,
-      petsAllowed: false,
-      smokingAllowed: false,
+      internetProvided: true, familyFriendly: true, petsAllowed: false, smokingAllowed: false,
       skillIds: [skillIds["garden_maintenance"], skillIds["composting"], skillIds["harvesting"], skillIds["strawbale_building"]],
-      isActive: true,
-      flaggedCount: 0,
-      status: "ACTIVE",
-      validatedAt: now,
-      validatedBy: user3,
-      updatedAt: now,
+      isActive: true, flaggedCount: 0, status: "ACTIVE", validatedAt: now, validatedBy: user3, updatedAt: now,
     });
-
     const project2 = await ctx.db.insert("projects", {
-      ownerId: user2,
-      title: "Rénovation écologique - Enduits terre et chaux dans le Sud",
+      ownerId: user2, title: "Rénovation écologique - Enduits terre et chaux dans le Sud",
       description: "Projet de rénovation d'une vieille ferme avec des matériaux naturels. Nous appliquons des enduits terre et chaux sur les murs intérieurs. C'est une excellente occasion d'apprendre ces techniques ancestrales dans un cadre magnifique près de Toulouse.",
-      projectType: "NATB",
-      addressId: addr2,
-      hoursPerDay: 6,
-      daysPerWeek: 5,
-      maxHelpers: 4,
+      projectType: "NATB", addressId: addr2, hoursPerDay: 6, daysPerWeek: 5, maxHelpers: 4,
       accommodationDetails: "Chambre partagée dans la ferme. Salle de bain avec eau chaude.",
       foodDetails: "Repas du midi fournis. Cuisine équipée disponible pour le petit-déjeuner et le dîner.",
-      internetProvided: true,
-      familyFriendly: false,
-      petsAllowed: true,
-      smokingAllowed: false,
+      internetProvided: true, familyFriendly: false, petsAllowed: true, smokingAllowed: false,
       skillIds: [skillIds["earthen_plaster"], skillIds["lime_plaster"], skillIds["masonry"]],
-      isActive: true,
-      flaggedCount: 0,
-      status: "ACTIVE",
-      validatedAt: now,
-      validatedBy: user3,
-      updatedAt: now,
+      isActive: true, flaggedCount: 0, status: "ACTIVE", validatedAt: now, validatedBy: user3, updatedAt: now,
     });
-
     const project3 = await ctx.db.insert("projects", {
-      ownerId: user1,
-      title: "Jardin-forêt méditerranéen - Greffage et multiplication",
+      ownerId: user1, title: "Jardin-forêt méditerranéen - Greffage et multiplication",
       description: "Création d'un jardin-forêt en climat méditerranéen. Nous cherchons des personnes intéressées par le greffage d'arbres fruitiers, la multiplication de plantes et la récolte de graines. Un projet passionnant pour les amoureux de la botanique.",
-      projectType: "PERM",
-      addressId: addr3,
-      hoursPerDay: 4,
-      daysPerWeek: 5,
-      maxHelpers: 2,
+      projectType: "PERM", addressId: addr3, hoursPerDay: 4, daysPerWeek: 5, maxHelpers: 2,
       accommodationDetails: "Petite maison indépendante avec cuisine.",
       foodDetails: "Fruits et légumes du jardin à volonté. Budget repas partagé pour le reste.",
-      internetProvided: false,
-      familyFriendly: true,
-      petsAllowed: true,
-      smokingAllowed: false,
+      internetProvided: false, familyFriendly: true, petsAllowed: true, smokingAllowed: false,
       skillIds: [skillIds["grafting"], skillIds["propagating"], skillIds["seeds_harvesting"], skillIds["garden_maintenance"]],
-      isActive: true,
-      flaggedCount: 0,
-      status: "ACTIVE",
-      validatedAt: now,
-      validatedBy: user3,
-      updatedAt: now,
+      isActive: true, flaggedCount: 0, status: "ACTIVE", validatedAt: now, validatedBy: user3, updatedAt: now,
     });
-
     const project4 = await ctx.db.insert("projects", {
-      ownerId: user2,
-      title: "Construction béton de chanvre - Maison passive en Forêt Noire",
+      ownerId: user2, title: "Construction béton de chanvre - Maison passive en Forêt Noire",
       description: "Nous construisons une extension en béton de chanvre pour notre maison dans la Forêt Noire. C'est une technique isolante exceptionnelle. Venez apprendre le hempcrete et la charpenterie traditionnelle dans un cadre forestier magnifique.",
-      projectType: "NATB",
-      addressId: addr4,
-      hoursPerDay: 7,
-      daysPerWeek: 6,
-      maxHelpers: 5,
+      projectType: "NATB", addressId: addr4, hoursPerDay: 7, daysPerWeek: 6, maxHelpers: 5,
       accommodationDetails: "Tente de glamping ou camping. Accès à la maison pour les douches.",
       foodDetails: "Tous les repas fournis, cuisine locale et bio.",
-      internetProvided: true,
-      familyFriendly: false,
-      petsAllowed: false,
-      smokingAllowed: false,
+      internetProvided: true, familyFriendly: false, petsAllowed: false, smokingAllowed: false,
       skillIds: [skillIds["hempcrete"], skillIds["carpentry"], skillIds["lime_plaster"]],
-      isActive: true,
-      flaggedCount: 0,
-      status: "ACTIVE",
-      validatedAt: now,
-      validatedBy: user3,
-      updatedAt: now,
+      isActive: true, flaggedCount: 0, status: "ACTIVE", validatedAt: now, validatedBy: user3, updatedAt: now,
+    });
+    const project5 = await ctx.db.insert("projects", {
+      ownerId: user1, title: "Éco-village en Alentejo - Permaculture et construction terre",
+      description: "Rejoignez notre éco-village dans la magnifique région de l'Alentejo au Portugal. Nous développons un système de permaculture intégrale avec potager, verger et animaux. Parallèlement, nous construisons des structures en terre crue (cob). Une expérience immersive dans un cadre solaire et paisible.",
+      projectType: "PERM", addressId: addr5, hoursPerDay: 5, daysPerWeek: 5, maxHelpers: 6,
+      accommodationDetails: "Caravane aménagée ou tente fournie. Cuisine et sanitaires communs.",
+      foodDetails: "Repas végétariens partagés, produits du potager et du marché local.",
+      internetProvided: false, familyFriendly: true, petsAllowed: true, smokingAllowed: false,
+      skillIds: [skillIds["garden_maintenance"], skillIds["composting"], skillIds["weeding"], skillIds["cob_building"]],
+      isActive: true, flaggedCount: 0, status: "ACTIVE", validatedAt: now, validatedBy: user3, updatedAt: now,
+    });
+    const project6 = await ctx.db.insert("projects", {
+      ownerId: user2, title: "Strawbale workshop - Learn natural building in Ireland",
+      description: "We are building a strawbale studio on our smallholding in West Cork. This is a hands-on workshop where you will learn every step of strawbale construction: timber framing, bale raising, compression, and lime rendering. Beautiful Irish countryside, green and lush.",
+      projectType: "NATB", addressId: addr6, hoursPerDay: 6, daysPerWeek: 5, maxHelpers: 4,
+      accommodationDetails: "Shared cottage with wood stove. Hot showers available.",
+      foodDetails: "All meals provided. We cook together using local and organic produce.",
+      internetProvided: true, familyFriendly: false, petsAllowed: false, smokingAllowed: false,
+      skillIds: [skillIds["strawbale_building"], skillIds["carpentry"], skillIds["lime_plaster"]],
+      isActive: true, flaggedCount: 0, status: "ACTIVE", validatedAt: now, validatedBy: user3, updatedAt: now,
+    });
+    const project7 = await ctx.db.insert("projects", {
+      ownerId: user1, title: "Biologische moestuin - Composteren en zaadoogst in Groningen",
+      description: "Op onze biologische boerderij in Groningen zoeken we enthousiaste vrijwilligers voor het onderhouden van onze grote moestuin. Je leert over composteren, vermeerderen van planten, zaadoogst en biologische tuiniertechnieken. Een perfecte ervaring voor wie meer wil leren over duurzame landbouw.",
+      projectType: "PERM", addressId: addr7, hoursPerDay: 4, daysPerWeek: 5, maxHelpers: 3,
+      accommodationDetails: "Eigen kamer in de boerderij. Gedeelde badkamer.",
+      foodDetails: "Ontbijt en lunch inbegrepen. Groenten uit eigen tuin.",
+      internetProvided: true, familyFriendly: true, petsAllowed: true, smokingAllowed: false,
+      skillIds: [skillIds["composting"], skillIds["seeds_harvesting"], skillIds["propagating"], skillIds["weeding"]],
+      isActive: true, flaggedCount: 0, status: "ACTIVE", validatedAt: now, validatedBy: user3, updatedAt: now,
+    });
+    const project8 = await ctx.db.insert("projects", {
+      ownerId: user2, title: "Restauration en Dordogne - Tadelakt et enduits naturels",
+      description: "Restauration d'une maison en pierre du XVIIIe siècle en Dordogne. Nous utilisons exclusivement des enduits naturels : tadelakt pour les salles d'eau, enduit terre pour les pièces de vie, enduit chaux pour les façades. Apprenez ces techniques rares dans un cadre historique exceptionnel du Périgord.",
+      projectType: "NATB", addressId: addr8, hoursPerDay: 6, daysPerWeek: 5, maxHelpers: 3,
+      accommodationDetails: "Gîte indépendant sur la propriété. Tout confort.",
+      foodDetails: "Tous les repas fournis. Cuisine du terroir, produits locaux.",
+      internetProvided: true, familyFriendly: false, petsAllowed: false, smokingAllowed: false,
+      skillIds: [skillIds["tadelakt_plaster"], skillIds["earthen_plaster"], skillIds["lime_plaster"], skillIds["masonry"]],
+      isActive: true, flaggedCount: 0, status: "ACTIVE", validatedAt: now, validatedBy: user3, updatedAt: now,
     });
 
     // ============================================
-    // 7. Availabilities
+    // 8. Project Images (from /public/projects/)
     // ============================================
-    await ctx.db.insert("availability", {
-      projectId: project1, year: 2026,
-      january: false, february: false, march: true, april: true,
-      may: true, june: true, july: true, august: true,
-      september: true, october: true, november: false, december: false,
-    });
-    await ctx.db.insert("availability", {
-      projectId: project2, year: 2026,
-      january: false, february: false, march: false, april: true,
-      may: true, june: true, july: false, august: false,
-      september: true, october: true, november: true, december: false,
-    });
-    await ctx.db.insert("availability", {
-      projectId: project3, year: 2026,
-      january: true, february: true, march: true, april: true,
-      may: true, june: false, july: false, august: false,
-      september: true, october: true, november: true, december: true,
-    });
-    await ctx.db.insert("availability", {
-      projectId: project4, year: 2026,
-      january: false, february: false, march: false, april: false,
-      may: true, june: true, july: true, august: true,
-      september: true, october: false, november: false, december: false,
-    });
+    const imageMap: Record<string, string> = {
+      [project1]: "1", [project2]: "2", [project3]: "3", [project4]: "10",
+      [project5]: "11", [project6]: "20", [project7]: "21", [project8]: "22",
+    };
+    for (const [projectId, folder] of Object.entries(imageMap)) {
+      for (let i = 1; i <= 5; i++) {
+        await ctx.db.insert("projectImages", {
+          projectId: projectId as any,
+          url: `/projects/${folder}/image_${i}.png`,
+          order: i - 1,
+        });
+      }
+    }
+
+    // ============================================
+    // 9. Availabilities
+    // ============================================
+    const availData = [
+      { id: project1, jan: false, feb: false, mar: true, apr: true, may: true, jun: true, jul: true, aug: true, sep: true, oct: true, nov: false, dec: false },
+      { id: project2, jan: false, feb: false, mar: false, apr: true, may: true, jun: true, jul: false, aug: false, sep: true, oct: true, nov: true, dec: false },
+      { id: project3, jan: true, feb: true, mar: true, apr: true, may: true, jun: false, jul: false, aug: false, sep: true, oct: true, nov: true, dec: true },
+      { id: project4, jan: false, feb: false, mar: false, apr: false, may: true, jun: true, jul: true, aug: true, sep: true, oct: false, nov: false, dec: false },
+      { id: project5, jan: true, feb: true, mar: true, apr: true, may: true, jun: true, jul: true, aug: true, sep: true, oct: true, nov: true, dec: true },
+      { id: project6, jan: false, feb: false, mar: false, apr: true, may: true, jun: true, jul: true, aug: true, sep: true, oct: false, nov: false, dec: false },
+      { id: project7, jan: false, feb: false, mar: true, apr: true, may: true, jun: true, jul: true, aug: true, sep: true, oct: true, nov: false, dec: false },
+      { id: project8, jan: false, feb: false, mar: false, apr: true, may: true, jun: true, jul: true, aug: false, sep: true, oct: true, nov: true, dec: false },
+    ];
+    for (const a of availData) {
+      await ctx.db.insert("availability", {
+        projectId: a.id, year: 2026,
+        january: a.jan, february: a.feb, march: a.mar, april: a.apr,
+        may: a.may, june: a.jun, july: a.jul, august: a.aug,
+        september: a.sep, october: a.oct, november: a.nov, december: a.dec,
+      });
+    }
 
     return {
       status: "seeded",
@@ -335,8 +496,9 @@ export const seedAll = mutation({
         languages: languagesData.length,
         skills: skillsData.length,
         users: 3,
-        projects: 4,
-        availabilities: 4,
+        projects: 8,
+        images: 40,
+        availabilities: 8,
       },
     };
   },

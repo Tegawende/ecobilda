@@ -30,7 +30,8 @@
     "users": "Utilisateurs",
     "adminPanel": "Panneau d'administration",
     "settings": "Paramètres",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "contacts": "Messages de contact"
   },
   "login": {
     "title": "Ecobilda Admin",
@@ -76,10 +77,6 @@
     "platformActivityDesc": "Nouveaux utilisateurs et projets sur les 30 derniers jours",
     "newUsers": "Nouveaux utilisateurs",
     "newProjects": "Nouveaux projets",
-    "platformActivity": "Activité de la plateforme",
-    "platformActivityDesc": "Nouveaux utilisateurs et projets sur les 30 derniers jours",
-    "newUsers": "Nouveaux utilisateurs",
-    "newProjects": "Nouveaux projets",
     "tooltips": {
       "totalUsers": "Nombre total d'utilisateurs inscrits sur la plateforme",
       "activeProjects": "Projets validés et visibles par les bénévoles",
@@ -117,9 +114,6 @@
     "validatedOn": "Validé le",
     "searchPlaceholder": "Rechercher par titre ou nom du propriétaire...",
     "allTypes": "Tous les types",
-    "noMatchingProjects": "Aucun projet ne correspond à votre recherche",
-    "searchPlaceholder": "Rechercher par titre ou nom du propriétaire...",
-    "allTypes": "Tous les types",
     "noMatchingProjects": "Aucun projet ne correspond à votre recherche"
   },
   "reports": {
@@ -139,18 +133,6 @@
     "adminNotes": "Notes admin (optionnel)...",
     "view": "Voir",
     "failedToLoad": "Échec du chargement des signalements",
-    "searchPlaceholder": "Rechercher par nom, email du signaleur ou détails...",
-    "allReasons": "Toutes les raisons",
-    "noMatchingReports": "Aucun signalement ne correspond à votre recherche",
-    "reasons": {
-      "inappropriate": "Inapproprié",
-      "misleading": "Trompeur",
-      "spam": "Spam",
-      "harassment": "Harcèlement",
-      "fake": "Faux",
-      "safety": "Sécurité",
-      "other": "Autre"
-    },
     "searchPlaceholder": "Rechercher par nom, email du signaleur ou détails...",
     "allReasons": "Toutes les raisons",
     "noMatchingReports": "Aucun signalement ne correspond à votre recherche",
@@ -193,6 +175,8 @@
   "users": {
     "title": "Gestion des utilisateurs",
     "subtitle": "Voir et gérer les utilisateurs de la plateforme",
+    "usersTab": "Utilisateurs",
+    "adminsTab": "Administrateurs",
     "searchPlaceholder": "Rechercher par nom ou email...",
     "user": "Utilisateur",
     "email": "Email",
@@ -242,7 +226,7 @@
     "clickToUnblock": "Cliquer pour débloquer l'utilisateur"
   },
   "userDetail": {
-    "title": "D\u00e9tails de l'utilisateur",
+    "title": "Détails de l'utilisateur",
     "backToUsers": "Retour aux utilisateurs",
     "personalInfo": "Informations personnelles",
     "accountInfo": "Informations du compte",
@@ -251,29 +235,29 @@
     "bio": "Biographie",
     "languages": "Langues",
     "location": "Localisation",
-    "skills": "Comp\u00e9tences",
-    "noSkills": "Aucune comp\u00e9tence s\u00e9lectionn\u00e9e",
-    "noLanguages": "Aucune langue s\u00e9lectionn\u00e9e",
+    "skills": "Compétences",
+    "noSkills": "Aucune compétence sélectionnée",
+    "noLanguages": "Aucune langue sélectionnée",
     "noBio": "Aucune biographie",
     "noAddress": "Aucune adresse",
     "projects": "Projets",
     "noProjects": "Aucun projet",
-    "reviewsReceived": "Avis re\u00e7us",
-    "noReviews": "Aucun avis re\u00e7u",
-    "notificationSettings": "Param\u00e8tres de notification",
+    "reviewsReceived": "Avis reçus",
+    "noReviews": "Aucun avis reçu",
+    "notificationSettings": "Paramètres de notification",
     "emailNotifications": "Notifications par e-mail",
     "newsletter": "Newsletter",
     "inAppNotifications": "Notifications dans l'application",
     "notificationLanguage": "Langue de notification",
-    "enabled": "Activ\u00e9",
-    "disabled": "D\u00e9sactiv\u00e9",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
     "genders": {
       "M": "Homme",
       "F": "Femme",
       "O": "Autre",
-      "N": "Pr\u00e9f\u00e8re ne pas dire"
+      "N": "Préfère ne pas dire"
     },
-    "failedToLoad": "\u00c9chec du chargement des d\u00e9tails de l'utilisateur"
+    "failedToLoad": "Échec du chargement des détails de l'utilisateur"
   },
   "settings": {
     "title": "Paramètres",
@@ -320,5 +304,26 @@
     "emailUnverified": "Email non vérifié",
     "emailUnverifiedDesc": "L'email de l'utilisateur a été marqué comme non vérifié.",
     "emailUnverifyError": "Impossible de retirer la vérification de l'email. Veuillez réessayer."
+  },
+  "contacts": {
+    "title": "Messages de contact",
+    "subtitle": "Messages reçus via le formulaire de contact",
+    "tabNew": "Nouveaux",
+    "tabAll": "Tous les messages",
+    "statusNew": "Nouveau",
+    "statusRead": "Lu",
+    "statusResolved": "Résolu",
+    "markRead": "Marquer comme lu",
+    "markResolved": "Marquer comme résolu",
+    "markedAsRead": "Marqué comme lu",
+    "markedAsResolved": "Marqué comme résolu",
+    "reply": "Répondre",
+    "showMore": "Voir plus",
+    "showLess": "Voir moins",
+    "noNewMessages": "Aucun nouveau message",
+    "noMessages": "Aucun message pour l'instant",
+    "noMatchingMessages": "Aucun message ne correspond à votre recherche",
+    "failedToLoad": "Impossible de charger les messages de contact",
+    "searchPlaceholder": "Rechercher par nom, email ou sujet..."
   }
 }

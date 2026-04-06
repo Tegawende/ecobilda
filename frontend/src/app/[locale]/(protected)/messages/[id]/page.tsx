@@ -1,6 +1,5 @@
-import { ChatClient } from './ChatClient';
+import { MessagesClient } from '../MessagesClient';
 
-export default async function ChatPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return <ChatClient conversationId={id} />;
+export default function ChatPage() {
+  return <MessagesClient />;
 }

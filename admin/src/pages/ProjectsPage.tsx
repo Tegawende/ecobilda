@@ -47,20 +47,20 @@ function ProjectCard({
   actionLoading,
   onLoaded,
 }: {
-  projectId: number;
+  projectId: string;
   isValidated: boolean;
-  onValidate: (id: number) => Promise<void>;
-  onInvalidate: (id: number, reason?: string) => Promise<void>;
-  onReject: (id: number, reason: string) => Promise<void>;
-  actionLoading: number | null;
-  onLoaded?: (id: number, detail: ProjectDetail) => void;
+  onValidate: (id: string) => Promise<void>;
+  onInvalidate: (id: string, reason?: string) => Promise<void>;
+  onReject: (id: string, reason: string) => Promise<void>;
+  actionLoading: string | null;
+  onLoaded?: (id: string, detail: ProjectDetail) => void;
 }) {
   const { t } = useTranslation();
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [rejectingId, setRejectingId] = useState<number | null>(null);
-  const [invalidatingId, setInvalidatingId] = useState<number | null>(null);
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [invalidatingId, setInvalidatingId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [invalidateReason, setInvalidateReason] = useState('');
 
@@ -79,8 +79,13 @@ function ProjectCard({
     fetchProject();
   }, [projectId, onLoaded]);
 
+  const frontendUrl = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:3000';
   const images = project?.images && project.images.length > 0
-    ? project.images.map(img => img.image)
+    ? project.images.filter(img => img.url).map(img => {
+        const url = img.url!;
+        // Relative URLs point to frontend public assets
+        return url.startsWith('/') ? `${frontendUrl}${url}` : url;
+      })
     : [];
 
   const nextImage = useCallback((e: React.MouseEvent) => {
@@ -135,7 +140,7 @@ function ProjectCard({
     return null;
   }
 
-  const isNatB = project.project_type === 'NATURAL_BUILDING' || project.project_type === 'NATB';
+  const isNatB = project.projectType === 'NATURAL_BUILDING' || project.projectType === 'NATB';
 
   return (
     <Card className="group overflow-hidden">
@@ -230,7 +235,7 @@ function ProjectCard({
 
           {/* Owner info */}
           <p className="text-sm text-gray-500 mb-1">
-            {t('projects.by')} {project.owner.first_name} {project.owner.last_name}
+            {t('projects.by')} {project.owner.firstName} {project.owner.lastName}
             {project.owner.email && (
               <span className="text-gray-400 ml-1">({project.owner.email})</span>
             )}
@@ -246,40 +251,40 @@ function ProjectCard({
 
           {/* Stats */}
           <div className="flex items-center gap-4 text-sm text-gray-500 mb-2">
-            {project.max_helpers && (
+            {project.maxHelpers && (
               <span className="flex items-center gap-1">
                 <Users size={14} />
-                {project.max_helpers} {t('projectDetail.maxHelpers')}
+                {project.maxHelpers} {t('projectDetail.maxHelpers')}
               </span>
             )}
-            {project.hours_per_day && (
+            {project.hoursPerDay && (
               <span className="flex items-center gap-1">
                 <Clock size={14} />
-                {project.hours_per_day}h/{t('projectDetail.day')}
+                {project.hoursPerDay}h/{t('projectDetail.day')}
               </span>
             )}
           </div>
 
           {/* Amenities & Skills */}
           <div className="flex flex-wrap gap-1.5 mb-2">
-            {project.wifi_available && (
+            {project.internetProvided && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
                 <Wifi size={10} /> {t('projectDetail.wifi')}
               </span>
             )}
-            {project.family_friendly && (
+            {project.familyFriendly && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
                 <Baby size={10} /> {t('projectDetail.familyFriendly')}
               </span>
             )}
-            {project.pets_allowed && (
+            {project.petsAllowed && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
                 <Dog size={10} /> {t('projectDetail.pets')}
               </span>
             )}
             {project.skills && project.skills.slice(0, 3).map((skill) => (
               <Badge key={skill.code} variant="secondary" className="text-[10px] px-1.5 py-0">
-                {i18n.language === 'fr' ? skill.display_name_fr : skill.display_name_en}
+                {i18n.language === 'fr' ? skill.displayNameFr : skill.displayNameEn}
               </Badge>
             ))}
             {project.skills && project.skills.length > 3 && (
@@ -293,12 +298,12 @@ function ProjectCard({
           <div className="flex flex-wrap gap-3 text-xs text-gray-400 mb-3">
             <span className="flex items-center gap-1">
               <Calendar size={12} />
-              {t('projects.submitted')} {formatDate(project.created_at)}
+              {t('projects.submitted')} {formatDate(project._creationTime)}
             </span>
-            {isValidated && project.validated_at && (
+            {isValidated && project.validatedAt && (
               <span className="flex items-center gap-1 text-green-600">
                 <Check size={12} />
-                {t('projects.validatedOn')} {formatDate(project.validated_at)}
+                {t('projects.validatedOn')} {formatDate(project.validatedAt)}
               </span>
             )}
           </div>
@@ -448,17 +453,17 @@ function ProjectCard({
 
 export function ProjectsPage() {
   const { t } = useTranslation();
-  const [pendingProjectIds, setPendingProjectIds] = useState<number[]>([]);
-  const [validatedProjectIds, setValidatedProjectIds] = useState<number[]>([]);
+  const [pendingProjectIds, setPendingProjectIds] = useState<string[]>([]);
+  const [validatedProjectIds, setValidatedProjectIds] = useState<string[]>([]);
   const [isLoadingPending, setIsLoadingPending] = useState(true);
   const [isLoadingValidated, setIsLoadingValidated] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<'all' | 'PERMACULTURE' | 'NATURAL_BUILDING'>('all');
-  const [projectDetailsCache, setProjectDetailsCache] = useState<Map<number, ProjectDetail>>(new Map());
+  const [projectDetailsCache, setProjectDetailsCache] = useState<Map<string, ProjectDetail>>(new Map());
 
-  const handleProjectLoaded = useCallback((id: number, detail: ProjectDetail) => {
+  const handleProjectLoaded = useCallback((id: string, detail: ProjectDetail) => {
     setProjectDetailsCache((prev) => {
       const next = new Map(prev);
       next.set(id, detail);
@@ -466,19 +471,19 @@ export function ProjectsPage() {
     });
   }, []);
 
-  const filterProjectIds = useCallback((ids: number[]) => {
+  const filterProjectIds = useCallback((ids: string[]) => {
     const query = searchQuery.toLowerCase().trim();
     return ids.filter((id) => {
       const detail = projectDetailsCache.get(id);
       if (!detail) return true; // Show cards that haven't loaded yet
       if (typeFilter !== 'all') {
-        const type = detail.project_type;
+        const type = detail.projectType;
         if (typeFilter === 'NATURAL_BUILDING' && type !== 'NATURAL_BUILDING' && type !== 'NATB') return false;
         if (typeFilter === 'PERMACULTURE' && type !== 'PERMACULTURE' && type !== 'PERM') return false;
       }
       if (query) {
         const title = detail.title?.toLowerCase() || '';
-        const ownerName = `${detail.owner?.first_name || ''} ${detail.owner?.last_name || ''}`.toLowerCase();
+        const ownerName = `${detail.owner?.firstName || ''} ${detail.owner?.lastName || ''}`.toLowerCase();
         if (!title.includes(query) && !ownerName.includes(query)) return false;
       }
       return true;
@@ -499,7 +504,7 @@ export function ProjectsPage() {
       setIsLoadingPending(true);
       const data: any = await adminApi.getPendingProjects();
       const projects = Array.isArray(data) ? data : data.results || [];
-      setPendingProjectIds(projects.map((p: { id: number }) => p.id));
+      setPendingProjectIds(projects.map((p: { _id: string }) => p._id));
     } catch (err) {
       setError(t('projects.failedToLoad'));
       console.error(err);
@@ -513,7 +518,7 @@ export function ProjectsPage() {
       setIsLoadingValidated(true);
       const data: any = await adminApi.getValidatedProjects();
       const projects = Array.isArray(data) ? data : data.results || [];
-      setValidatedProjectIds(projects.map((p: { id: number }) => p.id));
+      setValidatedProjectIds(projects.map((p: { _id: string }) => p._id));
     } catch (err) {
       console.error('Failed to fetch validated projects:', err);
     } finally {
@@ -526,7 +531,7 @@ export function ProjectsPage() {
     fetchValidatedProjects();
   }, [fetchPendingProjects, fetchValidatedProjects]);
 
-  const handleValidate = useCallback(async (id: number) => {
+  const handleValidate = useCallback(async (id: string) => {
     setActionLoading(id);
     try {
       await adminApi.validateProject(id);
@@ -549,10 +554,10 @@ export function ProjectsPage() {
     }
   }, [t]);
 
-  const handleInvalidate = useCallback(async (id: number, reason?: string) => {
+  const handleInvalidate = useCallback(async (id: string, reason?: string) => {
     setActionLoading(id);
     try {
-      await adminApi.invalidateProject(id, reason);
+      await adminApi.invalidateProject(id);
       setValidatedProjectIds((prev) => prev.filter((pid) => pid !== id));
       setPendingProjectIds((prev) => [id, ...prev]);
       toast({
@@ -572,7 +577,7 @@ export function ProjectsPage() {
     }
   }, [t]);
 
-  const handleReject = useCallback(async (id: number, reason: string) => {
+  const handleReject = useCallback(async (id: string, reason: string) => {
     setActionLoading(id);
     try {
       await adminApi.rejectProject(id, reason);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
-import { Link, useRouter } from '@/i18n/navigation';
+import { Link, useRouter, usePathname } from '@/i18n/navigation';
 import { Container, SimpleGrid, Stack, Group, Text, Anchor, Divider, NativeSelect, Box } from '@mantine/core';
 import { IconBrandTwitter, IconBrandInstagram, IconBrandFacebook, IconWorld } from '@tabler/icons-react';
 
@@ -9,37 +9,37 @@ export function Footer() {
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
+  const pathname = usePathname();
   const currentYear = new Date().getFullYear();
 
   const footerGroups = [
     {
-      title: t('footer.about.title') || 'About',
+      title: t('footer.about.title'),
       links: [
-        { label: t('footer.about.us') || 'About Us', link: '/about' },
-        { label: t('footer.about.contact') || 'Contact', link: '/contact' },
-        { label: t('footer.about.faq') || 'FAQ', link: '/faq' },
+        { label: t('footer.about.us'), link: '/about' },
+        { label: t('footer.about.contact'), link: '/contact' },
+        { label: t('footer.about.faq'), link: '/faq' },
       ],
     },
     {
-      title: t('footer.projects.title') || 'Projects',
+      title: t('footer.projects.title'),
       links: [
-        { label: t('footer.projects.browse') || 'Browse Projects', link: '/projects' },
-        { label: t('footer.projects.howItWorks') || 'How It Works', link: '/how-it-works' },
-        { label: t('footer.projects.forHosts') || 'For Hosts', link: '/for-hosts' },
+        { label: t('footer.projects.forHosts'), link: '/for-hosts' },
+        { label: t('footer.projects.forHelpers'), link: '/for-helpers' },
       ],
     },
     {
-      title: t('footer.legal.title') || 'Legal',
+      title: t('footer.legal.title'),
       links: [
-        { label: t('footer.links.terms') || 'Terms', link: '/terms' },
-        { label: t('footer.links.privacy') || 'Privacy', link: '/privacy' },
+        { label: t('footer.links.terms'), link: '/terms' },
+        { label: t('footer.links.privacy'), link: '/privacy' },
       ],
     },
   ];
 
   const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newLocale = event.target.value;
-    router.push('/', { locale: newLocale as any });
+    router.push(pathname, { locale: newLocale as any });
   };
 
   return (

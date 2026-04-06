@@ -8,10 +8,10 @@ export function HowItWorksClient() {
   const t = useTranslations();
 
   const steps = [
-    { icon: IconSearch, title: t('howItWorks.step1.title') || 'Browse Projects', desc: t('howItWorks.step1.desc') || 'Search for eco-construction and permaculture projects that match your interests and availability.' },
-    { icon: IconSend, title: t('howItWorks.step2.title') || 'Apply to Participate', desc: t('howItWorks.step2.desc') || 'Send a participation request with your motivation. The host will review your profile.' },
-    { icon: IconMessageCircle, title: t('howItWorks.step3.title') || 'Connect & Chat', desc: t('howItWorks.step3.desc') || 'Once accepted, you can chat directly with the host to plan your stay.' },
-    { icon: IconStar, title: t('howItWorks.step4.title') || 'Learn & Review', desc: t('howItWorks.step4.desc') || 'Gain hands-on experience and leave a review to help the community.' },
+    { icon: IconSearch, title: t('howItWorks.step1.title'), desc: t('howItWorks.step1.desc') },
+    { icon: IconSend, title: t('howItWorks.step2.title'), desc: t('howItWorks.step2.desc') },
+    { icon: IconMessageCircle, title: t('howItWorks.step3.title'), desc: t('howItWorks.step3.desc') },
+    { icon: IconStar, title: t('howItWorks.step4.title'), desc: t('howItWorks.step4.desc') },
   ];
 
   return (
@@ -19,10 +19,10 @@ export function HowItWorksClient() {
       <div className="bg-white py-24 sm:py-32">
         <div className="mx-auto max-w-4xl px-6 lg:px-8">
           <h1 className="text-4xl font-display font-bold text-eco-primary text-center mb-4">
-            {t('howItWorks.title') || 'How It Works'}
+            {t('howItWorks.title')}
           </h1>
           <p className="text-lg text-gray-600 text-center mb-16 max-w-2xl mx-auto">
-            {t('howItWorks.subtitle') || 'Join our community in 4 simple steps'}
+            {t('howItWorks.subtitle')}
           </p>
 
           <div className="space-y-12">

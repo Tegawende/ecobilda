@@ -18,6 +18,7 @@ export interface User {
   notificationLanguage?: 'en' | 'fr' | 'es' | 'de';
   averageRating: number;
   reviewCount: number;
+  hasPassword?: boolean;
   isStaff?: boolean;
   isActive?: boolean;
   _creationTime?: number;

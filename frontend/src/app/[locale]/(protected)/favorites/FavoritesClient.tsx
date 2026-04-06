@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
+import { useQuery } from 'convex/react';
+import { api } from '../../../../../convex/_generated/api';
 import { Container, Title, Text, SimpleGrid, Paper, Button, Group, Stack, ThemeIcon, ActionIcon, Badge, Avatar, Box } from '@mantine/core';
 import {
   IconHeart,
@@ -20,125 +22,127 @@ import {
 } from '@tabler/icons-react';
 import { Layout } from '@/components/common/Layout';
 import type { Project } from '@/types';
+import { useFavorites } from '@/hooks/useConvex';
 
 import { ProjectCard } from '@/components/projects/ProjectCard';
 import { FavoriteButton } from '@/components/common/FavoriteButton';
 import { MobileProjectDetailModal } from '@/components/projects/MobileProjectDetailModal';
 import { ProjectCardSkeleton } from '@/components/projects/ProjectCard';
 
-// Reuse ProjectCardList from ProjectsPage for consistency
+// Reuse same list card style as browse projects page
 function ProjectCardList({ project }: { project: Project }) {
   const t = useTranslations();
   const images = project.images && project.images.length > 0
-    ? project.images.map(img => img.url)
+    ? project.images.map(img => img.url || '')
     : ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'];
-
   const isNatB = project.projectType === 'NATB';
 
   return (
     <Link href={`/projects/${project._id}`}
-      className="block group cursor-pointer"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block group cursor-pointer transition-all duration-200"
     >
-      <Paper radius="lg" p="md" mb="md" withBorder className="hover:shadow-md transition-all">
-        <Group align="flex-start" gap="md" wrap="nowrap">
-          {/* Project Image */}
-          <div className="relative w-[210px] h-[160px] flex-shrink-0 rounded-lg overflow-hidden">
-            <img
-              src={images[0]}
-              alt={project.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute top-2 right-2 z-10">
-              <FavoriteButton projectId={project._id} variant="ghost" size="sm" initialFavorite={true} />
-            </div>
-
-            <div className="absolute top-2 left-2">
-              <Badge
-                size="xs"
-                color={isNatB ? 'eco-primary' : 'eco-terracotta'}
-                leftSection={isNatB ? <IconHome size={10} /> : <IconLeaf size={10} />}
-              >
-                {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
-              </Badge>
-            </div>
+      <Group gap="md" p="md" wrap="nowrap" align="flex-start" className="hover:bg-gray-50 transition-colors border-b border-gray-100">
+        {/* Image */}
+        <div className="relative w-[200px] h-[150px] flex-shrink-0 rounded-xl overflow-hidden">
+          <img
+            src={images[0]}
+            alt={project.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          <div className="absolute top-2 right-2 z-10">
+            <FavoriteButton projectId={project._id} variant="ghost" size="sm" initialFavorite={true} />
           </div>
+          <div className="absolute top-2 left-2">
+            <Badge
+              size="xs"
+              color={isNatB ? 'eco-primary' : 'eco-terracotta'}
+              leftSection={isNatB ? <IconHome size={10} /> : <IconLeaf size={10} />}
+            >
+              {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
+            </Badge>
+          </div>
+        </div>
 
-          {/* Content */}
-          <Stack gap="xs" className="flex-1 min-w-0">
-            <Title order={4} className="group-hover:text-eco-primary transition-colors line-clamp-1">
-              {project.title}
-            </Title>
-            <Group gap="xs">
-              <IconMapPin size={14} className="text-eco-terracotta" />
-              <Text size="sm" c="dimmed" truncate>{project.address?.city}, {project.address?.country?.name}</Text>
+        {/* Content */}
+        <Stack gap="xs" className="flex-1 min-w-0 py-1">
+          <Title order={4} className="group-hover:text-eco-primary transition-colors line-clamp-1">
+            {project.title}
+          </Title>
+
+          <Group gap={4}>
+            <IconMapPin size={14} className="flex-shrink-0 text-gray-500" />
+            <Text size="sm" c="dimmed">{project.address?.city}, {project.address?.country?.name}</Text>
+          </Group>
+
+          <Text size="sm" c="dimmed" lineClamp={2}>
+            {project.description}
+          </Text>
+
+          {/* Stats */}
+          <Group gap="md">
+            <Group gap={4}>
+              <IconUsers size={14} />
+              <Text size="sm" c="dimmed">{project.maxHelpers} {t('projects.volunteers')} max</Text>
             </Group>
-
-            <Text size="sm" c="dimmed" lineClamp={2}>
-              {project.description}
-            </Text>
-
-            <Group gap="md">
-              <Group gap={4}>
-                <IconUsers size={14} />
-                <Text size="xs" c="dimmed">{project.maxHelpers} {t('projects.volunteers') || 'volunteers'}</Text>
-              </Group>
-              <Group gap={4}>
-                <IconClock size={14} />
-                <Text size="xs" c="dimmed">{project.hoursPerDay}h/{t('common.day') || 'day'}</Text>
-              </Group>
+            <Group gap={4}>
+              <IconClock size={14} />
+              <Text size="sm" c="dimmed">{project.hoursPerDay}h/{t('common.day')}</Text>
             </Group>
+            <Text size="sm" c="dimmed">{project.daysPerWeek}{t('projects.daysPerWeekShort')}</Text>
+          </Group>
 
-            {/* Amenities */}
-            <Group gap="xs">
-              {project.internetProvided && (
-                <Badge variant="light" color="gray" size="xs" leftSection={<IconWifi size={12} />}>
-                  {t('projects.wifi')}
-                </Badge>
-              )}
-              {project.familyFriendly && (
-                <Badge variant="light" color="gray" size="xs" leftSection={<IconBabyCarriage size={12} />}>
-                  {t('projects.familyFriendly') || 'Family'}
-                </Badge>
-              )}
-              {project.petsAllowed && (
-                <Badge variant="light" color="gray" size="xs" leftSection={<IconDog size={12} />}>
-                  {t('projects.petsAllowed') || 'Pets'}
-                </Badge>
-              )}
-            </Group>
-
-            {/* Host Info */}
-            {project.owner && (
-              <Group gap="sm" pt="xs" className="border-t border-gray-100">
-                <Avatar src={project.owner?.profilePictureUrl} size="xs" radius="xl" />
-                <Text size="xs" c="dimmed">
-                  {t('common.by') || 'By'} <Text component="span" fw={500}>{project.owner?.firstName}</Text>
-                </Text>
-                {project.owner?.averageRating && (
-                  <Group gap={4}>
-                    <Text size="xs" fw={600} c="yellow">{Number(project.owner?.averageRating || 0).toFixed(1)}</Text>
-                    <IconStar size={12} className="text-yellow-500 fill-yellow-500" />
-                  </Group>
-                )}
-              </Group>
+          {/* Amenities */}
+          <Group gap="xs">
+            {project.internetProvided && (
+              <Badge variant="light" color="eco-primary" size="xs" leftSection={<IconWifi size={12} />}>
+                {t('projects.wifiIncluded')}
+              </Badge>
             )}
-          </Stack>
-        </Group>
-      </Paper>
+            {project.familyFriendly && (
+              <Badge variant="light" color="eco-primary" size="xs" leftSection={<IconBabyCarriage size={12} />}>
+                {t('projects.familiesWelcome')}
+              </Badge>
+            )}
+            {project.petsAllowed && (
+              <Badge variant="light" color="eco-primary" size="xs" leftSection={<IconDog size={12} />}>
+                {t('projects.petsAccepted')}
+              </Badge>
+            )}
+          </Group>
+
+          {/* Host info */}
+          {project.owner && (
+            <Group gap="sm" pt="xs" className="border-t border-gray-100">
+              <Avatar src={project.owner?.profilePictureUrl || undefined} size="sm" radius="xl" color="gray">
+                {!project.owner?.profilePictureUrl && <IconUsers size={18} />}
+              </Avatar>
+              <Stack gap={0}>
+                <Text size="sm" fw={600}>{project.owner?.firstName} {project.owner?.lastName?.charAt(0)}.</Text>
+                <Group gap={4}>
+                  <IconStar size={13} className="text-yellow-400 fill-yellow-400" />
+                  <Text size="xs" c="dimmed">{Number(project.owner?.averageRating || 0).toFixed(1)} ({project.owner?.reviewCount || 0} {t('projects.reviews')})</Text>
+                </Group>
+              </Stack>
+            </Group>
+          )}
+        </Stack>
+      </Group>
     </Link>
   );
 }
 
 export function FavoritesClient() {
   const t = useTranslations();
-  const [favorites, setFavorites] = useState<Project[]>([]);
+  const { favoriteProjectIds, isLoading: favLoading } = useFavorites();
+  const favoriteProjects = useQuery(
+    api.projects.getByIds,
+    favoriteProjectIds.length > 0 ? { ids: favoriteProjectIds as any } : "skip"
+  );
+  const favorites = (favoriteProjects ?? []) as Project[];
+  const isLoading = favLoading || (favoriteProjectIds.length > 0 && favoriteProjects === undefined);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // TODO: Fetch favorites from API
-    setIsLoading(false);
-  }, []);
   // Mobile modal state
   const [mobileModalProject, setMobileModalProject] = useState<Project | null>(null);
 
@@ -155,10 +159,10 @@ export function FavoritesClient() {
                 </ThemeIcon>
                 <Stack gap={4}>
                   <Title order={1} className="font-display">
-                    {t('favorites.title') || 'My Favorites'}
+                    {t('favorites.title')}
                   </Title>
                   <Text c="dimmed">
-                    {t('favorites.subtitle') || 'Projects you saved for later'}
+                    {t('favorites.subtitle')}
                   </Text>
                 </Stack>
               </Group>
@@ -216,10 +220,10 @@ export function FavoritesClient() {
                 <Stack align="center" gap="md">
                   <IconHeart size={64} className="text-gray-300" />
                   <Title order={3} className="font-display">
-                    {t('favorites.noFavorites') || 'No favorites yet'}
+                    {t('favorites.noFavorites')}
                   </Title>
                   <Text c="dimmed" maw={400}>
-                    {t('favorites.noFavoritesDesc') || 'Start exploring projects and save the ones you like!'}
+                    {t('favorites.noFavoritesDesc')}
                   </Text>
                   <Button
                     component={Link} href="/projects"
@@ -227,7 +231,7 @@ export function FavoritesClient() {
                     size="md"
                     color="eco-primary"
                   >
-                    {t('favorites.browseProjects') || 'Browse Projects'}
+                    {t('favorites.browseProjects')}
                   </Button>
                 </Stack>
               </Paper>
