@@ -260,51 +260,29 @@ export function ChatClient({ conversationId: propConversationId, noLayout = fals
 
   const chatContent = (
     <Flex direction="column" style={{ height: noLayout ? '100%' : '100vh' }} bg="gray.0">
-      {/* Header */}
-      <Box bg="white" px="md" py="sm" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)', flexShrink: 0 }}>
-        <Container size="md">
+      {/* Mobile-only header: back + details toggle */}
+      {!noLayout && (
+        <Box bg="white" px="md" py="xs" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)', flexShrink: 0 }}>
           <Group justify="space-between">
-            <Group>
-              {!noLayout && (
-                <Button
-                  variant="subtle"
-                  leftSection={<IconArrowLeft size={18} />}
-                  onClick={() => router.push('/messages')}
-                  size="sm"
-                >
-                  {t('common.back')}
-                </Button>
-              )}
-
-              <Avatar
-                src={otherUser?.profilePictureUrl || (otherUser as any)?.profilePicture}
-                size="md"
-                radius="xl"
-                color="blue"
-              >
-                {`${otherUser?.firstName?.[0] || ''}${otherUser?.lastName?.[0] || ''}`}
-              </Avatar>
-
-              <Box>
-                <Text fw={600}>
-                  {otherUser?.firstName} {otherUser?.lastName}
-                </Text>
-              </Box>
-            </Group>
-
-            {/* Mobile details button */}
+            <Button
+              variant="subtle"
+              leftSection={<IconArrowLeft size={18} />}
+              onClick={() => router.push('/messages')}
+              size="sm"
+            >
+              {t('common.back')}
+            </Button>
             <ActionIcon
               variant="subtle"
               color="gray"
-              hiddenFrom="md"
               onClick={openDetails}
               aria-label={t('messaging.openDetails')}
             >
               <IconInfoCircle size={20} />
             </ActionIcon>
           </Group>
-        </Container>
-      </Box>
+        </Box>
+      )}
 
       {/* Accept/Refuse banner — shown to host when request is PENDING */}
       {isHost && isPendingRequest && (
@@ -313,7 +291,7 @@ export function ChatClient({ conversationId: propConversationId, noLayout = fals
             <Group justify="space-between" wrap="nowrap">
               <Text size="sm" fw={500} c="eco-primary.8">
                 {t('messaging.pendingApplication', {
-                  name: `${otherUser.firstName} ${otherUser.lastName}`,
+                  name: otherUser.firstName,
                 })}
               </Text>
               <Group gap="sm" wrap="nowrap">

@@ -113,6 +113,15 @@ export const getById = query({
             }
           }
         }
+        let projectAddress = null;
+        if (project?.addressId) {
+          const addr = await ctx.db.get(project.addressId);
+          if (addr) {
+            let country = null;
+            if (addr.countryId) country = await ctx.db.get(addr.countryId);
+            projectAddress = { city: addr.city, country: country ? { name: country.name } : null };
+          }
+        }
         participationDetails = {
           _id: req._id,
           proposedStartDate: req.proposedStartDate ?? null,
@@ -122,6 +131,8 @@ export const getById = query({
             ? {
                 _id: project._id,
                 title: project.title,
+                projectType: project.projectType,
+                address: projectAddress,
                 coverImageUrl,
               }
             : null,

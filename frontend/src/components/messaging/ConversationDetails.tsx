@@ -2,32 +2,17 @@
 
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Link } from '@/i18n/navigation';
-import { useRouter } from '@/i18n/navigation';
-import { getSkillIcon } from '@/lib/skillIcons';
-import { getSkillDisplayName } from '@/types';
+import { Link, useRouter } from '@/i18n/navigation';
 import {
-  Box,
-  Stack,
-  Avatar,
-  Text,
-  Button,
-  Group,
-  Badge,
-  ScrollArea,
+  Box, Stack, Avatar, Text, Button, Group, Badge, ScrollArea, Divider,
 } from '@mantine/core';
 import {
-  IconMapPin,
-  IconCalendar,
-  IconVolume,
-  IconVolumeOff,
-  IconTrash,
-  IconExternalLink,
+  IconMapPin, IconCalendar, IconVolume, IconVolumeOff, IconTrash,
+  IconExternalLink, IconHome2, IconLeaf, IconUser,
 } from '@tabler/icons-react';
 import { modals } from '@mantine/modals';
 import { messagingService } from '@/services/messaging';
 import type { Conversation } from '@/types';
-import dayjs from 'dayjs';
 
 interface ConversationDetailsProps {
   conversation: Conversation;
@@ -47,18 +32,17 @@ export function ConversationDetails({
   const locale = useLocale();
   const [isTogglingMute, setIsTogglingMute] = useState(false);
 
-  // Determine the other user
   const otherUser = conversation.otherUser;
   const isMuted = conversation.isMuted ?? false;
   const participationDetails = conversation.participationDetails;
+  const project = participationDetails?.project;
+  const isNatB = project?.projectType === 'NATB';
 
   const handleToggleMute = async () => {
     setIsTogglingMute(true);
     try {
       await messagingService.toggleMute(conversation._id);
-      if (onMuteToggle) {
-        onMuteToggle();
-      }
+      onMuteToggle?.();
     } catch (error) {
       console.error('Failed to toggle mute:', error);
     } finally {
@@ -69,19 +53,13 @@ export function ConversationDetails({
   const handleDelete = () => {
     modals.openConfirmModal({
       title: t('messaging.deleteConfirm'),
-      children: (
-        <Text size="sm">
-          {t('messaging.deleteConfirmText')}
-        </Text>
-      ),
+      children: <Text size="sm">{t('messaging.deleteConfirmText')}</Text>,
       labels: { confirm: t('common.delete'), cancel: t('common.cancel') },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
         try {
           await messagingService.deleteConversation(conversation._id);
-          if (onDelete) {
-            onDelete();
-          }
+          onDelete?.();
           router.push('/messages');
         } catch (error) {
           console.error('Failed to delete conversation:', error);
@@ -97,178 +75,154 @@ export function ConversationDetails({
         flexDirection: 'column',
         height: '100%',
         backgroundColor: 'white',
-        borderLeft: '1px solid #e0e0e0',
+        borderLeft: '1px solid var(--mantine-color-gray-2)',
       }}
     >
       {/* Header */}
-      <Box p="lg" style={{ borderBottom: '1px solid #e0e0e0', flexShrink: 0 }}>
-        <Text fw={700} size="lg">
+      <Box p="md" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)', flexShrink: 0 }}>
+        <Text fw={700} size="sm" tt="uppercase" c="dimmed" style={{ letterSpacing: '0.05em' }}>
           {t('messaging.details')}
         </Text>
       </Box>
 
       <ScrollArea style={{ flex: 1 }}>
-        {/* Project Section */}
-        {participationDetails?.project && (
-          <Box p="lg" style={{ borderBottom: '1px solid #e0e0e0' }}>
-            <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb="sm">
-              {t('messaging.project')}
-            </Text>
+        <Stack gap={0}>
 
-            {participationDetails.project.coverImageUrl && (
-              <Box
-                mb="sm"
-                style={{
-                  borderRadius: 8,
-                  overflow: 'hidden',
-                  height: 120,
-                }}
-              >
-                <img
-                  src={participationDetails.project.coverImageUrl}
-                  alt={participationDetails.project.title}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                />
-              </Box>
-            )}
+          {/* Project Section */}
+          {project && (
+            <Box p="md">
+              <Stack gap="sm">
+                {/* Cover image */}
+                {project.coverImageUrl && (
+                  <Link href={`/projects/${project._id}`}>
+                    <div className="rounded-lg overflow-hidden aspect-[16/9] bg-gray-100">
+                      <img
+                        src={project.coverImageUrl}
+                        alt={project.title}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                  </Link>
+                )}
 
-            <Group justify="space-between" align="flex-start" wrap="nowrap">
-              <Text fw={600} size="sm" style={{ flex: 1 }}>
-                {participationDetails.project.title}
-              </Text>
-              <Link href={`/projects/${participationDetails.project._id}`} style={{ display: 'flex', flexShrink: 0 }}>
-                <IconExternalLink size={16} color="var(--mantine-color-gray-5)" />
-              </Link>
-            </Group>
+                {/* Type badge */}
+                <Badge
+                  size="xs"
+                  radius="xl"
+                  variant="light"
+                  color={isNatB ? 'eco-primary' : 'eco-terracotta'}
+                  leftSection={isNatB ? <IconHome2 size={10} /> : <IconLeaf size={10} />}
+                >
+                  {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
+                </Badge>
 
-            {(participationDetails.proposedStartDate || participationDetails.proposedEndDate) && (
-              <Group gap="xs" mt="xs">
-                <IconCalendar size={14} color="var(--mantine-color-gray-6)" />
-                <Text size="xs" c="dimmed">
-                  {participationDetails.proposedStartDate}
-                  {participationDetails.proposedEndDate && ` – ${participationDetails.proposedEndDate}`}
-                </Text>
-              </Group>
-            )}
-          </Box>
-        )}
-
-        {/* Profile Section */}
-        <Box p="lg" style={{ textAlign: 'center', borderBottom: '1px solid #e0e0e0' }}>
-          <Stack align="center" gap="md">
-            <Avatar
-              src={otherUser?.profilePictureUrl || otherUser?.profilePicture}
-              size={100}
-              radius="xl"
-              color="blue"
-            >
-              {!otherUser?.profilePicture &&
-                `${otherUser?.firstName?.[0] ?? ''}${otherUser?.lastName?.[0] ?? ''}`}
-            </Avatar>
-
-            <Box>
-              <Text fw={700} size="lg">
-                {otherUser?.firstName} {otherUser?.lastName}
-              </Text>
-
-              {(otherUser as any)?.address && (
-                <Group justify="center" gap="xs" mt="xs">
-                  <IconMapPin size={14} color="var(--mantine-color-gray-6)" />
-                  <Text size="sm" c="dimmed">
-                    {(otherUser as any).address.city}
-                    {(otherUser as any).address.country && `, ${(otherUser as any).address.country.name}`}
-                  </Text>
+                {/* Title + link */}
+                <Group justify="space-between" align="flex-start" wrap="nowrap" gap="xs">
+                  <Link href={`/projects/${project._id}`} className="no-underline flex-1 min-w-0">
+                    <Text fw={700} size="sm" c="dark" className="hover:text-eco-primary transition-colors line-clamp-2">
+                      {project.title}
+                    </Text>
+                  </Link>
+                  <Link href={`/projects/${project._id}`} style={{ flexShrink: 0 }}>
+                    <IconExternalLink size={14} color="var(--mantine-color-gray-5)" />
+                  </Link>
                 </Group>
-              )}
-            </Box>
 
+                {/* Location */}
+                {(project as any).address?.city && (
+                  <Group gap={4} wrap="nowrap">
+                    <IconMapPin size={12} className="text-gray-400 flex-shrink-0" />
+                    <Text size="xs" c="dimmed" className="truncate">
+                      {[(project as any).address.city, (project as any).address.country?.name].filter(Boolean).join(', ')}
+                    </Text>
+                  </Group>
+                )}
+
+                {/* Dates */}
+                {(participationDetails?.proposedStartDate || participationDetails?.proposedEndDate) && (
+                  <Group gap={4}>
+                    <IconCalendar size={12} className="text-gray-400" />
+                    <Text size="xs" c="dimmed">
+                      {participationDetails.proposedStartDate}
+                      {participationDetails.proposedEndDate && ` – ${participationDetails.proposedEndDate}`}
+                    </Text>
+                  </Group>
+                )}
+
+                {/* Participation status */}
+                {participationDetails?.status && (
+                  <Badge
+                    size="xs"
+                    variant="light"
+                    color={
+                      participationDetails.status === 'ACCEPTED' ? 'green'
+                        : participationDetails.status === 'PENDING' ? 'yellow'
+                        : 'red'
+                    }
+                  >
+                    {participationDetails.status === 'ACCEPTED' ? t('participations.accepted')
+                      : participationDetails.status === 'PENDING' ? t('participations.pending')
+                      : t('participations.rejected')}
+                  </Badge>
+                )}
+              </Stack>
+            </Box>
+          )}
+
+          <Divider />
+
+          {/* Host Section — compact */}
+          <Box p="md">
+            <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb="sm" style={{ letterSpacing: '0.05em' }}>
+              {t('messaging.host') || 'Host'}
+            </Text>
+            <Group gap="sm">
+              <Avatar
+                src={otherUser?.profilePictureUrl || otherUser?.profilePicture}
+                size={40}
+                radius="xl"
+                color="eco-primary"
+              >
+                {otherUser?.firstName?.[0]}
+              </Avatar>
+              <Stack gap={0} style={{ flex: 1, minWidth: 0 }}>
+                <Text fw={600} size="sm" className="truncate">
+                  {otherUser?.firstName}
+                </Text>
+                {(otherUser as any)?.address && (
+                  <Group gap={4}>
+                    <IconMapPin size={11} className="text-gray-400" />
+                    <Text size="xs" c="dimmed" className="truncate">
+                      {(otherUser as any).address.city}
+                    </Text>
+                  </Group>
+                )}
+              </Stack>
+            </Group>
             <Button
-              variant="outline"
+              variant="light"
+              color="eco-primary"
               component={Link}
               href={`/users/${otherUser?.publicId ?? otherUser?._id}`}
               fullWidth
-              size="sm"
+              size="xs"
+              radius="xl"
+              mt="sm"
+              leftSection={<IconUser size={14} />}
             >
               {t('messaging.viewFullProfile')}
             </Button>
-          </Stack>
-        </Box>
-
-        {/* User Info Section */}
-        <Box p="lg" style={{ borderBottom: '1px solid #e0e0e0' }}>
-          <Stack gap="md">
-            <Box>
-              <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb="xs">
-                {t('messaging.about')}
-              </Text>
-
-              {(otherUser as any)?.bio && (
-                <Text size="sm" mb="sm">
-                  {(otherUser as any).bio}
-                </Text>
-              )}
-
-              <Stack gap="xs">
-                <Group gap="xs">
-                  <IconCalendar size={16} color="var(--mantine-color-gray-6)" />
-                  <Text size="sm" c="dimmed">
-                    {t('messaging.memberSince', { date: dayjs().format('MMM YYYY') })}
-                  </Text>
-                </Group>
-              </Stack>
-            </Box>
-
-            {/* Skills */}
-            {(otherUser as any)?.skills && (otherUser as any).skills.length > 0 && (
-              <Box>
-                <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb="xs">
-                  {t('messaging.skills')}
-                </Text>
-                <Group gap="xs">
-                  {(otherUser as any).skills.slice(0, 5).map((skill: any, index: number) => {
-                    const SkillIcon = getSkillIcon(skill.icon);
-                    return (
-                      <Badge key={skill.code || index} variant="light" size="sm" leftSection={<SkillIcon size={12} />}>
-                        {getSkillDisplayName(skill, locale)}
-                      </Badge>
-                    );
-                  })}
-                  {(otherUser as any).skills.length > 5 && (
-                    <Badge variant="light" size="sm" c="dimmed">
-                      {t('messaging.more', { count: (otherUser as any).skills.length - 5 })}
-                    </Badge>
-                  )}
-                </Group>
-              </Box>
-            )}
-
-            {/* Languages */}
-            {(otherUser as any)?.languages && (otherUser as any).languages.length > 0 && (
-              <Box>
-                <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb="xs">
-                  {t('messaging.languages')}
-                </Text>
-                <Group gap="xs">
-                  {(otherUser as any).languages.map((language: any, index: number) => (
-                    <Badge key={language.code || index} variant="outline" size="sm">
-                      {language.name}
-                    </Badge>
-                  ))}
-                </Group>
-              </Box>
-            )}
-          </Stack>
-        </Box>
+          </Box>
+        </Stack>
       </ScrollArea>
 
-      {/* Actions Section */}
-      <Box p="lg" style={{ borderTop: '1px solid #e0e0e0', flexShrink: 0 }}>
-        <Stack gap="sm">
+      {/* Actions */}
+      <Box p="md" style={{ borderTop: '1px solid var(--mantine-color-gray-2)', flexShrink: 0 }}>
+        <Stack gap="xs">
           <Button
             variant="subtle"
-            leftSection={
-              isMuted ? <IconVolume size={16} /> : <IconVolumeOff size={16} />
-            }
+            size="xs"
+            leftSection={isMuted ? <IconVolume size={14} /> : <IconVolumeOff size={14} />}
             onClick={handleToggleMute}
             loading={isTogglingMute}
             fullWidth
@@ -276,11 +230,11 @@ export function ConversationDetails({
           >
             {isMuted ? t('messaging.unmuteConversation') : t('messaging.muteConversation')}
           </Button>
-
           <Button
             variant="subtle"
+            size="xs"
             color="red"
-            leftSection={<IconTrash size={16} />}
+            leftSection={<IconTrash size={14} />}
             onClick={handleDelete}
             fullWidth
           >
