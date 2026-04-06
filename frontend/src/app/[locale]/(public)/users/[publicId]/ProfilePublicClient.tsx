@@ -402,13 +402,13 @@ export function ProfilePublicClient() {
                     {t('nav.projects')}
                   </Text>
                 </Group>
-                {profile.projects.map((project: any) => {
-                  const isPerm = project.projectType === 'PERM';
-                  const coverUrl = project.coverImageUrl ?? 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800';
-                  return (
-                    <Link key={project._id} href={`/projects/${project._id}`} className="block group no-underline">
-                      <div className="rounded-xl overflow-hidden bg-white border border-gray-100 hover:shadow-md transition-shadow">
-                        <div className="relative aspect-[16/9] bg-gray-100 overflow-hidden">
+                <div className="grid grid-cols-2 gap-3">
+                  {profile.projects.map((project: any) => {
+                    const isPerm = project.projectType === 'PERM';
+                    const coverUrl = project.coverImageUrl ?? 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800';
+                    return (
+                      <Link key={project._id} href={`/projects/${project._id}`} className="block group no-underline">
+                        <div className="relative rounded-xl overflow-hidden aspect-[16/9] bg-gray-100">
                           <img
                             src={coverUrl}
                             alt={project.title}
@@ -429,23 +429,23 @@ export function ProfilePublicClient() {
                             </Badge>
                           </div>
                         </div>
-                        <div className="p-3">
-                          <Text size="sm" fw={700} c="dark" className="line-clamp-1 group-hover:text-eco-primary transition-colors">
+                        <Stack gap={2} px={2} pt={4}>
+                          <Text size="xs" fw={700} c="dark" className="line-clamp-1 group-hover:text-eco-primary transition-colors">
                             {project.title}
                           </Text>
                           {project.address?.city && (
-                            <Group gap={4} mt={4}>
-                              <IconMapPin size={12} className="text-gray-400" />
-                              <Text size="xs" c="dimmed">
+                            <Group gap={3} wrap="nowrap">
+                              <IconMapPin size={10} className="text-gray-400 flex-shrink-0" />
+                              <Text size="xs" c="dimmed" className="truncate">
                                 {[project.address.city, project.address.country?.name].filter(Boolean).join(', ')}
                               </Text>
                             </Group>
                           )}
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })}
+                        </Stack>
+                      </Link>
+                    );
+                  })}
+                </div>
               </Stack>
             )}
 
