@@ -238,23 +238,28 @@ function ParticipationCard({
             alt={participation.project?.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
+          {/* Type badge on image */}
+          <div className="absolute top-2 right-2 z-10">
+            <Badge
+              size="xs"
+              radius="xl"
+              variant="filled"
+              color={isNatB ? 'eco-primary' : 'eco-terracotta'}
+              leftSection={isNatB ? <IconHome2 size={10} /> : <IconLeaf size={10} />}
+              tt="uppercase"
+              fw={700}
+              styles={{ root: { letterSpacing: '0.05em', fontSize: '0.6rem' } }}
+            >
+              {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
+            </Badge>
+          </div>
         </div>
       </Link>
 
-      {/* Content — compact */}
+      {/* Content */}
       <Stack gap={2} px={2}>
-        {/* Badges row before title */}
         <Group gap={6} pt={2}>
           <StatusBadge status={participation.status} />
-          <Badge
-            size="xs"
-            radius="xl"
-            variant="light"
-            color={isNatB ? 'eco-primary' : 'eco-terracotta'}
-            leftSection={isNatB ? <IconHome2 size={10} /> : <IconLeaf size={10} />}
-          >
-            {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
-          </Badge>
         </Group>
 
         <Link href={`/projects/${participation.project?._id}`} className="no-underline">
@@ -273,34 +278,34 @@ function ParticipationCard({
         )}
 
         {host && (
-          <Group gap="xs" pt={2}>
-            <Avatar src={host.profilePictureUrl} size={22} radius="xl" color="eco-primary">
-              {host.firstName?.[0]}
-            </Avatar>
-            <Text size="xs" c="dimmed" className="truncate">
-              {host.firstName} {host.lastName}
-            </Text>
-            {host.averageRating > 0 && (
-              <Group gap={2} wrap="nowrap" ml="auto">
-                <IconStar size={11} style={{ fill: '#facc15', color: '#facc15' }} />
-                <Text size="xs" c="dimmed">{host.averageRating.toFixed(1)}</Text>
-              </Group>
+          <Group gap="xs" justify="space-between" pt={2}>
+            <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
+              <Avatar src={host.profilePictureUrl} size={22} radius="xl" color="eco-primary">
+                {host.firstName?.[0]}
+              </Avatar>
+              <Text size="xs" c="dimmed" className="truncate">
+                {host.firstName} {host.lastName}
+              </Text>
+              {host.averageRating > 0 && (
+                <Group gap={2} wrap="nowrap">
+                  <IconStar size={11} style={{ fill: '#facc15', color: '#facc15' }} />
+                  <Text size="xs" c="dimmed">{host.averageRating.toFixed(1)}</Text>
+                </Group>
+              )}
+            </Group>
+            {canReview && (
+              <Button
+                size="compact-xs"
+                variant="light"
+                color="eco-primary"
+                radius="xl"
+                leftSection={<IconStar size={12} />}
+                onClick={() => onReview(participation)}
+                style={{ flexShrink: 0 }}
+              >
+                {t('participations.leaveReview')}
+              </Button>
             )}
-          </Group>
-        )}
-
-        {canReview && (
-          <Group pt={4} className="border-t border-gray-100">
-            <Button
-              size="compact-xs"
-              variant="light"
-              color="eco-primary"
-              radius="xl"
-              leftSection={<IconStar size={12} />}
-              onClick={() => onReview(participation)}
-            >
-              {t('participations.leaveReview')}
-            </Button>
           </Group>
         )}
       </Stack>
