@@ -244,7 +244,7 @@ export function ProjectCard({
       {/* Content */}
       <Stack gap={4} px={4}>
         <Group justify="space-between" gap="xs" align="flex-start">
-          <Text fw={700} size="lg" c="dark" className="group-hover:text-eco-primary transition-colors line-clamp-1" style={{ flex: 1 }}>
+          <Text fw={700} size="sm" c="dark" className="group-hover:text-eco-primary transition-colors line-clamp-1" style={{ flex: 1 }}>
             {project.title}
           </Text>
           {showStatus && (
