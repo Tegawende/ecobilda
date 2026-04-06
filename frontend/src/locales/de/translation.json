@@ -33,7 +33,8 @@
     "online": "Online",
     "offline": "Offline",
     "more": "weitere",
-    "pending": "Ausstehend"
+    "pending": "Ausstehend",
+    "email": "E-Mail"
   },
   "errors": {
     "notFound": {
@@ -697,6 +698,10 @@
     "projectUpdatesDesc": "Über Projekte benachrichtigt werden, die Sie interessieren",
     "messageNotifications": "Nachrichtenbenachrichtigungen",
     "messageNotificationsDesc": "Benachrichtigungen für neue Nachrichten erhalten",
+    "inAppNotifications": "In-App-Benachrichtigungen",
+    "inAppNotificationsDesc": "Benachrichtigungen direkt in der Anwendung erhalten",
+    "newsletter": "Newsletter",
+    "newsletterDesc": "Unsere Neuigkeiten und Plattform-Updates per E-Mail erhalten",
     "marketingEmails": "Marketing-E-Mails",
     "marketingEmailsDesc": "Neuigkeiten und Werbeinhalte erhalten",
     "saveChanges": "Änderungen speichern",
@@ -774,7 +779,16 @@
     "unmuteConversation": "Konversation aktivieren",
     "deleteConversation": "Konversation löschen",
     "deleteConfirm": "Konversation löschen",
-    "deleteConfirmText": "Sind Sie sicher, dass Sie diese Konversation löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
+    "deleteConfirmText": "Sind Sie sicher, dass Sie diese Konversation löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "seen": "Gelesen",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "project": "Projekt",
+    "attachImage": "Bild anhängen",
+    "imageSendError": "Bild konnte nicht hochgeladen werden. Bitte versuchen Sie es erneut.",
+    "openDetails": "Konversationsdetails",
+    "messageImage": "[Bild]",
+    "settingsTitle": "Messaging-Einstellungen"
   },
   "reviews": {
     "title": "Bewertungen",

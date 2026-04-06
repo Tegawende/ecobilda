@@ -33,7 +33,8 @@
     "online": "En línea",
     "offline": "Desconectado",
     "more": "restantes",
-    "pending": "Pendiente"
+    "pending": "Pendiente",
+    "email": "Correo electrónico"
   },
   "errors": {
     "notFound": {
@@ -800,6 +801,10 @@
     "projectUpdatesDesc": "Ser notificado sobre proyectos que te interesan",
     "messageNotifications": "Notificaciones de mensajes",
     "messageNotificationsDesc": "Recibir notificaciones para nuevos mensajes",
+    "inAppNotifications": "Notificaciones en la aplicación",
+    "inAppNotificationsDesc": "Recibir notificaciones directamente en la aplicación",
+    "newsletter": "Boletín",
+    "newsletterDesc": "Recibir nuestras noticias y actualizaciones de la plataforma por email",
     "marketingEmails": "Emails de marketing",
     "marketingEmailsDesc": "Recibir noticias y contenido promocional",
     "saveChanges": "Guardar cambios",
@@ -1090,6 +1095,15 @@
     "deleteConversation": "Eliminar conversación",
     "deleteConfirm": "Eliminar conversación",
     "deleteConfirmText": "¿Estás seguro de que quieres eliminar esta conversación? Esta acción no se puede deshacer.",
+    "seen": "Visto",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "project": "Proyecto",
+    "attachImage": "Adjuntar imagen",
+    "imageSendError": "Error al subir la imagen. Por favor, inténtelo de nuevo.",
+    "openDetails": "Detalles de la conversación",
+    "messageImage": "[Imagen]",
+    "settingsTitle": "Preferencias de mensajería",
     "inbox": "Bandeja de entrada",
     "newMessage": "Nuevo mensaje",
     "sendMessage": "Enviar mensaje",

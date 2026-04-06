@@ -33,7 +33,8 @@
     "online": "Online",
     "offline": "Offline",
     "more": "meer",
-    "pending": "In behandeling"
+    "pending": "In behandeling",
+    "email": "E-mail"
   },
   "errors": {
     "notFound": {
@@ -870,6 +871,10 @@
     "projectUpdatesDesc": "Op de hoogte worden gehouden van projecten die u interesseren",
     "messageNotifications": "Berichtmeldingen",
     "messageNotificationsDesc": "Meldingen ontvangen voor nieuwe berichten",
+    "inAppNotifications": "In-app meldingen",
+    "inAppNotificationsDesc": "Meldingen rechtstreeks in de applicatie ontvangen",
+    "newsletter": "Nieuwsbrief",
+    "newsletterDesc": "Ons nieuws en platform-updates per e-mail ontvangen",
     "marketingEmails": "Marketing-e-mails",
     "marketingEmailsDesc": "Nieuws en promotionele content ontvangen",
     "saveChanges": "Wijzigingen opslaan",
@@ -1090,6 +1095,15 @@
     "deleteConversation": "Gesprek verwijderen",
     "deleteConfirm": "Gesprek verwijderen",
     "deleteConfirmText": "Weet u zeker dat u dit gesprek wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
+    "seen": "Gelezen",
+    "today": "Vandaag",
+    "yesterday": "Gisteren",
+    "project": "Project",
+    "attachImage": "Afbeelding bijvoegen",
+    "imageSendError": "Afbeelding kon niet worden geüpload. Probeer het opnieuw.",
+    "openDetails": "Gespreksdetails",
+    "messageImage": "[Afbeelding]",
+    "settingsTitle": "Berichtvoorkeuren",
     "inbox": "Inbox",
     "newMessage": "Nieuw bericht",
     "sendMessage": "Bericht versturen",
