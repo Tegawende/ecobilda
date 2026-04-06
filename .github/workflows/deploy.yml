@@ -15,5 +15,6 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: deploy
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script_stop: true
-          script: /opt/ecobilda/scripts/deploy.sh
+          script: |
+            set -e
+            /opt/ecobilda/scripts/deploy.sh
