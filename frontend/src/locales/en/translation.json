@@ -868,6 +868,7 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "project": "Project",
+    "host": "Host",
     "attachImage": "Attach image",
     "imageSendError": "Failed to upload image. Please try again.",
     "openDetails": "Conversation details",

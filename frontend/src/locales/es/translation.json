@@ -1099,6 +1099,7 @@
     "today": "Hoy",
     "yesterday": "Ayer",
     "project": "Proyecto",
+    "host": "Anfitrión",
     "attachImage": "Adjuntar imagen",
     "imageSendError": "Error al subir la imagen. Por favor, inténtelo de nuevo.",
     "openDetails": "Detalles de la conversación",
