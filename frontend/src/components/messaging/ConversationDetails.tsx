@@ -157,7 +157,7 @@ export function ConversationDetails({
           {/* Host Section — compact */}
           <Box p="md">
             <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb="sm" style={{ letterSpacing: '0.05em' }}>
-              {t('messaging.host') || 'Host'}
+              {t('messaging.host')}
             </Text>
             <Group gap="sm">
               <Avatar

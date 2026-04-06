@@ -868,6 +868,7 @@
     "today": "Aujourd'hui",
     "yesterday": "Hier",
     "project": "Projet",
+    "host": "Hôte",
     "attachImage": "Joindre une image",
     "imageSendError": "Échec de l'envoi de l'image. Veuillez réessayer.",
     "openDetails": "Détails de la conversation",
