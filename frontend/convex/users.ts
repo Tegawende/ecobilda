@@ -372,11 +372,35 @@ export const getPublicProfile = query({
       averageRating: user.averageRating,
       reviewCount: user.reviewCount,
       reviews: enrichedReviews,
-      projects: projects.map((p) => ({
-        _id: p._id,
-        title: p.title,
-        projectType: p.projectType,
-      })),
+      projects: await Promise.all(
+        projects.map(async (p) => {
+          let coverImageUrl: string | null = null;
+          const coverImg = await ctx.db
+            .query("projectImages")
+            .withIndex("by_project", (q) => q.eq("projectId", p._id))
+            .order("asc")
+            .first();
+          if (coverImg) {
+            coverImageUrl = coverImg.url ?? (coverImg.storageId ? await ctx.storage.getUrl(coverImg.storageId) : null);
+          }
+          let projectAddress = null;
+          if (p.addressId) {
+            const addr = await ctx.db.get(p.addressId);
+            if (addr) {
+              let country = null;
+              if (addr.countryId) country = await ctx.db.get(addr.countryId);
+              projectAddress = { city: addr.city, country: country ? { name: country.name } : null };
+            }
+          }
+          return {
+            _id: p._id,
+            title: p.title,
+            projectType: p.projectType,
+            coverImageUrl,
+            address: projectAddress,
+          };
+        })
+      ),
       _creationTime: user._creationTime,
     };
   },

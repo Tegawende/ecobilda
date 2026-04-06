@@ -239,7 +239,7 @@ export function ProfilePublicClient() {
                       </Group>
                       <Group gap="xs">
                         {profile.languages.map((lang: any) => (
-                          <Badge key={lang._id} variant="light" color="green" size="sm">
+                          <Badge key={lang._id} variant="light" color="gray" size="sm">
                             {getLocalizedLanguageName(lang.code, locale)}
                           </Badge>
                         ))}
@@ -262,14 +262,14 @@ export function ProfilePublicClient() {
                         {natbSkills.length > 0 && (
                           <Stack gap={6}>
                             <Group gap="xs">
-                              <IconHome2 size={14} style={{ color: 'var(--mantine-color-green-7)' }} />
+                              <IconHome2 size={14} style={{ color: 'var(--mantine-color-eco-primary-7, #4a7c59)' }} />
                               <Text size="xs" c="dimmed" fw={600}>{t('projects.naturalBuilding')}</Text>
                             </Group>
                             <Group gap="xs" wrap="wrap">
                               {natbSkills.map((skill: any) => {
                                 const SkillIcon = getSkillIcon(skill.icon);
                                 return (
-                                  <Badge key={skill.code} variant="light" color="green" size="sm" leftSection={<SkillIcon size={12} />}>
+                                  <Badge key={skill.code} variant="light" color="eco-primary" size="sm" leftSection={<SkillIcon size={12} />}>
                                     {getSkillDisplayName(skill, locale)}
                                   </Badge>
                                 );
@@ -280,14 +280,14 @@ export function ProfilePublicClient() {
                         {permSkills.length > 0 && (
                           <Stack gap={6}>
                             <Group gap="xs">
-                              <IconLeaf size={14} style={{ color: 'var(--mantine-color-teal-7)' }} />
+                              <IconLeaf size={14} style={{ color: 'var(--mantine-color-eco-terracotta-7, #c4704b)' }} />
                               <Text size="xs" c="dimmed" fw={600}>{t('projects.permaculture')}</Text>
                             </Group>
                             <Group gap="xs" wrap="wrap">
                               {permSkills.map((skill: any) => {
                                 const SkillIcon = getSkillIcon(skill.icon);
                                 return (
-                                  <Badge key={skill.code} variant="light" color="teal" size="sm" leftSection={<SkillIcon size={12} />}>
+                                  <Badge key={skill.code} variant="light" color="eco-terracotta" size="sm" leftSection={<SkillIcon size={12} />}>
                                     {getSkillDisplayName(skill, locale)}
                                   </Badge>
                                 );
@@ -298,37 +298,6 @@ export function ProfilePublicClient() {
                       </Stack>
                     </Stack>
                   )}
-                </Stack>
-              </Paper>
-            )}
-
-            {/* Projects */}
-            {profile.projects && profile.projects.length > 0 && (
-              <Paper radius="lg" p="xl" withBorder>
-                <Stack gap="md">
-                  <Group gap="xs">
-                    <IconHome2 size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
-                    <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
-                      {t('nav.projects')}
-                    </Text>
-                  </Group>
-                  <Stack gap="xs">
-                    {profile.projects.map((project: any) => (
-                      <Group key={project._id} gap="sm" wrap="nowrap" p="sm" className="rounded-lg hover:bg-gray-50 transition-colors">
-                        <Badge
-                          size="xs"
-                          variant="light"
-                          color={project.projectType === 'PERM' ? 'teal' : 'eco-primary'}
-                          leftSection={project.projectType === 'PERM' ? <IconLeaf size={10} /> : <IconHome2 size={10} />}
-                        >
-                          {project.projectType === 'PERM' ? t('projects.permaculture') : t('projects.naturalBuilding')}
-                        </Badge>
-                        <Text size="sm" fw={500} truncate className="flex-1">
-                          {project.title}
-                        </Text>
-                      </Group>
-                    ))}
-                  </Stack>
                 </Stack>
               </Paper>
             )}
@@ -423,6 +392,61 @@ export function ProfilePublicClient() {
                 )}
               </Stack>
             </Paper>
+
+            {/* Projects — mini cards */}
+            {profile.projects && profile.projects.length > 0 && (
+              <Paper radius="lg" p="xl" withBorder>
+                <Stack gap="md">
+                  <Group gap="xs">
+                    <IconHome2 size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+                    <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+                      {t('nav.projects')}
+                    </Text>
+                  </Group>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {profile.projects.map((project: any) => {
+                      const isPerm = project.projectType === 'PERM';
+                      return (
+                        <Link key={project._id} href={`/projects/${project._id}`} className="block group no-underline">
+                          <div className="rounded-lg overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
+                            {project.coverImageUrl && (
+                              <div className="aspect-[16/9] bg-gray-100 overflow-hidden">
+                                <img
+                                  src={project.coverImageUrl}
+                                  alt={project.title}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
+                              </div>
+                            )}
+                            <div className="p-3">
+                              <Badge
+                                size="xs"
+                                radius="xl"
+                                variant="light"
+                                color={isPerm ? 'eco-terracotta' : 'eco-primary'}
+                                leftSection={isPerm ? <IconLeaf size={10} /> : <IconHome2 size={10} />}
+                                mb={6}
+                              >
+                                {isPerm ? t('projects.permaculture') : t('projects.naturalBuilding')}
+                              </Badge>
+                              <Text size="sm" fw={600} c="dark" className="line-clamp-1 group-hover:text-eco-primary transition-colors">
+                                {project.title}
+                              </Text>
+                              {project.address?.city && (
+                                <Group gap={4} mt={4}>
+                                  <IconMapPin size={11} className="text-gray-400" />
+                                  <Text size="xs" c="dimmed">{[project.address.city, project.address.country?.name].filter(Boolean).join(', ')}</Text>
+                                </Group>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </Stack>
+              </Paper>
+            )}
 
           </Stack>
         </Container>
