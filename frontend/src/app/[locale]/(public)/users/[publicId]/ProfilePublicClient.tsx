@@ -5,32 +5,14 @@ import { useParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../../../../../convex/_generated/api';
 import { useTranslations, useLocale } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import {
-  Container,
-  Title,
-  Text,
-  Paper,
-  Group,
-  Stack,
-  Avatar,
-  Badge,
-  Rating,
-  Loader,
-  Center,
-  ThemeIcon,
-  Divider,
-  Button,
-  Textarea,
+  Container, Title, Text, Paper, Group, Stack, Avatar, Badge,
+  Rating, Loader, Center, ThemeIcon, Divider, Button, Textarea,
 } from '@mantine/core';
 import {
-  IconMapPin,
-  IconLanguage,
-  IconStar,
-  IconArrowLeft,
-  IconUser,
-  IconLeaf,
-  IconHome2,
-  IconMessageCircle,
+  IconMapPin, IconLanguage, IconStar, IconArrowLeft, IconUser,
+  IconLeaf, IconHome2, IconMessageCircle,
 } from '@tabler/icons-react';
 import { Layout } from '@/components/common/Layout';
 import { getSkillIcon } from '@/lib/skillIcons';
@@ -46,17 +28,6 @@ function getLocalizedLanguageName(code: string, locale: string): string {
   } catch {
     return code;
   }
-}
-
-function StarRating({ value }: { value: number }) {
-  return (
-    <Group gap={4} align="center">
-      <IconStar size={16} style={{ color: '#facc15', fill: '#facc15' }} />
-      <Text size="sm" fw={600}>
-        {value.toFixed(1)}
-      </Text>
-    </Group>
-  );
 }
 
 function ReviewResponseForm({
@@ -127,9 +98,9 @@ export function ProfilePublicClient() {
   if (profile === undefined) {
     return (
       <Layout>
-        <Center h={400}>
+        <div className="bg-stone-50 min-h-screen py-12 flex items-center justify-center">
           <Loader color="eco-primary" />
-        </Center>
+        </div>
       </Layout>
     );
   }
@@ -137,264 +108,325 @@ export function ProfilePublicClient() {
   if (profile === null) {
     return (
       <Layout>
-        <Container size="md" py="xl">
-          <Stack align="center" gap="md">
-            <ThemeIcon size={64} radius="xl" color="eco-primary" variant="light">
-              <IconUser size={32} />
-            </ThemeIcon>
-            <Title order={2}>{t('errors.notFound.title')}</Title>
-            <Text c="dimmed">{t('errors.notFound.description')}</Text>
-            <Button
-              variant="subtle"
-              leftSection={<IconArrowLeft size={16} />}
-              onClick={() => router.back()}
-            >
-              {t('common.back')}
-            </Button>
-          </Stack>
-        </Container>
+        <div className="bg-stone-50 min-h-screen py-12">
+          <Container size="sm">
+            <Stack align="center" gap="md" py="xl">
+              <ThemeIcon size={64} radius="xl" color="gray" variant="light">
+                <IconUser size={32} />
+              </ThemeIcon>
+              <Title order={2}>{t('errors.notFound.title')}</Title>
+              <Text c="dimmed">{t('errors.notFound.description')}</Text>
+              <Button
+                variant="subtle"
+                leftSection={<IconArrowLeft size={16} />}
+                onClick={() => router.back()}
+              >
+                {t('common.back')}
+              </Button>
+            </Stack>
+          </Container>
+        </div>
       </Layout>
     );
   }
 
   const joinYear = new Date(profile._creationTime).getFullYear();
-  const reviewLabel =
-    profile.reviewCount === 1 ? t('profile.review') : t('profile.reviews');
+  const reviewLabel = profile.reviewCount === 1 ? t('profile.review') : t('profile.reviews');
+
+  const natbSkills = (profile.skills ?? []).filter((s: any) => s.category === 'NATB');
+  const permSkills = (profile.skills ?? []).filter((s: any) => s.category === 'PERM');
+  const hasSkills = natbSkills.length > 0 || permSkills.length > 0;
 
   return (
     <Layout>
-      <Container size="md" py="xl">
-        {/* Back */}
-        <Button
-          variant="subtle"
-          size="sm"
-          leftSection={<IconArrowLeft size={16} />}
-          onClick={() => router.back()}
-          mb="lg"
-          color="eco-primary"
-        >
-          {t('common.back')}
-        </Button>
+      <div className="bg-stone-50 min-h-screen py-12">
+        <Container size="sm">
+          <Stack gap="xl">
 
-        {/* Header card */}
-        <Paper radius="xl" p="xl" withBorder mb="lg">
-          <Group align="flex-start" gap="xl">
-            <Avatar
-              src={profile.profilePictureUrl}
-              alt={profile.firstName}
-              size={100}
-              radius="xl"
-              className="border-2 border-eco-primary/20"
+            {/* Back button */}
+            <Button
+              variant="subtle"
+              size="sm"
+              leftSection={<IconArrowLeft size={16} />}
+              onClick={() => router.back()}
+              color="eco-primary"
+              className="self-start"
             >
-              {profile.firstName?.[0]}
-            </Avatar>
+              {t('common.back')}
+            </Button>
 
-            <Stack gap="xs" className="flex-1">
-              <Title order={2}>
-                {profile.firstName}
-              </Title>
+            {/* Header card */}
+            <Paper radius="lg" p="xl" withBorder>
+              <Group align="flex-start" gap="lg" wrap="wrap">
+                <Avatar
+                  src={profile.profilePictureUrl}
+                  alt={profile.firstName}
+                  size={96}
+                  radius="xl"
+                  style={{ border: '3px solid var(--mantine-color-green-2)' }}
+                >
+                  {profile.firstName?.[0]}
+                </Avatar>
 
-              {profile.reviewCount > 0 ? (
-                <Group gap="xs">
-                  <Rating value={profile.averageRating} readOnly size="sm" color="yellow" />
-                  <Text size="sm" c="dimmed">
-                    {profile.averageRating.toFixed(1)} · {profile.reviewCount} {reviewLabel}
+                <Stack gap="xs" style={{ flex: 1, minWidth: 200 }}>
+                  <Title order={2} className="font-display">
+                    {profile.firstName}
+                  </Title>
+
+                  {profile.reviewCount > 0 ? (
+                    <Group gap="xs">
+                      <IconStar size={18} style={{ color: 'var(--mantine-color-yellow-5)' }} />
+                      <Text fw={600} size="sm">
+                        {profile.averageRating.toFixed(1)}
+                      </Text>
+                      <Rating value={profile.averageRating} readOnly fractions={2} size="sm" color="yellow" />
+                      <Text size="sm" c="dimmed">
+                        ({profile.reviewCount} {reviewLabel})
+                      </Text>
+                    </Group>
+                  ) : (
+                    <Text size="sm" c="dimmed">
+                      {t('profile.noReviewsYet')}
+                    </Text>
+                  )}
+
+                  {profile.address?.city && (
+                    <Group gap={6}>
+                      <IconMapPin size={14} style={{ color: 'var(--mantine-color-gray-5)' }} />
+                      <Text size="sm" c="dimmed">
+                        {[profile.address.city, profile.address.country?.name].filter(Boolean).join(', ')}
+                      </Text>
+                    </Group>
+                  )}
+
+                  <Text size="xs" c="dimmed">
+                    {t('profile.memberSince', { date: String(joinYear) })}
                   </Text>
-                </Group>
-              ) : (
-                <Text size="sm" c="dimmed">
-                  {t('profile.noReviewsYet')}
-                </Text>
+                </Stack>
+              </Group>
+
+              {profile.bio && (
+                <>
+                  <Divider my="md" />
+                  <Stack gap={6}>
+                    <Group gap="xs">
+                      <IconUser size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+                      <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+                        {t('profile.about')}
+                      </Text>
+                    </Group>
+                    <Text size="sm" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.7 }}>
+                      {profile.bio}
+                    </Text>
+                  </Stack>
+                </>
               )}
+            </Paper>
 
-              {profile.address?.city && (
-                <Group gap={6}>
-                  <IconMapPin size={14} className="text-eco-primary" />
-                  <Text size="sm" c="dimmed">
-                    {[profile.address.city, profile.address.country?.name]
-                      .filter(Boolean)
-                      .join(', ')}
-                  </Text>
-                </Group>
-              )}
+            {/* Languages & Skills */}
+            {(hasSkills || (profile.languages && profile.languages.length > 0)) && (
+              <Paper radius="lg" p="xl" withBorder>
+                <Stack gap="lg">
 
-              <Text size="sm" c="dimmed">
-                {t('profile.memberSince', { date: String(joinYear) })}
-              </Text>
-            </Stack>
-          </Group>
-
-          {profile.bio && (
-            <>
-              <Divider my="md" />
-              <Text size="sm" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.7 }}>
-                {profile.bio}
-              </Text>
-            </>
-          )}
-        </Paper>
-
-        <Group align="flex-start" gap="lg" grow>
-          {/* Left column */}
-          <Stack gap="lg" style={{ flex: '1 1 300px' }}>
-            {/* Languages */}
-            {profile.languages && profile.languages.length > 0 && (
-              <Paper radius="xl" p="lg" withBorder>
-                <Group gap="sm" mb="md">
-                  <ThemeIcon size={32} radius="xl" color="eco-primary" variant="light">
-                    <IconLanguage size={18} />
-                  </ThemeIcon>
-                  <Title order={4}>{t('profile.languages')}</Title>
-                </Group>
-                <Group gap="xs">
-                  {profile.languages.map((lang: any) => (
-                    <Badge key={lang._id} variant="light" color="eco-primary" radius="xl">
-                      {getLocalizedLanguageName(lang.code, locale)}
-                    </Badge>
-                  ))}
-                </Group>
-              </Paper>
-            )}
-
-            {/* Skills */}
-            {profile.skills && profile.skills.length > 0 && (
-              <Paper radius="xl" p="lg" withBorder>
-                <Group gap="sm" mb="md">
-                  <ThemeIcon size={32} radius="xl" color="eco-green-6" variant="light">
-                    <IconLeaf size={18} />
-                  </ThemeIcon>
-                  <Title order={4}>{t('profile.skills')}</Title>
-                </Group>
-                <Stack gap="xs">
-                  {profile.skills.map((skill: any) => {
-                    const SkillIcon = getSkillIcon(skill.code);
-                    return (
-                      <Group key={skill._id} gap="sm">
-                        <ThemeIcon size={28} radius="xl" color="eco-green-6" variant="light">
-                          <SkillIcon size={16} />
-                        </ThemeIcon>
-                        <Text size="sm">{getSkillDisplayName(skill, locale)}</Text>
+                  {/* Languages */}
+                  {profile.languages && profile.languages.length > 0 && (
+                    <Stack gap={6}>
+                      <Group gap="xs">
+                        <IconLanguage size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+                        <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+                          {t('profile.languages')}
+                        </Text>
                       </Group>
-                    );
-                  })}
+                      <Group gap="xs">
+                        {profile.languages.map((lang: any) => (
+                          <Badge key={lang._id} variant="light" color="green" size="sm">
+                            {getLocalizedLanguageName(lang.code, locale)}
+                          </Badge>
+                        ))}
+                      </Group>
+                    </Stack>
+                  )}
+
+                  {profile.languages && profile.languages.length > 0 && hasSkills && <Divider />}
+
+                  {/* Skills */}
+                  {hasSkills && (
+                    <Stack gap={6}>
+                      <Group gap="xs">
+                        <IconLeaf size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+                        <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+                          {t('profile.skills')}
+                        </Text>
+                      </Group>
+                      <Stack gap="sm">
+                        {natbSkills.length > 0 && (
+                          <Stack gap={6}>
+                            <Group gap="xs">
+                              <IconHome2 size={14} style={{ color: 'var(--mantine-color-green-7)' }} />
+                              <Text size="xs" c="dimmed" fw={600}>{t('projects.naturalBuilding')}</Text>
+                            </Group>
+                            <Group gap="xs" wrap="wrap">
+                              {natbSkills.map((skill: any) => {
+                                const SkillIcon = getSkillIcon(skill.icon);
+                                return (
+                                  <Badge key={skill.code} variant="light" color="green" size="sm" leftSection={<SkillIcon size={12} />}>
+                                    {getSkillDisplayName(skill, locale)}
+                                  </Badge>
+                                );
+                              })}
+                            </Group>
+                          </Stack>
+                        )}
+                        {permSkills.length > 0 && (
+                          <Stack gap={6}>
+                            <Group gap="xs">
+                              <IconLeaf size={14} style={{ color: 'var(--mantine-color-teal-7)' }} />
+                              <Text size="xs" c="dimmed" fw={600}>{t('projects.permaculture')}</Text>
+                            </Group>
+                            <Group gap="xs" wrap="wrap">
+                              {permSkills.map((skill: any) => {
+                                const SkillIcon = getSkillIcon(skill.icon);
+                                return (
+                                  <Badge key={skill.code} variant="light" color="teal" size="sm" leftSection={<SkillIcon size={12} />}>
+                                    {getSkillDisplayName(skill, locale)}
+                                  </Badge>
+                                );
+                              })}
+                            </Group>
+                          </Stack>
+                        )}
+                      </Stack>
+                    </Stack>
+                  )}
                 </Stack>
               </Paper>
             )}
 
             {/* Projects */}
             {profile.projects && profile.projects.length > 0 && (
-              <Paper radius="xl" p="lg" withBorder>
-                <Group gap="sm" mb="md">
-                  <ThemeIcon size={32} radius="xl" color="eco-terracotta" variant="light">
-                    <IconHome2 size={18} />
-                  </ThemeIcon>
-                  <Title order={4}>{t('nav.projects')}</Title>
-                </Group>
-                <Stack gap="xs">
-                  {profile.projects.map((project: any) => (
-                    <Group key={project._id} gap="sm" wrap="nowrap">
-                      <Badge
-                        size="xs"
-                        variant="light"
-                        color={project.projectType === 'PERM' ? 'eco-green-6' : 'eco-terracotta'}
-                      >
-                        {project.projectType === 'PERM'
-                          ? t('projects.permaculture')
-                          : t('projects.naturalBuilding')}
-                      </Badge>
-                      <Text size="sm" truncate>
-                        {project.title}
-                      </Text>
-                    </Group>
-                  ))}
+              <Paper radius="lg" p="xl" withBorder>
+                <Stack gap="md">
+                  <Group gap="xs">
+                    <IconHome2 size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+                    <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+                      {t('nav.projects')}
+                    </Text>
+                  </Group>
+                  <Stack gap="xs">
+                    {profile.projects.map((project: any) => (
+                      <Group key={project._id} gap="sm" wrap="nowrap" p="sm" className="rounded-lg hover:bg-gray-50 transition-colors">
+                        <Badge
+                          size="xs"
+                          variant="light"
+                          color={project.projectType === 'PERM' ? 'teal' : 'eco-primary'}
+                          leftSection={project.projectType === 'PERM' ? <IconLeaf size={10} /> : <IconHome2 size={10} />}
+                        >
+                          {project.projectType === 'PERM' ? t('projects.permaculture') : t('projects.naturalBuilding')}
+                        </Badge>
+                        <Text size="sm" fw={500} truncate className="flex-1">
+                          {project.title}
+                        </Text>
+                      </Group>
+                    ))}
+                  </Stack>
                 </Stack>
               </Paper>
             )}
-          </Stack>
 
-          {/* Right column — Reviews */}
-          {profile.reviews && profile.reviews.length > 0 && (
-            <Stack gap="md" style={{ flex: '1 1 400px' }}>
-              <Title order={4}>
-                {t('profile.reviewsTitle')} ({profile.reviewCount})
-              </Title>
-              {profile.reviews.map((review: any) => (
-                <Paper key={review._id} radius="xl" p="lg" withBorder>
-                  <Group align="flex-start" gap="md">
-                    <Avatar
-                      src={review.writer?.profilePictureUrl}
-                      alt={review.writer?.firstName}
-                      size="md"
-                      radius="xl"
-                    >
-                      {review.writer?.firstName?.[0]}
-                    </Avatar>
-                    <Stack gap={4} className="flex-1">
-                      <Group justify="space-between" wrap="nowrap">
-                        <Text size="sm" fw={600}>
-                          {review.writer?.firstName}
-                        </Text>
-                        <Rating value={review.rating} readOnly size="xs" color="yellow" />
-                      </Group>
-                      <Text size="xs" c="dimmed">
-                        {new Date(review._creationTime).toLocaleDateString(locale, {
-                          year: 'numeric',
-                          month: 'long',
-                        })}
-                      </Text>
-                      <Text size="sm" mt={4} style={{ lineHeight: 1.6 }}>
-                        {review.feedback}
-                      </Text>
+            {/* Reviews */}
+            <Paper radius="lg" p="xl" withBorder>
+              <Stack gap="lg">
+                <Group gap="sm" align="center">
+                  <IconMessageCircle size={22} style={{ color: 'var(--mantine-color-green-7)' }} />
+                  <Title order={4} className="font-display">
+                    {t('profile.reviewsTitle')}
+                  </Title>
+                  {profile.reviewCount > 0 && (
+                    <Badge variant="filled" color="green" size="sm" radius="xl">
+                      {profile.reviewCount}
+                    </Badge>
+                  )}
+                  {profile.reviewCount > 0 && (
+                    <Group gap={4} ml="auto">
+                      <Rating value={profile.averageRating} readOnly fractions={2} size="sm" color="yellow" />
+                      <Text size="sm" fw={600}>{profile.averageRating?.toFixed(1)}</Text>
+                    </Group>
+                  )}
+                </Group>
 
-                      {/* Host response */}
-                      {review.response ? (
-                        <Paper
-                          mt="xs"
-                          p="sm"
-                          radius="md"
-                          style={{ backgroundColor: 'var(--mantine-color-eco-primary-0)' }}
-                        >
-                          <Group gap={6} mb={4}>
-                            <IconMessageCircle size={12} className="text-eco-primary" />
-                            <Text size="xs" fw={600} c="eco-primary">
-                              {t('profile.hostResponse')}
-                            </Text>
-                            {review.responseDate && (
-                              <Text size="xs" c="dimmed">
-                                · {new Date(review.responseDate).toLocaleDateString(locale, {
-                                  year: 'numeric',
-                                  month: 'long',
-                                })}
+                {profile.reviews && profile.reviews.length > 0 ? (
+                  <Stack gap="md">
+                    {profile.reviews.map((review: any) => (
+                      <Paper key={review._id} radius="md" p="md" withBorder>
+                        <Group align="flex-start" gap="md">
+                          <Avatar
+                            src={review.writer?.profilePictureUrl}
+                            alt={review.writer?.firstName}
+                            size="md"
+                            radius="xl"
+                          >
+                            {review.writer?.firstName?.[0]}
+                          </Avatar>
+                          <Stack gap={4} style={{ flex: 1 }}>
+                            <Group justify="space-between" align="center">
+                              <Text fw={600} size="sm">
+                                {review.writer?.firstName}
                               </Text>
-                            )}
-                          </Group>
-                          <Text size="xs">{review.response}</Text>
-                        </Paper>
-                      ) : isOwner && respondingTo !== review._id ? (
-                        <Button
-                          variant="subtle"
-                          size="xs"
-                          color="eco-primary"
-                          leftSection={<IconMessageCircle size={12} />}
-                          mt="xs"
-                          onClick={() => setRespondingTo(review._id)}
-                        >
-                          {t('profile.replyToReview')}
-                        </Button>
-                      ) : isOwner && respondingTo === review._id ? (
-                        <ReviewResponseForm
-                          reviewId={review._id}
-                          onDone={() => setRespondingTo(null)}
-                        />
-                      ) : null}
-                    </Stack>
-                  </Group>
-                </Paper>
-              ))}
-            </Stack>
-          )}
-        </Group>
-      </Container>
+                              <Rating value={review.rating} readOnly size="xs" color="yellow" />
+                            </Group>
+                            <Text size="xs" c="dimmed">
+                              {new Date(review._creationTime).toLocaleDateString(locale, {
+                                year: 'numeric',
+                                month: 'long',
+                              })}
+                            </Text>
+                            <Text size="sm" mt={4} style={{ lineHeight: 1.6 }}>
+                              {review.feedback}
+                            </Text>
+
+                            {review.response ? (
+                              <Paper mt="xs" p="sm" radius="sm" bg="gray.0" style={{ borderLeft: '3px solid var(--mantine-color-green-6)' }}>
+                                <Group gap={6} mb={4}>
+                                  <IconMessageCircle size={12} className="text-eco-primary" />
+                                  <Text size="xs" fw={600} c="green.7">
+                                    {t('profile.hostResponse')}
+                                  </Text>
+                                </Group>
+                                <Text size="sm" c="dimmed">{review.response}</Text>
+                              </Paper>
+                            ) : isOwner && respondingTo !== review._id ? (
+                              <Button
+                                variant="subtle"
+                                size="xs"
+                                color="eco-primary"
+                                leftSection={<IconMessageCircle size={12} />}
+                                mt="xs"
+                                onClick={() => setRespondingTo(review._id)}
+                              >
+                                {t('profile.replyToReview')}
+                              </Button>
+                            ) : isOwner && respondingTo === review._id ? (
+                              <ReviewResponseForm
+                                reviewId={review._id}
+                                onDone={() => setRespondingTo(null)}
+                              />
+                            ) : null}
+                          </Stack>
+                        </Group>
+                      </Paper>
+                    ))}
+                  </Stack>
+                ) : (
+                  <Text size="sm" c="dimmed" fs="italic" ta="center" py="md">
+                    {t('profile.noReviewsYet')}
+                  </Text>
+                )}
+              </Stack>
+            </Paper>
+
+          </Stack>
+        </Container>
+      </div>
     </Layout>
   );
 }
