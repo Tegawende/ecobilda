@@ -238,9 +238,6 @@ function ParticipationCard({
             alt={participation.project?.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <div className="absolute top-2 left-2 z-10">
-            <StatusBadge status={participation.status} />
-          </div>
           <div className="absolute top-2 right-2 z-10">
             <Badge
               size="xs"
@@ -261,11 +258,14 @@ function ParticipationCard({
       {/* Content — compact */}
       <Stack gap={2} px={2}>
         <Group justify="space-between" align="center" gap="xs" wrap="nowrap">
-          <Link href={`/projects/${participation.project?._id}`} className="no-underline min-w-0 flex-1">
-            <Text fw={700} size="sm" c="dark" className="group-hover:text-eco-primary transition-colors line-clamp-1">
-              {participation.project?.title}
-            </Text>
-          </Link>
+          <Group gap={6} wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
+            <Link href={`/projects/${participation.project?._id}`} className="no-underline min-w-0">
+              <Text fw={700} size="sm" c="dark" className="group-hover:text-eco-primary transition-colors line-clamp-1">
+                {participation.project?.title}
+              </Text>
+            </Link>
+            <StatusBadge status={participation.status} />
+          </Group>
           {canReview && (
             <Button
               size="compact-xs"
