@@ -238,25 +238,25 @@ function ParticipationCard({
             alt={participation.project?.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <div className="absolute top-2 right-2 z-10">
-            <Badge
-              size="xs"
-              radius="xl"
-              variant="filled"
-              color={isNatB ? 'eco-primary' : 'eco-terracotta'}
-              leftSection={isNatB ? <IconHome2 size={10} /> : <IconLeaf size={10} />}
-              tt="uppercase"
-              fw={700}
-              styles={{ root: { letterSpacing: '0.05em', fontSize: '0.6rem' } }}
-            >
-              {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
-            </Badge>
-          </div>
         </div>
       </Link>
 
       {/* Content — compact */}
       <Stack gap={2} px={2}>
+        {/* Badges row before title */}
+        <Group gap={6} pt={2}>
+          <StatusBadge status={participation.status} />
+          <Badge
+            size="xs"
+            radius="xl"
+            variant="light"
+            color={isNatB ? 'eco-primary' : 'eco-terracotta'}
+            leftSection={isNatB ? <IconHome2 size={10} /> : <IconLeaf size={10} />}
+          >
+            {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
+          </Badge>
+        </Group>
+
         <Link href={`/projects/${participation.project?._id}`} className="no-underline">
           <Text fw={700} size="sm" c="dark" className="group-hover:text-eco-primary transition-colors line-clamp-1">
             {participation.project?.title}
@@ -289,10 +289,8 @@ function ParticipationCard({
           </Group>
         )}
 
-        {/* Status + Review — bottom row */}
-        <Group justify="space-between" align="center" pt={4} className="border-t border-gray-100">
-          <StatusBadge status={participation.status} />
-          {canReview && (
+        {canReview && (
+          <Group pt={4} className="border-t border-gray-100">
             <Button
               size="compact-xs"
               variant="light"
@@ -303,8 +301,8 @@ function ParticipationCard({
             >
               {t('participations.leaveReview')}
             </Button>
-          )}
-        </Group>
+          </Group>
+        )}
       </Stack>
     </div>
   );
