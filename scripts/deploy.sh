@@ -10,6 +10,7 @@ cd "$PROJECT_DIR"
 
 # Pull latest code
 echo "--- Pulling latest code ---"
+git reset --hard HEAD
 git pull origin main
 
 # Build and restart containers (Convex + Frontend)
