@@ -93,17 +93,15 @@ export function ConversationDetails({
             <Box p="md">
               <Stack gap="sm">
                 {/* Cover image */}
-                {project.coverImageUrl && (
-                  <Link href={`/projects/${project._id}`}>
-                    <div className="rounded-lg overflow-hidden aspect-[16/9] bg-gray-100">
-                      <img
-                        src={project.coverImageUrl}
-                        alt={project.title}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-                  </Link>
-                )}
+                <Link href={`/projects/${project._id}`}>
+                  <div className="rounded-lg overflow-hidden aspect-[16/9] bg-gray-100">
+                    <img
+                      src={project.coverImageUrl || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'}
+                      alt={project.title}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                </Link>
 
                 {/* Type badge */}
                 <Badge
@@ -149,22 +147,7 @@ export function ConversationDetails({
                   </Group>
                 )}
 
-                {/* Participation status */}
-                {participationDetails?.status && (
-                  <Badge
-                    size="xs"
-                    variant="light"
-                    color={
-                      participationDetails.status === 'ACCEPTED' ? 'green'
-                        : participationDetails.status === 'PENDING' ? 'yellow'
-                        : 'red'
-                    }
-                  >
-                    {participationDetails.status === 'ACCEPTED' ? t('participations.accepted')
-                      : participationDetails.status === 'PENDING' ? t('participations.pending')
-                      : t('participations.rejected')}
-                  </Badge>
-                )}
+
               </Stack>
             </Box>
           )}
