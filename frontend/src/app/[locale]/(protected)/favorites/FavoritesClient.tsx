@@ -119,7 +119,7 @@ function ProjectCardList({ project }: { project: Project }) {
                 {!project.owner?.profilePictureUrl && <IconUsers size={18} />}
               </Avatar>
               <Stack gap={0}>
-                <Text size="sm" fw={600}>{project.owner?.firstName} {project.owner?.lastName?.charAt(0)}.</Text>
+                <Text size="sm" fw={600}>{project.owner?.firstName}</Text>
                 <Group gap={4}>
                   <IconStar size={13} className="text-yellow-400 fill-yellow-400" />
                   <Text size="xs" c="dimmed">{Number(project.owner?.averageRating || 0).toFixed(1)} ({project.owner?.reviewCount || 0} {t('projects.reviews')})</Text>
