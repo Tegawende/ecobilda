@@ -258,10 +258,6 @@ function ParticipationCard({
 
       {/* Content */}
       <Stack gap={2} px={2}>
-        <Group gap={6} pt={2}>
-          <StatusBadge status={participation.status} />
-        </Group>
-
         <Link href={`/projects/${participation.project?._id}`} className="no-underline">
           <Text fw={700} size="sm" c="dark" className="group-hover:text-eco-primary transition-colors line-clamp-1">
             {participation.project?.title}
@@ -316,7 +312,7 @@ function ParticipationCard({
 // ─── Main component ───────────────────────────────────────────────────────────
 export function MyParticipationsClient() {
   const t = useTranslations();
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState('PENDING');
   const [reviewTarget, setReviewTarget] = useState<any | null>(null);
   const [reviewSuccess, setReviewSuccess] = useState(false);
 
@@ -330,10 +326,7 @@ export function MyParticipationsClient() {
 
   const isLoading = participations === undefined;
 
-  const filtered = (participations ?? []).filter((p) => {
-    if (filter === 'all') return true;
-    return p.status === filter;
-  });
+  const filtered = (participations ?? []).filter((p) => p.status === filter);
 
   const handleReviewSubmit = async (rating: number, feedback: string) => {
     if (!token || !reviewTarget?.host) return;
@@ -373,7 +366,6 @@ export function MyParticipationsClient() {
             {/* Filter tabs — full width */}
             <div className="flex w-full items-center rounded-lg bg-gray-100 p-1 gap-0.5">
               {[
-                { value: 'all',      label: t('participations.all') },
                 { value: 'PENDING',  label: t('participations.pending') },
                 { value: 'ACCEPTED', label: t('participations.accepted') },
                 { value: 'REFUSED',  label: t('participations.rejected') },
