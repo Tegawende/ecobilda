@@ -33,7 +33,8 @@
     "online": "En ligne",
     "offline": "Hors ligne",
     "more": "restant(s)",
-    "pending": "En attente"
+    "pending": "En attente",
+    "email": "E-mail"
   },
   "errors": {
     "notFound": {
@@ -781,6 +782,10 @@
     "projectUpdatesDesc": "Être notifié des projets qui vous intéressent",
     "messageNotifications": "Notifications de messages",
     "messageNotificationsDesc": "Recevoir des notifications pour les nouveaux messages",
+    "inAppNotifications": "Notifications dans l'application",
+    "inAppNotificationsDesc": "Recevoir des notifications directement dans l'application",
+    "newsletter": "Newsletter",
+    "newsletterDesc": "Recevoir nos actualités et mises à jour de la plateforme par email",
     "marketingEmails": "Emails marketing",
     "marketingEmailsDesc": "Recevoir des actualités et du contenu promotionnel",
     "saveChanges": "Enregistrer les modifications",
@@ -858,7 +863,16 @@
     "unmuteConversation": "Réactiver les notifications",
     "deleteConversation": "Supprimer la conversation",
     "deleteConfirm": "Supprimer la conversation",
-    "deleteConfirmText": "Êtes-vous sûr de vouloir supprimer cette conversation ? Cette action est irréversible."
+    "deleteConfirmText": "Êtes-vous sûr de vouloir supprimer cette conversation ? Cette action est irréversible.",
+    "seen": "Lu",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "project": "Projet",
+    "attachImage": "Joindre une image",
+    "imageSendError": "Échec de l'envoi de l'image. Veuillez réessayer.",
+    "openDetails": "Détails de la conversation",
+    "messageImage": "[Image]",
+    "settingsTitle": "Préférences de messagerie"
   },
   "reviews": {
     "title": "Avis",

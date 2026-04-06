@@ -11,7 +11,7 @@ import {
 import {
   IconPencil, IconMapPin, IconMail, IconMessage, IconHome2, IconLeaf,
   IconGift, IconArrowLeft, IconLanguage, IconUser, IconAlertCircle,
-  IconInfoCircle, IconLock, IconStar,
+  IconStar,
 } from '@tabler/icons-react';
 import { getSkillIcon } from '@/lib/skillIcons';
 import { Layout } from '@/components/common/Layout';
@@ -239,6 +239,27 @@ export function ProfileClient() {
                       {t('profile.noReviewsYet', { defaultValue: 'No reviews yet' })}
                     </Text>
                   )}
+
+                  {/* Email */}
+                  <Group gap="xs" mt={4}>
+                    <IconMail size={16} style={{ color: 'var(--mantine-color-gray-5)' }} />
+                    <Text size="sm" c="dimmed">{user.email}</Text>
+                  </Group>
+
+                  {/* Date of birth */}
+                  {user.dateOfBirth && (
+                    <Group gap="xs">
+                      <IconGift size={16} style={{ color: 'var(--mantine-color-gray-5)' }} />
+                      <Text size="sm" c="dimmed">
+                        {new Date(user.dateOfBirth).toLocaleDateString(locale, {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                        {' '}({Math.floor((Date.now() - new Date(user.dateOfBirth).getTime()) / (365.25 * 24 * 60 * 60 * 1000))} {t('profile.yearsOld')})
+                      </Text>
+                    </Group>
+                  )}
                 </Stack>
               </Group>
             </Paper>
@@ -246,20 +267,7 @@ export function ProfileClient() {
             {/* Public info section */}
             <Paper radius="lg" p="xl" withBorder>
               <Stack gap="lg">
-                <Stack gap={4}>
-                  <Group gap="xs">
-                    <IconInfoCircle size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
-                    <Title order={4}>{t('profile.publicInfoTitle')}</Title>
-                  </Group>
-                  <Alert
-                    color="blue"
-                    variant="light"
-                    icon={<IconInfoCircle size={14} />}
-                    p="xs"
-                  >
-                    <Text size="xs">{t('profile.publicInfoDesc')}</Text>
-                  </Alert>
-                </Stack>
+                <Title order={4}>{t('profile.publicInfoTitle')}</Title>
 
                 <Divider />
 
@@ -368,62 +376,6 @@ export function ProfileClient() {
                     <Text size="sm" c="dimmed" fs="italic">{t('profile.noSkills')}</Text>
                   )}
                 </Stack>
-              </Stack>
-            </Paper>
-
-            {/* Private info section */}
-            <Paper radius="lg" p="xl" withBorder>
-              <Stack gap="lg">
-                <Stack gap={4}>
-                  <Group gap="xs">
-                    <IconLock size={20} style={{ color: 'var(--mantine-color-gray-6)' }} />
-                    <Title order={4}>{t('profile.privateInfoTitle')}</Title>
-                  </Group>
-                  <Alert
-                    color="gray"
-                    variant="light"
-                    icon={<IconLock size={14} />}
-                    p="xs"
-                  >
-                    <Text size="xs">{t('profile.privateInfoDesc')}</Text>
-                  </Alert>
-                </Stack>
-
-                <Divider />
-
-                {/* Email */}
-                <Stack gap={6}>
-                  <Group gap="xs">
-                    <IconMail size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
-                    <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
-                      {t('common.email', { defaultValue: 'Email' })}
-                    </Text>
-                  </Group>
-                  <Text size="sm">{user.email}</Text>
-                </Stack>
-
-                {/* Date of birth */}
-                {user.dateOfBirth && (
-                  <Stack gap={6}>
-                    <Group gap="xs">
-                      <IconGift size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
-                      <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
-                        {t('profile.birthday')}
-                      </Text>
-                    </Group>
-                    <Text size="sm">
-                      {new Date(user.dateOfBirth).toLocaleDateString(locale, {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                      {' '}
-                      <Text component="span" c="dimmed" size="sm">
-                        ({Math.floor((Date.now() - new Date(user.dateOfBirth).getTime()) / (365.25 * 24 * 60 * 60 * 1000))} {t('profile.yearsOld')})
-                      </Text>
-                    </Text>
-                  </Stack>
-                )}
               </Stack>
             </Paper>
 

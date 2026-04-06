@@ -1,17 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../../../../convex/_generated/api';
 import {
   Container, Title, Text, Group, Stack, ThemeIcon, Alert,
-  SimpleGrid, Paper, Button, Avatar, Modal, Textarea, Badge,
+  Paper, Button, Avatar, Modal, Textarea, Badge,
 } from '@mantine/core';
 import {
-  IconCompass, IconCircleCheck, IconClock, IconX, IconArrowRight,
-  IconStar, IconMessageCircle, IconUser,
+  IconCompass, IconCircleCheck, IconClock, IconX,
+  IconStar, IconUser, IconMapPin, IconHome2, IconLeaf,
 } from '@tabler/icons-react';
 import { getSessionToken } from '@/lib/convexClient';
 import { Layout } from '@/components/common/Layout';
@@ -220,37 +220,65 @@ function ParticipationCard({
   onReview: (participation: any) => void;
 }) {
   const t = useTranslations();
-  const locale = useLocale();
 
   const host = participation.host;
   const canReview = participation.status === 'ACCEPTED';
   const coverUrl = participation.project?.coverImageUrl
     ?? 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800';
+  const isNatB = participation.project?.projectType === 'NATB';
+  const address = participation.project?.address;
 
   return (
-    <Paper radius="lg" p={0} withBorder className="overflow-hidden flex flex-col h-full">
-      {/* Cover image */}
-      <Link href={`/projects/${participation.project?._id}`} className="block relative overflow-hidden" style={{ aspectRatio: '16/7' }}>
-        <img src={coverUrl} alt={participation.project?.title} className="w-full h-full object-cover" />
-        <div className="absolute top-3 right-3">
-          <StatusBadge status={participation.status} />
+    <div className="group cursor-pointer">
+      {/* Image — même ratio que ProjectCard */}
+      <Link href={`/projects/${participation.project?._id}`} className="block">
+        <div className="relative rounded-xl overflow-hidden aspect-[4/3] mb-3 bg-gray-100">
+          <img
+            src={coverUrl}
+            alt={participation.project?.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          <div className="absolute top-3 left-3 z-10">
+            <StatusBadge status={participation.status} />
+          </div>
+          <div className="absolute top-3 right-3 z-10">
+            <Badge
+              size="sm"
+              radius="xl"
+              variant="filled"
+              color={isNatB ? 'eco-primary' : 'eco-terracotta'}
+              leftSection={isNatB ? <IconHome2 size={12} /> : <IconLeaf size={12} />}
+              tt="uppercase"
+              fw={700}
+              styles={{ root: { letterSpacing: '0.05em', fontSize: '0.65rem' } }}
+            >
+              {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
+            </Badge>
+          </div>
         </div>
       </Link>
 
-      <div className="flex-1 p-4 flex flex-col gap-3">
-        {/* Title */}
-        <Link
-          href={`/projects/${participation.project?._id}`}
-          className="text-base font-display font-bold text-gray-900 hover:text-eco-primary transition-colors line-clamp-1"
-        >
-          {participation.project?.title}
+      {/* Content — même structure que ProjectCard */}
+      <Stack gap={4} px={4}>
+        <Link href={`/projects/${participation.project?._id}`} className="no-underline">
+          <Text fw={700} size="lg" c="dark" className="group-hover:text-eco-primary transition-colors line-clamp-1">
+            {participation.project?.title}
+          </Text>
         </Link>
 
-        {/* Host info */}
+        {address?.city && (
+          <Group gap={4} wrap="nowrap">
+            <IconMapPin size={14} className="text-gray-500 flex-shrink-0" />
+            <Text size="sm" c="dimmed" className="truncate">
+              {[address.city, address.country?.name].filter(Boolean).join(', ')}
+            </Text>
+          </Group>
+        )}
+
         {host && (
-          <Group gap="sm" p="sm" className="rounded-xl bg-gray-50 border border-gray-100">
+          <Group gap="sm" pt={4} className="border-t border-gray-100">
             {host.publicId ? (
-              <Link href={`/users/${host.publicId}`}>
+              <Link href={`/users/${host.publicId}`} onClick={(e) => e.stopPropagation()}>
                 <Avatar src={host.profilePictureUrl} size="sm" radius="xl" color="eco-primary" style={{ cursor: 'pointer' }}>
                   {host.firstName?.[0]}{host.lastName?.[0]}
                 </Avatar>
@@ -260,15 +288,9 @@ function ParticipationCard({
                 {host.firstName?.[0]}{host.lastName?.[0]}
               </Avatar>
             )}
-            <Stack gap={1} className="flex-1 min-w-0">
+            <Stack gap={0} style={{ flex: 1, minWidth: 0 }}>
               <Text size="xs" c="dimmed">{t('participations.hostedBy')}</Text>
-              {host.publicId ? (
-                <Link href={`/users/${host.publicId}`} className="no-underline">
-                  <Text size="sm" fw={600} c="eco-primary">{host.firstName} {host.lastName}</Text>
-                </Link>
-              ) : (
-                <Text size="sm" fw={600}>{host.firstName} {host.lastName}</Text>
-              )}
+              <Text size="sm" fw={600} c="dark" className="truncate">{host.firstName} {host.lastName}</Text>
             </Stack>
             {host.averageRating > 0 && (
               <Group gap={4} wrap="nowrap">
@@ -279,39 +301,21 @@ function ParticipationCard({
           </Group>
         )}
 
-        {/* Host response */}
-        {participation.hostResponseMessage && (
-          <Paper radius="md" p="sm" bg="gray.0">
-            <Text size="xs" fw={600} c="dimmed" mb={4}>{t('participations.hostResponse')} :</Text>
-            <Text size="sm" c="dimmed" lineClamp={2}>{participation.hostResponseMessage}</Text>
-          </Paper>
-        )}
-
-        {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
-          <Link
-            href={`/projects/${participation.project?._id}`}
-            className="inline-flex items-center gap-1 text-xs font-bold text-eco-primary hover:underline"
+        {canReview && (
+          <Button
+            size="xs"
+            variant="light"
+            color="eco-primary"
+            radius="xl"
+            leftSection={<IconStar size={14} />}
+            onClick={() => onReview(participation)}
+            mt={4}
           >
-            {t('participations.viewProject')}
-            <IconArrowRight size={14} />
-          </Link>
-
-          {canReview && (
-            <Button
-              size="xs"
-              variant="light"
-              color="eco-primary"
-              radius="xl"
-              leftSection={<IconStar size={14} />}
-              onClick={() => onReview(participation)}
-            >
-              {t('participations.leaveReview')}
-            </Button>
-          )}
-        </div>
-      </div>
-    </Paper>
+            {t('participations.leaveReview')}
+          </Button>
+        )}
+      </Stack>
+    </div>
   );
 }
 
@@ -394,13 +398,17 @@ export function MyParticipationsClient() {
 
             {/* Content */}
             {isLoading ? (
-              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-                {[1, 2, 3].map((i) => (
-                  <Paper key={i} radius="lg" h={280} withBorder className="animate-pulse bg-gray-100" />
+              <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <Stack key={i} gap="xs">
+                    <Paper radius="xl" h={0} style={{ aspectRatio: '4/3', paddingBottom: '75%' }} className="animate-pulse bg-gray-100" />
+                    <Paper h={16} w="70%" radius="sm" className="animate-pulse bg-gray-100" />
+                    <Paper h={14} w="50%" radius="sm" className="animate-pulse bg-gray-100" />
+                  </Stack>
                 ))}
               </SimpleGrid>
             ) : filtered.length > 0 ? (
-              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
+              <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
                 {filtered.map((p) => (
                   <ParticipationCard key={p._id} participation={p} onReview={setReviewTarget} />
                 ))}
