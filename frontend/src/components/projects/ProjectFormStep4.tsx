@@ -89,6 +89,7 @@ interface ProjectFormStep4Props {
   onBack: () => void;
   isSubmitting: boolean;
   error: string | null;
+  isEditing?: boolean;
 }
 
 export function ProjectFormStep4({
@@ -98,11 +99,14 @@ export function ProjectFormStep4({
   onBack,
   isSubmitting,
   error,
+  isEditing = false,
 }: ProjectFormStep4Props) {
   const t = useTranslations();
 
   // Availability
-  const [availMode, setAvailMode] = useState<'range' | 'months'>('range');
+  const [availMode, setAvailMode] = useState<'range' | 'months'>(
+    data.availabilities.length > 0 ? 'months' : 'range'
+  );
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   const [availError, setAvailError] = useState<string | null>(null);
 
@@ -112,11 +116,12 @@ export function ProjectFormStep4({
   const years = [currentYear, currentYear + 1, currentYear + 2];
   const [selectedYearTab, setSelectedYearTab] = useState(String(currentYear));
 
-  // Month selection state per year
-  const [monthsData, setMonthsData] = useState<AvailabilityData[]>(
-    data.availabilities.length > 0
-      ? data.availabilities
-      : years.map(emptyYear)
+  // Month selection state per year — pre-fill from existing data if present
+  const [monthsData, setMonthsData] = useState<AvailabilityData[]>(() =>
+    years.map(year => {
+      const existing = data.availabilities.find(a => a.year === year);
+      return existing ? { ...emptyYear(year), ...existing } : emptyYear(year);
+    })
   );
 
   const toggleMonth = (year: number, month: MonthKey) => {
@@ -125,7 +130,10 @@ export function ProjectFormStep4({
     ));
   };
 
-  // Images
+  // Existing images (edit mode)
+  const existingImages = data.existingImages ?? [];
+
+  // Images (new uploads)
   const [images, setImages] = useState<File[]>(data.images);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -174,6 +182,9 @@ export function ProjectFormStep4({
     setDragOverIndex(null);
   };
 
+  const totalImages = existingImages.length + images.length;
+  const minImages = isEditing ? 1 : 5;
+
   const handleSubmit = () => {
     // Validate availability
     if (availMode === 'range') {
@@ -191,7 +202,7 @@ export function ProjectFormStep4({
       onUpdate({ availabilities: monthsData.filter(y => MONTH_KEYS.some(k => y[k])) });
     }
 
-    if (images.length < 5) return;
+    if (totalImages < minImages) return;
     setAvailError(null);
     onSubmit();
   };
@@ -341,9 +352,25 @@ export function ProjectFormStep4({
         <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
           {t('createProject.step4.images')}
         </Text>
-        <Text size="sm" c="dimmed">{t('createProject.step4.imagesMin')}</Text>
+        {!isEditing && <Text size="sm" c="dimmed">{t('createProject.step4.imagesMin')}</Text>}
 
-        {images.length < 10 && (
+        {/* Existing images (edit mode) */}
+        {existingImages.length > 0 && (
+          <SimpleGrid cols={{ base: 3, sm: 4, md: 5 }} spacing="xs">
+            {existingImages.map((img, index) => (
+              <Card key={index} padding={0} withBorder style={{ position: 'relative', overflow: 'hidden' }}>
+                <Image src={img.url} alt={`Image ${index + 1}`} height={90} fit="cover" />
+                {index === 0 && images.length === 0 && (
+                  <Badge color="eco-primary" variant="filled" size="xs" style={{ position: 'absolute', top: 4, left: 4 }}>
+                    {t('createProject.step4.cover')}
+                  </Badge>
+                )}
+              </Card>
+            ))}
+          </SimpleGrid>
+        )}
+
+        {totalImages < 10 && (
           <FileButton onChange={handleImageUpload} accept="image/png,image/jpeg,image/jpg" multiple>
             {(props) => (
               <Card
@@ -404,7 +431,7 @@ export function ProjectFormStep4({
         )}
       </Stack>
 
-      {images.length < 5 && (
+      {totalImages < minImages && (
         <Alert color="yellow" variant="light" icon={<IconAlertCircle size={18} />}>
           {t('createProject.step4.minImagesAlert')}
         </Alert>
@@ -529,12 +556,15 @@ export function ProjectFormStep4({
         </Button>
         <Button
           onClick={handleSubmit}
-          disabled={images.length < 5}
+          disabled={totalImages < minImages}
           loading={isSubmitting}
           color="eco-primary"
           leftSection={!isSubmitting ? <IconCheck size={18} /> : undefined}
         >
-          {isSubmitting ? t('createProject.step4.creating') : t('createProject.step4.create')}
+          {isEditing
+            ? (isSubmitting ? t('createProject.step4.updating') : t('createProject.step4.update'))
+            : (isSubmitting ? t('createProject.step4.creating') : t('createProject.step4.create'))
+          }
         </Button>
       </Group>
     </Stack>

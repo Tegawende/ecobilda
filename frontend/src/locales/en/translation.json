@@ -569,6 +569,8 @@
       "back": "Back",
       "create": "Create Project",
       "creating": "Creating Project...",
+      "update": "Update Project",
+      "updating": "Updating Project...",
       "monthLabels": {
         "jan": "Jan",
         "feb": "Feb",

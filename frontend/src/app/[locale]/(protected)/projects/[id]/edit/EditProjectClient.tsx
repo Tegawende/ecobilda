@@ -90,8 +90,23 @@ export function EditProjectClient() {
           familyFriendly: project.familyFriendly || false,
           petsAllowed: project.petsAllowed || false,
           smokingAllowed: project.smokingAllowed || false,
-          availabilities: [],
+          availabilities: project.availabilities?.map((a: any) => ({
+            year: a.year,
+            january: a.january ?? false,
+            february: a.february ?? false,
+            march: a.march ?? false,
+            april: a.april ?? false,
+            may: a.may ?? false,
+            june: a.june ?? false,
+            july: a.july ?? false,
+            august: a.august ?? false,
+            september: a.september ?? false,
+            october: a.october ?? false,
+            november: a.november ?? false,
+            december: a.december ?? false,
+          })) ?? [],
           images: [],
+          existingImages: project.images?.map((img: any) => ({ url: img.url || img })).filter((img: any) => img.url) ?? [],
         });
       } catch (err) {
         setError(t('myProjects.fetchError'));
@@ -140,12 +155,31 @@ export function EditProjectClient() {
         familyFriendly: formData.familyFriendly,
         petsAllowed: formData.petsAllowed,
         smokingAllowed: formData.smokingAllowed,
+        skills: formData.skills,
       });
+
+      // Save availabilities
+      for (const avail of formData.availabilities) {
+        await projectsService.saveAvailability(projectId, avail.year, {
+          january: avail.january,
+          february: avail.february,
+          march: avail.march,
+          april: avail.april,
+          may: avail.may,
+          june: avail.june,
+          july: avail.july,
+          august: avail.august,
+          september: avail.september,
+          october: avail.october,
+          november: avail.november,
+          december: avail.december,
+        });
+      }
 
       // Upload new images if any
       if (formData.images.length > 0) {
         for (let i = 0; i < formData.images.length; i++) {
-          const isCover = i === 0;
+          const isCover = i === 0 && (formData.existingImages?.length ?? 0) === 0;
           await projectsService.uploadImage(projectId, formData.images[i], isCover);
         }
       }
@@ -243,6 +277,7 @@ export function EditProjectClient() {
               onBack={handleBack}
               isSubmitting={isSubmitting}
               error={error}
+              isEditing
             />
           )}
         </Paper>

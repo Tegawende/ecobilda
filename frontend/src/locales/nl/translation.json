@@ -658,6 +658,8 @@
       "back": "Terug",
       "create": "Project aanmaken",
       "creating": "Project aanmaken...",
+      "update": "Project bijwerken",
+      "updating": "Project bijwerken...",
       "monthLabels": {
         "jan": "Jan",
         "feb": "Feb",

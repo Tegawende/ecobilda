@@ -71,6 +71,9 @@ export interface ProjectFormData {
 
   // Images
   images: File[];
+
+  // Existing uploaded images (edit mode only)
+  existingImages?: { url: string }[];
 }
 
 export function CreateProjectClient() {
