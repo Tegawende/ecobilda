@@ -12,16 +12,23 @@ import {
   Avatar,
   Badge,
   Center,
+  ActionIcon,
+  Popover,
+  Switch,
+  Divider,
 } from '@mantine/core';
 import {
   IconSearch,
   IconMessage,
   IconVolumeOff,
+  IconSettings,
 } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import type { Conversation } from '@/types';
+import { useAuth } from '@/providers/AuthProvider';
+import { profileService } from '@/services/profile';
 
 dayjs.extend(relativeTime);
 
@@ -41,46 +48,48 @@ export function ConversationList({
   onToggleMute: _onToggleMute,
 }: ConversationListProps) {
   const t = useTranslations();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<string | null>('all');
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [emailNotif, setEmailNotif] = useState<boolean>((user as any)?.emailNotifications ?? true);
+  const [inAppNotif, setInAppNotif] = useState<boolean>((user as any)?.inAppNotifications ?? true);
+
+  const handleToggleEmail = async (value: boolean) => {
+    setEmailNotif(value);
+    try {
+      await profileService.updateSettings({ emailNotifications: value });
+    } catch {
+      setEmailNotif(!value); // revert on error
+    }
+  };
+
+  const handleToggleInApp = async (value: boolean) => {
+    setInAppNotif(value);
+    try {
+      await profileService.updateSettings({ inAppNotifications: value });
+    } catch {
+      setInAppNotif(!value);
+    }
+  };
 
   // Filter conversations based on search and tab
   const filteredConversations = conversations.filter((conv) => {
-    // Get the other user
     const otherUser = conv.otherUser;
-
-    // Search filter
     const matchesSearch =
       searchQuery === '' ||
       `${otherUser?.firstName ?? ''} ${otherUser?.lastName ?? ''}`
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
-
-    // Tab filter
     const unreadCount = conv.unreadCount ?? 0;
-
     const matchesTab =
       activeTab === 'all' || (activeTab === 'unread' && unreadCount > 0);
-
     return matchesSearch && matchesTab;
   });
 
-  // Calculate total unread count
-  const totalUnread = conversations.reduce((sum, conv) => {
-    return sum + (conv.unreadCount ?? 0);
-  }, 0);
+  const totalUnread = conversations.reduce((sum, conv) => sum + (conv.unreadCount ?? 0), 0);
 
-  const getOtherUser = (conv: Conversation) => {
-    return conv.otherUser;
-  };
-
-  const getUnreadCount = (conv: Conversation) => {
-    return conv.unreadCount ?? 0;
-  };
-
-  const isMuted = (conv: Conversation) => {
-    return conv.isMuted ?? false;
-  };
+  const isMuted = (conv: Conversation) => conv.isMuted ?? false;
 
   return (
     <Box style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: 'white' }}>
@@ -90,6 +99,51 @@ export function ConversationList({
           <Text fw={700} size="xl">
             {t('messaging.title')}
           </Text>
+
+          <Popover
+            opened={settingsOpen}
+            onChange={setSettingsOpen}
+            position="bottom-end"
+            shadow="md"
+            width={260}
+            withArrow
+          >
+            <Popover.Target>
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                onClick={() => setSettingsOpen((o) => !o)}
+                aria-label={t('messaging.settingsTitle')}
+              >
+                <IconSettings size={18} />
+              </ActionIcon>
+            </Popover.Target>
+
+            <Popover.Dropdown>
+              <Text fw={600} size="sm" mb="sm">
+                {t('messaging.settingsTitle')}
+              </Text>
+              <Divider mb="sm" />
+              <Stack gap="sm">
+                <Switch
+                  label={t('settings.emailNotifications')}
+                  description={t('settings.emailNotificationsDesc')}
+                  checked={emailNotif}
+                  onChange={(e) => handleToggleEmail(e.currentTarget.checked)}
+                  color="eco-primary"
+                  styles={{ track: { cursor: 'pointer' }, label: { cursor: 'pointer' } }}
+                />
+                <Switch
+                  label={t('settings.inAppNotifications')}
+                  description={t('settings.inAppNotificationsDesc')}
+                  checked={inAppNotif}
+                  onChange={(e) => handleToggleInApp(e.currentTarget.checked)}
+                  color="eco-primary"
+                  styles={{ track: { cursor: 'pointer' }, label: { cursor: 'pointer' } }}
+                />
+              </Stack>
+            </Popover.Dropdown>
+          </Popover>
         </Group>
 
         <TextInput
@@ -127,8 +181,8 @@ export function ConversationList({
         {filteredConversations.length > 0 ? (
           <Stack gap={0}>
             {filteredConversations.map((conv) => {
-              const otherUser = getOtherUser(conv);
-              const unreadCount = getUnreadCount(conv);
+              const otherUser = conv.otherUser;
+              const unreadCount = conv.unreadCount ?? 0;
               const isSelected = selectedId === conv._id;
               const muted = isMuted(conv);
 
@@ -144,14 +198,10 @@ export function ConversationList({
                     transition: 'background-color 0.2s',
                   }}
                   onMouseEnter={(e) => {
-                    if (!isSelected) {
-                      e.currentTarget.style.backgroundColor = '#f0f0f0';
-                    }
+                    if (!isSelected) e.currentTarget.style.backgroundColor = '#f0f0f0';
                   }}
                   onMouseLeave={(e) => {
-                    if (!isSelected) {
-                      e.currentTarget.style.backgroundColor = 'white';
-                    }
+                    if (!isSelected) e.currentTarget.style.backgroundColor = 'white';
                   }}
                 >
                   <Group wrap="nowrap" align="flex-start" gap="sm">
@@ -167,11 +217,7 @@ export function ConversationList({
 
                     <Box style={{ flex: 1, minWidth: 0 }}>
                       <Group justify="space-between" gap="xs" mb={4} wrap="nowrap">
-                        <Text
-                          fw={unreadCount > 0 ? 700 : 500}
-                          size="sm"
-                          lineClamp={1}
-                        >
+                        <Text fw={unreadCount > 0 ? 700 : 500} size="sm" lineClamp={1}>
                           {otherUser?.firstName} {otherUser?.lastName}
                         </Text>
                         <Group gap={4} wrap="nowrap">
@@ -179,9 +225,7 @@ export function ConversationList({
                             <IconVolumeOff size={14} color="var(--mantine-color-gray-6)" />
                           )}
                           <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
-                            {conv.lastMessageAt
-                              ? dayjs(conv.lastMessageAt).fromNow()
-                              : ''}
+                            {conv.lastMessageAt ? dayjs(conv.lastMessageAt).fromNow() : ''}
                           </Text>
                         </Group>
                       </Group>
@@ -203,13 +247,6 @@ export function ConversationList({
                           </Badge>
                         )}
                       </Group>
-
-                      {(otherUser as any)?.address && (
-                        <Text size="xs" c="dimmed" mt={2}>
-                          {(otherUser as any).address.city}
-                          {(otherUser as any).address.country && `, ${(otherUser as any).address.country.name}`}
-                        </Text>
-                      )}
                     </Box>
                   </Group>
                 </Box>

@@ -129,6 +129,7 @@ export interface Conversation {
   user2Id?: string;
   otherUser?: {
     _id: string;
+    publicId?: string;
     firstName: string;
     lastName: string;
     profilePicture?: string | null;
@@ -139,6 +140,19 @@ export interface Conversation {
   lastMessageAt?: number;
   unreadCount?: number;
   isMuted?: boolean;
+  user1LastReadAt?: number;
+  user2LastReadAt?: number;
+  participationDetails?: {
+    _id: string;
+    proposedStartDate?: string | null;
+    proposedEndDate?: string | null;
+    status: string;
+    project?: {
+      _id: string;
+      title: string;
+      coverImageUrl?: string | null;
+    } | null;
+  } | null;
   _creationTime?: number;
 }
 
@@ -154,6 +168,9 @@ export interface Message {
   } | null;
   senderId?: string;
   body: string;
+  isSystem?: boolean;
+  imageStorageId?: string;
+  imageUrl?: string | null;
   _creationTime?: number;
 }
 

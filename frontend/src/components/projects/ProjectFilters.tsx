@@ -26,6 +26,89 @@ import {
 } from '@tabler/icons-react';
 import { MobileSearchModal } from './MobileSearchModal';
 
+function LanguageFilter({
+    allLanguages,
+    selected,
+    onChange,
+    label,
+}: {
+    allLanguages: { code: string; name: string }[];
+    selected: string[];
+    onChange: (langs: string[]) => void;
+    label: string;
+}) {
+    const [search, setSearch] = useState('');
+    const [open, setOpen] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    const filtered = allLanguages.filter(
+        l => !selected.includes(l.code) && l.name.toLowerCase().includes(search.toLowerCase())
+    );
+
+    useEffect(() => {
+        function handleClick(e: MouseEvent) {
+            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                setOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, []);
+
+    return (
+        <div className="space-y-3">
+            <h3 className="font-semibold text-gray-900">{label}</h3>
+            <div ref={containerRef} className="relative">
+                {/* Input box with selected chips inside */}
+                <div
+                    className="flex flex-wrap gap-1.5 min-h-[40px] px-3 py-2 border border-gray-300 rounded-lg cursor-text focus-within:border-gray-900"
+                    onClick={() => { setOpen(true); (containerRef.current?.querySelector('input') as HTMLInputElement)?.focus(); }}
+                >
+                    {selected.map(code => {
+                        const lang = allLanguages.find(l => l.code === code);
+                        if (!lang) return null;
+                        return (
+                            <span key={code} className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-gray-900 text-white">
+                                {lang.name}
+                                <button
+                                    type="button"
+                                    onMouseDown={e => { e.stopPropagation(); onChange(selected.filter(c => c !== code)); }}
+                                    className="hover:opacity-70 cursor-pointer leading-none"
+                                >
+                                    ×
+                                </button>
+                            </span>
+                        );
+                    })}
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={e => { setSearch(e.target.value); setOpen(true); }}
+                        onFocus={() => setOpen(true)}
+                        placeholder={selected.length === 0 ? 'Search...' : ''}
+                        className="flex-1 min-w-[80px] text-sm outline-none bg-transparent"
+                    />
+                </div>
+                {/* Dropdown */}
+                {open && filtered.length > 0 && (
+                    <div className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
+                        {filtered.map(lang => (
+                            <button
+                                key={lang.code}
+                                type="button"
+                                onMouseDown={e => { e.preventDefault(); onChange([...selected, lang.code]); setSearch(''); }}
+                                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                            >
+                                {lang.name}
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
 export interface ProjectFiltersState {
     projectType: 'all' | 'NATB' | 'PERM';
     location: { name: string; lat: number; lng: number } | null;
@@ -1016,33 +1099,12 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
 
                             {/* Language filter */}
                             {allLanguages.length > 0 && (
-                                <div className="space-y-3">
-                                    <h3 className="font-semibold text-gray-900">{t('projects.filters.languages')}</h3>
-                                    <div className="flex flex-wrap gap-2">
-                                        {allLanguages.map(lang => {
-                                            const isSelected = tempFilters.languages.includes(lang.code);
-                                            return (
-                                                <button
-                                                    key={lang.code}
-                                                    type="button"
-                                                    onClick={() => setTempFilters(prev => ({
-                                                        ...prev,
-                                                        languages: isSelected
-                                                            ? prev.languages.filter(c => c !== lang.code)
-                                                            : [...prev.languages, lang.code]
-                                                    }))}
-                                                    className={`px-3 py-1.5 rounded-full text-sm border transition-all cursor-pointer ${
-                                                        isSelected
-                                                            ? 'bg-gray-900 text-white border-gray-900'
-                                                            : 'border-gray-300 text-gray-600 hover:border-gray-900 hover:text-gray-900'
-                                                    }`}
-                                                >
-                                                    {lang.name}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
+                                <LanguageFilter
+                                    allLanguages={allLanguages}
+                                    selected={tempFilters.languages}
+                                    onChange={langs => setTempFilters(prev => ({ ...prev, languages: langs }))}
+                                    label={t('projects.filters.languages')}
+                                />
                             )}
 
                             {/* Work Details removed for MVP */}

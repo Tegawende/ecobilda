@@ -92,6 +92,43 @@ export const getById = query({
       otherUserPictureUrl = await ctx.storage.getUrl(otherUser.profilePicture);
     }
 
+    // Enrich with participation request and project details
+    let participationDetails = null;
+    if (conv.participationRequestId) {
+      const req = await ctx.db.get(conv.participationRequestId);
+      if (req) {
+        const project = await ctx.db.get(req.projectId);
+        let coverImageUrl: string | null = null;
+        if (project) {
+          const coverImg = await ctx.db
+            .query("projectImages")
+            .withIndex("by_project", (q) => q.eq("projectId", project._id))
+            .order("asc")
+            .first();
+          if (coverImg) {
+            if (coverImg.url) {
+              coverImageUrl = coverImg.url;
+            } else if (coverImg.storageId) {
+              coverImageUrl = await ctx.storage.getUrl(coverImg.storageId);
+            }
+          }
+        }
+        participationDetails = {
+          _id: req._id,
+          proposedStartDate: req.proposedStartDate ?? null,
+          proposedEndDate: req.proposedEndDate ?? null,
+          status: req.status,
+          project: project
+            ? {
+                _id: project._id,
+                title: project.title,
+                coverImageUrl,
+              }
+            : null,
+        };
+      }
+    }
+
     return {
       ...conv,
       otherUser: otherUser
@@ -103,6 +140,7 @@ export const getById = query({
             profilePictureUrl: otherUserPictureUrl,
           }
         : null,
+      participationDetails,
     };
   },
 });
@@ -121,9 +159,9 @@ export const markAsRead = mutation({
     if (!conv) throw new Error("Conversation not found.");
 
     if (conv.user1Id === user._id) {
-      await ctx.db.patch(args.id, { unreadCountUser1: 0 });
+      await ctx.db.patch(args.id, { unreadCountUser1: 0, user1LastReadAt: Date.now() });
     } else if (conv.user2Id === user._id) {
-      await ctx.db.patch(args.id, { unreadCountUser2: 0 });
+      await ctx.db.patch(args.id, { unreadCountUser2: 0, user2LastReadAt: Date.now() });
     }
     return { success: true };
   },
@@ -179,5 +217,25 @@ export const toggleMute = mutation({
       await ctx.db.patch(args.id, { user2Muted: !conv.user2Muted });
     }
     return { success: true };
+  },
+});
+
+// ============================================
+// Generate Upload URL for Message Images
+// ============================================
+
+export const generateMessageUploadUrl = mutation({
+  args: { token: v.string(), conversationId: v.id("conversations") },
+  handler: async (ctx, args) => {
+    const user = await getUserFromToken(ctx, args.token);
+    if (!user) throw new Error("Not authenticated.");
+
+    const conv = await ctx.db.get(args.conversationId);
+    if (!conv) throw new Error("Conversation not found.");
+    if (conv.user1Id !== user._id && conv.user2Id !== user._id) {
+      throw new Error("Not authorized.");
+    }
+
+    return await ctx.storage.generateUploadUrl();
   },
 });

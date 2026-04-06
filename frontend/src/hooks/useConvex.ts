@@ -123,6 +123,19 @@ export function useMessages(conversationId: string | null) {
   };
 }
 
+export function useConversation(conversationId: string | null) {
+  const token = getSessionToken();
+  const conversation = useQuery(
+    api.conversations.getById,
+    token && conversationId ? { token, id: conversationId as any } : "skip"
+  );
+
+  return {
+    conversation: conversation ?? null,
+    isLoading: conversation === undefined,
+  };
+}
+
 // ============================================
 // Projects
 // ============================================

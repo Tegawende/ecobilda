@@ -85,8 +85,8 @@ export function MessageBubble({ message, isOwnMessage, showAvatar = true }: Mess
         {/* Bubble */}
         <Box>
           <Box
-            px="md"
-            py="xs"
+            px={message.imageUrl && !message.body ? 0 : 'md'}
+            py={message.imageUrl && !message.body ? 0 : 'xs'}
             style={{
               backgroundColor: isOwnMessage
                 ? 'var(--mantine-color-eco-blue-6)'
@@ -96,18 +96,41 @@ export function MessageBubble({ message, isOwnMessage, showAvatar = true }: Mess
               borderBottomRightRadius: isOwnMessage ? 4 : 16,
               borderBottomLeftRadius: isOwnMessage ? 16 : 4,
               display: 'inline-block',
+              overflow: 'hidden',
             }}
           >
-            <Text
-              size="sm"
-              style={{
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word',
-                lineHeight: 1.4,
-              }}
-            >
-              {message.body}
-            </Text>
+            {message.imageUrl && (
+              <Box
+                mb={message.body ? 'xs' : 0}
+                style={{
+                  maxWidth: 240,
+                  cursor: 'pointer',
+                  borderRadius: message.body ? 0 : 16,
+                  overflow: 'hidden',
+                }}
+                onClick={() => window.open(message.imageUrl!, '_blank')}
+              >
+                <img
+                  src={message.imageUrl}
+                  alt=""
+                  style={{ width: '100%', display: 'block' }}
+                />
+              </Box>
+            )}
+            {message.body && (
+              <Box px={message.imageUrl ? 'md' : 0} py={message.imageUrl ? 'xs' : 0}>
+                <Text
+                  size="sm"
+                  style={{
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {message.body}
+                </Text>
+              </Box>
+            )}
           </Box>
 
           <Text

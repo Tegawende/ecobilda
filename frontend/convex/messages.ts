@@ -34,12 +34,17 @@ export const getByConversation = query({
       .withIndex("by_conversation", (q) => q.eq("conversationId", args.conversationId))
       .collect();
 
-    // Enrich with sender info
+    // Enrich with sender info and image URLs
     const enriched = [];
     for (const msg of messages) {
       const sender = await ctx.db.get(msg.senderId);
+      let imageUrl: string | null = null;
+      if (msg.imageStorageId) {
+        imageUrl = await ctx.storage.getUrl(msg.imageStorageId);
+      }
       enriched.push({
         ...msg,
+        imageUrl,
         sender: sender
           ? {
               _id: sender._id,
@@ -65,6 +70,7 @@ export const send = mutation({
     token: v.string(),
     conversationId: v.id("conversations"),
     body: v.string(),
+    imageStorageId: v.optional(v.id("_storage")),
   },
   handler: async (ctx, args) => {
     const user = await getUserFromToken(ctx, args.token);
@@ -81,12 +87,16 @@ export const send = mutation({
       conversationId: args.conversationId,
       senderId: user._id,
       body: args.body,
+      ...(args.imageStorageId ? { imageStorageId: args.imageStorageId } : {}),
     });
 
     // Update conversation metadata
     const isUser1 = conv.user1Id === user._id;
+    const lastMessageText = args.body.trim()
+      ? args.body.slice(0, 200)
+      : "[image]";
     const updates: any = {
-      lastMessageText: args.body.slice(0, 200),
+      lastMessageText,
       lastMessageAt: Date.now(),
     };
 
