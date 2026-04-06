@@ -230,27 +230,27 @@ function ParticipationCard({
 
   return (
     <div className="group cursor-pointer">
-      {/* Image — même ratio que ProjectCard */}
+      {/* Image — compact 16:9 */}
       <Link href={`/projects/${participation.project?._id}`} className="block">
-        <div className="relative rounded-xl overflow-hidden aspect-[4/3] mb-3 bg-gray-100">
+        <div className="relative rounded-xl overflow-hidden aspect-[16/9] mb-2 bg-gray-100">
           <img
             src={coverUrl}
             alt={participation.project?.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <div className="absolute top-3 left-3 z-10">
+          <div className="absolute top-2 left-2 z-10">
             <StatusBadge status={participation.status} />
           </div>
-          <div className="absolute top-3 right-3 z-10">
+          <div className="absolute top-2 right-2 z-10">
             <Badge
-              size="sm"
+              size="xs"
               radius="xl"
               variant="filled"
               color={isNatB ? 'eco-primary' : 'eco-terracotta'}
-              leftSection={isNatB ? <IconHome2 size={12} /> : <IconLeaf size={12} />}
+              leftSection={isNatB ? <IconHome2 size={10} /> : <IconLeaf size={10} />}
               tt="uppercase"
               fw={700}
-              styles={{ root: { letterSpacing: '0.05em', fontSize: '0.65rem' } }}
+              styles={{ root: { letterSpacing: '0.05em', fontSize: '0.6rem' } }}
             >
               {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
             </Badge>
@@ -258,61 +258,53 @@ function ParticipationCard({
         </div>
       </Link>
 
-      {/* Content — même structure que ProjectCard */}
-      <Stack gap={4} px={4}>
-        <Link href={`/projects/${participation.project?._id}`} className="no-underline">
-          <Text fw={700} size="lg" c="dark" className="group-hover:text-eco-primary transition-colors line-clamp-1">
-            {participation.project?.title}
-          </Text>
-        </Link>
+      {/* Content — compact */}
+      <Stack gap={2} px={2}>
+        <Group justify="space-between" align="center" gap="xs" wrap="nowrap">
+          <Link href={`/projects/${participation.project?._id}`} className="no-underline min-w-0 flex-1">
+            <Text fw={700} size="sm" c="dark" className="group-hover:text-eco-primary transition-colors line-clamp-1">
+              {participation.project?.title}
+            </Text>
+          </Link>
+          {canReview && (
+            <Button
+              size="compact-xs"
+              variant="light"
+              color="eco-primary"
+              radius="xl"
+              leftSection={<IconStar size={12} />}
+              onClick={() => onReview(participation)}
+              style={{ flexShrink: 0 }}
+            >
+              {t('participations.leaveReview')}
+            </Button>
+          )}
+        </Group>
 
         {address?.city && (
           <Group gap={4} wrap="nowrap">
-            <IconMapPin size={14} className="text-gray-500 flex-shrink-0" />
-            <Text size="sm" c="dimmed" className="truncate">
+            <IconMapPin size={12} className="text-gray-400 flex-shrink-0" />
+            <Text size="xs" c="dimmed" className="truncate">
               {[address.city, address.country?.name].filter(Boolean).join(', ')}
             </Text>
           </Group>
         )}
 
         {host && (
-          <Group gap="sm" pt={4} className="border-t border-gray-100">
-            {host.publicId ? (
-              <Link href={`/users/${host.publicId}`} onClick={(e) => e.stopPropagation()}>
-                <Avatar src={host.profilePictureUrl} size="sm" radius="xl" color="eco-primary" style={{ cursor: 'pointer' }}>
-                  {host.firstName?.[0]}{host.lastName?.[0]}
-                </Avatar>
-              </Link>
-            ) : (
-              <Avatar src={host.profilePictureUrl} size="sm" radius="xl" color="eco-primary">
-                {host.firstName?.[0]}{host.lastName?.[0]}
-              </Avatar>
-            )}
-            <Stack gap={0} style={{ flex: 1, minWidth: 0 }}>
-              <Text size="xs" c="dimmed">{t('participations.hostedBy')}</Text>
-              <Text size="sm" fw={600} c="dark" className="truncate">{host.firstName} {host.lastName}</Text>
-            </Stack>
+          <Group gap="xs" pt={2}>
+            <Avatar src={host.profilePictureUrl} size={22} radius="xl" color="eco-primary">
+              {host.firstName?.[0]}
+            </Avatar>
+            <Text size="xs" c="dimmed" className="truncate">
+              {host.firstName} {host.lastName}
+            </Text>
             {host.averageRating > 0 && (
-              <Group gap={4} wrap="nowrap">
-                <IconStar size={12} style={{ fill: '#facc15', color: '#facc15' }} />
+              <Group gap={2} wrap="nowrap" ml="auto">
+                <IconStar size={11} style={{ fill: '#facc15', color: '#facc15' }} />
                 <Text size="xs" c="dimmed">{host.averageRating.toFixed(1)}</Text>
               </Group>
             )}
           </Group>
-        )}
-
-        {canReview && (
-          <Button
-            size="xs"
-            variant="light"
-            color="eco-primary"
-            radius="xl"
-            leftSection={<IconStar size={14} />}
-            onClick={() => onReview(participation)}
-            mt={4}
-          >
-            {t('participations.leaveReview')}
-          </Button>
         )}
       </Stack>
     </div>
@@ -376,8 +368,8 @@ export function MyParticipationsClient() {
               </Alert>
             )}
 
-            {/* Filter tabs */}
-            <div className="inline-flex w-fit items-center rounded-md bg-gray-100 p-1 gap-0.5">
+            {/* Filter tabs — full width */}
+            <div className="flex w-full items-center rounded-lg bg-gray-100 p-1 gap-0.5">
               {[
                 { value: 'all',      label: t('participations.all') },
                 { value: 'PENDING',  label: t('participations.pending') },
@@ -387,7 +379,7 @@ export function MyParticipationsClient() {
                 <button
                   key={tab.value}
                   onClick={() => setFilter(tab.value)}
-                  className={`px-3 py-1.5 rounded-sm text-sm font-medium transition-all cursor-pointer whitespace-nowrap ${
+                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all cursor-pointer whitespace-nowrap ${
                     filter === tab.value ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
