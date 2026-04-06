@@ -185,7 +185,7 @@ export function ConversationDetails({
             <Button
               variant="outline"
               component={Link}
-              href={`/profile/${otherUser?.publicId ?? otherUser?._id}`}
+              href={`/users/${otherUser?.publicId ?? otherUser?._id}`}
               fullWidth
               size="sm"
             >
