@@ -2,7 +2,7 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, useRouter, usePathname } from '@/i18n/navigation';
-import { Container, SimpleGrid, Stack, Group, Text, Anchor, Divider, NativeSelect, Box } from '@mantine/core';
+import { SimpleGrid, Stack, Group, Text, Anchor, Divider, NativeSelect, Box } from '@mantine/core';
 import { IconBrandTwitter, IconBrandInstagram, IconBrandFacebook, IconWorld } from '@tabler/icons-react';
 
 export function Footer() {
@@ -44,7 +44,7 @@ export function Footer() {
 
   return (
     <footer className="bg-white border-t border-gray-200 pt-16 pb-8">
-      <Container size="xl" px={{ base: 'lg', lg: 'xl' }}>
+      <div className="px-8 lg:px-12">
         <SimpleGrid cols={{ base: 1, md: 2, lg: 5 }} spacing="xl" mb="xl">
           <Box className="lg:col-span-2">
             <Group gap="xs">
@@ -110,7 +110,7 @@ export function Footer() {
             className="hover:bg-gray-50 rounded-md transition-colors"
           />
         </Group>
-      </Container>
+      </div>
     </footer>
   );
 }
