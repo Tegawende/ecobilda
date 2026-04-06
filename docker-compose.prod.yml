@@ -54,6 +54,8 @@ services:
       - "127.0.0.1:3000:3000"
     depends_on:
       - convex-backend
+    environment:
+      - CONVEX_INTERNAL_URL=http://convex-backend:3210
     networks:
       - internal
 

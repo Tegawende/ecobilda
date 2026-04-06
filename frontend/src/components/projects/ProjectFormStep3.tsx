@@ -12,6 +12,7 @@ import {
   Card,
   Grid,
   Skeleton,
+  MultiSelect,
 } from '@mantine/core';
 import {
   IconLeaf,
@@ -21,13 +22,15 @@ import {
   IconDog,
   IconSmoking,
   IconCheck,
+  IconLanguage,
 } from '@tabler/icons-react';
-import { useSkills } from '@/hooks/useConvex';
+import { useSkills, useLanguages } from '@/hooks/useConvex';
 import type { ProjectFormData } from '@/app/[locale]/(protected)/create-project/CreateProjectClient';
 import { getSkillDisplayName, type Skill } from '@/types';
 
 interface Step3FormData {
   skills: string[];
+  languages: string[];
   internetProvided: boolean;
   familyFriendly: boolean;
   petsAllowed: boolean;
@@ -45,10 +48,12 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
   const t = useTranslations();
   const locale = useLocale();
   const { skills: allSkills, isLoading: isLoadingSkills } = useSkills(data.projectType as "PERM" | "NATB" | undefined);
+  const { languages: allLanguages } = useLanguages();
 
   const form = useForm<Step3FormData>({
     initialValues: {
       skills: data.skills || [],
+      languages: data.languages || [],
       internetProvided: data.internetProvided || false,
       familyFriendly: data.familyFriendly || false,
       petsAllowed: data.petsAllowed || false,
@@ -73,7 +78,7 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
   };
 
   const handleFormSubmit = (formData: Step3FormData) => {
-    onUpdate(formData);
+    onUpdate({ ...formData, languages: formData.languages });
     onNext();
   };
 
@@ -216,6 +221,26 @@ export function ProjectFormStep3({ data, onUpdate, onNext, onBack }: ProjectForm
               );
             })}
           </Grid>
+        </Stack>
+
+        {/* Languages */}
+        <Stack gap="md">
+          <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+            {t('createProject.step3.languages')}
+          </Text>
+          <Text size="sm" c="dimmed">
+            {t('createProject.step3.languagesDescription')}
+          </Text>
+          <MultiSelect
+            data={allLanguages.map(l => ({ value: l.code, label: l.name }))}
+            value={form.values.languages}
+            onChange={(value) => form.setFieldValue('languages', value)}
+            placeholder={t('createProject.step3.languagesPlaceholder')}
+            searchable
+            clearable
+            leftSection={<IconLanguage size={16} />}
+            maxDropdownHeight={200}
+          />
         </Stack>
 
         {/* Navigation */}

@@ -583,8 +583,7 @@ export function UsersPage() {
                             </Button>
                           )
                         )}
-                        {/* Protected admin email cannot be deleted */}
-                        {user.email.toLowerCase() !== 'aurelien_lef@hotmail.fr' && (
+                        {!user.isStaff && !user.isSuperuser && (
                           <Button
                             variant="ghost"
                             size="sm"

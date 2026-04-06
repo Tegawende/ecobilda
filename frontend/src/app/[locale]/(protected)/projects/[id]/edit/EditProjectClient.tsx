@@ -59,6 +59,7 @@ export function EditProjectClient() {
     petsAllowed: false,
     smokingAllowed: false,
     availabilities: [],
+    languages: [],
     images: [],
   });
 
@@ -86,6 +87,7 @@ export function EditProjectClient() {
           accommodationDetails: project.accommodationDetails || '',
           foodDetails: project.foodDetails || '',
           skills: project.skills?.map((s: any) => s.code || s._id) || [],
+          languages: project.languages?.map((l: any) => l.code) ?? [],
           internetProvided: project.internetProvided || false,
           familyFriendly: project.familyFriendly || false,
           petsAllowed: project.petsAllowed || false,
@@ -156,6 +158,7 @@ export function EditProjectClient() {
         petsAllowed: formData.petsAllowed,
         smokingAllowed: formData.smokingAllowed,
         skills: formData.skills,
+        languages: formData.languages,
       });
 
       // Save availabilities

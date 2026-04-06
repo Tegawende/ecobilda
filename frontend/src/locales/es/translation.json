@@ -360,7 +360,8 @@
       "workDetails": "Detalles del trabajo",
       "anyDate": "Cualquier fecha",
       "accommodation": "Alojamiento incluido",
-      "food": "Comida incluida"
+      "food": "Comida incluida",
+      "languages": "Idiomas"
     },
     "helpersMax": "voluntarios máx",
     "daysPerWeek": "Días por semana",
@@ -534,6 +535,9 @@
       "petsAllowedDesc": "Los voluntarios pueden traer sus mascotas",
       "smokingAllowed": "Fumar permitido",
       "smokingAllowedDesc": "Fumar está permitido en la propiedad",
+      "languages": "Idiomas hablados",
+      "languagesDescription": "¿Qué idiomas se hablan en este proyecto? Esto ayuda a los voluntarios a saber si pueden comunicarse contigo.",
+      "languagesPlaceholder": "Seleccionar idiomas...",
       "back": "Atrás",
       "next": "Siguiente",
       "validation": {
@@ -556,6 +560,7 @@
       "uploadButton": "Haz clic para subir imágenes",
       "uploadHint": "PNG, JPG hasta 10MB cada una",
       "cover": "Portada",
+      "imagesHint": "La primera imagen se usará como portada. Arrastra y suelta para reordenar.",
       "imagesUploaded": "{count} / 10 imágenes subidas",
       "maxImagesAlert": "Máximo 10 imágenes permitidas",
       "imagesMin": "Mínimo 5 imágenes requeridas. Formatos aceptados: JPG, PNG.",
@@ -742,6 +747,10 @@
     "reviews": "reseñas",
     "reviewsTitle": "Reseñas",
     "yourResponse": "Tu respuesta",
+    "hostResponse": "Respuesta del anfitrión",
+    "replyToReview": "Responder a esta reseña",
+    "submitResponse": "Enviar respuesta",
+    "responseHint": "Escribe tu respuesta a esta reseña...",
     "title": "Mi Perfil",
     "subtitle": "Tu información personal",
     "noBio": "Sin biografía",

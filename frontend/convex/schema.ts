@@ -128,6 +128,7 @@ export default defineSchema({
     smokingAllowed: v.boolean(),
 
     skillIds: v.array(v.id("skills")),
+    languageIds: v.optional(v.array(v.id("languages"))),
 
     isActive: v.boolean(),
     flaggedCount: v.number(),

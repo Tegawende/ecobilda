@@ -367,7 +367,8 @@
       "wifi": "WiFi incluído",
       "workDetails": "Detalhes do trabalho",
       "accommodation": "Alojamento incluído",
-      "food": "Refeições incluídas"
+      "food": "Refeições incluídas",
+      "languages": "Idiomas"
     },
     "helpersMax": "voluntários máx",
     "daysPerWeek": "Dias por semana",
@@ -534,6 +535,9 @@
       "petsAllowedDesc": "Os voluntários podem trazer os seus animais",
       "smokingAllowed": "Fumar permitido",
       "smokingAllowedDesc": "Fumar é permitido na propriedade",
+      "languages": "Línguas faladas",
+      "languagesDescription": "Que línguas são faladas neste projeto? Isso ajuda os voluntários a saber se podem comunicar consigo.",
+      "languagesPlaceholder": "Selecionar línguas...",
       "back": "Voltar",
       "next": "Seguinte",
       "validation": {
@@ -556,6 +560,7 @@
       "uploadButton": "Clique para carregar imagens",
       "uploadHint": "PNG, JPG até 10MB cada",
       "cover": "Capa",
+      "imagesHint": "A primeira imagem será usada como capa. Arraste e solte para reordenar.",
       "imagesUploaded": "{count} / 10 imagens carregadas",
       "maxImagesAlert": "Máximo de 10 imagens permitidas",
       "imagesMin": "Mínimo de 5 imagens necessárias. Formatos aceites: JPG, PNG.",
@@ -742,6 +747,10 @@
     "reviews": "avaliações",
     "reviewsTitle": "Avaliações",
     "yourResponse": "A sua resposta",
+    "hostResponse": "Resposta do anfitrião",
+    "replyToReview": "Responder a esta avaliação",
+    "submitResponse": "Enviar resposta",
+    "responseHint": "Escreva sua resposta a esta avaliação...",
     "title": "Meu perfil",
     "subtitle": "As suas informações pessoais",
     "noBio": "Sem biografia ainda",

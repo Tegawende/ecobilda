@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import type { Skill } from '@/types';
-import { useSkills } from '@/hooks/useConvex';
+import { useSkills, useLanguages } from '@/hooks/useConvex';
 import { getSkillIcon } from '@/lib/skillIcons';
 
 import {
@@ -40,6 +40,7 @@ export interface ProjectFiltersState {
     accommodationProvided: boolean;
     foodProvided: boolean;
     skills: string[];
+    languages: string[];
 }
 
 interface ProjectFiltersProps {
@@ -65,6 +66,7 @@ export const defaultFilters: ProjectFiltersState = {
     accommodationProvided: false,
     foodProvided: false,
     skills: [],
+    languages: [],
 };
 
 // Get Mapbox token from environment
@@ -483,6 +485,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
     const [locationSuggestions, setLocationSuggestions] = useState<MapboxFeature[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const { skills: allSkills } = useSkills();
+    const { languages: allLanguages } = useLanguages();
     const locationRef = useRef<HTMLDivElement>(null);
     const calendarRef = useRef<HTMLDivElement>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -604,6 +607,7 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
         if (filters.daysPerWeek[0] > 1 || filters.daysPerWeek[1] < 7) count++;
         if (filters.maxHelpers[0] > 1 || filters.maxHelpers[1] < 30) count++;
         if (filters.skills.length > 0) count++;
+        if (filters.languages.length > 0) count++;
         return count;
     };
 
@@ -1006,6 +1010,37 @@ export function ProjectFilters({ filters, onFiltersChange, onLocationSelect, onC
                                                 );
                                             })}
                                         </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Language filter */}
+                            {allLanguages.length > 0 && (
+                                <div className="space-y-3">
+                                    <h3 className="font-semibold text-gray-900">{t('projects.filters.languages')}</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {allLanguages.map(lang => {
+                                            const isSelected = tempFilters.languages.includes(lang.code);
+                                            return (
+                                                <button
+                                                    key={lang.code}
+                                                    type="button"
+                                                    onClick={() => setTempFilters(prev => ({
+                                                        ...prev,
+                                                        languages: isSelected
+                                                            ? prev.languages.filter(c => c !== lang.code)
+                                                            : [...prev.languages, lang.code]
+                                                    }))}
+                                                    className={`px-3 py-1.5 rounded-full text-sm border transition-all cursor-pointer ${
+                                                        isSelected
+                                                            ? 'bg-gray-900 text-white border-gray-900'
+                                                            : 'border-gray-300 text-gray-600 hover:border-gray-900 hover:text-gray-900'
+                                                    }`}
+                                                >
+                                                    {lang.name}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             )}

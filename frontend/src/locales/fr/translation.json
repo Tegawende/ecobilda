@@ -366,7 +366,8 @@
       "pets": "Animaux acceptés",
       "smoking": "Fumeur autorisé",
       "accommodation": "Hébergement inclus",
-      "food": "Repas inclus"
+      "food": "Repas inclus",
+      "languages": "Langues"
     },
     "helpersMax": "volontaires max",
     "viewList": "Voir la liste",
@@ -531,6 +532,9 @@
       "petsAllowedDesc": "Les volontaires peuvent apporter leurs animaux",
       "smokingAllowed": "Fumer autorisé",
       "smokingAllowedDesc": "Fumer est autorisé sur la propriété",
+      "languages": "Langues parlées",
+      "languagesDescription": "Quelles langues parlez-vous sur ce projet ? Cela aide les volontaires à savoir s'ils peuvent communiquer avec vous.",
+      "languagesPlaceholder": "Sélectionner des langues...",
       "back": "Retour",
       "next": "Suivant",
       "validation": {
@@ -553,6 +557,7 @@
       "uploadButton": "Cliquez pour télécharger des images",
       "uploadHint": "PNG, JPG jusqu'à 10 Mo chacun",
       "cover": "Couverture",
+      "imagesHint": "La première image sera utilisée comme couverture. Glissez-déposez pour réordonner.",
       "imagesUploaded": "{count} / 10 images téléchargées",
       "maxImagesAlert": "Maximum 10 images autorisées",
       "imagesMin": "Minimum 5 images requises. Formats acceptés : JPG, PNG.",
@@ -723,6 +728,10 @@
     "reviews": "avis",
     "reviewsTitle": "Avis",
     "yourResponse": "Votre réponse",
+    "hostResponse": "Réponse de l'hôte",
+    "replyToReview": "Répondre à cet avis",
+    "submitResponse": "Soumettre la réponse",
+    "responseHint": "Écrivez votre réponse à cet avis...",
     "title": "Mon profil",
     "subtitle": "Vos informations personnelles",
     "noBio": "Pas encore de biographie",

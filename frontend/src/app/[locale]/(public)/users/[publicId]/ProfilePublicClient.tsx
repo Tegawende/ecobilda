@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useQuery } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../../../../../convex/_generated/api';
 import { useTranslations, useLocale } from 'next-intl';
 import {
@@ -19,6 +20,7 @@ import {
   ThemeIcon,
   Divider,
   Button,
+  Textarea,
 } from '@mantine/core';
 import {
   IconMapPin,
@@ -28,10 +30,13 @@ import {
   IconUser,
   IconLeaf,
   IconHome2,
+  IconMessageCircle,
 } from '@tabler/icons-react';
 import { Layout } from '@/components/common/Layout';
 import { getSkillIcon } from '@/lib/skillIcons';
 import { getSkillDisplayName } from '@/types';
+import { useAuth } from '@/providers/AuthProvider';
+import { getSessionToken } from '@/lib/convexClient';
 
 function getLocalizedLanguageName(code: string, locale: string): string {
   try {
@@ -46,11 +51,63 @@ function getLocalizedLanguageName(code: string, locale: string): string {
 function StarRating({ value }: { value: number }) {
   return (
     <Group gap={4} align="center">
-      <IconStar size={16} className="text-eco-terracotta fill-eco-terracotta" />
+      <IconStar size={16} style={{ color: '#facc15', fill: '#facc15' }} />
       <Text size="sm" fw={600}>
         {value.toFixed(1)}
       </Text>
     </Group>
+  );
+}
+
+function ReviewResponseForm({
+  reviewId,
+  onDone,
+}: {
+  reviewId: string;
+  onDone: () => void;
+}) {
+  const t = useTranslations();
+  const [response, setResponse] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const addResponse = useMutation(api.reviews.addResponse);
+
+  const handleSubmit = async () => {
+    if (response.trim().length < 10) return;
+    setSubmitting(true);
+    try {
+      const token = getSessionToken();
+      if (!token) return;
+      await addResponse({ token, reviewId: reviewId as any, response: response.trim() });
+      onDone();
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <Stack gap="xs" mt="xs">
+      <Textarea
+        placeholder={t('profile.responseHint')}
+        minRows={2}
+        value={response}
+        onChange={(e) => setResponse(e.currentTarget.value)}
+        autoFocus
+      />
+      <Group gap="xs" justify="flex-end">
+        <Button variant="subtle" size="xs" color="gray" onClick={onDone} disabled={submitting}>
+          {t('common.cancel')}
+        </Button>
+        <Button
+          size="xs"
+          color="eco-primary"
+          loading={submitting}
+          disabled={response.trim().length < 10}
+          onClick={handleSubmit}
+        >
+          {t('profile.submitResponse')}
+        </Button>
+      </Group>
+    </Stack>
   );
 }
 
@@ -59,9 +116,13 @@ export function ProfilePublicClient() {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations();
+  const { user: currentUser } = useAuth();
   const publicId = params.publicId as string;
+  const [respondingTo, setRespondingTo] = useState<string | null>(null);
 
   const profile = useQuery(api.users.getPublicProfile, { publicId });
+
+  const isOwner = !!currentUser && !!profile && (currentUser as any)._id === profile._id;
 
   if (profile === undefined) {
     return (
@@ -136,7 +197,7 @@ export function ProfilePublicClient() {
 
               {profile.averageRating > 0 && (
                 <Group gap="xs">
-                  <Rating value={profile.averageRating} readOnly size="sm" color="eco-terracotta" />
+                  <Rating value={profile.averageRating} readOnly size="sm" color="yellow" />
                   <Text size="sm" c="dimmed">
                     {profile.averageRating.toFixed(1)} · {profile.reviewCount} {reviewLabel}
                   </Text>
@@ -271,7 +332,7 @@ export function ProfilePublicClient() {
                         <Text size="sm" fw={600}>
                           {review.writer?.firstName} {review.writer?.lastName}
                         </Text>
-                        <Rating value={review.rating} readOnly size="xs" color="eco-terracotta" />
+                        <Rating value={review.rating} readOnly size="xs" color="yellow" />
                       </Group>
                       <Text size="xs" c="dimmed">
                         {new Date(review._creationTime).toLocaleDateString(locale, {
@@ -282,19 +343,48 @@ export function ProfilePublicClient() {
                       <Text size="sm" mt={4} style={{ lineHeight: 1.6 }}>
                         {review.feedback}
                       </Text>
-                      {review.response && (
+
+                      {/* Host response */}
+                      {review.response ? (
                         <Paper
                           mt="xs"
                           p="sm"
                           radius="md"
                           style={{ backgroundColor: 'var(--mantine-color-eco-primary-0)' }}
                         >
-                          <Text size="xs" fw={600} mb={4}>
-                            {t('profile.yourResponse')}
-                          </Text>
+                          <Group gap={6} mb={4}>
+                            <IconMessageCircle size={12} className="text-eco-primary" />
+                            <Text size="xs" fw={600} c="eco-primary">
+                              {t('profile.hostResponse')}
+                            </Text>
+                            {review.responseDate && (
+                              <Text size="xs" c="dimmed">
+                                · {new Date(review.responseDate).toLocaleDateString(locale, {
+                                  year: 'numeric',
+                                  month: 'long',
+                                })}
+                              </Text>
+                            )}
+                          </Group>
                           <Text size="xs">{review.response}</Text>
                         </Paper>
-                      )}
+                      ) : isOwner && respondingTo !== review._id ? (
+                        <Button
+                          variant="subtle"
+                          size="xs"
+                          color="eco-primary"
+                          leftSection={<IconMessageCircle size={12} />}
+                          mt="xs"
+                          onClick={() => setRespondingTo(review._id)}
+                        >
+                          {t('profile.replyToReview')}
+                        </Button>
+                      ) : isOwner && respondingTo === review._id ? (
+                        <ReviewResponseForm
+                          reviewId={review._id}
+                          onDone={() => setRespondingTo(null)}
+                        />
+                      ) : null}
                     </Stack>
                   </Group>
                 </Paper>
