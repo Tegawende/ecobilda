@@ -204,20 +204,26 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                 </Paper>
 
                 {/* Accommodation & Food */}
-                <Paper radius="xl" p="xl" withBorder>
-                  <Title order={3} mb="lg" className="font-display">{t('projectDetail.accommodation')}</Title>
-                  <Stack gap="lg">
-                    <div>
-                      <Text fw={600} mb="xs">{t('projectDetail.accommodationType')}</Text>
-                      <Text c="dimmed">{project.accommodationDetails || t('projectDetail.notSpecified')}</Text>
-                    </div>
-                    <Divider />
-                    <div>
-                      <Text fw={600} mb="xs">{t('projectDetail.meals')}</Text>
-                      <Text c="dimmed">{project.foodDetails || t('projectDetail.notSpecified')}</Text>
-                    </div>
-                  </Stack>
-                </Paper>
+                {(project.accommodationDetails || project.foodDetails) && (
+                  <Paper radius="xl" p="xl" withBorder>
+                    <Title order={3} mb="lg" className="font-display">{t('projectDetail.accommodation')}</Title>
+                    <Stack gap="lg">
+                      {project.accommodationDetails && (
+                        <div>
+                          <Text fw={600} mb="xs">{t('projectDetail.accommodationType')}</Text>
+                          <Text c="dimmed">{project.accommodationDetails}</Text>
+                        </div>
+                      )}
+                      {project.accommodationDetails && project.foodDetails && <Divider />}
+                      {project.foodDetails && (
+                        <div>
+                          <Text fw={600} mb="xs">{t('projectDetail.meals')}</Text>
+                          <Text c="dimmed">{project.foodDetails}</Text>
+                        </div>
+                      )}
+                    </Stack>
+                  </Paper>
+                )}
 
                 {/* Skills */}
                 {project.skills && project.skills.length > 0 && (
@@ -283,8 +289,8 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                                   py="xs"
                                   px={4}
                                   ta="center"
-                                  bg={available ? 'var(--color-eco-primary-light, rgba(103,163,111,0.1))' : 'gray.0'}
-                                  style={{ color: available ? 'var(--color-eco-primary)' : 'var(--mantine-color-gray-4)' }}
+                                  bg={available ? 'green.0' : 'red.0'}
+                                  style={{ color: available ? 'var(--mantine-color-green-7)' : 'var(--mantine-color-red-6)' }}
                                 >
                                   <Text size="sm" fw={500} inherit>
                                     {monthNames[idx]?.slice(0, 3)}

@@ -469,6 +469,8 @@
       "back": "Zurück",
       "create": "Projekt erstellen",
       "creating": "Projekt wird erstellt...",
+      "update": "Projekt aktualisieren",
+      "updating": "Projekt wird aktualisiert...",
       "monthLabels": {
         "jan": "Jan",
         "feb": "Feb",
