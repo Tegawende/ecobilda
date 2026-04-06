@@ -26,7 +26,10 @@ sleep 10
 # Deploy Convex functions
 echo "--- Deploying Convex functions ---"
 cd "$PROJECT_DIR/frontend"
-npx convex deploy
+source "$PROJECT_DIR/.env"
+CONVEX_SELF_HOSTED_URL=http://127.0.0.1:3210 \
+CONVEX_SELF_HOSTED_ADMIN_KEY="$CONVEX_SELF_HOSTED_ADMIN_KEY" \
+npx convex deploy --url http://127.0.0.1:3210 --admin-key "$CONVEX_SELF_HOSTED_ADMIN_KEY"
 cd "$PROJECT_DIR"
 
 # Build admin panel (static files served by Caddy)
