@@ -4,27 +4,21 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { useTranslations, useLocale } from 'next-intl';
-import { Container, Title, Text, Paper, Button, Group, Stack, Avatar, Badge, Rating, TextInput, Textarea, ThemeIcon, Alert } from '@mantine/core';
 import {
-  IconPencil,
-  IconMapPin,
-  IconMail,
-  IconMessage,
-  IconHome2,
-  IconLeaf,
-  IconGift,
-  IconArrowLeft,
-  IconLanguage,
-  IconUser,
-  IconAlertCircle,
-  IconInfoCircle,
+  Container, Title, Text, Paper, Button, Group, Stack, Avatar, Badge,
+  Rating, Alert, Divider, ThemeIcon,
+} from '@mantine/core';
+import {
+  IconPencil, IconMapPin, IconMail, IconMessage, IconHome2, IconLeaf,
+  IconGift, IconArrowLeft, IconLanguage, IconUser, IconAlertCircle,
+  IconInfoCircle, IconLock, IconStar,
 } from '@tabler/icons-react';
 import { getSkillIcon } from '@/lib/skillIcons';
 import { Layout } from '@/components/common/Layout';
 import { EditProfileForm } from '@/components/profile/EditProfileForm';
-import { getSkillDisplayName, type Review, type Skill } from '@/types';
-
-// Imported from types
+import { getSkillDisplayName, type Review } from '@/types';
+import { convexClient } from '@/lib/convexClient';
+import { api } from '../../../../../convex/_generated/api';
 
 function getLocalizedLanguageName(code: string, locale: string): string {
   try {
@@ -36,40 +30,40 @@ function getLocalizedLanguageName(code: string, locale: string): string {
   }
 }
 
-// Review Card Component using Mantine
 function ReviewCard({ review }: { review: Review }) {
   const t = useTranslations();
   const locale = useLocale();
 
   return (
-    <Paper radius="lg" p="lg" withBorder>
+    <Paper radius="md" p="md" withBorder>
       <Group align="flex-start" gap="md">
         <Avatar
           src={review.writer?.profilePictureUrl}
           alt={`${review.writer?.firstName} ${review.writer?.lastName}`}
-          size="lg"
+          size="md"
           radius="xl"
-          className="border-2 border-eco-primary/20"
         />
-        <Stack gap="xs" className="flex-1">
-          <Group justify="space-between">
-            <Title order={5}>
+        <Stack gap={4} style={{ flex: 1 }}>
+          <Group justify="space-between" align="center">
+            <Text fw={600} size="sm">
               {review.writer?.firstName} {review.writer?.lastName}
-            </Title>
-            <Rating value={review.rating} readOnly size="sm" color="eco-terracotta" />
+            </Text>
+            <Rating value={review.rating} readOnly size="xs" color="yellow" />
           </Group>
-          <Text size="sm" c="dimmed">
-            {review._creationTime ? new Date(review._creationTime).toLocaleDateString(locale, {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            }) : ''}
+          <Text size="xs" c="dimmed">
+            {review._creationTime
+              ? new Date(review._creationTime).toLocaleDateString(locale, {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+              : ''}
           </Text>
-          <Text size="sm">{review.feedback}</Text>
+          <Text size="sm" mt={4}>{review.feedback}</Text>
 
           {review.response && (
-            <Paper radius="md" p="sm" bg="var(--mantine-color-eco-primary-light)" className="border-l-2 border-eco-primary">
-              <Text size="sm" fw={600} c="eco-primary" mb={4}>
+            <Paper radius="sm" p="sm" bg="gray.0" mt="xs" style={{ borderLeft: '3px solid var(--mantine-color-green-6)' }}>
+              <Text size="xs" fw={600} c="green.7" mb={2}>
                 {t('profile.yourResponse')}
               </Text>
               <Text size="sm" c="dimmed">{review.response}</Text>
@@ -81,23 +75,36 @@ function ReviewCard({ review }: { review: Review }) {
   );
 }
 
-// EditProfileForm imported from @/components/profile/EditProfileForm
-
 export function ProfileClient() {
   const t = useTranslations();
   const locale = useLocale();
   const searchParams = useSearchParams();
   const [isEditing, setIsEditing] = useState(searchParams?.get('edit') === '1');
   const [user, setUser] = useState<any>(null);
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     import('@/services/profile').then(({ profileService }) => {
       profileService.getProfile()
-        .then(data => { setUser(data); setLoading(false); })
-        .catch(err => { setError(t('profile.loadError')); setLoading(false); });
+        .then(async (data) => {
+          setUser(data);
+          // Fetch reviews after getting user
+          if (data?._id) {
+            try {
+              const userReviews = await convexClient.query(api.reviews.getByUser, { userId: data._id });
+              setReviews(userReviews ?? []);
+            } catch {
+              // Reviews are non-critical, fail silently
+            }
+          }
+          setLoading(false);
+        })
+        .catch(() => {
+          setError(t('profile.loadError'));
+          setLoading(false);
+        });
     });
   }, []);
 
@@ -154,184 +161,307 @@ export function ProfileClient() {
     );
   }
 
+  const natbSkills = (user.skills ?? []).filter((s: any) => s.category === 'NATB');
+  const permSkills = (user.skills ?? []).filter((s: any) => s.category === 'PERM');
+  const hasSkills = natbSkills.length > 0 || permSkills.length > 0;
+  const memberSince = user._creationTime
+    ? new Date(user._creationTime).toLocaleDateString(locale, { year: 'numeric', month: 'long' })
+    : null;
+
   return (
     <Layout>
       <div className="bg-stone-50 min-h-screen py-12">
         <Container size="sm">
-          <Stack gap="lg">
-            {/* Header */}
-            <Group gap="md" mb="xl">
-              <ThemeIcon size={48} radius="md" color="eco-primary" variant="light">
+          <Stack gap="xl">
+
+            {/* Page heading */}
+            <Group gap="md">
+              <ThemeIcon size={48} radius="md" color="green" variant="light">
                 <IconUser size={28} />
               </ThemeIcon>
               <Stack gap={4}>
                 <Title order={1} className="font-display">
                   {t('profile.title')}
                 </Title>
-                <Text c="dimmed">
-                  {t('profile.subtitle')}
-                </Text>
+                <Text c="dimmed">{t('profile.subtitle')}</Text>
               </Stack>
             </Group>
 
-            {/* Profile Header Card */}
-            <Paper radius="lg" p="lg" withBorder>
-              <Stack gap="md">
-                <Group align="flex-start" gap="lg" wrap="wrap">
-                  {/* Avatar */}
-                  <Avatar
-                    src={user.profilePictureUrl || user.profilePicture}
-                    alt={`${user.firstName} ${user.lastName}`}
-                    size={96}
-                    radius="xl"
-                    className="border-4 border-eco-primary/20"
-                  />
+            {/* Header card: avatar + name + rating + edit button */}
+            <Paper radius="lg" p="xl" withBorder>
+              <Group align="flex-start" gap="lg" wrap="wrap">
+                <Avatar
+                  src={user.profilePictureUrl || user.profilePicture}
+                  alt={`${user.firstName} ${user.lastName}`}
+                  size={96}
+                  radius="xl"
+                  style={{ border: '3px solid var(--mantine-color-green-2)' }}
+                />
 
-                  {/* User Info */}
-                  <Stack gap="xs" className="flex-1" style={{ minWidth: 200 }}>
-                    <Group justify="space-between" align="flex-start">
+                <Stack gap="xs" style={{ flex: 1, minWidth: 200 }}>
+                  <Group justify="space-between" align="flex-start" wrap="wrap" gap="xs">
+                    <Stack gap={2}>
                       <Title order={2} className="font-display">
                         {user.firstName} {user.lastName}
                       </Title>
-                      <Button
-                        variant="outline"
-                        radius="xl"
-                        size="xs"
-                        leftSection={<IconPencil size={16} />}
-                        onClick={() => setIsEditing(true)}
-                      >
-                        {t('profile.editProfile')}
-                      </Button>
-                    </Group>
-                    <Group gap="xs">
-                      <IconMail size={16} className="text-gray-500" />
-                      <Text c="dimmed">{user.email}</Text>
-                    </Group>
-                    {user.dateOfBirth && (
-                      <Group gap="xs">
-                        <IconGift size={16} className="text-gray-500" />
-                        <Text c="dimmed">
-                          {new Date(user.dateOfBirth).toLocaleDateString(locale, {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
-                          {' '}({Math.floor((Date.now() - new Date(user.dateOfBirth).getTime()) / (365.25 * 24 * 60 * 60 * 1000))} {t('profile.yearsOld')})
+                      {memberSince && (
+                        <Text size="xs" c="dimmed">
+                          {t('profile.memberSince', { date: memberSince })}
                         </Text>
-                      </Group>
-                    )}
-                    {user.address?.city && (
-                      <Group gap="xs">
-                        <IconMapPin size={16} className="text-gray-500" />
-                        <Text c="dimmed">{[user.address.city, user.address.country?.name].filter(Boolean).join(', ')}</Text>
-                      </Group>
-                    )}
+                      )}
+                    </Stack>
+                    <Button
+                      variant="outline"
+                      color="green"
+                      radius="xl"
+                      size="sm"
+                      leftSection={<IconPencil size={16} />}
+                      onClick={() => setIsEditing(true)}
+                    >
+                      {t('profile.editProfile')}
+                    </Button>
+                  </Group>
 
-                    {user.reviewCount > 0 && (
-                      <Group gap="xs" mt="xs">
-                        <Rating value={user.averageRating} readOnly fractions={2} color="eco-terracotta" />
-                        <Text size="sm" c="dimmed">
-                          ({user.reviewCount} {user.reviewCount === 1 ? t('profile.review') : t('profile.reviews')})
-                        </Text>
-                      </Group>
-                    )}
-                  </Stack>
-                </Group>
+                  {/* Rating */}
+                  {user.reviewCount > 0 ? (
+                    <Group gap="xs" mt="xs">
+                      <IconStar size={18} style={{ color: 'var(--mantine-color-yellow-5)' }} />
+                      <Text fw={600} size="sm">
+                        {user.averageRating?.toFixed(1)}
+                      </Text>
+                      <Rating value={user.averageRating} readOnly fractions={2} size="sm" color="yellow" />
+                      <Text size="sm" c="dimmed">
+                        ({user.reviewCount} {user.reviewCount === 1 ? t('profile.review') : t('profile.reviews')})
+                      </Text>
+                    </Group>
+                  ) : (
+                    <Text size="sm" c="dimmed" mt="xs">
+                      {t('profile.noReviewsYet', { defaultValue: 'No reviews yet' })}
+                    </Text>
+                  )}
+                </Stack>
+              </Group>
+            </Paper>
+
+            {/* Public info section */}
+            <Paper radius="lg" p="xl" withBorder>
+              <Stack gap="lg">
+                <Stack gap={4}>
+                  <Group gap="xs">
+                    <IconInfoCircle size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+                    <Title order={4}>{t('profile.publicInfoTitle')}</Title>
+                  </Group>
+                  <Alert
+                    color="blue"
+                    variant="light"
+                    icon={<IconInfoCircle size={14} />}
+                    p="xs"
+                  >
+                    <Text size="xs">{t('profile.publicInfoDesc')}</Text>
+                  </Alert>
+                </Stack>
+
+                <Divider />
 
                 {/* Bio */}
-                {user.bio && (
-                  <Stack gap="xs" pt="md" className="border-t border-gray-100">
-                    <Group gap="xs">
-                      <IconUser size={16} className="text-gray-500" />
-                      <Text size="sm" fw={700} c="dimmed" tt="uppercase">
-                        {t('profile.about')}
-                      </Text>
-                    </Group>
-                    <Text className="whitespace-pre-wrap">{user.bio}</Text>
-                  </Stack>
-                )}
+                <Stack gap={6}>
+                  <Group gap="xs">
+                    <IconUser size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+                    <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+                      {t('profile.about')}
+                    </Text>
+                  </Group>
+                  {user.bio ? (
+                    <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>{user.bio}</Text>
+                  ) : (
+                    <Text size="sm" c="dimmed" fs="italic">{t('profile.noBio')}</Text>
+                  )}
+                </Stack>
+
+                {/* Location */}
+                <Stack gap={6}>
+                  <Group gap="xs">
+                    <IconMapPin size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+                    <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+                      {t('profile.location')}
+                    </Text>
+                  </Group>
+                  {user.address?.city ? (
+                    <Text size="sm">
+                      {[user.address.city, user.address.country?.name].filter(Boolean).join(', ')}
+                    </Text>
+                  ) : (
+                    <Text size="sm" c="dimmed" fs="italic">{t('profile.noLocation')}</Text>
+                  )}
+                </Stack>
 
                 {/* Languages */}
-                {user.languages && user.languages.length > 0 && (
-                  <Stack gap="xs" pt="md" className="border-t border-gray-100">
-                    <Group gap="xs">
-                      <IconLanguage size={16} className="text-eco-terracotta" />
-                      <Text size="sm" fw={700} c="dimmed" tt="uppercase">
-                        {t('profile.languages')}
-                      </Text>
-                    </Group>
+                <Stack gap={6}>
+                  <Group gap="xs">
+                    <IconLanguage size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+                    <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+                      {t('profile.languages')}
+                    </Text>
+                  </Group>
+                  {user.languages && user.languages.length > 0 ? (
                     <Group gap="xs">
                       {user.languages.map((lang: any) => (
-                        <Badge key={lang.code} variant="light" color="eco-primary" size="sm">
+                        <Badge key={lang.code} variant="light" color="green" size="sm">
                           {getLocalizedLanguageName(lang.code, locale)}
                         </Badge>
                       ))}
                     </Group>
-                  </Stack>
-                )}
+                  ) : (
+                    <Text size="sm" c="dimmed" fs="italic">{t('profile.noLanguages')}</Text>
+                  )}
+                </Stack>
 
-                {/* Skills - Natural Building */}
-                {user.skills && user.skills.filter((s: any) => s.category === 'NATB').length > 0 && (
-                  <Stack gap="xs" pt="md" className="border-t border-gray-100">
+                {/* Skills */}
+                <Stack gap={6}>
+                  <Group gap="xs">
+                    <IconLeaf size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+                    <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+                      {t('profile.skills')}
+                    </Text>
+                  </Group>
+
+                  {hasSkills ? (
+                    <Stack gap="sm">
+                      {natbSkills.length > 0 && (
+                        <Stack gap={6}>
+                          <Group gap="xs">
+                            <IconHome2 size={14} style={{ color: 'var(--mantine-color-green-7)' }} />
+                            <Text size="xs" c="dimmed" fw={600}>{t('projects.naturalBuilding')}</Text>
+                          </Group>
+                          <Group gap="xs" wrap="wrap">
+                            {natbSkills.map((skill: any) => {
+                              const SkillIcon = getSkillIcon(skill.icon);
+                              return (
+                                <Badge key={skill.code} variant="light" color="green" size="sm" leftSection={<SkillIcon size={12} />}>
+                                  {getSkillDisplayName(skill, locale)}
+                                </Badge>
+                              );
+                            })}
+                          </Group>
+                        </Stack>
+                      )}
+                      {permSkills.length > 0 && (
+                        <Stack gap={6}>
+                          <Group gap="xs">
+                            <IconLeaf size={14} style={{ color: 'var(--mantine-color-teal-7)' }} />
+                            <Text size="xs" c="dimmed" fw={600}>{t('projects.permaculture')}</Text>
+                          </Group>
+                          <Group gap="xs" wrap="wrap">
+                            {permSkills.map((skill: any) => {
+                              const SkillIcon = getSkillIcon(skill.icon);
+                              return (
+                                <Badge key={skill.code} variant="light" color="teal" size="sm" leftSection={<SkillIcon size={12} />}>
+                                  {getSkillDisplayName(skill, locale)}
+                                </Badge>
+                              );
+                            })}
+                          </Group>
+                        </Stack>
+                      )}
+                    </Stack>
+                  ) : (
+                    <Text size="sm" c="dimmed" fs="italic">{t('profile.noSkills')}</Text>
+                  )}
+                </Stack>
+              </Stack>
+            </Paper>
+
+            {/* Private info section */}
+            <Paper radius="lg" p="xl" withBorder>
+              <Stack gap="lg">
+                <Stack gap={4}>
+                  <Group gap="xs">
+                    <IconLock size={20} style={{ color: 'var(--mantine-color-gray-6)' }} />
+                    <Title order={4}>{t('profile.privateInfoTitle')}</Title>
+                  </Group>
+                  <Alert
+                    color="gray"
+                    variant="light"
+                    icon={<IconLock size={14} />}
+                    p="xs"
+                  >
+                    <Text size="xs">{t('profile.privateInfoDesc')}</Text>
+                  </Alert>
+                </Stack>
+
+                <Divider />
+
+                {/* Email */}
+                <Stack gap={6}>
+                  <Group gap="xs">
+                    <IconMail size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+                    <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+                      {t('common.email', { defaultValue: 'Email' })}
+                    </Text>
+                  </Group>
+                  <Text size="sm">{user.email}</Text>
+                </Stack>
+
+                {/* Date of birth */}
+                {user.dateOfBirth && (
+                  <Stack gap={6}>
                     <Group gap="xs">
-                      <IconHome2 size={16} className="text-eco-primary" />
-                      <Text size="sm" fw={700} c="dimmed" tt="uppercase">
-                        {t('projects.naturalBuilding')}
+                      <IconGift size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+                      <Text size="sm" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+                        {t('profile.birthday')}
                       </Text>
                     </Group>
-                    <Group gap="xs" wrap="wrap">
-                      {user.skills.filter((s: any) => s.category === 'NATB').map((skill: any) => {
-                        const SkillIcon = getSkillIcon(skill.icon);
-                        return (
-                          <Badge key={skill.code} variant="light" color="eco-primary" size="sm" leftSection={<SkillIcon size={14} />}>
-                            {getSkillDisplayName(skill, locale)}
-                          </Badge>
-                        );
+                    <Text size="sm">
+                      {new Date(user.dateOfBirth).toLocaleDateString(locale, {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
                       })}
-                    </Group>
-                  </Stack>
-                )}
-
-                {/* Skills - Permaculture */}
-                {user.skills && user.skills.filter((s: any) => s.category === 'PERM').length > 0 && (
-                  <Stack gap="xs" pt="md" className="border-t border-gray-100">
-                    <Group gap="xs">
-                      <IconLeaf size={16} className="text-eco-terracotta" />
-                      <Text size="sm" fw={700} c="dimmed" tt="uppercase">
-                        {t('projects.permaculture')}
+                      {' '}
+                      <Text component="span" c="dimmed" size="sm">
+                        ({Math.floor((Date.now() - new Date(user.dateOfBirth).getTime()) / (365.25 * 24 * 60 * 60 * 1000))} {t('profile.yearsOld')})
                       </Text>
-                    </Group>
-                    <Group gap="xs" wrap="wrap">
-                      {user.skills.filter((s: any) => s.category === 'PERM').map((skill: any) => {
-                        const SkillIcon = getSkillIcon(skill.icon);
-                        return (
-                          <Badge key={skill.code} variant="light" color="eco-terracotta" size="sm" leftSection={<SkillIcon size={14} />}>
-                            {getSkillDisplayName(skill, locale)}
-                          </Badge>
-                        );
-                      })}
-                    </Group>
+                    </Text>
                   </Stack>
                 )}
               </Stack>
             </Paper>
 
-            {/* Reviews Section */}
-            {reviews.length > 0 && (
-              <Paper radius="lg" p="lg" withBorder>
-                <Group gap="sm" mb="lg" pb="md" className="border-b border-gray-100">
-                  <IconMessage size={24} className="text-eco-primary" />
+            {/* Reviews section */}
+            <Paper radius="lg" p="xl" withBorder>
+              <Stack gap="lg">
+                <Group gap="sm" align="center">
+                  <IconMessage size={22} style={{ color: 'var(--mantine-color-green-7)' }} />
                   <Title order={4} className="font-display">
-                    {t('profile.reviewsTitle')} ({reviews.length})
+                    {t('profile.reviewsTitle')}
                   </Title>
+                  {reviews.length > 0 && (
+                    <Badge variant="filled" color="green" size="sm" radius="xl">
+                      {reviews.length}
+                    </Badge>
+                  )}
+                  {user.reviewCount > 0 && (
+                    <Group gap={4} ml="auto">
+                      <Rating value={user.averageRating} readOnly fractions={2} size="sm" color="yellow" />
+                      <Text size="sm" fw={600}>{user.averageRating?.toFixed(1)}</Text>
+                    </Group>
+                  )}
                 </Group>
-                <Stack gap="md">
-                  {reviews.map((review) => (
-                    <ReviewCard key={review._id} review={review} />
-                  ))}
-                </Stack>
-              </Paper>
-            )}
+
+                {reviews.length > 0 ? (
+                  <Stack gap="md">
+                    {reviews.map((review) => (
+                      <ReviewCard key={review._id} review={review} />
+                    ))}
+                  </Stack>
+                ) : (
+                  <Text size="sm" c="dimmed" fs="italic" ta="center" py="md">
+                    {t('profile.noReviewsYet', { defaultValue: 'No reviews yet' })}
+                  </Text>
+                )}
+              </Stack>
+            </Paper>
+
           </Stack>
         </Container>
       </div>

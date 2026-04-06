@@ -2,6 +2,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { adminApi, AdminUserDetail } from '@/services/api';
+import { getSkillIcon } from '@/lib/skillIcons';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -376,11 +377,15 @@ export function UserDetailPage() {
         <CardContent>
           {user.skills.length > 0 ? (
             <div className="flex flex-wrap gap-2">
-              {user.skills.map((skill) => (
-                <Badge key={skill.code} variant="outline" className="px-3 py-1">
-                  {getSkillName(skill)}
-                </Badge>
-              ))}
+              {user.skills.map((skill) => {
+                const SkillIcon = getSkillIcon(skill.code);
+                return (
+                  <Badge key={skill.code} variant="outline" className="inline-flex items-center gap-1.5 px-3 py-1">
+                    <SkillIcon size={13} />
+                    {getSkillName(skill)}
+                  </Badge>
+                );
+              })}
             </div>
           ) : (
             <p className="italic text-muted-foreground">{t('userDetail.noSkills')}</p>

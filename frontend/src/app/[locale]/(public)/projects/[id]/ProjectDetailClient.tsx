@@ -314,7 +314,7 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                         <Link href={`/users/${project.owner.publicId}`}>
                           <Avatar
                             src={project.owner?.profilePictureUrl || undefined}
-                            alt={`${project.owner?.firstName} ${project.owner?.lastName}`}
+                            alt={project.owner?.firstName}
                             size="lg"
                             radius="xl"
                             color="eco-primary"
@@ -324,7 +324,7 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                       ) : (
                         <Avatar
                           src={project.owner?.profilePictureUrl || undefined}
-                          alt={`${project.owner?.firstName} ${project.owner?.lastName}`}
+                          alt={project.owner?.firstName}
                           size="lg"
                           radius="xl"
                           color="eco-primary"
@@ -334,20 +334,22 @@ export function ProjectDetailClient({ id: projectId }: { id?: string }) {
                         {project.owner?.publicId ? (
                           <Link href={`/users/${project.owner.publicId}`} className="no-underline hover:underline">
                             <Text fw={700} size="lg" c="eco-primary">
-                              {project.owner?.firstName} {project.owner?.lastName}
+                              {project.owner?.firstName}
                             </Text>
                           </Link>
                         ) : (
                           <Text fw={700} size="lg">
-                            {project.owner?.firstName} {project.owner?.lastName}
+                            {project.owner?.firstName}
                           </Text>
                         )}
-                        <Group gap={4}>
-                          <IconStar size={16} className="text-yellow-500" />
-                          <Text size="sm" c="dimmed">
-                            {Number(project.owner?.averageRating || 0).toFixed(1)} ({project.owner?.reviewCount} {t('projects.reviews')})
-                          </Text>
-                        </Group>
+                        {(project.owner?.reviewCount ?? 0) > 0 && (
+                          <Group gap={4}>
+                            <IconStar size={16} className="text-yellow-500" />
+                            <Text size="sm" c="dimmed">
+                              {Number(project.owner?.averageRating || 0).toFixed(1)} ({project.owner?.reviewCount} {t('projects.reviews')})
+                            </Text>
+                          </Group>
+                        )}
                       </Stack>
                     </Group>
                   </Paper>

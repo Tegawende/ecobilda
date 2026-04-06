@@ -181,27 +181,30 @@ export function ProfilePublicClient() {
           <Group align="flex-start" gap="xl">
             <Avatar
               src={profile.profilePictureUrl}
-              alt={`${profile.firstName} ${profile.lastName}`}
+              alt={profile.firstName}
               size={100}
               radius="xl"
               className="border-2 border-eco-primary/20"
             >
               {profile.firstName?.[0]}
-              {profile.lastName?.[0]}
             </Avatar>
 
             <Stack gap="xs" className="flex-1">
               <Title order={2}>
-                {profile.firstName} {profile.lastName}
+                {profile.firstName}
               </Title>
 
-              {profile.averageRating > 0 && (
+              {profile.reviewCount > 0 ? (
                 <Group gap="xs">
                   <Rating value={profile.averageRating} readOnly size="sm" color="yellow" />
                   <Text size="sm" c="dimmed">
                     {profile.averageRating.toFixed(1)} · {profile.reviewCount} {reviewLabel}
                   </Text>
                 </Group>
+              ) : (
+                <Text size="sm" c="dimmed">
+                  {t('profile.noReviewsYet')}
+                </Text>
               )}
 
               {profile.address?.city && (
@@ -320,17 +323,16 @@ export function ProfilePublicClient() {
                   <Group align="flex-start" gap="md">
                     <Avatar
                       src={review.writer?.profilePictureUrl}
-                      alt={`${review.writer?.firstName} ${review.writer?.lastName}`}
+                      alt={review.writer?.firstName}
                       size="md"
                       radius="xl"
                     >
                       {review.writer?.firstName?.[0]}
-                      {review.writer?.lastName?.[0]}
                     </Avatar>
                     <Stack gap={4} className="flex-1">
                       <Group justify="space-between" wrap="nowrap">
                         <Text size="sm" fw={600}>
-                          {review.writer?.firstName} {review.writer?.lastName}
+                          {review.writer?.firstName}
                         </Text>
                         <Rating value={review.rating} readOnly size="xs" color="yellow" />
                       </Group>

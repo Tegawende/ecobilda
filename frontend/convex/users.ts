@@ -345,7 +345,6 @@ export const getPublicProfile = query({
             ? {
                 _id: writer._id,
                 firstName: writer.firstName,
-                lastName: writer.lastName,
                 profilePictureUrl: writerPicture,
                 publicId: writer.publicId,
               }
@@ -365,7 +364,6 @@ export const getPublicProfile = query({
       _id: user._id,
       publicId: user.publicId,
       firstName: user.firstName,
-      lastName: user.lastName,
       bio: user.bio,
       profilePictureUrl,
       address,

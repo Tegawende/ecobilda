@@ -14,39 +14,40 @@ interface MessageBubbleProps {
 export function MessageBubble({ message, isOwnMessage, showAvatar = true }: MessageBubbleProps) {
   const isSystem = (message as any).isSystem;
 
-  // System message (acceptance / refusal) — centered banner style
+  // System message (acceptance / refusal) — centered event banner
   if (isSystem) {
     const isAccepted = message.body.startsWith('✓');
     return (
-      <Box display="flex" mb="md" style={{ justifyContent: 'center' }}>
-        <Box
-          px="md"
-          py="xs"
-          style={{
-            backgroundColor: isAccepted
-              ? 'var(--mantine-color-green-0)'
-              : 'var(--mantine-color-red-0)',
-            border: `1px solid var(--mantine-color-${isAccepted ? 'green' : 'red'}-2)`,
-            borderRadius: 20,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            maxWidth: '80%',
-          }}
-        >
-          {isAccepted
-            ? <IconCheck size={14} color="var(--mantine-color-green-6)" style={{ flexShrink: 0 }} />
-            : <IconX size={14} color="var(--mantine-color-red-6)" style={{ flexShrink: 0 }} />
-          }
-          <Text
-            size="xs"
-            fw={500}
-            c={isAccepted ? 'green.7' : 'red.7'}
-            style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+      <Box display="flex" mb="lg" mt="xs" style={{ justifyContent: 'center', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+        {/* Horizontal rule lines */}
+        <Box style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', maxWidth: 420 }}>
+          <Box style={{ flex: 1, height: 1, backgroundColor: isAccepted ? 'var(--mantine-color-green-2)' : 'var(--mantine-color-red-2)' }} />
+          <Box
+            px="md"
+            py={6}
+            style={{
+              backgroundColor: isAccepted ? 'var(--mantine-color-green-0)' : 'var(--mantine-color-red-0)',
+              border: `1.5px solid var(--mantine-color-${isAccepted ? 'green' : 'red'}-3)`,
+              borderRadius: 999,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              flexShrink: 0,
+            }}
           >
-            {message.body.replace(/^[✓✗]\s*/, '')}
-          </Text>
+            {isAccepted
+              ? <IconCheck size={13} color="var(--mantine-color-green-7)" style={{ flexShrink: 0 }} />
+              : <IconX size={13} color="var(--mantine-color-red-7)" style={{ flexShrink: 0 }} />
+            }
+            <Text size="xs" fw={600} c={isAccepted ? 'green.7' : 'red.7'} style={{ whiteSpace: 'nowrap' }}>
+              {message.body.replace(/^[✓✗]\s*/, '')}
+            </Text>
+          </Box>
+          <Box style={{ flex: 1, height: 1, backgroundColor: isAccepted ? 'var(--mantine-color-green-2)' : 'var(--mantine-color-red-2)' }} />
         </Box>
+        <Text size="xs" c="dimmed">
+          {dayjs(message._creationTime).format('D MMM YYYY, h:mm A')}
+        </Text>
       </Box>
     );
   }
