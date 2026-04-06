@@ -1,11 +1,13 @@
+'use client';
+
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import type { Project } from '../../types';
+import type { Project } from '@/types';
 
 // Set Mapbox token from env
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
+mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 
 interface MapBounds {
     north: number;
@@ -16,11 +18,12 @@ interface MapBounds {
 
 interface ProjectsMapProps {
     projects: Project[];
+    allProjects?: Project[];
     selectedProject: Project | null;
     onProjectSelect: (project: Project | null) => void;
     onBoundsChange?: (bounds: MapBounds) => void;
     onMoveStart?: () => void;
-    hoveredProjectId?: number | null;
+    hoveredProjectId?: string | null;
 }
 
 export interface ProjectsMapRef {
@@ -30,16 +33,17 @@ export interface ProjectsMapRef {
 
 export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function ProjectsMap({
     projects,
+    allProjects,
     selectedProject,
     onProjectSelect,
     onBoundsChange,
     onMoveStart,
     hoveredProjectId,
 }, ref) {
-    const { t } = useTranslation();
+    const t = useTranslations();
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<mapboxgl.Map | null>(null);
-    const markersRef = useRef<{ [key: number]: { marker: mapboxgl.Marker; element: HTMLDivElement } }>({});
+    const markersRef = useRef<{ [key: string]: { marker: mapboxgl.Marker; element: HTMLDivElement } }>({});
     const popupRef = useRef<mapboxgl.Popup | null>(null);
     const [isMapLoaded, setIsMapLoaded] = useState(false);
 
@@ -55,6 +59,18 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
         onMoveStartRef.current = onMoveStart;
     }, [onMoveStart]);
 
+    // Refs for latest data
+    const projectsRef = useRef(projects);
+    const allProjectsRef = useRef(allProjects);
+
+    useEffect(() => {
+        projectsRef.current = projects;
+    }, [projects]);
+
+    useEffect(() => {
+        allProjectsRef.current = allProjects;
+    }, [allProjects]);
+
     // Expose flyTo and resetView methods via ref
     useImperativeHandle(ref, () => ({
         flyTo: (lat: number, lng: number) => {
@@ -69,12 +85,14 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
         resetView: () => {
             if (!map.current) return;
 
+            const currentProjects = allProjectsRef.current || projectsRef.current;
+
             // If there are projects, fit bounds to them
-            if (projects.length > 0) {
+            if (currentProjects && currentProjects.length > 0) {
                 const bounds = new mapboxgl.LngLatBounds();
                 let hasValidCoords = false;
 
-                projects.forEach((project) => {
+                currentProjects.forEach((project) => {
                     if (project.address?.latitude && project.address?.longitude) {
                         bounds.extend([project.address.longitude, project.address.latitude]);
                         hasValidCoords = true;
@@ -94,7 +112,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
                 duration: 1500,
             });
         }
-    }), [projects]);
+    }), []);
 
     // Initialize map
     useEffect(() => {
@@ -126,10 +144,8 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
 
         map.current.on('load', () => {
             setIsMapLoaded(true);
-            const bounds = getBounds();
-            if (bounds && onBoundsChangeRef.current) {
-                onBoundsChangeRef.current(bounds);
-            }
+            // Don't call onBoundsChange here — initial bounds are set before projects load,
+            // which causes the list to show 0 results. Let moveend (after fitBounds) set bounds.
         });
 
         // Handle map move/zoom - use refs to get latest callbacks
@@ -169,7 +185,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
             el.className = 'project-marker';
             el.style.cssText = 'cursor: pointer;';
 
-            const isNatB = project.project_type === 'NATB';
+            const isNatB = project.projectType === 'NATB';
             const bgColor = isNatB ? 'var(--color-eco-primary)' : 'var(--color-eco-terracotta)';
 
             // Using SVG icons matching IconHome and IconLeaf from Tabler Icons
@@ -203,7 +219,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
                 markerInner.style.boxShadow = '0 4px 12px rgba(0,0,0,0.35)';
             });
             el.addEventListener('mouseleave', () => {
-                if (selectedProject?.id !== project.id) {
+                if (selectedProject?._id !== project._id) {
                     markerInner.style.transform = 'scale(1)';
                     markerInner.style.boxShadow = '0 2px 8px rgba(0,0,0,0.25)';
                 }
@@ -219,15 +235,20 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
                 showPopup(project);
             });
 
-            markersRef.current[project.id] = { marker, element: el };
+            markersRef.current[project._id] = { marker, element: el };
         });
+    }, [projects, isMapLoaded, onProjectSelect]);
 
-        // Fit bounds to show all markers if there are any
-        if (projects.length > 0) {
+    // Fit bounds when the full project set changes (filter changes, not viewport panning)
+    useEffect(() => {
+        if (!map.current || !isMapLoaded) return;
+
+        const boundsSource = allProjects || projects;
+        if (boundsSource.length > 0) {
             const bounds = new mapboxgl.LngLatBounds();
             let hasValidCoords = false;
 
-            projects.forEach((project) => {
+            boundsSource.forEach((project) => {
                 if (project.address?.latitude && project.address?.longitude) {
                     bounds.extend([project.address.longitude, project.address.latitude]);
                     hasValidCoords = true;
@@ -238,7 +259,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
                 map.current.fitBounds(bounds, { padding: 60, maxZoom: 12 });
             }
         }
-    }, [projects, isMapLoaded, onProjectSelect]);
+    }, [allProjects, isMapLoaded]);
 
     // Show popup for project
     const showPopup = (project: Project) => {
@@ -249,8 +270,8 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
             popupRef.current.remove();
         }
 
-        const images = project.images.length > 0
-            ? project.images.map(img => img.image)
+        const images = project.images && project.images.length > 0
+            ? project.images.map(img => img.url || '')
             : ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400'];
 
         // Preload all images for instant switching
@@ -259,7 +280,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
             img.src = src;
         });
 
-        const isNatB = project.project_type === 'NATB';
+        const isNatB = project.projectType === 'NATB';
         const badgeColor = isNatB ? 'var(--color-eco-primary)' : 'var(--color-eco-terracotta)';
         const badgeText = isNatB ? t('projects.naturalBuilding') : t('projects.permaculture');
 
@@ -270,19 +291,19 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
 
         // Amenity icons
         const amenities = [];
-        if (project.internet_provided) {
+        if (project.internetProvided) {
             amenities.push(`<span style="display:inline-flex;align-items:center;gap:2px;padding:2px 6px;background:#f3f4f6;border-radius:9999px;font-size:10px;color:#4b5563;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 18h.01"/><path d="M9.172 15.172a4 4 0 0 1 5.656 0"/><path d="M6.343 12.343a8 8 0 0 1 11.314 0"/><path d="M3.515 9.515a12 12 0 0 1 16.97 0"/></svg>
                 ${t('projects.wifi')}
             </span>`);
         }
-        if (project.family_friendly) {
+        if (project.familyFriendly) {
             amenities.push(`<span style="display:inline-flex;align-items:center;gap:2px;padding:2px 6px;background:#f3f4f6;border-radius:9999px;font-size:10px;color:#4b5563;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="20" rx="10" ry="3"/><circle cx="12" cy="14" r="4"/><circle cx="12" cy="6" r="2"/></svg>
                 ${t('projects.familyFriendly')}
             </span>`);
         }
-        if (project.pets_allowed) {
+        if (project.petsAllowed) {
             amenities.push(`<span style="display:inline-flex;align-items:center;gap:2px;padding:2px 6px;background:#f3f4f6;border-radius:9999px;font-size:10px;color:#4b5563;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 16c-3 0-5-2-5-5c0-4 5-9 5-9s5 5 5 9c0 3-2 5-5 5z"/><path d="M16 16c-1.5 0-3-1-3-2.5"/></svg>
                 ${t('projects.petsAllowed')}
@@ -294,7 +315,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
             `<span style="width:${idx === 0 ? '8px' : '6px'};height:6px;border-radius:9999px;background:${idx === 0 ? 'white' : 'rgba(255,255,255,0.5)'};transition:all 0.2s;" data-dot="${idx}"></span>`
         ).join('');
 
-        const popupId = `popup-${project.id}-${Date.now()}`;
+        const popupId = `popup-${project._id}-${Date.now()}`;
 
         const popup = new mapboxgl.Popup({
             closeButton: false,
@@ -360,25 +381,25 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
             <div style="display: flex; gap: 16px; font-size: 12px; color: #666; margin-bottom: 10px;">
               <span style="display: flex; align-items: center; gap: 4px;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                ${project.max_helpers} ${t('projects.max')}
+                ${project.maxHelpers} ${t('projects.max')}
               </span>
               <span style="display: flex; align-items: center; gap: 4px;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                ${project.hours_per_day}${t('projects.hoursPerDayShort')}
+                ${project.hoursPerDay}${t('projects.hoursPerDayShort')}
               </span>
             </div>
             
             ${amenities.length > 0 ? `<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px;">${amenities.join('')}</div>` : ''}
             
             <a 
-              href="/projects/${project.id}" 
+              href="/projects/${project._id}" 
               target="_blank"
               rel="noopener noreferrer"
               style="display: block; padding: 10px 16px; background: var(--color-eco-primary); color: white; text-align: center; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 600; transition: background 0.2s;"
               onmouseover="this.style.background='var(--color-eco-primaryDark)'"
               onmouseout="this.style.background='var(--color-eco-primary)'"
             >
-              ${t('projects.viewProject') || 'Voir le projet'}
+              ${t('projects.viewProject')}
             </a>
           </div>
         </div>
@@ -475,7 +496,7 @@ export const ProjectsMap = forwardRef<ProjectsMapRef, ProjectsMapProps>(function
         Object.entries(markersRef.current).forEach(([id, { element }]) => {
             const markerInner = element.querySelector('.marker-inner') as HTMLElement;
             if (markerInner) {
-                if (parseInt(id) === hoveredProjectId) {
+                if (id === hoveredProjectId) {
                     markerInner.style.transform = 'scale(1.25)';
                     markerInner.style.boxShadow = '0 4px 16px rgba(0,0,0,0.4)';
                     markerInner.style.zIndex = '1000';

@@ -1,96 +1,112 @@
 // User types
 export interface User {
-  id: number;
+  _id: string;
   email: string;
-  first_name: string;
-  last_name: string;
-  date_of_birth: string;
-  gender: 'M' | 'F' | 'O' | 'P';
-  bio: string;
-  profile_picture: string | null;
-  address: Address;
-  languages: Language[];
-  skills: Skill[];
-  email_notifications: boolean;
-  newsletter: boolean;
-  in_app_notifications: boolean;
-  notification_language: 'en' | 'fr' | 'es' | 'de';
-  average_rating: number;
-  review_count: number;
+  firstName: string;
+  lastName: string;
+  dateOfBirth?: string;
+  gender?: 'M' | 'F' | 'O' | 'P';
+  bio?: string;
+  profilePicture?: string | null;
+  profilePictureUrl?: string | null;
+  address?: Address | null;
+  languages?: Language[];
+  skills?: Skill[];
+  emailNotifications?: boolean;
+  newsletter?: boolean;
+  inAppNotifications?: boolean;
+  notificationLanguage?: 'en' | 'fr' | 'es' | 'de';
+  averageRating: number;
+  reviewCount: number;
+  hasPassword?: boolean;
+  isStaff?: boolean;
+  isActive?: boolean;
+  _creationTime?: number;
+  lastLoginAt?: number;
 }
 
 // Address types
 export interface Address {
-  id: number;
-  city: string;
-  street: string;
-  street_number: string;
-  postal_code: string;
-  country: Country;
-  latitude: number;
-  longitude: number;
-  formatted_address: string;
+  _id?: string;
+  city?: string;
+  street?: string;
+  streetNumber?: string;
+  postalCode?: string;
+  country?: Country | null;
+  countryId?: string;
+  latitude?: number;
+  longitude?: number;
+  formattedAddress?: string;
 }
 
 export interface Country {
+  _id?: string;
   code: string;
   name: string;
 }
 
 export interface Language {
+  _id?: string;
   code: string;
   name: string;
 }
 
 // Skill types
 export interface Skill {
+  _id?: string;
   code: string;
   category: 'PERM' | 'NATB';
-  display_name_en: string;
-  display_name_fr: string;
-  display_name_es: string;
-  display_name_de: string;
-  icon: string;
+  displayNameEn: string;
+  displayNameFr: string;
+  displayNameEs: string;
+  displayNameDe: string;
+  displayNameNl?: string;
+  displayNamePt?: string;
+  icon?: string;
 }
 
 // Project types
 export interface Project {
-  id: number;
-  owner: User;
+  _id: string;
+  owner?: User | null;
+  ownerId?: string;
   title: string;
   description: string;
-  project_type: 'PERM' | 'NATB';
-  address: Address;
-  hours_per_day: number;
-  days_per_week: number;
-  max_helpers: number;
-  accommodation_details: string;
-  food_details: string;
-  internet_provided: boolean;
-  family_friendly: boolean;
-  pets_allowed: boolean;
-  smoking_allowed: boolean;
-  is_free: boolean;
-  skills: Skill[];
-  is_active: boolean;
-  flagged_count: number;
-  created_at: string;
-  updated_at: string;
-  images: ProjectImage[];
-  availabilities: Availability[];
+  projectType: 'PERM' | 'NATB';
+  status: 'PENDING' | 'ACTIVE' | 'REJECTED';
+  address?: Address | null;
+  addressId?: string;
+  hoursPerDay: number;
+  daysPerWeek: number;
+  maxHelpers: number;
+  accommodationDetails?: string;
+  foodDetails?: string;
+  internetProvided: boolean;
+  familyFriendly: boolean;
+  petsAllowed: boolean;
+  smokingAllowed: boolean;
+  skills?: Skill[];
+  skillIds?: string[];
+  isActive: boolean;
+  flaggedCount: number;
+  _creationTime?: number;
+  updatedAt?: number;
+  validatedAt?: number | null;
+  images?: ProjectImage[];
+  availabilities?: Availability[];
 }
 
 export interface ProjectImage {
-  id: number;
-  project: number;
-  image: string;
-  is_cover: boolean;
+  _id: string;
+  projectId: string;
+  storageId: string;
   order: number;
+  url?: string; // Resolved URL from Convex storage
 }
 
 export interface Availability {
-  id: number;
-  project: number;
+  _id?: string;
+  projectId: string;
   year: number;
   january: boolean;
   february: boolean;
@@ -108,50 +124,96 @@ export interface Availability {
 
 // Messaging types
 export interface Conversation {
-  id: number;
-  user1: User;
-  user2: User;
-  last_message_text: string;
-  last_message_at: string;
-  unread_count_user1: number;
-  unread_count_user2: number;
-  user1_muted: boolean;
-  user2_muted: boolean;
+  _id: string;
+  user1Id?: string;
+  user2Id?: string;
+  otherUser?: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    profilePicture?: string | null;
+    profilePictureUrl?: string | null;
+  } | null;
+  participationRequestId?: string;
+  lastMessageText?: string;
+  lastMessageAt?: number;
+  unreadCount?: number;
+  isMuted?: boolean;
+  _creationTime?: number;
 }
 
 export interface Message {
-  id: number;
-  conversation: number;
-  sender: User;
+  _id: string;
+  conversationId: string;
+  sender?: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    profilePicture?: string | null;
+    profilePictureUrl?: string | null;
+  } | null;
+  senderId?: string;
   body: string;
-  created_at: string;
+  _creationTime?: number;
 }
 
 // Review types
 export interface Review {
-  id: number;
-  writer: User;
-  receiver: User;
+  _id: string;
+  writer?: User | null;
+  writerId?: string;
+  receiver?: User | null;
+  receiverId?: string;
   rating: number;
   feedback: string;
-  response: string;
-  response_date: string | null;
-  created_at: string;
-  updated_at: string;
+  response?: string;
+  responseDate?: number | null;
+  isPublished?: boolean;
+  _creationTime?: number;
+  updatedAt?: number;
 }
 
 // Notification types
 export interface Notification {
-  id: number;
-  recipient: number;
+  _id: string;
+  recipientId: string;
   type: 'REVIEW' | 'MESSAGE' | 'ADMIN' | 'PROJECT' | 'SYSTEM';
   title: string;
   message: string;
-  link_url: string;
-  is_read: boolean;
-  read_at: string | null;
-  created_at: string;
-  sender_profile_picture?: string;
+  linkUrl?: string;
+  isRead: boolean;
+  readAt?: number | null;
+  _creationTime?: number;
+}
+
+// Participation types
+export interface ParticipationRequest {
+  _id: string;
+  volunteerId: string;
+  projectId: string;
+  project?: {
+    _id: string;
+    title: string;
+    projectType: string;
+    address?: Address | null;
+    ownerId?: string;
+  } | null;
+  volunteer?: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    profilePicture?: string | null;
+    profilePictureUrl?: string | null;
+    averageRating?: number;
+    reviewCount?: number;
+  } | null;
+  status: 'PENDING' | 'ACCEPTED' | 'REFUSED' | 'CANCELLED' | 'EXPIRED';
+  motivation: string;
+  proposedStartDate?: string;
+  proposedEndDate?: string;
+  hostResponseMessage?: string;
+  respondedAt?: number;
+  _creationTime?: number;
 }
 
 // Auth types
@@ -163,9 +225,11 @@ export interface LoginCredentials {
 export interface RegisterData {
   email: string;
   password: string;
-  first_name: string;
-  last_name: string;
-  date_of_birth: string;
+  passwordConfirm: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  locale?: string;
 }
 
 export interface AuthTokens {
@@ -173,15 +237,8 @@ export interface AuthTokens {
   refresh: string;
 }
 
-// API Response types
-export interface PaginatedResponse<T> {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: T[];
-}
-
-export interface ApiError {
-  detail?: string;
-  [key: string]: any;
+// Helper: get skill display name for current locale
+export function getSkillDisplayName(skill: Skill, locale: string): string {
+  const key = `displayName${locale.charAt(0).toUpperCase() + locale.slice(1)}` as keyof Skill;
+  return (skill[key] as string) || skill.displayNameEn;
 }

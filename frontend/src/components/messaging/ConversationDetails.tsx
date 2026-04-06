@@ -1,5 +1,10 @@
+'use client';
+
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useTranslations, useLocale } from 'next-intl';
+import { useRouter } from '@/i18n/navigation';
+import { getSkillIcon } from '@/lib/skillIcons';
+import { getSkillDisplayName } from '@/types';
 import {
   Box,
   Stack,
@@ -17,13 +22,13 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import { modals } from '@mantine/modals';
-import { messagingService } from '../../services/messaging';
-import type { Conversation } from '../../types';
+import { messagingService } from '@/services/messaging';
+import type { Conversation } from '@/types';
 import dayjs from 'dayjs';
 
 interface ConversationDetailsProps {
   conversation: Conversation;
-  currentUserId: number;
+  currentUserId: string;
   onMuteToggle?: () => void;
   onDelete?: () => void;
 }
@@ -34,24 +39,20 @@ export function ConversationDetails({
   onMuteToggle,
   onDelete,
 }: ConversationDetailsProps) {
-  const navigate = useNavigate();
+  const t = useTranslations();
+  const router = useRouter();
+  const locale = useLocale();
   const [isTogglingMute, setIsTogglingMute] = useState(false);
 
   // Determine the other user
-  const otherUser =
-    currentUserId === conversation.user1.id
-      ? conversation.user2
-      : conversation.user1;
+  const otherUser = conversation.otherUser;
 
-  const isMuted =
-    currentUserId === conversation.user1.id
-      ? conversation.user1_muted
-      : conversation.user2_muted;
+  const isMuted = conversation.isMuted ?? false;
 
   const handleToggleMute = async () => {
     setIsTogglingMute(true);
     try {
-      await messagingService.toggleMute(conversation.id);
+      await messagingService.toggleMute(conversation._id);
       if (onMuteToggle) {
         onMuteToggle();
       }
@@ -64,21 +65,21 @@ export function ConversationDetails({
 
   const handleDelete = () => {
     modals.openConfirmModal({
-      title: 'Delete conversation',
+      title: t('messaging.deleteConfirm'),
       children: (
         <Text size="sm">
-          Are you sure you want to delete this conversation? This action cannot be undone.
+          {t('messaging.deleteConfirmText')}
         </Text>
       ),
-      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      labels: { confirm: t('common.delete'), cancel: t('common.cancel') },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
         try {
-          await messagingService.deleteConversation(conversation.id);
+          await messagingService.deleteConversation(conversation._id);
           if (onDelete) {
             onDelete();
           }
-          navigate('/messages');
+          router.push('/messages');
         } catch (error) {
           console.error('Failed to delete conversation:', error);
         }
@@ -99,7 +100,7 @@ export function ConversationDetails({
       {/* Header */}
       <Box p="lg" style={{ borderBottom: '1px solid #e0e0e0' }}>
         <Text fw={700} size="lg">
-          Details
+          {t('messaging.details')}
         </Text>
       </Box>
 
@@ -107,26 +108,26 @@ export function ConversationDetails({
       <Box p="lg" style={{ textAlign: 'center', borderBottom: '1px solid #e0e0e0' }}>
         <Stack align="center" gap="md">
           <Avatar
-            src={otherUser.profile_picture}
+            src={otherUser?.profilePictureUrl || otherUser?.profilePicture}
             size={120}
             radius="xl"
             color="blue"
           >
-            {!otherUser.profile_picture &&
-              `${otherUser.first_name[0]}${otherUser.last_name[0]}`}
+            {!otherUser?.profilePicture &&
+              `${otherUser?.firstName?.[0] ?? ''}${otherUser?.lastName?.[0] ?? ''}`}
           </Avatar>
 
           <Box>
             <Text fw={700} size="lg">
-              {otherUser.first_name} {otherUser.last_name}
+              {otherUser?.firstName} {otherUser?.lastName}
             </Text>
 
-            {otherUser.address && (
+            {(otherUser as any)?.address && (
               <Group justify="center" gap="xs" mt="xs">
                 <IconMapPin size={14} color="var(--mantine-color-gray-6)" />
                 <Text size="sm" c="dimmed">
-                  {otherUser.address.city}
-                  {otherUser.address.country && `, ${otherUser.address.country.name}`}
+                  {(otherUser as any).address.city}
+                  {(otherUser as any).address.country && `, ${(otherUser as any).address.country.name}`}
                 </Text>
               </Group>
             )}
@@ -134,10 +135,10 @@ export function ConversationDetails({
 
           <Button
             variant="outline"
-            onClick={() => navigate(`/profile/${otherUser.id}`)}
+            onClick={() => router.push(`/profile/${otherUser?._id}`)}
             fullWidth
           >
-            View full profile
+            {t('messaging.viewFullProfile')}
           </Button>
         </Stack>
       </Box>
@@ -147,12 +148,12 @@ export function ConversationDetails({
         <Stack gap="md">
           <Box>
             <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb="xs">
-              About
+              {t('messaging.about')}
             </Text>
 
-            {otherUser.bio && (
+            {(otherUser as any)?.bio && (
               <Text size="sm" mb="sm">
-                {otherUser.bio}
+                {(otherUser as any).bio}
               </Text>
             )}
 
@@ -160,27 +161,30 @@ export function ConversationDetails({
               <Group gap="xs">
                 <IconCalendar size={16} color="var(--mantine-color-gray-6)" />
                 <Text size="sm" c="dimmed">
-                  Member since {dayjs().format('MMM YYYY')}
+                  {t('messaging.memberSince', { date: dayjs().format('MMM YYYY') })}
                 </Text>
               </Group>
             </Stack>
           </Box>
 
           {/* Skills */}
-          {otherUser.skills && otherUser.skills.length > 0 && (
+          {(otherUser as any)?.skills && (otherUser as any).skills.length > 0 && (
             <Box>
               <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb="xs">
-                Skills
+                {t('messaging.skills')}
               </Text>
               <Group gap="xs">
-                {otherUser.skills.slice(0, 5).map((skill, index) => (
-                  <Badge key={skill.code || index} variant="light" size="sm">
-                    {skill.display_name_en || skill.code}
-                  </Badge>
-                ))}
-                {otherUser.skills.length > 5 && (
+                {(otherUser as any).skills.slice(0, 5).map((skill: any, index: number) => {
+                  const SkillIcon = getSkillIcon(skill.icon);
+                  return (
+                    <Badge key={skill.code || index} variant="light" size="sm" leftSection={<SkillIcon size={12} />}>
+                      {getSkillDisplayName(skill, locale)}
+                    </Badge>
+                  );
+                })}
+                {(otherUser as any).skills.length > 5 && (
                   <Badge variant="light" size="sm" c="dimmed">
-                    +{otherUser.skills.length - 5} more
+                    {t('messaging.more', { count: (otherUser as any).skills.length - 5 })}
                   </Badge>
                 )}
               </Group>
@@ -188,13 +192,13 @@ export function ConversationDetails({
           )}
 
           {/* Languages */}
-          {otherUser.languages && otherUser.languages.length > 0 && (
+          {(otherUser as any)?.languages && (otherUser as any).languages.length > 0 && (
             <Box>
               <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb="xs">
-                Languages
+                {t('messaging.languages')}
               </Text>
               <Group gap="xs">
-                {otherUser.languages.map((language, index) => (
+                {(otherUser as any).languages.map((language: any, index: number) => (
                   <Badge key={language.code || index} variant="outline" size="sm">
                     {language.name}
                   </Badge>
@@ -217,7 +221,7 @@ export function ConversationDetails({
             loading={isTogglingMute}
             fullWidth
           >
-            {isMuted ? 'Unmute conversation' : 'Mute conversation'}
+            {isMuted ? t('messaging.unmuteConversation') : t('messaging.muteConversation')}
           </Button>
 
           <Button
@@ -227,7 +231,7 @@ export function ConversationDetails({
             onClick={handleDelete}
             fullWidth
           >
-            Delete conversation
+            {t('messaging.deleteConversation')}
           </Button>
         </Stack>
       </Box>

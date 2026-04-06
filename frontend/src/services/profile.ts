@@ -1,70 +1,94 @@
-import api from './api';
+import { convexClient, getSessionToken } from "@/lib/convexClient";
+import { api } from "../../convex/_generated/api";
 import type { User } from '../types';
 
 export interface UpdateProfileData {
-  first_name?: string;
-  last_name?: string;
+  firstName?: string;
+  lastName?: string;
   bio?: string;
-  date_of_birth?: string;
-  phone_number?: string;
-  profile_picture?: File;
-  languages?: number[]; // Language IDs
-  skills?: string[]; // Skill codes
+  dateOfBirth?: string;
+  profilePicture?: File;
+  languages?: string[];
+  languageCodes?: string[];
+  skillCodes?: string[];
+  city?: string;
+  postalCode?: string;
+  countryCode?: string;
   address?: {
     city?: string;
-    postal_code?: string;
-    country_code?: string;
+    postalCode?: string;
+    countryCode?: string;
   };
 }
 
 export const profileService = {
-  // Get current user's profile
   async getProfile(): Promise<User> {
-    const response = await api.get('/profile/');
-    return response.data;
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    const user = await convexClient.query(api.auth.me, { token });
+    if (!user) throw new Error("Not authenticated");
+    return user as any;
   },
 
-  // Update current user's profile
   async updateProfile(data: UpdateProfileData): Promise<User> {
-    const formData = new FormData();
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
 
-    // Add all non-file fields
-    Object.entries(data).forEach(([key, value]) => {
-      if (key === 'profile_picture' && value instanceof File) {
-        formData.append('profile_picture', value);
-      } else if (key === 'address' && typeof value === 'object') {
-        // Flatten address object
-        Object.entries(value).forEach(([addrKey, addrValue]) => {
-          if (addrValue !== undefined) {
-            formData.append(`address.${addrKey}`, String(addrValue));
-          }
-        });
-      } else if (Array.isArray(value)) {
-        // Handle arrays (languages, skills)
-        value.forEach((item) => formData.append(key, String(item)));
-      } else if (value !== undefined) {
-        formData.append(key, String(value));
-      }
+    // Handle profile picture upload if provided
+    if (data.profilePicture) {
+      await this.uploadProfilePicture(data.profilePicture);
+    }
+
+    // Resolve address fields (accept both flat and nested)
+    const city = data.city ?? data.address?.city;
+    const postalCode = data.postalCode ?? data.address?.postalCode;
+    const countryCode = data.countryCode ?? data.address?.countryCode;
+
+    await convexClient.mutation(api.users.updateProfile, {
+      token,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      bio: data.bio,
+      dateOfBirth: data.dateOfBirth,
+      skillCodes: data.skillCodes,
+      languageCodes: data.languageCodes ?? data.languages,
+      city,
+      postalCode,
+      countryCode,
     });
 
-    const response = await api.patch('/profile/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data;
+    return await this.getProfile();
   },
 
-  // Upload/update profile picture
-  async uploadProfilePicture(file: File): Promise<User> {
-    const formData = new FormData();
-    formData.append('profile_picture', file);
+  async updateSettings(data: {
+    emailNotifications?: boolean;
+    newsletter?: boolean;
+    inAppNotifications?: boolean;
+    notificationLanguage?: string;
+  }): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.users.updateSettings, { token, ...data });
+  },
 
-    const response = await api.patch('/profile/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+  async uploadProfilePicture(file: File): Promise<User> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+
+    // 1. Get upload URL
+    const uploadUrl = await convexClient.mutation(api.projects.generateUploadUrl, { token });
+
+    // 2. Upload file to Convex storage
+    const result = await fetch(uploadUrl, {
+      method: "POST",
+      headers: { "Content-Type": file.type },
+      body: file,
     });
-    return response.data;
+    const { storageId } = await result.json();
+
+    // 3. Save storage ID to user profile
+    await convexClient.mutation(api.users.updateProfilePicture, { token, storageId });
+
+    return await this.getProfile();
   },
 };

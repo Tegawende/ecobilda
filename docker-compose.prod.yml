@@ -1,0 +1,65 @@
+# ---- Production Docker Compose ----
+# Backend: Convex self-hosted (see docker-compose.yml for dev Convex)
+# Frontend: Next.js
+
+services:
+  # PostgreSQL Database (for Convex backend storage)
+  db:
+    image: postgres:15-alpine
+    container_name: ecobilda-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-ecobilda}
+      POSTGRES_USER: ${DB_USER:-ecobilda}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-ecobilda}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  # Convex Backend (self-hosted)
+  convex-backend:
+    image: convex-local-backend
+    container_name: ecobilda-convex
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3210:3210"
+    environment:
+      - CONVEX_BACKEND_DB_URL=postgres://${DB_USER:-ecobilda}:${DB_PASSWORD}@db:5432/${DB_NAME:-ecobilda}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_CONVEX_URL: ${NEXT_PUBLIC_CONVEX_URL:-http://convex-backend:3210}
+        NEXT_PUBLIC_MAPBOX_TOKEN: ${NEXT_PUBLIC_MAPBOX_TOKEN}
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
+        NEXT_PUBLIC_APP_NAME: Ecobilda
+        NEXT_PUBLIC_DEFAULT_LANGUAGE: en
+    container_name: ecobilda-frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - convex-backend
+    networks:
+      - internal
+
+volumes:
+  postgres_data:
+
+networks:
+  internal:
+    driver: bridge

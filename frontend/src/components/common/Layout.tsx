@@ -1,8 +1,10 @@
+'use client';
+
 import type { ReactNode } from 'react';
 import { AppShell, Box } from '@mantine/core';
-import { useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
+import { usePathname } from '@/i18n/navigation';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 
@@ -12,9 +14,9 @@ interface LayoutProps {
 }
 
 export function Layout({ children, hideFooter = false }: LayoutProps) {
-  const { t } = useTranslation();
-  const location = useLocation();
-  const isHomePage = location.pathname === '/';
+  const t = useTranslations();
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -36,10 +38,7 @@ export function Layout({ children, hideFooter = false }: LayoutProps) {
 
   return (
     <>
-      {/* Skip link for keyboard navigation */}
-      <a href="#main-content" className="skip-link">
-        {t('a11y.skipToContent', { defaultValue: 'Skip to main content' })}
-      </a>
+      {/* Skip link removed - was causing visual issues */}
       <AppShell
         header={{ height: isHomePage ? 0 : 64 }}
       >
@@ -53,7 +52,7 @@ export function Layout({ children, hideFooter = false }: LayoutProps) {
             right: 0,
             zIndex: 100,
             width: '100%',
-            minHeight: '64px', // Force height for content visibility
+            minHeight: '64px',
             transition: 'background-color 0.3s ease, border-bottom 0.3s ease',
           }}
         >

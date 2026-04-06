@@ -1,7 +1,9 @@
+'use client';
+
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { Burger, Container, Group, Menu, Avatar, Drawer, Stack, Divider, Anchor, Button } from '@mantine/core';
+import { useTranslations } from 'next-intl';
+import { Link, usePathname, useRouter } from '@/i18n/navigation';
+import { Burger, Group, Menu, Avatar, Drawer, Stack, Divider, Anchor, Button, Container } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconUser,
@@ -12,37 +14,19 @@ import {
   IconFolder,
   IconLogout,
 } from '@tabler/icons-react';
-import { isAuthenticated, clearAuthTokens } from '../../services/api';
-import { profileService } from '../../services/profile';
+import { useAuth } from '@/providers/AuthProvider';
 import { NotificationBell } from './NotificationBell';
-import classes from './Navbar.module.css';
-import type { User } from '../../types';
-import logger from '../../utils/logger';
-
-const links: Array<{ link: string; label: string }> = [];
 
 export function Navbar() {
-  const { t } = useTranslation();
-  const location = useLocation();
-  const isLoggedIn = isAuthenticated();
+  const t = useTranslations();
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user, isAuthenticated, logout } = useAuth();
   const [opened, { toggle, close }] = useDisclosure(false);
-  const [active, setActive] = useState('');
   const [scrolled, setScrolled] = useState(false);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   // Check if we're on the home page
-  const isHomePage = location.pathname === '/';
-
-  // Fetch user profile for avatar
-  useEffect(() => {
-    if (isLoggedIn) {
-      profileService.getProfile()
-        .then(user => setCurrentUser(user))
-        .catch(err => logger.error('Failed to fetch profile:', err));
-    } else {
-      setCurrentUser(null);
-    }
-  }, [isLoggedIn]);
+  const isHomePage = pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,7 +35,6 @@ export function Navbar() {
 
     if (isHomePage) {
       window.addEventListener('scroll', handleScroll);
-      // Initialize scroll state
       handleScroll();
       return () => window.removeEventListener('scroll', handleScroll);
     } else {
@@ -60,34 +43,11 @@ export function Navbar() {
   }, [isHomePage]);
 
   const handleLogout = () => {
-    // For now, just clear local tokens without API call (mock mode)
-    // TODO: Re-enable API call when backend is ready
-    clearAuthTokens();
-    setCurrentUser(null);
-    // Force redirect to landing page using window.location to ensure full page reload
-    window.location.href = '/';
+    logout();
   };
 
   // Transparent only on Home Page AND when not scrolled
   const isTransparent = isHomePage && !scrolled;
-
-  const items = links.map((link) => (
-    <Link
-      key={link.label}
-      to={link.link}
-      className={classes.link}
-      data-active={active === link.link || undefined}
-      onClick={() => {
-        setActive(link.link);
-        close();
-      }}
-      style={{
-        color: isTransparent ? 'white' : undefined,
-      }}
-    >
-      {link.label}
-    </Link>
-  ));
 
   return (
     <div
@@ -96,34 +56,29 @@ export function Navbar() {
         : 'bg-white/95 backdrop-blur-md shadow-sm'
         }`}
     >
-      <Container size="xl" className="h-full">
-        <div className="flex justify-between items-center h-full px-4 sm:px-0">
+      <Container size="xl" h="100%" px={{ base: 'xs', sm: 'sm', lg: 'lg' }}>
+        <Group justify="space-between" h="100%">
           <Link
-            to={isLoggedIn ? '/projects' : '/'}
+            href={isAuthenticated ? '/projects' : '/'}
             className="flex items-center no-underline gap-2 z-50 relative"
           >
-            {/* Logo handling: White logo on transparent bg. Invert color (black/dark) on white bg */}
             <img
-              src={isTransparent ? "/images/logo-white.png" : "/images/logo-black.png"}
+              src="/images/logo-white.png"
               alt="Ecobilda"
               className="h-14 w-auto object-contain transition-all duration-300"
             />
           </Link>
 
-          <Group gap={5} visibleFrom="xs">
-            {items}
-          </Group>
-
           <Group gap="xs">
             {/* "Browse Projects" button - visible to all */}
             <Link
-              to="/projects"
-              className={`text-sm font-semibold px-6 py-2.5 rounded-full transition-all hidden sm:block shadow-lg hover:-translate-y-0.5 bg-eco-primary text-white hover:bg-eco-primaryDark shadow-eco-primary/20 border border-transparent ${location.pathname === '/projects' ? 'ring-2 ring-eco-primary ring-offset-2' : ''}`}
+              href="/projects"
+              className="text-sm font-semibold px-6 py-2.5 rounded-full transition-all hidden sm:block shadow-lg hover:-translate-y-0.5 bg-eco-primary text-white hover:bg-eco-primaryDark shadow-eco-primary/20 border border-transparent"
             >
-              {t('home.hero.browseProjects') || "Parcourir les projets"}
+              {t('home.hero.browseProjects')}
             </Link>
 
-            {isLoggedIn ? (
+            {isAuthenticated ? (
               <>
                 <NotificationBell />
                 {/* Hide profile menu on mobile - use hamburger menu instead */}
@@ -131,39 +86,38 @@ export function Navbar() {
                   <Menu shadow="md" width={220} position="bottom-end">
                     <Menu.Target>
                       <Avatar
-                        src={currentUser?.profile_picture || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face'}
-                        color="eco-primary"
+                        src={user?.profilePictureUrl || user?.profilePicture || null}
                         radius="xl"
-                        size="md"
+                        size={40}
                         style={{ cursor: 'pointer', border: '2px solid transparent' }}
-                        className="bg-eco-primary text-white hover:ring-2 hover:ring-eco-primary/50 transition-all"
+                        className="hover:ring-2 hover:ring-eco-primary/50 transition-all"
                       >
-                        {!currentUser?.profile_picture && <IconUser size={20} />}
+                        <IconUser size={20} />
                       </Avatar>
                     </Menu.Target>
 
                     <Menu.Dropdown>
-                      <Menu.Item component={Link} to="/favorites" leftSection={<IconHeart size={16} />}>
+                      <Menu.Item component={Link} href="/favorites" leftSection={<IconHeart size={16} />}>
                         {t('nav.userMenu.favorites')}
                       </Menu.Item>
 
-                      <Menu.Item component={Link} to="/my-projects" leftSection={<IconFolder size={16} />}>
+                      <Menu.Item component={Link} href="/my-projects" leftSection={<IconFolder size={16} />}>
                         {t('nav.userMenu.myProjects')}
                       </Menu.Item>
 
-                      <Menu.Item component={Link} to="/participations" leftSection={<IconCompass size={16} />}>
+                      <Menu.Item component={Link} href="/participations" leftSection={<IconCompass size={16} />}>
                         {t('nav.userMenu.participations')}
                       </Menu.Item>
 
-                      <Menu.Item component={Link} to="/messages" leftSection={<IconMail size={16} />}>
+                      <Menu.Item component={Link} href="/messages" leftSection={<IconMail size={16} />}>
                         {t('nav.userMenu.messages')}
                       </Menu.Item>
 
-                      <Menu.Item component={Link} to="/profile" leftSection={<IconUser size={16} />}>
+                      <Menu.Item component={Link} href="/profile" leftSection={<IconUser size={16} />}>
                         {t('nav.userMenu.profile')}
                       </Menu.Item>
 
-                      <Menu.Item component={Link} to="/settings" leftSection={<IconSettings size={16} />}>
+                      <Menu.Item component={Link} href="/settings" leftSection={<IconSettings size={16} />}>
                         {t('nav.userMenu.settings')}
                       </Menu.Item>
 
@@ -179,8 +133,11 @@ export function Navbar() {
             ) : (
               <>
                 <Link
-                  to="/login"
-                  className={`text-sm font-semibold px-6 py-2.5 rounded-full transition-all hidden sm:block shadow-lg hover:-translate-y-0.5 bg-eco-primary text-white hover:bg-eco-primaryDark shadow-eco-primary/20 border border-transparent ${location.pathname === '/login' || location.pathname === '/register' ? 'ring-2 ring-eco-primary ring-offset-2' : ''}`}
+                  href="/login"
+                  className="text-sm font-semibold px-6 py-2.5 rounded-full transition-all hidden sm:block shadow-lg hover:-translate-y-0.5 text-white border border-transparent"
+                  style={{ backgroundColor: '#677DA3' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#4d6080')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#677DA3')}
                 >
                   {t('common.login')}
                 </Link>
@@ -192,24 +149,22 @@ export function Navbar() {
               <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" color={isTransparent ? 'white' : 'black'} />
             </div>
           </Group>
-        </div>
+        </Group>
       </Container>
 
-      {/* Mobile Drawer - Simplified: Only navbar items, not footer items */}
+      {/* Mobile Drawer */}
       <Drawer opened={opened} onClose={close} title="" withCloseButton={false} padding="md" size="md">
         <Stack gap="md">
-          <div className="flex justify-between items-center mb-6">
-            <Link to="/" onClick={close}>
-              <img src="/images/logo-black.png" alt="Ecobilda" className="h-10 w-auto object-contain" />
+          <Group justify="space-between" mb="lg">
+            <Link href="/" onClick={close}>
+              <img src="/images/logo-white.png" alt="Ecobilda" className="h-10 w-auto object-contain" />
             </Link>
             <Burger opened={opened} onClick={toggle} size="sm" />
-          </div>
+          </Group>
 
-          {/* Browse Projects - always visible */}
-          {/* Browse Projects - always visible */}
           <Button
             component={Link}
-            to="/projects"
+            href="/projects"
             variant="filled"
             color="eco-primary"
             size="lg"
@@ -221,41 +176,40 @@ export function Navbar() {
             {t('home.hero.browseProjects')}
           </Button>
 
-          {isLoggedIn ? (
+          {isAuthenticated ? (
             <>
-              {/* Only show navbar user menu items, not footer links */}
               <Stack gap="xs">
-                <Anchor component={Link} to="/favorites" onClick={close} className="py-2" c="black">
+                <Anchor component={Link} href="/favorites" onClick={close} className="py-2" c="black">
                   <Group gap="xs">
                     <IconHeart size={20} color="black" />
                     {t('nav.userMenu.favorites')}
                   </Group>
                 </Anchor>
-                <Anchor component={Link} to="/my-projects" onClick={close} className="py-2" c="black">
+                <Anchor component={Link} href="/my-projects" onClick={close} className="py-2" c="black">
                   <Group gap="xs">
                     <IconFolder size={20} color="black" />
                     {t('nav.userMenu.myProjects')}
                   </Group>
                 </Anchor>
-                <Anchor component={Link} to="/participations" onClick={close} className="py-2" c="black">
+                <Anchor component={Link} href="/participations" onClick={close} className="py-2" c="black">
                   <Group gap="xs">
                     <IconCompass size={20} color="black" />
                     {t('nav.userMenu.participations')}
                   </Group>
                 </Anchor>
-                <Anchor component={Link} to="/messages" onClick={close} className="py-2" c="black">
+                <Anchor component={Link} href="/messages" onClick={close} className="py-2" c="black">
                   <Group gap="xs">
                     <IconMail size={20} color="black" />
                     {t('nav.userMenu.messages')}
                   </Group>
                 </Anchor>
-                <Anchor component={Link} to="/profile" onClick={close} className="py-2" c="black">
+                <Anchor component={Link} href="/profile" onClick={close} className="py-2" c="black">
                   <Group gap="xs">
                     <IconUser size={20} color="black" />
                     {t('nav.userMenu.profile')}
                   </Group>
                 </Anchor>
-                <Anchor component={Link} to="/settings" onClick={close} className="py-2" c="black">
+                <Anchor component={Link} href="/settings" onClick={close} className="py-2" c="black">
                   <Group gap="xs">
                     <IconSettings size={20} color="black" />
                     {t('nav.userMenu.settings')}
@@ -271,14 +225,13 @@ export function Navbar() {
             <Stack gap="md" mt="md">
               <Button
                 component={Link}
-                to="/login"
+                href="/login"
                 variant="filled"
-                color="eco-primary"
+                color="eco-blue"
                 size="lg"
                 radius="xl"
                 fullWidth
                 onClick={close}
-                className="bg-eco-primary hover:bg-eco-primaryDark"
               >
                 {t('common.login')}
               </Button>

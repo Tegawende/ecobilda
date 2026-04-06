@@ -1,8 +1,9 @@
-import api from './api';
+import { convexClient, getSessionToken } from "@/lib/convexClient";
+import { api } from "../../convex/_generated/api";
 import type { Review } from '../types';
 
 export interface CreateReviewData {
-  receiver_id: number;
+  receiver_id: number | string;
   rating: number;
   feedback: string;
 }
@@ -13,43 +14,60 @@ export interface UpdateReviewResponseData {
 
 export interface ReviewEligibility {
   eligible: boolean;
-  reason?: string;
-  conversation_id?: number;
+  reason?: string | null;
 }
 
 export const reviewsService = {
-  // Get reviews received by a user
-  async getUserReviews(userId: number): Promise<Review[]> {
-    const response = await api.get(`/users/${userId}/reviews/`);
-    return response.data.results || response.data;
+  async getUserReviews(userId: number | string): Promise<Review[]> {
+    const results = await convexClient.query(api.reviews.getByUser, { userId: userId as any });
+    return results as any;
   },
 
-  // Get reviews written by current user
   async getMyReviews(): Promise<Review[]> {
-    const response = await api.get('/reviews/written/');
-    return response.data.results || response.data;
+    const token = getSessionToken();
+    if (!token) return [];
+    const results = await convexClient.query(api.reviews.getWrittenByUser, { token });
+    return results as any;
   },
 
-  // Check if current user can review another user
-  async checkEligibility(userId: number): Promise<ReviewEligibility> {
-    const response = await api.get(`/reviews/eligibility/${userId}/`);
-    return response.data;
+  async checkEligibility(userId: number | string): Promise<ReviewEligibility> {
+    const token = getSessionToken();
+    if (!token) return { eligible: false, reason: "Not authenticated" };
+    return await convexClient.query(api.reviews.checkEligibility, {
+      token,
+      userId: userId as any,
+    });
   },
 
-  // Create a new review
   async createReview(data: CreateReviewData): Promise<Review> {
-    const response = await api.post('/reviews/', data);
-    return response.data;
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    const id = await convexClient.mutation(api.reviews.create, {
+      token,
+      receiverId: data.receiver_id as any,
+      rating: data.rating,
+      feedback: data.feedback,
+    });
+    return { id } as any;
   },
 
-  // Update review (only response, not rating/feedback)
-  async updateReviewResponse(reviewId: number, data: UpdateReviewResponseData): Promise<Review> {
-    const response = await api.patch(`/reviews/${reviewId}/`, data);
-    return response.data;
+  async updateReviewResponse(reviewId: number | string, data: UpdateReviewResponseData): Promise<Review> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.reviews.addResponse, {
+      token,
+      reviewId: reviewId as any,
+      response: data.response,
+    });
+    return { id: reviewId } as any;
   },
 
-  // Delete a review (only if no response yet)
-  async deleteReview(reviewId: number): Promise<void> {
-    await api.delete(`/reviews/${reviewId}/`);
+  async deleteReview(reviewId: number | string): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.reviews.remove, {
+      token,
+      reviewId: reviewId as any,
+    });
   },
 };

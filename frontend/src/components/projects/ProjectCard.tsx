@@ -1,6 +1,10 @@
+'use client';
+
 import { useState, useEffect, useCallback, memo } from 'react';
-import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
+import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
+import { Text, Group, Badge, Stack, ActionIcon, Skeleton } from '@mantine/core';
 import {
   IconMapPin,
   IconUsers,
@@ -15,7 +19,7 @@ import {
   IconChevronRight,
 } from '@tabler/icons-react';
 import { FavoriteButton } from '../common/FavoriteButton';
-import type { Project } from '../../types';
+import type { Project } from '@/types';
 
 interface ProjectCardProps {
   project: Project;
@@ -23,30 +27,10 @@ interface ProjectCardProps {
   onHover?: (project: Project | null) => void;
   initialFavorite?: boolean;
   showEdit?: boolean;
-  onEdit?: (id: number) => void;
+  onEdit?: (id: string) => void;
   showStatus?: boolean;
   /** Called on mobile clicks instead of navigation */
   onMobileClick?: (project: Project) => void;
-}
-
-// Preload images hook for performance
-function useImagePreloader(images: string[]) {
-  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    // Preload all images in background
-    images.forEach((src) => {
-      if (!loadedImages.has(src)) {
-        const img = new Image();
-        img.onload = () => {
-          setLoadedImages((prev) => new Set(prev).add(src));
-        };
-        img.src = src;
-      }
-    });
-  }, [images]);
-
-  return loadedImages;
 }
 
 // Memoized image component for carousel slide
@@ -57,13 +41,15 @@ const CarouselImage = memo(({
   src: string;
   alt: string;
 }) => (
-  <img
-    src={src}
-    alt={alt}
-    loading="lazy"
-    decoding="async"
-    className="w-full h-full object-cover flex-shrink-0"
-  />
+  <div className="relative w-full h-full flex-shrink-0">
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      className="object-cover"
+    />
+  </div>
 ));
 
 CarouselImage.displayName = 'CarouselImage';
@@ -85,16 +71,13 @@ export function ProjectCard({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const lastClickTime = useState<{ current: number }>({ current: 0 })[0];
 
   const images = project.images && project.images.length > 0
-    ? project.images.map(img => img.image)
+    ? project.images.map(img => img.url || '')
     : ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'];
-
-  // Preload all images for instant switching
-  useImagePreloader(images);
 
   const nextImage = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -130,7 +113,7 @@ export function ProjectCard({
     onHover?.(null);
   }, [onHover]);
 
-  const isNatB = project.project_type === 'NATB';
+  const isNatB = project.projectType === 'NATB';
 
   // Handle click - use modal on mobile if callback provided
   const handleClick = useCallback((e: React.MouseEvent) => {
@@ -141,8 +124,7 @@ export function ProjectCard({
   }, [isMobile, onMobileClick, project]);
 
   return (
-    <Link
-      to={`/projects/${project.id}`}
+    <Link href={`/projects/${project._id}`}
       className={`block group cursor-pointer transition-all duration-200 ${isHovered ? 'scale-[1.02]' : ''}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -168,7 +150,7 @@ export function ProjectCard({
         {!showEdit && (
           <div className="absolute top-3 right-3 z-[5]">
             <FavoriteButton
-              projectId={project.id}
+              projectId={project._id}
               variant="ghost"
               size="md"
               initialFavorite={initialFavorite}
@@ -178,25 +160,35 @@ export function ProjectCard({
 
         {/* Edit Button */}
         {showEdit && (
-          <button
+          <ActionIcon
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              onEdit?.(project.id);
+              onEdit?.(project._id);
             }}
-            className="absolute top-3 right-3 z-30 w-9 h-9 rounded-full bg-white/95 backdrop-blur flex items-center justify-center text-gray-700 hover:text-eco-primary hover:bg-white shadow-sm transition-all"
+            variant="white"
+            radius="xl"
+            size="lg"
+            className="absolute top-3 right-3 z-30 text-gray-700 hover:text-eco-primary shadow-sm transition-all"
           >
             <IconEdit size={18} />
-          </button>
+          </ActionIcon>
         )}
 
         {/* Type Badge */}
-        <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
-          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold shadow-sm uppercase tracking-wider ${isNatB ? 'bg-eco-primary text-white' : 'bg-eco-terracotta text-white'
-            }`}>
-            {isNatB ? <IconHome size={10} /> : <IconLeaf size={10} />}
+        <div className="absolute top-3 left-3 z-10">
+          <Badge
+            size="sm"
+            radius="xl"
+            variant="filled"
+            color={isNatB ? 'eco-primary' : 'eco-terracotta'}
+            leftSection={isNatB ? <IconHome size={12} /> : <IconLeaf size={12} />}
+            tt="uppercase"
+            fw={700}
+            styles={{ root: { letterSpacing: '0.05em', fontSize: '0.65rem' } }}
+          >
             {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
-          </span>
+          </Badge>
         </div>
 
         {/* Image Navigation - Show only when not at boundary */}
@@ -238,69 +230,86 @@ export function ProjectCard({
       </div>
 
       {/* Content */}
-      <div className="space-y-1 px-1">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-bold text-gray-900 group-hover:text-eco-primary transition-colors line-clamp-1 text-lg flex-1">
+      <Stack gap={4} px={4}>
+        <Group justify="space-between" gap="xs" align="flex-start">
+          <Text fw={700} size="lg" c="dark" className="group-hover:text-eco-primary transition-colors line-clamp-1" style={{ flex: 1 }}>
             {project.title}
-          </h3>
+          </Text>
           {showStatus && (
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider flex-shrink-0 mt-1 ${project.is_active ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-gray-100 text-gray-600 border border-gray-200'}`}>
-              {project.is_active ? (t('common.active') || 'Active') : (t('common.inactive') || 'Inactive')}
-            </span>
+            <Badge
+              size="xs"
+              radius="xl"
+              variant="light"
+              color={project.status === 'PENDING' ? 'yellow' : project.isActive ? 'green' : 'gray'}
+              tt="uppercase"
+              fw={700}
+              mt={4}
+              styles={{ root: { flexShrink: 0 } }}
+            >
+              {project.status === 'PENDING'
+                ? t('common.pending')
+                : project.isActive
+                ? t('common.active')
+                : t('common.inactive')}
+            </Badge>
           )}
-        </div>
+        </Group>
 
-        <div className="flex items-center text-gray-500 text-sm">
-          <IconMapPin size={14} className="mr-1 flex-shrink-0" />
-          <span className="truncate">{project.address?.city}, {project.address?.country?.name}</span>
-        </div>
+        <Group gap={4} wrap="nowrap">
+          <IconMapPin size={14} className="text-gray-500 flex-shrink-0" />
+          <Text size="sm" c="dimmed" className="truncate">{project.address?.city}, {project.address?.country?.name}</Text>
+        </Group>
 
-        <div className="flex items-center gap-3 text-sm text-gray-500">
-          <span className="flex items-center gap-1">
-            <IconUsers size={14} />
-            {project.max_helpers} {t('projects.volunteers') || 'volunteers'}
-          </span>
-          <span className="flex items-center gap-1">
-            <IconClock size={14} />
-            {project.hours_per_day}h/{t('common.day') || 'day'}
-          </span>
-        </div>
+        <Group gap="md">
+          <Group gap={4}>
+            <IconUsers size={14} className="text-gray-500" />
+            <Text size="sm" c="dimmed">
+              {project.maxHelpers} {t('projects.volunteers')}
+            </Text>
+          </Group>
+          <Group gap={4}>
+            <IconClock size={14} className="text-gray-500" />
+            <Text size="sm" c="dimmed">
+              {project.hoursPerDay}h/{t('common.day')}
+            </Text>
+          </Group>
+        </Group>
 
         {/* Amenities */}
-        <div className="flex flex-wrap gap-1.5 pt-1">
-          {project.internet_provided && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
-              <IconWifi size={10} /> {t('projects.wifi')}
-            </span>
+        <Group gap="xs" pt={4}>
+          {project.internetProvided && (
+            <Badge size="xs" variant="light" color="gray" leftSection={<IconWifi size={10} />} radius="xl">
+              {t('projects.wifi')}
+            </Badge>
           )}
-          {project.family_friendly && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
-              <IconBabyCarriage size={10} /> {t('projects.familyFriendly') || 'Family'}
-            </span>
+          {project.familyFriendly && (
+            <Badge size="xs" variant="light" color="gray" leftSection={<IconBabyCarriage size={10} />} radius="xl">
+              {t('projects.familyFriendly')}
+            </Badge>
           )}
-          {project.pets_allowed && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
-              <IconDog size={10} /> {t('projects.petsAllowed') || 'Pets'}
-            </span>
+          {project.petsAllowed && (
+            <Badge size="xs" variant="light" color="gray" leftSection={<IconDog size={10} />} radius="xl">
+              {t('projects.petsAllowed')}
+            </Badge>
           )}
-        </div>
-      </div>
+        </Group>
+      </Stack>
     </Link>
   );
 }
 
 export function ProjectCardSkeleton() {
   return (
-    <div className="animate-pulse">
-      <div className="aspect-[4/3] bg-gray-200 rounded-xl mb-3" />
-      <div className="space-y-2 px-1">
-        <div className="h-5 bg-gray-200 rounded w-3/4" />
-        <div className="h-4 bg-gray-200 rounded w-1/2" />
-        <div className="flex gap-3">
-          <div className="h-4 bg-gray-200 rounded w-20" />
-          <div className="h-4 bg-gray-200 rounded w-20" />
-        </div>
-      </div>
-    </div>
+    <Stack gap="xs">
+      <Skeleton h={0} className="aspect-[4/3]" radius="xl" />
+      <Stack gap="xs" px={4}>
+        <Skeleton h={20} w="75%" radius="sm" />
+        <Skeleton h={16} w="50%" radius="sm" />
+        <Group gap="md">
+          <Skeleton h={16} w={80} radius="sm" />
+          <Skeleton h={16} w={80} radius="sm" />
+        </Group>
+      </Stack>
+    </Stack>
   );
 }

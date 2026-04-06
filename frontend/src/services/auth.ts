@@ -1,63 +1,113 @@
-import api, { setAuthTokens, clearAuthTokens } from './api';
-import type { LoginCredentials, RegisterData, AuthTokens, User } from '../types';
+import { convexClient, getSessionToken, setSessionToken, clearSessionToken } from "@/lib/convexClient";
+import { api } from "../../convex/_generated/api";
+import type { LoginCredentials, AuthTokens, User } from '../types';
+
+export interface RegisterData {
+  email: string;
+  password: string;
+  passwordConfirm: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  locale?: string;
+}
 
 export const authService = {
-  // Email/Password authentication
   async login(credentials: LoginCredentials): Promise<{ tokens: AuthTokens; user: User }> {
-    const response = await api.post('/auth/login/', credentials);
-    const { tokens, user } = response.data;
-    setAuthTokens(tokens);
-    return { tokens, user };
+    const result = await convexClient.mutation(api.auth.login, {
+      email: credentials.email,
+      password: credentials.password,
+    });
+    setSessionToken(result.token);
+    return {
+      tokens: { access: result.token, refresh: "" },
+      user: result.user as any,
+    };
   },
 
-  async register(data: RegisterData): Promise<{ tokens: AuthTokens; user: User }> {
-    const response = await api.post('/auth/register/', data);
-    const { tokens, user } = response.data;
-    setAuthTokens(tokens);
-    return { tokens, user };
+  async register(data: RegisterData): Promise<{ message: string; email: string }> {
+    const result = await convexClient.mutation(api.auth.register, {
+      email: data.email,
+      password: data.password,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      dateOfBirth: data.dateOfBirth,
+      locale: data.locale,
+    });
+    return { message: result.message, email: data.email };
   },
 
   async logout(): Promise<void> {
-    try {
-      await api.post('/auth/logout/');
-    } finally {
-      clearAuthTokens();
+    const token = getSessionToken();
+    if (token) {
+      try {
+        await convexClient.mutation(api.auth.logout, { token });
+      } catch {
+        // Ignore
+      }
     }
+    clearSessionToken();
   },
 
-  // Google OAuth
-  async googleLogin(credential: string): Promise<{ tokens: AuthTokens; user: User }> {
-    const response = await api.post('/auth/google/', { credential });
-    const { access, refresh, user } = response.data;
-    const tokens = { access, refresh };
-    setAuthTokens(tokens);
-    return { tokens, user };
+  async googleLogin(accessToken: string): Promise<{ tokens: AuthTokens; user: User; created: boolean }> {
+    // Get user info from Google
+    const googleResponse = await fetch(
+      `https://www.googleapis.com/oauth2/v3/userinfo`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    const googleUser = await googleResponse.json();
+
+    const result = await convexClient.mutation(api.auth.googleLogin, {
+      email: googleUser.email,
+      firstName: googleUser.given_name || "",
+      lastName: googleUser.family_name || "",
+      pictureUrl: googleUser.picture,
+    });
+
+    setSessionToken(result.token);
+    return {
+      tokens: { access: result.token, refresh: "" },
+      user: result.user as any,
+      created: result.created,
+    };
   },
 
-  // Apple OAuth
-  async appleLogin(credential: string): Promise<{ tokens: AuthTokens; user: User }> {
-    const response = await api.post('/auth/apple/', { credential });
-    const { access, refresh, user } = response.data;
-    const tokens = { access, refresh };
-    setAuthTokens(tokens);
-    return { tokens, user };
-  },
-
-  // Get current user
   async getCurrentUser(): Promise<User> {
-    const response = await api.get('/auth/me/');
-    return response.data;
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    const user = await convexClient.query(api.auth.me, { token });
+    if (!user) throw new Error("Not authenticated");
+    return user as any;
   },
 
-  // Password reset
   async requestPasswordReset(email: string): Promise<void> {
-    await api.post('/auth/password-reset/', { email });
+    await convexClient.mutation(api.auth.requestPasswordReset, { email });
   },
 
   async confirmPasswordReset(token: string, newPassword: string): Promise<void> {
-    await api.post('/auth/password-reset/confirm/', {
+    await convexClient.mutation(api.auth.confirmPasswordReset, { token, newPassword });
+  },
+
+  async verifyEmail(token: string) {
+    return await convexClient.mutation(api.auth.verifyEmail, { token });
+  },
+
+  async sendVerificationEmail(): Promise<void> {
+    // TODO: Implement via Convex action
+  },
+
+  async checkEmail(email: string): Promise<{ exists: boolean; hasPassword: boolean }> {
+    const result = await convexClient.query(api.auth.checkEmail, { email });
+    return { exists: result.exists, hasPassword: result.hasPassword };
+  },
+
+  async changePassword(data: { currentPassword: string; newPassword: string; confirmPassword: string }): Promise<void> {
+    const token = getSessionToken();
+    if (!token) throw new Error("Not authenticated");
+    await convexClient.mutation(api.auth.changePassword, {
       token,
-      password: newPassword,
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
     });
   },
 };

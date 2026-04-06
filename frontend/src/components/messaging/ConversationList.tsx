@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import {
   Box,
@@ -16,18 +18,19 @@ import {
   IconMessage,
   IconVolumeOff,
 } from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import type { Conversation } from '../../types';
+import type { Conversation } from '@/types';
 
 dayjs.extend(relativeTime);
 
 interface ConversationListProps {
   conversations: Conversation[];
-  selectedId?: number;
-  currentUserId?: number;
-  onSelect: (conversationId: number) => void;
-  onToggleMute?: (_conversationId: number) => void;
+  selectedId?: string;
+  currentUserId?: string;
+  onSelect: (conversationId: string) => void;
+  onToggleMute?: (_conversationId: string) => void;
 }
 
 export function ConversationList({
@@ -37,27 +40,24 @@ export function ConversationList({
   onSelect,
   onToggleMute: _onToggleMute,
 }: ConversationListProps) {
+  const t = useTranslations();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<string | null>('all');
 
   // Filter conversations based on search and tab
   const filteredConversations = conversations.filter((conv) => {
     // Get the other user
-    const otherUser =
-      currentUserId === conv.user1.id ? conv.user2 : conv.user1;
+    const otherUser = conv.otherUser;
 
     // Search filter
     const matchesSearch =
       searchQuery === '' ||
-      `${otherUser.first_name} ${otherUser.last_name}`
+      `${otherUser?.firstName ?? ''} ${otherUser?.lastName ?? ''}`
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
 
     // Tab filter
-    const unreadCount =
-      currentUserId === conv.user1.id
-        ? conv.unread_count_user1
-        : conv.unread_count_user2;
+    const unreadCount = conv.unreadCount ?? 0;
 
     const matchesTab =
       activeTab === 'all' || (activeTab === 'unread' && unreadCount > 0);
@@ -67,27 +67,19 @@ export function ConversationList({
 
   // Calculate total unread count
   const totalUnread = conversations.reduce((sum, conv) => {
-    const unreadCount =
-      currentUserId === conv.user1.id
-        ? conv.unread_count_user1
-        : conv.unread_count_user2;
-    return sum + unreadCount;
+    return sum + (conv.unreadCount ?? 0);
   }, 0);
 
   const getOtherUser = (conv: Conversation) => {
-    return currentUserId === conv.user1.id ? conv.user2 : conv.user1;
+    return conv.otherUser;
   };
 
   const getUnreadCount = (conv: Conversation) => {
-    return currentUserId === conv.user1.id
-      ? conv.unread_count_user1
-      : conv.unread_count_user2;
+    return conv.unreadCount ?? 0;
   };
 
   const isMuted = (conv: Conversation) => {
-    return currentUserId === conv.user1.id
-      ? conv.user1_muted
-      : conv.user2_muted;
+    return conv.isMuted ?? false;
   };
 
   return (
@@ -96,12 +88,12 @@ export function ConversationList({
       <Box p="lg" style={{ borderBottom: '1px solid #e0e0e0' }}>
         <Group justify="space-between" mb="md">
           <Text fw={700} size="xl">
-            Messages
+            {t('messaging.title')}
           </Text>
         </Group>
 
         <TextInput
-          placeholder="Search conversations..."
+          placeholder={t('messaging.searchConversations')}
           leftSection={<IconSearch size={16} />}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -113,7 +105,7 @@ export function ConversationList({
       <Tabs value={activeTab} onChange={setActiveTab}>
         <Tabs.List style={{ borderBottom: '1px solid #e0e0e0', paddingLeft: '16px' }}>
           <Tabs.Tab value="all">
-            All
+            {t('messaging.all')}
           </Tabs.Tab>
           <Tabs.Tab
             value="unread"
@@ -125,7 +117,7 @@ export function ConversationList({
               ) : null
             }
           >
-            Unread
+            {t('messaging.unread')}
           </Tabs.Tab>
         </Tabs.List>
       </Tabs>
@@ -137,13 +129,13 @@ export function ConversationList({
             {filteredConversations.map((conv) => {
               const otherUser = getOtherUser(conv);
               const unreadCount = getUnreadCount(conv);
-              const isSelected = selectedId === conv.id;
+              const isSelected = selectedId === conv._id;
               const muted = isMuted(conv);
 
               return (
                 <Box
-                  key={conv.id}
-                  onClick={() => onSelect(conv.id)}
+                  key={conv._id}
+                  onClick={() => onSelect(conv._id)}
                   style={{
                     padding: '16px',
                     cursor: 'pointer',
@@ -164,13 +156,13 @@ export function ConversationList({
                 >
                   <Group wrap="nowrap" align="flex-start" gap="sm">
                     <Avatar
-                      src={otherUser.profile_picture}
+                      src={otherUser?.profilePictureUrl || otherUser?.profilePicture}
                       size={48}
                       radius="xl"
                       color="blue"
                     >
-                      {!otherUser.profile_picture &&
-                        `${otherUser.first_name[0]}${otherUser.last_name[0]}`}
+                      {!otherUser?.profilePicture &&
+                        `${otherUser?.firstName?.[0] ?? ''}${otherUser?.lastName?.[0] ?? ''}`}
                     </Avatar>
 
                     <Box style={{ flex: 1, minWidth: 0 }}>
@@ -180,15 +172,15 @@ export function ConversationList({
                           size="sm"
                           lineClamp={1}
                         >
-                          {otherUser.first_name} {otherUser.last_name}
+                          {otherUser?.firstName} {otherUser?.lastName}
                         </Text>
                         <Group gap={4} wrap="nowrap">
                           {muted && (
                             <IconVolumeOff size={14} color="var(--mantine-color-gray-6)" />
                           )}
                           <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
-                            {conv.last_message_at
-                              ? dayjs(conv.last_message_at).fromNow()
+                            {conv.lastMessageAt
+                              ? dayjs(conv.lastMessageAt).fromNow()
                               : ''}
                           </Text>
                         </Group>
@@ -202,7 +194,7 @@ export function ConversationList({
                           lineClamp={1}
                           style={{ flex: 1 }}
                         >
-                          {conv.last_message_text || 'No messages yet'}
+                          {conv.lastMessageText || t('messaging.noMessagesDefault')}
                         </Text>
 
                         {unreadCount > 0 && (
@@ -212,10 +204,10 @@ export function ConversationList({
                         )}
                       </Group>
 
-                      {otherUser.address && (
+                      {(otherUser as any)?.address && (
                         <Text size="xs" c="dimmed" mt={2}>
-                          {otherUser.address.city}
-                          {otherUser.address.country && `, ${otherUser.address.country.name}`}
+                          {(otherUser as any).address.city}
+                          {(otherUser as any).address.country && `, ${(otherUser as any).address.country.name}`}
                         </Text>
                       )}
                     </Box>
@@ -230,10 +222,10 @@ export function ConversationList({
               <IconMessage size={64} color="var(--mantine-color-gray-5)" />
               <Text c="dimmed" size="sm">
                 {searchQuery
-                  ? 'No conversations found'
+                  ? t('messaging.noConversationsFound')
                   : activeTab === 'unread'
-                  ? 'No unread messages'
-                  : 'No conversations yet'}
+                  ? t('messaging.noUnreadMessages')
+                  : t('messaging.noConversations')}
               </Text>
             </Stack>
           </Center>

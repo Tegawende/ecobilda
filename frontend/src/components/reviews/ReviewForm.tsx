@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { useForm } from '@mantine/form';
 import {
@@ -13,7 +15,8 @@ import {
   List,
 } from '@mantine/core';
 import { IconInfoCircle, IconStar } from '@tabler/icons-react';
-import type { User } from '../../types';
+import { useTranslations } from 'next-intl';
+import type { User } from '@/types';
 
 interface ReviewFormData {
   rating: number;
@@ -27,6 +30,7 @@ interface ReviewFormProps {
 }
 
 export function ReviewForm({ receiver, onSubmit, onCancel }: ReviewFormProps) {
+  const t = useTranslations();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<ReviewFormData>({
@@ -35,10 +39,10 @@ export function ReviewForm({ receiver, onSubmit, onCancel }: ReviewFormProps) {
       feedback: '',
     },
     validate: {
-      rating: (value) => (value >= 1 && value <= 5 ? null : 'Please select a rating'),
+      rating: (value) => (value >= 1 && value <= 5 ? null : t('reviews.ratingRequired')),
       feedback: (value) => {
-        if (value.length < 20) return 'Feedback must be at least 20 characters';
-        if (value.length > 1000) return 'Feedback must be less than 1000 characters';
+        if (value.length < 20) return t('reviews.feedbackMinLength');
+        if (value.length > 1000) return t('reviews.feedbackMaxLength');
         return null;
       },
     },
@@ -53,20 +57,20 @@ export function ReviewForm({ receiver, onSubmit, onCancel }: ReviewFormProps) {
     }
   };
 
-  const ratingLabels = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+  const ratingLabels = [t('reviews.ratingPoor'), t('reviews.ratingFair'), t('reviews.ratingGood'), t('reviews.ratingVeryGood'), t('reviews.ratingExcellent')];
 
   return (
     <Card withBorder shadow="sm" padding="lg">
       <form onSubmit={form.onSubmit(handleFormSubmit)}>
         <Stack gap="lg">
           <Title order={3}>
-            Leave a Review for {receiver.first_name} {receiver.last_name}
+            {t('reviews.leaveReview', { firstName: receiver.firstName, lastName: receiver.lastName })}
           </Title>
 
           {/* Rating Selection */}
           <div>
             <Text fw={500} mb="xs">
-              Rating *
+              {t('reviews.ratingLabel')}
             </Text>
             <Group>
               <Rating
@@ -90,35 +94,35 @@ export function ReviewForm({ receiver, onSubmit, onCancel }: ReviewFormProps) {
 
           {/* Feedback Textarea */}
           <Textarea
-            label="Your Feedback *"
-            placeholder="Share your experience with this person. What did you appreciate? What could be improved?"
+            label={t('reviews.feedbackLabel')}
+            placeholder={t('reviews.feedbackPlaceholder')}
             minRows={5}
             maxLength={1000}
             {...form.getInputProps('feedback')}
-            description={`${form.values.feedback.length} / 1000 characters`}
+            description={`${form.values.feedback.length} ${t('reviews.characterCount')}`}
           />
 
           {/* Guidelines */}
-          <Alert color="blue" icon={<IconInfoCircle />} title="Review Guidelines">
+          <Alert color="blue" icon={<IconInfoCircle />} title={t('reviews.guidelines')}>
             <List size="sm">
-              <List.Item>Be honest and constructive</List.Item>
-              <List.Item>Focus on your personal experience</List.Item>
-              <List.Item>Avoid offensive or discriminatory language</List.Item>
-              <List.Item>Reviews are public and cannot be edited once submitted</List.Item>
+              <List.Item>{t('reviews.guidelineHonest')}</List.Item>
+              <List.Item>{t('reviews.guidelinePersonal')}</List.Item>
+              <List.Item>{t('reviews.guidelineRespectful')}</List.Item>
+              <List.Item>{t('reviews.guidelinePublic')}</List.Item>
             </List>
           </Alert>
 
           {/* Actions */}
           <Group justify="flex-end">
             <Button variant="default" onClick={onCancel} disabled={isSubmitting}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               type="submit"
               loading={isSubmitting}
               leftSection={<IconStar size={18} />}
             >
-              Submit Review
+              {t('reviews.submitReview')}
             </Button>
           </Group>
         </Stack>

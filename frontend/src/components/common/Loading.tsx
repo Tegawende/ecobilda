@@ -1,8 +1,10 @@
-import { useTranslation } from 'react-i18next';
+'use client';
+
+import { useTranslations } from 'next-intl';
 import { Center, Stack, Loader, Text } from '@mantine/core';
 
 export function Loading() {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   return (
     <Center mih="100vh">

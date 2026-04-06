@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslations, useLocale } from 'next-intl';
 import {
     IconArrowLeft,
     IconSearch,
@@ -12,10 +14,23 @@ import {
     IconChevronRight,
     IconCheck,
 } from '@tabler/icons-react';
+import {
+    ActionIcon,
+    Box,
+    Button,
+    Center,
+    Group,
+    Paper,
+    Stack,
+    Text,
+    TextInput,
+    Title,
+    UnstyledButton,
+} from '@mantine/core';
 import type { ProjectFiltersState } from './ProjectFilters';
 
 // Mapbox Geocoding
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || '';
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 
 interface MapboxFeature {
     id: string;
@@ -57,7 +72,8 @@ export function MobileSearchModal({
     onFiltersChange,
     onLocationSelect,
 }: MobileSearchModalProps) {
-    const { t, i18n } = useTranslation();
+    const t = useTranslations();
+    const locale = useLocale();
     const [step, setStep] = useState<Step>('location');
     const [tempFilters, setTempFilters] = useState(filters);
     const [locationQuery, setLocationQuery] = useState(filters.location?.name || '');
@@ -95,7 +111,7 @@ export function MobileSearchModal({
         }
         setIsSearching(true);
         debounceRef.current = setTimeout(async () => {
-            const results = await searchMapboxLocations(query, i18n.language);
+            const results = await searchMapboxLocations(query, locale);
             setLocationSuggestions(results);
             setIsSearching(false);
         }, 300);
@@ -119,16 +135,13 @@ export function MobileSearchModal({
         setStep('dates');
     };
 
-
-
     // Calendar logic
-    const monthName = new Intl.DateTimeFormat(i18n.language, { month: 'long' }).format(currentMonth);
+    const monthName = new Intl.DateTimeFormat(locale, { month: 'long' }).format(currentMonth);
     const dayNames = [0, 1, 2, 3, 4, 5, 6].map(d =>
-        new Intl.DateTimeFormat(i18n.language, { weekday: 'short' }).format(new Date(2024, 0, d + 1))
+        new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(new Date(2024, 0, d + 1))
     );
 
     const formatDate = (date: Date) => {
-        // Return simple format to debug build
         return date.toLocaleDateString();
     };
 
@@ -223,125 +236,137 @@ export function MobileSearchModal({
       `}</style>
 
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
-                <button onClick={goBack} className="p-2 -ml-2 rounded-full hover:bg-gray-100 cursor-pointer">
+            <Group justify="space-between" p="md" className="border-b border-gray-200">
+                <ActionIcon variant="subtle" color="gray" radius="xl" onClick={goBack} size="lg">
                     <IconArrowLeft size={22} />
-                </button>
-                <div className="flex gap-1.5">
+                </ActionIcon>
+                <Group gap={6}>
                     {(['location', 'dates', 'type'] as const).map((s) => (
                         <div
                             key={s}
-                            className={`w-2 h-2 rounded-full transition-all ${step === s ? 'bg-eco-primary w-4' :
+                            className={`h-2 rounded-full transition-all ${step === s ? 'bg-eco-primary w-4' :
                                 (s === 'location' ? 'bg-eco-primary/50' :
                                     s === 'dates' && step === 'type' ? 'bg-eco-primary/50' : 'bg-gray-300')
-                                }`}
+                                } ${step === s ? '' : 'w-2'}`}
                         />
                     ))}
-                </div>
-                <button onClick={onClose} className="p-2 -mr-2 rounded-full hover:bg-gray-100 cursor-pointer">
+                </Group>
+                <ActionIcon variant="subtle" color="gray" radius="xl" onClick={onClose} size="lg">
                     <IconX size={22} />
-                </button>
-            </div>
+                </ActionIcon>
+            </Group>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto">
+            <Box className="flex-1 overflow-y-auto">
                 {/* Step 1: Location */}
                 {step === 'location' && (
-                    <div className="p-4">
-                        <h2 className="text-2xl font-display font-bold text-gray-900 mb-2">{t('projects.filters.whereToGo') || 'Où allez-vous ?'}</h2>
-                        <p className="text-gray-500 mb-6">{t('projects.filters.searchByLocation') || 'Recherchez par ville, région ou pays'}</p>
+                    <Stack p="md" gap="md">
+                        <Box>
+                            <Title order={2} className="font-display" mb={4}>{t('projects.filters.whereToGo')}</Title>
+                            <Text c="dimmed">{t('projects.filters.searchByLocation')}</Text>
+                        </Box>
 
-                        <div className="relative mb-4">
-                            <div className="flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-gray-200 focus-within:border-eco-primary bg-white">
-                                {isSearching ? (
-                                    <IconLoader2 size={20} className="text-gray-400 animate-spin" />
-                                ) : (
-                                    <IconMapPin size={20} className="text-gray-400" />
-                                )}
-                                <input
-                                    ref={inputRef}
-                                    type="text"
-                                    value={locationQuery}
-                                    onChange={(e) => handleLocationSearch(e.target.value)}
-                                    placeholder={t('projects.filters.locationPlaceholder') || 'Ex: Bruxelles, Ardennes...'}
-                                    className="flex-1 outline-none text-lg bg-transparent"
-                                />
-                                {locationQuery && (
-                                    <button onClick={() => { setLocationQuery(''); setLocationSuggestions([]); }} className="text-gray-400 hover:text-gray-600 cursor-pointer">
-                                        <IconX size={18} />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
+                        <TextInput
+                            ref={inputRef}
+                            value={locationQuery}
+                            onChange={(e) => handleLocationSearch(e.currentTarget.value)}
+                            placeholder={t('projects.filters.locationPlaceholder')}
+                            size="lg"
+                            radius="xl"
+                            leftSection={isSearching ? (
+                                <IconLoader2 size={20} className="text-gray-400 animate-spin" />
+                            ) : (
+                                <IconMapPin size={20} className="text-gray-400" />
+                            )}
+                            rightSection={locationQuery ? (
+                                <ActionIcon variant="subtle" color="gray" size="sm" onClick={() => { setLocationQuery(''); setLocationSuggestions([]); }}>
+                                    <IconX size={18} />
+                                </ActionIcon>
+                            ) : undefined}
+                        />
 
                         {/* Suggestions */}
                         {locationSuggestions.length > 0 && (
-                            <div className="space-y-1">
+                            <Stack gap={4}>
                                 {locationSuggestions.map((feature) => (
-                                    <button
+                                    <UnstyledButton
                                         key={feature.id}
                                         onClick={() => selectLocation(feature)}
-                                        className="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors text-left cursor-pointer"
+                                        className="rounded-xl hover:bg-gray-50 transition-colors"
+                                        px="md"
+                                        py="sm"
                                     >
-                                        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                                            <IconMapPin size={18} className="text-gray-500" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-gray-900 truncate">{feature.text}</p>
-                                            <p className="text-sm text-gray-500 truncate">{feature.place_name}</p>
-                                        </div>
-                                    </button>
+                                        <Group gap="sm" wrap="nowrap">
+                                            <Center className="w-10 h-10 rounded-full bg-gray-100">
+                                                <IconMapPin size={18} className="text-gray-500" />
+                                            </Center>
+                                            <Box className="flex-1 min-w-0">
+                                                <Text fw={500} truncate>{feature.text}</Text>
+                                                <Text size="sm" c="dimmed" truncate>{feature.place_name}</Text>
+                                            </Box>
+                                        </Group>
+                                    </UnstyledButton>
                                 ))}
-                            </div>
+                            </Stack>
                         )}
 
                         {/* Flexible option */}
-                        <button
+                        <UnstyledButton
                             onClick={skipLocation}
-                            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors mt-4 cursor-pointer"
+                            className="rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors"
+                            px="md"
+                            py="sm"
                         >
-                            <div className="w-10 h-10 rounded-full bg-eco-primary/10 flex items-center justify-center">
-                                <IconSearch size={18} className="text-eco-primary" />
-                            </div>
-                            <div className="text-left">
-                                <p className="font-medium text-gray-900">{t('projects.filters.flexible') || 'Je suis flexible'}</p>
-                                <p className="text-sm text-gray-500">{t('projects.filters.searchEverywhere') || 'Rechercher partout'}</p>
-                            </div>
-                        </button>
-                    </div>
+                            <Group gap="sm">
+                                <Center className="w-10 h-10 rounded-full bg-eco-primary/10">
+                                    <IconSearch size={18} className="text-eco-primary" />
+                                </Center>
+                                <Box>
+                                    <Text fw={500}>{t('projects.filters.flexible')}</Text>
+                                    <Text size="sm" c="dimmed">{t('projects.filters.searchEverywhere')}</Text>
+                                </Box>
+                            </Group>
+                        </UnstyledButton>
+                    </Stack>
                 )}
 
                 {/* Step 2: Dates */}
                 {step === 'dates' && (
-                    <div className="p-4">
-                        <h2 className="text-2xl font-display font-bold text-gray-900 mb-2">{t('projects.filters.whenToGo') || 'Quand partez-vous ?'}</h2>
-                        <p className="text-gray-500 mb-6">{t('projects.filters.selectDates') || 'Sélectionnez vos dates'}</p>
+                    <Stack p="md" gap="md">
+                        <Box>
+                            <Title order={2} className="font-display" mb={4}>{t('projects.filters.whenToGo')}</Title>
+                            <Text c="dimmed">{t('projects.filters.selectDates')}</Text>
+                        </Box>
 
                         {/* Calendar */}
-                        <div className="bg-gray-50 rounded-2xl p-4">
-                            <div className="flex items-center justify-between mb-4">
-                                <button
+                        <Paper bg="gray.0" radius="lg" p="md">
+                            <Group justify="space-between" mb="md">
+                                <ActionIcon
+                                    variant="subtle"
+                                    color="gray"
+                                    radius="xl"
                                     onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-                                    className="p-2 hover:bg-white rounded-full cursor-pointer"
                                 >
                                     <IconChevronLeft size={20} />
-                                </button>
-                                <span className="font-semibold text-gray-900 capitalize">
+                                </ActionIcon>
+                                <Text fw={600} className="capitalize">
                                     {monthName} {currentMonth.getFullYear()}
-                                </span>
-                                <button
+                                </Text>
+                                <ActionIcon
+                                    variant="subtle"
+                                    color="gray"
+                                    radius="xl"
                                     onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-                                    className="p-2 hover:bg-white rounded-full cursor-pointer"
                                 >
                                     <IconChevronRight size={20} />
-                                </button>
-                            </div>
+                                </ActionIcon>
+                            </Group>
 
                             <div className="grid grid-cols-7 gap-1 mb-2">
                                 {dayNames.map((day) => (
-                                    <div key={day} className="text-center text-xs text-gray-500 font-medium py-2">
+                                    <Text key={day} ta="center" size="xs" c="dimmed" fw={500} py={8}>
                                         {day}
-                                    </div>
+                                    </Text>
                                 ))}
                             </div>
 
@@ -349,147 +374,161 @@ export function MobileSearchModal({
                                 {getDaysInMonth(currentMonth).map((date, idx) => (
                                     <div key={idx} className="aspect-square">
                                         {date && (
-                                            <button
+                                            <UnstyledButton
                                                 onClick={() => handleDayClick(date)}
                                                 disabled={date < today}
-                                                className={`w-full h-full rounded-full text-sm flex items-center justify-center transition-all cursor-pointer
-                          ${date < today ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-white'}
+                                                className={`w-full h-full rounded-full text-sm flex items-center justify-center transition-all
+                          ${date < today ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-white cursor-pointer'}
                           ${isSelected(date) ? 'bg-eco-primary text-white' : ''}
                           ${isInRange(date) && !isSelected(date) ? 'bg-eco-primary/20' : ''}
                         `}
                                             >
                                                 {date.getDate()}
-                                            </button>
+                                            </UnstyledButton>
                                         )}
                                     </div>
                                 ))}
                             </div>
-                        </div>
+                        </Paper>
 
                         {/* Selected dates display */}
                         {tempFilters.dateRange.start && (
-                            <div className="mt-4 p-3 bg-eco-primary/10 rounded-xl text-center">
-                                <span className="text-eco-primary font-medium">
+                            <Paper bg="var(--color-eco-primary-light, rgba(76, 175, 80, 0.1))" radius="md" p="sm" ta="center">
+                                <Text className="text-eco-primary" fw={500}>
                                     {formatDate(tempFilters.dateRange.start)}
                                     {tempFilters.dateRange.end && (
-                                        <> → {formatDate(tempFilters.dateRange.end)}</>
+                                        <> &rarr; {formatDate(tempFilters.dateRange.end)}</>
                                     )}
-                                </span>
-                            </div>
+                                </Text>
+                            </Paper>
                         )}
 
                         {/* Skip option */}
-                        <button
-                            onClick={skipDates}
-                            className="w-full mt-4 py-3 text-gray-600 font-medium hover:text-gray-900 cursor-pointer"
-                        >
-                            {t('projects.filters.skipDates') || 'Dates flexibles'}
-                        </button>
-                    </div>
+                        <UnstyledButton onClick={skipDates} className="w-full py-3 text-gray-600 font-medium hover:text-gray-900 transition-colors" ta="center">
+                            {t('projects.filters.skipDates')}
+                        </UnstyledButton>
+                    </Stack>
                 )}
 
                 {/* Step 3: Type */}
                 {step === 'type' && (
-                    <div className="p-4">
-                        <h2 className="text-2xl font-display font-bold text-gray-900 mb-2">{t('projects.filters.whatType') || 'Quel type de projet ?'}</h2>
-                        <p className="text-gray-500 mb-6">{t('projects.filters.chooseType') || 'Choisissez le type de projet'}</p>
+                    <Stack p="md" gap="md">
+                        <Box>
+                            <Title order={2} className="font-display" mb={4}>{t('projects.filters.whatType')}</Title>
+                            <Text c="dimmed">{t('projects.filters.chooseType')}</Text>
+                        </Box>
 
-                        <div className="space-y-3">
+                        <Stack gap="sm">
                             {/* All */}
-                            <button
+                            <UnstyledButton
                                 onClick={() => setTempFilters({ ...tempFilters, projectType: 'all' })}
-                                className={`flex items-center gap-4 w-full p-4 rounded-xl border-2 transition-all cursor-pointer ${tempFilters.projectType === 'all'
+                                className={`rounded-xl border-2 transition-all ${tempFilters.projectType === 'all'
                                     ? 'border-eco-primary bg-eco-primary/5'
                                     : 'border-gray-200 hover:border-gray-300'
                                     }`}
+                                p="md"
                             >
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${tempFilters.projectType === 'all' ? 'bg-eco-primary text-white' : 'bg-gray-100 text-gray-500'
-                                    }`}>
-                                    <IconSearch size={22} />
-                                </div>
-                                <div className="flex-1 text-left">
-                                    <p className="font-semibold text-gray-900">{t('projects.filters.all')}</p>
-                                    <p className="text-sm text-gray-500">{t('projects.filters.allDescription') || 'Tous les types de projets'}</p>
-                                </div>
-                                {tempFilters.projectType === 'all' && (
-                                    <IconCheck size={22} className="text-eco-primary" />
-                                )}
-                            </button>
+                                <Group gap="md" wrap="nowrap">
+                                    <Center className={`w-12 h-12 rounded-xl ${tempFilters.projectType === 'all' ? 'bg-eco-primary text-white' : 'bg-gray-100 text-gray-500'}`}>
+                                        <IconSearch size={22} />
+                                    </Center>
+                                    <Box className="flex-1">
+                                        <Text fw={600}>{t('projects.filters.all')}</Text>
+                                        <Text size="sm" c="dimmed">{t('projects.filters.allDescription')}</Text>
+                                    </Box>
+                                    {tempFilters.projectType === 'all' && (
+                                        <IconCheck size={22} className="text-eco-primary" />
+                                    )}
+                                </Group>
+                            </UnstyledButton>
 
                             {/* Natural Building */}
-                            <button
+                            <UnstyledButton
                                 onClick={() => setTempFilters({ ...tempFilters, projectType: 'NATB' })}
-                                className={`flex items-center gap-4 w-full p-4 rounded-xl border-2 transition-all cursor-pointer ${tempFilters.projectType === 'NATB'
+                                className={`rounded-xl border-2 transition-all ${tempFilters.projectType === 'NATB'
                                     ? 'border-eco-primary bg-eco-primary/5'
                                     : 'border-gray-200 hover:border-gray-300'
                                     }`}
+                                p="md"
                             >
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${tempFilters.projectType === 'NATB' ? 'bg-eco-primary text-white' : 'bg-gray-100 text-gray-500'
-                                    }`}>
-                                    <IconHome size={22} />
-                                </div>
-                                <div className="flex-1 text-left">
-                                    <p className="font-semibold text-gray-900">{t('projects.naturalBuilding')}</p>
-                                    <p className="text-sm text-gray-500">{t('projects.filters.natbDescription') || 'Construction écologique'}</p>
-                                </div>
-                                {tempFilters.projectType === 'NATB' && (
-                                    <IconCheck size={22} className="text-eco-primary" />
-                                )}
-                            </button>
+                                <Group gap="md" wrap="nowrap">
+                                    <Center className={`w-12 h-12 rounded-xl ${tempFilters.projectType === 'NATB' ? 'bg-eco-primary text-white' : 'bg-gray-100 text-gray-500'}`}>
+                                        <IconHome size={22} />
+                                    </Center>
+                                    <Box className="flex-1">
+                                        <Text fw={600}>{t('projects.naturalBuilding')}</Text>
+                                        <Text size="sm" c="dimmed">{t('projects.filters.natbDescription')}</Text>
+                                    </Box>
+                                    {tempFilters.projectType === 'NATB' && (
+                                        <IconCheck size={22} className="text-eco-primary" />
+                                    )}
+                                </Group>
+                            </UnstyledButton>
 
                             {/* Permaculture */}
-                            <button
+                            <UnstyledButton
                                 onClick={() => setTempFilters({ ...tempFilters, projectType: 'PERM' })}
-                                className={`flex items-center gap-4 w-full p-4 rounded-xl border-2 transition-all cursor-pointer ${tempFilters.projectType === 'PERM'
+                                className={`rounded-xl border-2 transition-all ${tempFilters.projectType === 'PERM'
                                     ? 'border-eco-terracotta bg-eco-terracotta/5'
                                     : 'border-gray-200 hover:border-gray-300'
                                     }`}
+                                p="md"
                             >
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${tempFilters.projectType === 'PERM' ? 'bg-eco-terracotta text-white' : 'bg-gray-100 text-gray-500'
-                                    }`}>
-                                    <IconLeaf size={22} />
-                                </div>
-                                <div className="flex-1 text-left">
-                                    <p className="font-semibold text-gray-900">{t('projects.permaculture')}</p>
-                                    <p className="text-sm text-gray-500">{t('projects.filters.permDescription') || 'Jardins et agriculture durable'}</p>
-                                </div>
-                                {tempFilters.projectType === 'PERM' && (
-                                    <IconCheck size={22} className="text-eco-terracotta" />
-                                )}
-                            </button>
-                        </div>
-                    </div>
+                                <Group gap="md" wrap="nowrap">
+                                    <Center className={`w-12 h-12 rounded-xl ${tempFilters.projectType === 'PERM' ? 'bg-eco-terracotta text-white' : 'bg-gray-100 text-gray-500'}`}>
+                                        <IconLeaf size={22} />
+                                    </Center>
+                                    <Box className="flex-1">
+                                        <Text fw={600}>{t('projects.permaculture')}</Text>
+                                        <Text size="sm" c="dimmed">{t('projects.filters.permDescription')}</Text>
+                                    </Box>
+                                    {tempFilters.projectType === 'PERM' && (
+                                        <IconCheck size={22} className="text-eco-terracotta" />
+                                    )}
+                                </Group>
+                            </UnstyledButton>
+                        </Stack>
+                    </Stack>
                 )}
-            </div>
+            </Box>
 
             {/* Footer - Action buttons */}
-            <div className="p-4 border-t border-gray-200 bg-white">
+            <Box p="md" className="border-t border-gray-200 bg-white">
                 {step === 'location' && locationQuery && locationSuggestions.length === 0 && !isSearching && (
-                    <button
+                    <Button
+                        fullWidth
+                        size="lg"
+                        radius="md"
                         onClick={() => setStep('dates')}
-                        className="w-full py-4 bg-eco-primary text-white font-bold rounded-xl shadow-lg cursor-pointer hover:bg-eco-primaryDark transition-all"
+                        className="bg-eco-primary hover:bg-eco-primaryDark shadow-lg transition-all"
                     >
-                        {t('common.continue') || 'Continuer'}
-                    </button>
+                        {t('common.continue')}
+                    </Button>
                 )}
                 {step === 'dates' && (
-                    <button
+                    <Button
+                        fullWidth
+                        size="lg"
+                        radius="md"
                         onClick={confirmDates}
-                        className="w-full py-4 bg-eco-primary text-white font-bold rounded-xl shadow-lg cursor-pointer hover:bg-eco-primaryDark transition-all"
+                        className="bg-eco-primary hover:bg-eco-primaryDark shadow-lg transition-all"
                     >
-                        {t('common.continue') || 'Continuer'}
-                    </button>
+                        {t('common.continue')}
+                    </Button>
                 )}
                 {step === 'type' && (
-                    <button
+                    <Button
+                        fullWidth
+                        size="lg"
+                        radius="md"
                         onClick={applySearch}
-                        className="w-full py-4 bg-eco-primary text-white font-bold rounded-xl shadow-lg cursor-pointer hover:bg-eco-primaryDark transition-all flex items-center justify-center gap-2"
+                        leftSection={<IconSearch size={20} />}
+                        className="bg-eco-primary hover:bg-eco-primaryDark shadow-lg transition-all"
                     >
-                        <IconSearch size={20} />
-                        {t('projects.filters.search') || 'Rechercher'}
-                    </button>
+                        {t('projects.filters.search')}
+                    </Button>
                 )}
-            </div>
+            </Box>
         </div>
     );
 }

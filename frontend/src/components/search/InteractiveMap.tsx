@@ -1,8 +1,11 @@
+'use client';
+
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { Center, Stack, Text, Box } from '@mantine/core';
 import { IconMap } from '@tabler/icons-react';
-import type { Project } from '../../types';
+import type { Project } from '@/types';
 
 interface InteractiveMapProps {
   projects: Project[];
@@ -14,7 +17,8 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
   const mapRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
   const onBoundsChangeRef = useRef(onBoundsChange);
-  const navigate = useNavigate();
+  const router = useRouter();
+  const t = useTranslations();
   const [isMapReady, setIsMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
@@ -30,7 +34,7 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
         mapRef.current.remove();
         mapRef.current = null;
         setIsMapReady(false);
-        setMapError('WebGL context lost. Please refresh the page.');
+        setMapError('errors.generic.webglLost');
       } catch (error) {
         console.error('Error handling WebGL context loss:', error);
       }
@@ -125,7 +129,7 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
         mapRef.current = map;
       } catch (error) {
         console.error('Failed to initialize Mapbox map:', error);
-        setMapError('Failed to load map. Please refresh the page.');
+        setMapError('errors.generic.mapLoadFailed');
       }
     }
 
@@ -163,7 +167,7 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
       // Add new markers
       projects.forEach(project => {
         if (!project.address?.latitude || !project.address?.longitude) {
-          console.warn(`Project ${project.id} missing coordinates:`, {
+          console.warn(`Project ${project._id} missing coordinates:`, {
             hasAddress: !!project.address,
             latitude: project.address?.latitude,
             longitude: project.address?.longitude,
@@ -178,8 +182,8 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
           el.style.height = '40px';
           el.style.borderRadius = '50%';
           el.style.cursor = 'pointer';
-          el.style.backgroundImage = project.images?.[0]?.image
-            ? `url(${project.images[0].image})`
+          el.style.backgroundImage = project.images?.[0]?.url
+            ? `url(${project.images[0].url})`
             : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
           el.style.backgroundSize = 'cover';
           el.style.backgroundPosition = 'center';
@@ -193,10 +197,10 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
                 <div style="padding: 8px; min-width: 200px;">
                   <h3 style="font-weight: bold; margin-bottom: 4px;">${project.title}</h3>
                   <p style="color: #666; font-size: 14px; margin-bottom: 8px;">
-                    ${project.address.city}, ${project.address.country.name}
+                    ${project.address?.city ?? ''}, ${project.address?.country?.name ?? ''}
                   </p>
                   <p style="font-size: 12px; color: #888;">
-                    ${project.project_type === 'PERM' ? 'Permaculture' : 'Natural Building'}
+                    ${project.projectType === 'PERM' ? 'Permaculture' : 'Natural Building'}
                   </p>
                 </div>
               `)
@@ -205,12 +209,12 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
 
           // Navigate to project on marker click
           el.addEventListener('click', () => {
-            navigate(`/projects/${project.id}`);
+            router.push(`/projects/${project._id}`);
           });
 
           markersRef.current.push(marker);
         } catch (error) {
-          console.warn('Error adding marker for project:', project.id, error);
+          console.warn('Error adding marker for project:', project._id, error);
         }
       });
 
@@ -237,7 +241,7 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
     } catch (error) {
       console.error('Error updating markers:', error);
     }
-  }, [projects, isMapReady, navigate]);
+  }, [projects, isMapReady, router]);
 
   const mapboxAvailable = typeof window !== 'undefined' && (window as any).mapboxgl;
 
@@ -257,7 +261,7 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
       <Center h="100%" bg="gray.1" style={{ borderRadius: 8 }}>
         <Stack align="center" gap="xs">
           <IconMap size={48} color="red" />
-          <Text size="sm" c="red">{mapError}</Text>
+          <Text size="sm" c="red">{t(mapError)}</Text>
         </Stack>
       </Center>
     );
