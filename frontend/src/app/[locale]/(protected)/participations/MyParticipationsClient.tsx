@@ -56,7 +56,7 @@ function HalfStarRating({
               {halfFill && (
                 <defs>
                   <linearGradient id={`half-${star}`}>
-                    <stop offset="50%" stopColor="var(--mantine-color-eco-terracotta-6)" />
+                    <stop offset="50%" stopColor="#facc15" />
                     <stop offset="50%" stopColor="#e5e7eb" />
                   </linearGradient>
                 </defs>
@@ -65,12 +65,12 @@ function HalfStarRating({
                 points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
                 fill={
                   fullFill
-                    ? 'var(--mantine-color-eco-terracotta-6)'
+                    ? '#facc15'
                     : halfFill
                     ? `url(#half-${star})`
                     : '#e5e7eb'
                 }
-                stroke={fullFill || halfFill ? 'var(--mantine-color-eco-terracotta-6)' : '#d1d5db'}
+                stroke={fullFill || halfFill ? '#facc15' : '#d1d5db'}
                 strokeWidth="1"
               />
             </svg>
@@ -78,7 +78,7 @@ function HalfStarRating({
         );
       })}
       {value > 0 && (
-        <Text size="sm" fw={600} c="eco-terracotta" ml={4}>
+        <Text size="sm" fw={600} c="yellow.6" ml={4}>
           {value}
         </Text>
       )}
@@ -145,7 +145,7 @@ function ReviewModal({
       onClose={onClose}
       title={
         <Group gap="sm">
-          <ThemeIcon size="md" radius="xl" color="eco-terracotta" variant="light">
+          <ThemeIcon size="md" radius="xl" color="eco-primary" variant="light">
             <IconStar size={16} />
           </ThemeIcon>
           <Text fw={600}>{t('participations.reviewModalTitle')}</Text>
@@ -153,7 +153,7 @@ function ReviewModal({
       }
       centered
       radius="lg"
-      size="md"
+      size="lg"
     >
       <Stack gap="lg">
         {/* Host info */}
@@ -197,7 +197,7 @@ function ReviewModal({
             {t('common.cancel')}
           </Button>
           <Button
-            color="eco-terracotta"
+            color="eco-primary"
             radius="xl"
             leftSection={<IconStar size={16} />}
             loading={submitting}
@@ -224,40 +224,43 @@ function ParticipationCard({
 
   const host = participation.host;
   const canReview = participation.status === 'ACCEPTED';
+  const coverUrl = participation.project?.coverImageUrl
+    ?? 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800';
 
   return (
     <Paper radius="lg" p={0} withBorder className="overflow-hidden flex flex-col h-full">
-      {/* Header */}
-      <div className="p-5 bg-gradient-to-r from-eco-primary/5 to-eco-terracotta/5">
-        <Group justify="space-between" align="flex-start" wrap="nowrap">
-          <Link
-            href={`/projects/${participation.project?._id}`}
-            className="text-base font-display font-bold text-gray-900 hover:text-eco-primary transition-colors line-clamp-2 flex-1 pr-3"
-          >
-            {participation.project?.title}
-          </Link>
-          <div className="flex-shrink-0">
-            <StatusBadge status={participation.status} />
-          </div>
-        </Group>
-      </div>
+      {/* Cover image */}
+      <Link href={`/projects/${participation.project?._id}`} className="block relative overflow-hidden" style={{ aspectRatio: '16/7' }}>
+        <img src={coverUrl} alt={participation.project?.title} className="w-full h-full object-cover" />
+        <div className="absolute top-3 right-3">
+          <StatusBadge status={participation.status} />
+        </div>
+      </Link>
 
-      <div className="flex-1 p-5 flex flex-col gap-4">
+      <div className="flex-1 p-4 flex flex-col gap-3">
+        {/* Title */}
+        <Link
+          href={`/projects/${participation.project?._id}`}
+          className="text-base font-display font-bold text-gray-900 hover:text-eco-primary transition-colors line-clamp-1"
+        >
+          {participation.project?.title}
+        </Link>
+
         {/* Host info */}
         {host && (
           <Group gap="sm" p="sm" className="rounded-xl bg-gray-50 border border-gray-100">
             {host.publicId ? (
               <Link href={`/users/${host.publicId}`}>
-                <Avatar src={host.profilePictureUrl} size="md" radius="xl" color="eco-primary" style={{ cursor: 'pointer' }}>
+                <Avatar src={host.profilePictureUrl} size="sm" radius="xl" color="eco-primary" style={{ cursor: 'pointer' }}>
                   {host.firstName?.[0]}{host.lastName?.[0]}
                 </Avatar>
               </Link>
             ) : (
-              <Avatar src={host.profilePictureUrl} size="md" radius="xl" color="eco-primary">
+              <Avatar src={host.profilePictureUrl} size="sm" radius="xl" color="eco-primary">
                 {host.firstName?.[0]}{host.lastName?.[0]}
               </Avatar>
             )}
-            <Stack gap={2} className="flex-1 min-w-0">
+            <Stack gap={1} className="flex-1 min-w-0">
               <Text size="xs" c="dimmed">{t('participations.hostedBy')}</Text>
               {host.publicId ? (
                 <Link href={`/users/${host.publicId}`} className="no-underline">
@@ -266,28 +269,21 @@ function ParticipationCard({
               ) : (
                 <Text size="sm" fw={600}>{host.firstName} {host.lastName}</Text>
               )}
-              {host.averageRating > 0 && (
-                <Group gap={4}>
-                  <IconStar size={12} className="text-eco-terracotta" style={{ fill: 'var(--mantine-color-eco-terracotta-6)' }} />
-                  <Text size="xs" c="dimmed">
-                    {host.averageRating.toFixed(1)} · {host.reviewCount} {host.reviewCount === 1 ? t('profile.review') : t('profile.reviews')}
-                  </Text>
-                </Group>
-              )}
             </Stack>
+            {host.averageRating > 0 && (
+              <Group gap={4} wrap="nowrap">
+                <IconStar size={12} style={{ fill: '#facc15', color: '#facc15' }} />
+                <Text size="xs" c="dimmed">{host.averageRating.toFixed(1)}</Text>
+              </Group>
+            )}
           </Group>
-        )}
-
-        {/* Motivation */}
-        {participation.motivation && (
-          <Text size="sm" c="dimmed" lineClamp={2}>{participation.motivation}</Text>
         )}
 
         {/* Host response */}
         {participation.hostResponseMessage && (
           <Paper radius="md" p="sm" bg="gray.0">
             <Text size="xs" fw={600} c="dimmed" mb={4}>{t('participations.hostResponse')} :</Text>
-            <Text size="sm" c="dimmed">{participation.hostResponseMessage}</Text>
+            <Text size="sm" c="dimmed" lineClamp={2}>{participation.hostResponseMessage}</Text>
           </Paper>
         )}
 
@@ -305,7 +301,7 @@ function ParticipationCard({
             <Button
               size="xs"
               variant="light"
-              color="eco-terracotta"
+              color="eco-primary"
               radius="xl"
               leftSection={<IconStar size={14} />}
               onClick={() => onReview(participation)}

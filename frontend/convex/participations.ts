@@ -25,6 +25,18 @@ async function enrichParticipation(ctx: any, participation: any) {
     }
   }
 
+  // Project cover image
+  let coverImageUrl: string | null = null;
+  if (project) {
+    const coverImg = await ctx.db
+      .query("projectImages")
+      .withIndex("by_project", (q: any) => q.eq("projectId", project._id))
+      .first();
+    if (coverImg) {
+      coverImageUrl = coverImg.url ?? (coverImg.storageId ? await ctx.storage.getUrl(coverImg.storageId) : null);
+    }
+  }
+
   // Host (project owner)
   let host = null;
   if (project?.ownerId) {
@@ -55,6 +67,7 @@ async function enrichParticipation(ctx: any, participation: any) {
           projectType: project.projectType,
           address: projectAddress,
           ownerId: project.ownerId,
+          coverImageUrl,
         }
       : null,
     host,
