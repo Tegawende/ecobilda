@@ -218,7 +218,7 @@ export function ConversationList({
                     <Box style={{ flex: 1, minWidth: 0 }}>
                       <Group justify="space-between" gap="xs" mb={4} wrap="nowrap">
                         <Text fw={unreadCount > 0 ? 700 : 500} size="sm" lineClamp={1}>
-                          {otherUser?.firstName} {otherUser?.lastName}
+                          {otherUser?.firstName}
                         </Text>
                         <Group gap={4} wrap="nowrap">
                           {muted && (
