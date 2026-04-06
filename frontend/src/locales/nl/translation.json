@@ -743,7 +743,14 @@
     "editProject": "Project bewerken",
     "editProjectDesc": "Werk uw projectinformatie bij",
     "projectCreated": "Je project is succesvol ingediend!",
-    "projectCreatedDesc": "Het wordt beoordeeld door een beheerder voordat het wordt gepubliceerd. Je ontvangt een melding zodra het is goedgekeurd. Je project is niet zichtbaar voor gebruikers totdat het is gevalideerd."
+    "projectCreatedDesc": "Het wordt beoordeeld door een beheerder voordat het wordt gepubliceerd. Je ontvangt een melding zodra het is goedgekeurd. Je project is niet zichtbaar voor gebruikers totdat het is gevalideerd.",
+    "deleteProject": "Project verwijderen",
+    "deleteProjectTitle": "Dit project verwijderen?",
+    "deleteProjectConfirm": "Deze actie is onomkeerbaar. Het project en alle bijbehorende gegevens (afbeeldingen, beschikbaarheden) worden permanent verwijderd.",
+    "deleteProjectBtn": "Ja, verwijderen",
+    "deleteProjectCancel": "Annuleren",
+    "deleteProjectSuccess": "Project succesvol verwijderd.",
+    "deleteProjectError": "Verwijderen mislukt. Probeer het opnieuw."
   },
   "participations": {
     "title": "Mijn deelnames",
@@ -753,7 +760,7 @@
     "accepted": "Geaccepteerd",
     "rejected": "Afgewezen",
     "completed": "Voltooid",
-    "hostedBy": "Gehost door",
+    "hostedBy": "Georganiseerd door",
     "viewProject": "Project bekijken",
     "noParticipations": "Nog geen deelnames",
     "noParticipationsDesc": "Begin met het verkennen van projecten en solliciteer om deel te nemen!",
@@ -772,7 +779,20 @@
     "requestSent": "Verzoek verzonden!",
     "requestSentDesc": "De gastgever zal uw verzoek bekijken en u antwoorden.",
     "sendRequest": "Verzoek verzenden",
-    "startDate": "Startdatum"
+    "startDate": "Startdatum",
+    "leaveReview": "Beoordeling achterlaten",
+    "reviewModalTitle": "Beoordeel je ervaring",
+    "reviewRating": "Beoordeling",
+    "reviewRatingHint": "Klik om te beoordelen (halve sterren mogelijk)",
+    "reviewFeedback": "Jouw beoordeling",
+    "reviewFeedbackPlaceholder": "Deel je ervaring met deze host...",
+    "reviewFeedbackRequired": "Schrijf minimaal 20 tekens.",
+    "reviewSubmit": "Beoordeling indienen",
+    "reviewSubmitting": "Verzenden...",
+    "reviewSuccess": "Je beoordeling is ingediend!",
+    "reviewError": "Indienen mislukt. Probeer het opnieuw.",
+    "reviewAlreadyDone": "Je hebt deze host al beoordeeld.",
+    "viewProfile": "Profiel bekijken"
   },
   "profile": {
     "personalInfo": "Persoonlijke informatie",

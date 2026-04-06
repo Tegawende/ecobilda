@@ -657,7 +657,14 @@
     "noPast": "Sem projetos passados",
     "noPastDesc": "Ainda não tem projetos passados.",
     "projectCreated": "O seu projeto foi submetido com sucesso!",
-    "projectCreatedDesc": "Será analisado por um administrador antes de ser publicado. Receberá uma notificação assim que for aprovado. O seu projeto não será visível para os utilizadores até ser validado."
+    "projectCreatedDesc": "Será analisado por um administrador antes de ser publicado. Receberá uma notificação assim que for aprovado. O seu projeto não será visível para os utilizadores até ser validado.",
+    "deleteProject": "Excluir projeto",
+    "deleteProjectTitle": "Excluir este projeto?",
+    "deleteProjectConfirm": "Esta ação é irreversível. O projeto e todos os seus dados (imagens, disponibilidades) serão excluídos permanentemente.",
+    "deleteProjectBtn": "Sim, excluir",
+    "deleteProjectCancel": "Cancelar",
+    "deleteProjectSuccess": "Projeto excluído com sucesso.",
+    "deleteProjectError": "Falha ao excluir o projeto. Tente novamente."
   },
   "participations": {
     "title": "As minhas participações",
@@ -667,7 +674,7 @@
     "accepted": "Aceite",
     "rejected": "Rejeitado",
     "completed": "Concluído",
-    "hostedBy": "Alojado por",
+    "hostedBy": "Organizado por",
     "viewProject": "Ver projeto",
     "noParticipations": "Ainda sem participações",
     "noParticipationsDesc": "Comece a explorar projetos e candidate-se para participar!",
@@ -686,7 +693,20 @@
     "requestSent": "Pedido enviado!",
     "requestSentDesc": "O anfitrião irá analisar o seu pedido e responder-lhe.",
     "sendRequest": "Enviar pedido",
-    "startDate": "Data de início"
+    "startDate": "Data de início",
+    "leaveReview": "Deixar uma avaliação",
+    "reviewModalTitle": "Avalie sua experiência",
+    "reviewRating": "Avaliação",
+    "reviewRatingHint": "Clique para avaliar (meias estrelas disponíveis)",
+    "reviewFeedback": "Sua avaliação",
+    "reviewFeedbackPlaceholder": "Compartilhe sua experiência com este anfitrião...",
+    "reviewFeedbackRequired": "Por favor escreva pelo menos 20 caracteres.",
+    "reviewSubmit": "Enviar avaliação",
+    "reviewSubmitting": "Enviando...",
+    "reviewSuccess": "Sua avaliação foi enviada!",
+    "reviewError": "Falha ao enviar avaliação. Tente novamente.",
+    "reviewAlreadyDone": "Você já avaliou este anfitrião.",
+    "viewProfile": "Ver perfil"
   },
   "favorites": {
     "title": "Os meus favoritos",

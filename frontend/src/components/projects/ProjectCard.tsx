@@ -17,6 +17,7 @@ import {
   IconEdit,
   IconChevronLeft,
   IconChevronRight,
+  IconTrash,
 } from '@tabler/icons-react';
 import { FavoriteButton } from '../common/FavoriteButton';
 import type { Project } from '@/types';
@@ -28,6 +29,7 @@ interface ProjectCardProps {
   initialFavorite?: boolean;
   showEdit?: boolean;
   onEdit?: (id: string) => void;
+  onDelete?: (project: Project) => void;
   showStatus?: boolean;
   /** Called on mobile clicks instead of navigation */
   onMobileClick?: (project: Project) => void;
@@ -61,6 +63,7 @@ export function ProjectCard({
   initialFavorite = false,
   showEdit = false,
   onEdit,
+  onDelete,
   showStatus = false,
   onMobileClick,
 }: ProjectCardProps) {
@@ -158,21 +161,30 @@ export function ProjectCard({
           </div>
         )}
 
-        {/* Edit Button */}
+        {/* Edit + Delete buttons */}
         {showEdit && (
-          <ActionIcon
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onEdit?.(project._id);
-            }}
-            variant="white"
-            radius="xl"
-            size="lg"
-            className="absolute top-3 right-3 z-30 text-gray-700 hover:text-eco-primary shadow-sm transition-all"
-          >
-            <IconEdit size={18} />
-          </ActionIcon>
+          <div className="absolute top-3 right-3 z-30 flex gap-1.5">
+            {onDelete && (
+              <ActionIcon
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDelete(project); }}
+                variant="white"
+                radius="xl"
+                size="lg"
+                className="text-red-500 hover:text-red-600 shadow-sm transition-all"
+              >
+                <IconTrash size={16} />
+              </ActionIcon>
+            )}
+            <ActionIcon
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onEdit?.(project._id); }}
+              variant="white"
+              radius="xl"
+              size="lg"
+              className="text-gray-700 hover:text-eco-primary shadow-sm transition-all"
+            >
+              <IconEdit size={18} />
+            </ActionIcon>
+          </div>
         )}
 
         {/* Type Badge */}

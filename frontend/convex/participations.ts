@@ -25,6 +25,27 @@ async function enrichParticipation(ctx: any, participation: any) {
     }
   }
 
+  // Host (project owner)
+  let host = null;
+  if (project?.ownerId) {
+    const owner = await ctx.db.get(project.ownerId);
+    if (owner) {
+      let hostPictureUrl = owner.profilePictureUrl ?? null;
+      if (owner.profilePicture && !hostPictureUrl) {
+        hostPictureUrl = await ctx.storage.getUrl(owner.profilePicture);
+      }
+      host = {
+        _id: owner._id,
+        publicId: owner.publicId,
+        firstName: owner.firstName,
+        lastName: owner.lastName,
+        profilePictureUrl: hostPictureUrl,
+        averageRating: owner.averageRating,
+        reviewCount: owner.reviewCount,
+      };
+    }
+  }
+
   return {
     ...participation,
     project: project
@@ -36,6 +57,7 @@ async function enrichParticipation(ctx: any, participation: any) {
           ownerId: project.ownerId,
         }
       : null,
+    host,
     volunteer: volunteer
       ? {
           _id: volunteer._id,

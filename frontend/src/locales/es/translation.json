@@ -657,7 +657,14 @@
     "projectCreated": "¡Su proyecto ha sido enviado con éxito!",
     "projectCreatedDesc": "Será revisado por un administrador antes de ser publicado. Recibirá una notificación cuando haya sido aprobado. Su proyecto no será visible para los usuarios hasta que sea validado.",
     "editProject": "Editar proyecto",
-    "editProjectDesc": "Actualice la información de su proyecto"
+    "editProjectDesc": "Actualice la información de su proyecto",
+    "deleteProject": "Eliminar proyecto",
+    "deleteProjectTitle": "¿Eliminar este proyecto?",
+    "deleteProjectConfirm": "Esta acción es irreversible. El proyecto y todos sus datos (imágenes, disponibilidades) serán eliminados permanentemente.",
+    "deleteProjectBtn": "Sí, eliminar",
+    "deleteProjectCancel": "Cancelar",
+    "deleteProjectSuccess": "Proyecto eliminado correctamente.",
+    "deleteProjectError": "Error al eliminar el proyecto. Inténtalo de nuevo."
   },
   "participations": {
     "title": "Mis participaciones",
@@ -667,7 +674,7 @@
     "accepted": "Aceptado",
     "rejected": "Rechazado",
     "completed": "Completado",
-    "hostedBy": "Alojado por",
+    "hostedBy": "Organizado por",
     "viewProject": "Ver proyecto",
     "noParticipations": "Aún no hay participaciones",
     "noParticipationsDesc": "¡Comienza a explorar proyectos y postúlate para unirte!",
@@ -686,7 +693,20 @@
     "requestSent": "Solicitud enviada!",
     "requestSentDesc": "El anfitrión revisará su solicitud y le responderá.",
     "sendRequest": "Enviar solicitud",
-    "startDate": "Fecha de inicio"
+    "startDate": "Fecha de inicio",
+    "leaveReview": "Dejar una valoración",
+    "reviewModalTitle": "Valora tu experiencia",
+    "reviewRating": "Puntuación",
+    "reviewRatingHint": "Haz clic para valorar (medias estrellas disponibles)",
+    "reviewFeedback": "Tu valoración",
+    "reviewFeedbackPlaceholder": "Comparte tu experiencia con este anfitrión...",
+    "reviewFeedbackRequired": "Por favor escribe al menos 20 caracteres.",
+    "reviewSubmit": "Enviar valoración",
+    "reviewSubmitting": "Enviando...",
+    "reviewSuccess": "¡Tu valoración ha sido enviada!",
+    "reviewError": "Error al enviar la valoración. Inténtalo de nuevo.",
+    "reviewAlreadyDone": "Ya has valorado a este anfitrión.",
+    "viewProfile": "Ver perfil"
   },
   "favorites": {
     "title": "Mis favoritos",

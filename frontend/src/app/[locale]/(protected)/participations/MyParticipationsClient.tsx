@@ -1,166 +1,358 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useState } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import logger from '@/lib/logger';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '../../../../../convex/_generated/api';
 import {
-  Container,
-  Title,
-  Text,
-  Group,
-  Stack,
-  ThemeIcon,
-  Alert,
-  SimpleGrid,
-  Paper,
-  Button,
+  Container, Title, Text, Group, Stack, ThemeIcon, Alert,
+  SimpleGrid, Paper, Button, Avatar, Modal, Textarea, Badge,
 } from '@mantine/core';
 import {
-  IconCompass,
-  IconCalendar,
-  IconCircleCheck,
-  IconClock,
-  IconX,
-  IconArrowRight,
-  IconAlertCircle,
+  IconCompass, IconCircleCheck, IconClock, IconX, IconArrowRight,
+  IconStar, IconMessageCircle, IconUser,
 } from '@tabler/icons-react';
-import { participationsService } from '@/services/participations';
-import type { ParticipationRequest } from '@/types';
+import { getSessionToken } from '@/lib/convexClient';
 import { Layout } from '@/components/common/Layout';
 
-type DisplayStatus = 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled' | 'expired';
-
-function mapStatus(apiStatus: ParticipationRequest['status']): DisplayStatus {
-  const statusMap: Record<ParticipationRequest['status'], DisplayStatus> = {
-    'PENDING': 'pending',
-    'ACCEPTED': 'accepted',
-    'REFUSED': 'rejected',
-    'CANCELLED': 'cancelled',
-    'EXPIRED': 'expired',
-  };
-  return statusMap[apiStatus] || 'pending';
-}
-
-function StatusBadge({ status }: { status: ParticipationRequest['status'] }) {
-  const t = useTranslations();
-  const displayStatus = mapStatus(status);
-
-  const config: Record<DisplayStatus, { bg: string; text: string; icon: typeof IconClock; label: string }> = {
-    pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', icon: IconClock, label: t('participations.pending') },
-    accepted: { bg: 'bg-green-100', text: 'text-green-800', icon: IconCircleCheck, label: t('participations.accepted') },
-    rejected: { bg: 'bg-red-100', text: 'text-red-800', icon: IconX, label: t('participations.rejected') },
-    completed: { bg: 'bg-blue-100', text: 'text-blue-800', icon: IconCircleCheck, label: t('participations.completed') },
-    cancelled: { bg: 'bg-gray-100', text: 'text-gray-800', icon: IconX, label: t('participations.cancelled') },
-    expired: { bg: 'bg-gray-100', text: 'text-gray-600', icon: IconClock, label: t('participations.expired') },
-  };
-
-  const { bg, text, icon: Icon, label } = config[displayStatus];
+// ─── Half-star rating component ──────────────────────────────────────────────
+function HalfStarRating({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  const [hovered, setHovered] = useState<number | null>(null);
+  const display = hovered ?? value;
 
   return (
-    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${bg} ${text}`}>
-      <Icon size={14} />
-      {label}
-    </span>
+    <Group gap={4}>
+      {[1, 2, 3, 4, 5].map((star) => {
+        const fullFill = display >= star;
+        const halfFill = !fullFill && display >= star - 0.5;
+        return (
+          <div
+            key={star}
+            className="relative cursor-pointer"
+            style={{ width: 32, height: 32 }}
+            onMouseLeave={() => setHovered(null)}
+          >
+            {/* Left half → half star */}
+            <div
+              className="absolute left-0 top-0 w-1/2 h-full z-10"
+              onMouseEnter={() => setHovered(star - 0.5)}
+              onClick={() => onChange(star - 0.5)}
+            />
+            {/* Right half → full star */}
+            <div
+              className="absolute right-0 top-0 w-1/2 h-full z-10"
+              onMouseEnter={() => setHovered(star)}
+              onClick={() => onChange(star)}
+            />
+            {/* Star icon with clip for half */}
+            <svg width="32" height="32" viewBox="0 0 24 24" style={{ display: 'block' }}>
+              {halfFill && (
+                <defs>
+                  <linearGradient id={`half-${star}`}>
+                    <stop offset="50%" stopColor="var(--mantine-color-eco-terracotta-6)" />
+                    <stop offset="50%" stopColor="#e5e7eb" />
+                  </linearGradient>
+                </defs>
+              )}
+              <polygon
+                points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
+                fill={
+                  fullFill
+                    ? 'var(--mantine-color-eco-terracotta-6)'
+                    : halfFill
+                    ? `url(#half-${star})`
+                    : '#e5e7eb'
+                }
+                stroke={fullFill || halfFill ? 'var(--mantine-color-eco-terracotta-6)' : '#d1d5db'}
+                strokeWidth="1"
+              />
+            </svg>
+          </div>
+        );
+      })}
+      {value > 0 && (
+        <Text size="sm" fw={600} c="eco-terracotta" ml={4}>
+          {value}
+        </Text>
+      )}
+    </Group>
   );
 }
 
-function ParticipationCard({ participation }: { participation: ParticipationRequest }) {
+// ─── Status badge ─────────────────────────────────────────────────────────────
+type Status = 'PENDING' | 'ACCEPTED' | 'REFUSED' | 'CANCELLED' | 'EXPIRED';
+
+function StatusBadge({ status }: { status: Status }) {
   const t = useTranslations();
+  const cfg: Record<Status, { color: string; icon: typeof IconClock; label: string }> = {
+    PENDING:   { color: 'yellow', icon: IconClock,        label: t('participations.pending') },
+    ACCEPTED:  { color: 'green',  icon: IconCircleCheck,  label: t('participations.accepted') },
+    REFUSED:   { color: 'red',    icon: IconX,            label: t('participations.rejected') },
+    CANCELLED: { color: 'gray',   icon: IconX,            label: t('participations.cancelled') },
+    EXPIRED:   { color: 'gray',   icon: IconClock,        label: t('participations.expired') },
+  };
+  const { color, icon: Icon, label } = cfg[status] ?? cfg.PENDING;
+  return (
+    <Badge color={color} variant="light" radius="xl" leftSection={<Icon size={12} />}>
+      {label}
+    </Badge>
+  );
+}
+
+// ─── Review modal ─────────────────────────────────────────────────────────────
+function ReviewModal({
+  opened,
+  onClose,
+  host,
+  onSubmit,
+}: {
+  opened: boolean;
+  onClose: () => void;
+  host: any;
+  onSubmit: (rating: number, feedback: string) => Promise<void>;
+}) {
+  const t = useTranslations();
+  const [rating, setRating] = useState(0);
+  const [feedback, setFeedback] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    if (rating === 0) { setError(t('participations.reviewRatingHint')); return; }
+    if (feedback.trim().length < 20) { setError(t('participations.reviewFeedbackRequired')); return; }
+    setError(null);
+    setSubmitting(true);
+    try {
+      await onSubmit(rating, feedback.trim());
+      onClose();
+    } catch (e: any) {
+      setError(e.message?.includes('already') ? t('participations.reviewAlreadyDone') : t('participations.reviewError'));
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <Paper radius="lg" p={0} withBorder className="hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full">
-      <div className="relative p-5 bg-gradient-to-r from-eco-primary/5 to-eco-terracotta/5">
-        <div className="absolute top-3 right-3 z-10">
-          <StatusBadge status={participation.status} />
-        </div>
-        <Link
-          href={`/projects/${participation.project?._id}`}
-          className="text-lg font-display font-bold text-gray-900 hover:text-eco-primary transition-colors line-clamp-2 pr-20"
-        >
-          {participation.project?.title}
-        </Link>
-      </div>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title={
+        <Group gap="sm">
+          <ThemeIcon size="md" radius="xl" color="eco-terracotta" variant="light">
+            <IconStar size={16} />
+          </ThemeIcon>
+          <Text fw={600}>{t('participations.reviewModalTitle')}</Text>
+        </Group>
+      }
+      centered
+      radius="lg"
+      size="md"
+    >
+      <Stack gap="lg">
+        {/* Host info */}
+        {host && (
+          <Group gap="sm">
+            <Avatar src={host.profilePictureUrl} size="md" radius="xl" color="eco-primary">
+              {host.firstName?.[0]}{host.lastName?.[0]}
+            </Avatar>
+            <Stack gap={0}>
+              <Text fw={600} size="sm">{host.firstName} {host.lastName}</Text>
+              {host.averageRating > 0 && (
+                <Group gap={4}>
+                  <IconStar size={12} className="text-eco-terracotta fill-eco-terracotta" />
+                  <Text size="xs" c="dimmed">{host.averageRating.toFixed(1)} · {host.reviewCount} avis</Text>
+                </Group>
+              )}
+            </Stack>
+          </Group>
+        )}
 
-      <div className="flex-1 p-5 flex flex-col">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-4 text-xs font-medium text-eco-primary bg-eco-primary/5 p-2 rounded-lg">
-            <IconCalendar size={16} />
-            <span>
-              {participation.proposedStartDate ? new Date(participation.proposedStartDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : ''}
-              {' - '}
-              {participation.proposedEndDate ? new Date(participation.proposedEndDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : ''}
-            </span>
-          </div>
+        {/* Star rating */}
+        <Stack gap={6}>
+          <Text size="sm" fw={600}>{t('participations.reviewRating')}</Text>
+          <HalfStarRating value={rating} onChange={setRating} />
+        </Stack>
 
-          {participation.motivation && (
-            <p className="text-sm text-gray-600 line-clamp-2 mb-4">{participation.motivation}</p>
-          )}
+        {/* Feedback */}
+        <Textarea
+          label={t('participations.reviewFeedback')}
+          placeholder={t('participations.reviewFeedbackPlaceholder')}
+          minRows={4}
+          value={feedback}
+          onChange={(e) => setFeedback(e.currentTarget.value)}
+          error={feedback.length > 0 && feedback.trim().length < 20 ? t('participations.reviewFeedbackRequired') : undefined}
+        />
 
-          {participation.hostResponseMessage && (
-            <Paper radius="md" p="sm" bg="gray.0">
-              <Text size="sm" fw={600} c="dimmed">{t('participations.hostResponse')}:</Text>
-              <Text size="sm" c="dimmed" mt={4}>{participation.hostResponseMessage}</Text>
-            </Paper>
-          )}
-        </div>
+        {error && <Alert color="red" variant="light" radius="md">{error}</Alert>}
 
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
-          <Text size="xs" c="dimmed">
-            {t('participations.host')}
-          </Text>
+        <Group justify="flex-end" gap="sm">
+          <Button variant="default" radius="xl" onClick={onClose} disabled={submitting}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            color="eco-terracotta"
+            radius="xl"
+            leftSection={<IconStar size={16} />}
+            loading={submitting}
+            onClick={handleSubmit}
+          >
+            {submitting ? t('participations.reviewSubmitting') : t('participations.reviewSubmit')}
+          </Button>
+        </Group>
+      </Stack>
+    </Modal>
+  );
+}
+
+// ─── Participation card ───────────────────────────────────────────────────────
+function ParticipationCard({
+  participation,
+  onReview,
+}: {
+  participation: any;
+  onReview: (participation: any) => void;
+}) {
+  const t = useTranslations();
+  const locale = useLocale();
+
+  const host = participation.host;
+  const canReview = participation.status === 'ACCEPTED';
+
+  return (
+    <Paper radius="lg" p={0} withBorder className="overflow-hidden flex flex-col h-full">
+      {/* Header */}
+      <div className="p-5 bg-gradient-to-r from-eco-primary/5 to-eco-terracotta/5">
+        <Group justify="space-between" align="flex-start" wrap="nowrap">
           <Link
             href={`/projects/${participation.project?._id}`}
-            className="inline-flex items-center gap-1 text-xs font-bold text-eco-primary hover:text-eco-primaryDark"
+            className="text-base font-display font-bold text-gray-900 hover:text-eco-primary transition-colors line-clamp-2 flex-1 pr-3"
+          >
+            {participation.project?.title}
+          </Link>
+          <div className="flex-shrink-0">
+            <StatusBadge status={participation.status} />
+          </div>
+        </Group>
+      </div>
+
+      <div className="flex-1 p-5 flex flex-col gap-4">
+        {/* Host info */}
+        {host && (
+          <Group gap="sm" p="sm" className="rounded-xl bg-gray-50 border border-gray-100">
+            {host.publicId ? (
+              <Link href={`/users/${host.publicId}`}>
+                <Avatar src={host.profilePictureUrl} size="md" radius="xl" color="eco-primary" style={{ cursor: 'pointer' }}>
+                  {host.firstName?.[0]}{host.lastName?.[0]}
+                </Avatar>
+              </Link>
+            ) : (
+              <Avatar src={host.profilePictureUrl} size="md" radius="xl" color="eco-primary">
+                {host.firstName?.[0]}{host.lastName?.[0]}
+              </Avatar>
+            )}
+            <Stack gap={2} className="flex-1 min-w-0">
+              <Text size="xs" c="dimmed">{t('participations.hostedBy')}</Text>
+              {host.publicId ? (
+                <Link href={`/users/${host.publicId}`} className="no-underline">
+                  <Text size="sm" fw={600} c="eco-primary">{host.firstName} {host.lastName}</Text>
+                </Link>
+              ) : (
+                <Text size="sm" fw={600}>{host.firstName} {host.lastName}</Text>
+              )}
+              {host.averageRating > 0 && (
+                <Group gap={4}>
+                  <IconStar size={12} className="text-eco-terracotta" style={{ fill: 'var(--mantine-color-eco-terracotta-6)' }} />
+                  <Text size="xs" c="dimmed">
+                    {host.averageRating.toFixed(1)} · {host.reviewCount} {host.reviewCount === 1 ? t('profile.review') : t('profile.reviews')}
+                  </Text>
+                </Group>
+              )}
+            </Stack>
+          </Group>
+        )}
+
+        {/* Motivation */}
+        {participation.motivation && (
+          <Text size="sm" c="dimmed" lineClamp={2}>{participation.motivation}</Text>
+        )}
+
+        {/* Host response */}
+        {participation.hostResponseMessage && (
+          <Paper radius="md" p="sm" bg="gray.0">
+            <Text size="xs" fw={600} c="dimmed" mb={4}>{t('participations.hostResponse')} :</Text>
+            <Text size="sm" c="dimmed">{participation.hostResponseMessage}</Text>
+          </Paper>
+        )}
+
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
+          <Link
+            href={`/projects/${participation.project?._id}`}
+            className="inline-flex items-center gap-1 text-xs font-bold text-eco-primary hover:underline"
           >
             {t('participations.viewProject')}
             <IconArrowRight size={14} />
           </Link>
+
+          {canReview && (
+            <Button
+              size="xs"
+              variant="light"
+              color="eco-terracotta"
+              radius="xl"
+              leftSection={<IconStar size={14} />}
+              onClick={() => onReview(participation)}
+            >
+              {t('participations.leaveReview')}
+            </Button>
+          )}
         </div>
       </div>
     </Paper>
   );
 }
 
-
+// ─── Main component ───────────────────────────────────────────────────────────
 export function MyParticipationsClient() {
   const t = useTranslations();
   const [filter, setFilter] = useState('all');
-  const [participations, setParticipations] = useState<ParticipationRequest[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [reviewTarget, setReviewTarget] = useState<any | null>(null);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
 
-  useEffect(() => {
-    const fetchParticipations = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const data = await participationsService.getMyParticipations();
-        const requestList = Array.isArray(data) ? data : ((data as any).results || []);
-        setParticipations(requestList);
-      } catch (err: any) {
-        // 404 means the endpoint doesn't exist yet - treat as empty list
-        if (err?.response?.status === 404) {
-          setParticipations([]);
-        } else {
-          logger.error('Failed to fetch participations:', err);
-          setError(t('participations.fetchError'));
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const token = getSessionToken();
+  const participations = useQuery(
+    api.participations.getMyRequests,
+    token ? { token } : 'skip'
+  ) as any[] | undefined;
 
-    fetchParticipations();
-  }, [t]);
+  const createReview = useMutation(api.reviews.create);
 
-  const filteredParticipations = participations.filter(p => {
+  const isLoading = participations === undefined;
+
+  const filtered = (participations ?? []).filter((p) => {
     if (filter === 'all') return true;
     return p.status === filter;
   });
 
-  const countByStatus = (status: string) =>
-    status === 'all' ? participations.length : participations.filter(p => p.status === status).length;
+  const handleReviewSubmit = async (rating: number, feedback: string) => {
+    if (!token || !reviewTarget?.host) return;
+    await createReview({
+      token,
+      receiverId: reviewTarget.host._id,
+      rating,
+      feedback,
+    });
+    setReviewSuccess(true);
+    setReviewTarget(null);
+    setTimeout(() => setReviewSuccess(false), 4000);
+  };
 
   return (
     <Layout>
@@ -173,30 +365,30 @@ export function MyParticipationsClient() {
                 <IconCompass size={28} />
               </ThemeIcon>
               <Stack gap={4}>
-                <Title order={1} className="font-display">
-                  {t('participations.title')}
-                </Title>
-                <Text c="dimmed">
-                  {t('participations.subtitle')}
-                </Text>
+                <Title order={1} className="font-display">{t('participations.title')}</Title>
+                <Text c="dimmed">{t('participations.subtitle')}</Text>
               </Stack>
             </Group>
 
-            {/* Filter Tabs */}
+            {reviewSuccess && (
+              <Alert color="green" variant="light" radius="md" icon={<IconCircleCheck size={18} />}>
+                {t('participations.reviewSuccess')}
+              </Alert>
+            )}
+
+            {/* Filter tabs */}
             <div className="inline-flex w-fit items-center rounded-md bg-gray-100 p-1 gap-0.5">
               {[
-                { value: 'all', label: t('participations.all') },
-                { value: 'PENDING', label: t('participations.pending') },
+                { value: 'all',      label: t('participations.all') },
+                { value: 'PENDING',  label: t('participations.pending') },
                 { value: 'ACCEPTED', label: t('participations.accepted') },
-                { value: 'REFUSED', label: t('participations.rejected') },
+                { value: 'REFUSED',  label: t('participations.rejected') },
               ].map((tab) => (
                 <button
                   key={tab.value}
                   onClick={() => setFilter(tab.value)}
                   className={`px-3 py-1.5 rounded-sm text-sm font-medium transition-all cursor-pointer whitespace-nowrap ${
-                    filter === tab.value
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
+                    filter === tab.value ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
                   {tab.label}
@@ -204,43 +396,26 @@ export function MyParticipationsClient() {
               ))}
             </div>
 
-            {/* Error */}
-            {error && (
-              <Alert icon={<IconAlertCircle size={16} />} color="red" onClose={() => setError(null)} withCloseButton>
-                {error}
-              </Alert>
-            )}
-
             {/* Content */}
             {isLoading ? (
               <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
                 {[1, 2, 3].map((i) => (
-                  <Paper key={i} radius="lg" h={256} withBorder className="animate-pulse bg-gray-100" />
+                  <Paper key={i} radius="lg" h={280} withBorder className="animate-pulse bg-gray-100" />
                 ))}
               </SimpleGrid>
-            ) : !error && filteredParticipations.length > 0 ? (
+            ) : filtered.length > 0 ? (
               <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-                {filteredParticipations.map((participation) => (
-                  <ParticipationCard key={participation._id} participation={participation} />
+                {filtered.map((p) => (
+                  <ParticipationCard key={p._id} participation={p} onReview={setReviewTarget} />
                 ))}
               </SimpleGrid>
             ) : (
               <Paper radius="lg" p="xl" withBorder className="text-center">
                 <Stack align="center" gap="md">
                   <IconCompass size={64} className="text-gray-300" />
-                  <Title order={3} className="font-display">
-                    {t('participations.noParticipations')}
-                  </Title>
-                  <Text c="dimmed" maw={400}>
-                    {t('participations.noParticipationsDesc')}
-                  </Text>
-                  <Button
-                    component={Link}
-                    href="/projects"
-                    radius="xl"
-                    size="md"
-                    color="eco-primary"
-                  >
+                  <Title order={3} className="font-display">{t('participations.noParticipations')}</Title>
+                  <Text c="dimmed" maw={400}>{t('participations.noParticipationsDesc')}</Text>
+                  <Button component={Link} href="/projects" radius="xl" size="md" color="eco-primary">
                     {t('participations.browseProjects')}
                   </Button>
                 </Stack>
@@ -249,6 +424,14 @@ export function MyParticipationsClient() {
           </Stack>
         </Container>
       </div>
+
+      {/* Review modal */}
+      <ReviewModal
+        opened={reviewTarget !== null}
+        onClose={() => setReviewTarget(null)}
+        host={reviewTarget?.host}
+        onSubmit={handleReviewSubmit}
+      />
     </Layout>
   );
 }
