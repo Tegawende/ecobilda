@@ -45,6 +45,7 @@ __pycache__/
 
 # Build artifacts
 dist/
+.vite/
 
 # Temporary files
 *.tmp
