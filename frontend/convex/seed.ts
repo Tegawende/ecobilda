@@ -1,4 +1,4 @@
-import { mutation, action, internalMutation } from "./_generated/server";
+import { mutation, action, internalMutation, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 
@@ -576,7 +576,7 @@ export const uploadSeedImages = action({
 });
 
 // Internal query to get seed images
-export const _getSeedImages = internalMutation({
+export const _getSeedImages = internalQuery({
   args: {},
   handler: async (ctx) => {
     return await ctx.db.query("projectImages").collect();
