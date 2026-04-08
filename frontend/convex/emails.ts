@@ -41,7 +41,9 @@ async function sendEmail(opts: { to: string; subject: string; html: string }): P
   // fromAddress = what the recipient sees (can be an alias)
   const mailbox = process.env.MS_GRAPH_MAILBOX || "admin@ecobilda.org";
   const fromAddress = process.env.DEFAULT_FROM_EMAIL || "noreply@ecobilda.org";
+  console.log(`[EMAIL] Sending to ${opts.to} via mailbox ${mailbox} from ${fromAddress}`);
   const token = await getAccessToken();
+  console.log(`[EMAIL] Token obtained, sending...`);
   const url = GRAPH_SEND_URL.replace("{sender}", mailbox);
 
   const payload = {
@@ -54,18 +56,27 @@ async function sendEmail(opts: { to: string; subject: string; html: string }): P
     saveToSentItems: false,
   };
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
 
-  if (!response.ok && response.status !== 202) {
-    const error = await response.text();
-    throw new Error(`MS Graph send error (${response.status}): ${error}`);
+    console.log(`[EMAIL] Response status: ${response.status}`);
+
+    if (!response.ok && response.status !== 202) {
+      const error = await response.text();
+      console.error(`[EMAIL] FAILED: ${response.status} - ${error}`);
+      throw new Error(`MS Graph send error (${response.status}): ${error}`);
+    }
+    console.log(`[EMAIL] Sent successfully to ${opts.to}`);
+  } catch (e: any) {
+    console.error(`[EMAIL] Exception: ${e.message}`);
+    throw e;
   }
 }
 
