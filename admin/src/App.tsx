@@ -41,7 +41,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return <>{children}</>;
+  return <ConvexProvider>{children}</ConvexProvider>;
 }
 
 // Public route wrapper (redirects to dashboard if already logged in)
@@ -102,13 +102,11 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <ConvexProvider>
-      <ThemeProvider>
-        <AuthProvider>
-          <AppRoutes />
-          <Toaster />
-        </AuthProvider>
-      </ThemeProvider>
-    </ConvexProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppRoutes />
+        <Toaster />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
