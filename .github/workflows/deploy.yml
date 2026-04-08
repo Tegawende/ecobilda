@@ -8,6 +8,7 @@ jobs:
   deploy:
     name: Deploy to production server
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
@@ -15,9 +16,14 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: deploy
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 10m
           script: |
             set -e
             cd /opt/ecobilda
-            git fetch origin
+
+            # Clean stale refs before fetch (prevents lock errors)
+            git gc --prune=now --quiet 2>/dev/null || true
+            git fetch origin --force --prune
             git reset --hard origin/main
+
             bash scripts/deploy.sh
