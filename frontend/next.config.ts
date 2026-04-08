@@ -21,6 +21,8 @@ const nextConfig: NextConfig = {
         port: "3210",
       },
       { protocol: "https", hostname: "api.ecobilda.org" },
+      { protocol: "https", hostname: "convex.ecobilda.org" },
+      { protocol: "https", hostname: "ecobilda.org" },
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
     ],
   },

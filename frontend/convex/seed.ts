@@ -504,27 +504,20 @@ export const seedAll = mutation({
   },
 });
 
-// One-time fix: restore original seed images from frontend/public/projects/
+// One-time fix: restore seed images to relative URLs (/projects/X/image_N.png)
 export const fixSeedImages = mutation({
   args: {},
   handler: async (ctx) => {
-    const baseUrl = process.env.FRONTEND_URL || "https://ecobilda.org";
-
-    // Get all projects to build a mapping
     const projects = await ctx.db.query("projects").collect();
-    const imageMap: Record<string, string> = {};
-    // The seed created projects in order with folders: 1, 2, 3, 10, 11, 20, 21, 22
     const folders = ["1", "2", "3", "10", "11", "20", "21", "22"];
+    const imageMap: Record<string, string> = {};
     projects.forEach((p, idx) => {
-      if (idx < folders.length) {
-        imageMap[p._id] = folders[idx];
-      }
+      if (idx < folders.length) imageMap[p._id] = folders[idx];
     });
 
     let updated = 0;
     const allImages = await ctx.db.query("projectImages").collect();
 
-    // Group images by project, sorted by order
     const imagesByProject: Record<string, typeof allImages> = {};
     for (const img of allImages) {
       const pid = img.projectId as string;
@@ -535,10 +528,9 @@ export const fixSeedImages = mutation({
     for (const [projectId, images] of Object.entries(imagesByProject)) {
       const folder = imageMap[projectId];
       if (!folder) continue;
-      // Sort by order field
       images.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0));
       for (let i = 0; i < images.length && i < 5; i++) {
-        const newUrl = `${baseUrl}/projects/${folder}/image_${i + 1}.png`;
+        const newUrl = `/projects/${folder}/image_${i + 1}.png`;
         if (images[i].url !== newUrl) {
           await ctx.db.patch(images[i]._id, { url: newUrl });
           updated++;
