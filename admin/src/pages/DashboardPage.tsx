@@ -10,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { type DashboardStats } from '@/services/api';
 import { cn } from '@/lib/utils';
 import { useAdminQuery } from '@/hooks/useAdminQuery';
-import { api } from '../../convex/_generated/api';
+import { api } from '@convex/_generated/api';
 
 export function DashboardPage() {
   const { t } = useTranslation();

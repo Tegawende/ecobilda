@@ -16,7 +16,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
 import { useAdminQuery } from '@/hooks/useAdminQuery';
-import { api } from '../../convex/_generated/api';
+import { api } from '@convex/_generated/api';
 import { cn } from '@/lib/utils';
 
 export function Layout() {

@@ -38,7 +38,7 @@ import { formatDate } from '@/lib/utils';
 import { toast } from '@/hooks/useToast';
 import { getSkillIcon } from '@/lib/skillIcons';
 import { useAdminQuery } from '@/hooks/useAdminQuery';
-import { api } from '../../convex/_generated/api';
+import { api } from '@convex/_generated/api';
 
 // Project Card with frontend-style UI
 function ProjectCard({
