@@ -37,6 +37,8 @@ import { adminApi, type ProjectDetail } from '@/services/api';
 import { formatDate } from '@/lib/utils';
 import { toast } from '@/hooks/useToast';
 import { getSkillIcon } from '@/lib/skillIcons';
+import { useAdminQuery } from '@/hooks/useAdminQuery';
+import { api } from '../../convex/_generated/api';
 
 // Project Card with frontend-style UI
 function ProjectCard({
@@ -458,11 +460,21 @@ function ProjectCard({
 
 export function ProjectsPage() {
   const { t } = useTranslation();
-  const [pendingProjectIds, setPendingProjectIds] = useState<string[]>([]);
-  const [validatedProjectIds, setValidatedProjectIds] = useState<string[]>([]);
-  const [isLoadingPending, setIsLoadingPending] = useState(true);
-  const [isLoadingValidated, setIsLoadingValidated] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const pendingData = useAdminQuery(api.admin.projects.getPending as any);
+  const validatedData = useAdminQuery(api.admin.projects.getValidated as any);
+  const pendingProjectIds = useMemo(() => {
+    if (!pendingData) return [];
+    const projects = Array.isArray(pendingData) ? pendingData : (pendingData as any).results || [];
+    return projects.map((p: { _id: string }) => p._id);
+  }, [pendingData]);
+  const validatedProjectIds = useMemo(() => {
+    if (!validatedData) return [];
+    const projects = Array.isArray(validatedData) ? validatedData : (validatedData as any).results || [];
+    return projects.map((p: { _id: string }) => p._id);
+  }, [validatedData]);
+  const isLoadingPending = pendingData === undefined;
+  const isLoadingValidated = validatedData === undefined;
+  const [error] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<'all' | 'PERMACULTURE' | 'NATURAL_BUILDING'>('all');
@@ -504,44 +516,10 @@ export function ProjectsPage() {
     [filterProjectIds, validatedProjectIds]
   );
 
-  const fetchPendingProjects = useCallback(async () => {
-    try {
-      setIsLoadingPending(true);
-      const data: any = await adminApi.getPendingProjects();
-      const projects = Array.isArray(data) ? data : data.results || [];
-      setPendingProjectIds(projects.map((p: { _id: string }) => p._id));
-    } catch (err) {
-      setError(t('projects.failedToLoad'));
-      console.error(err);
-    } finally {
-      setIsLoadingPending(false);
-    }
-  }, [t]);
-
-  const fetchValidatedProjects = useCallback(async () => {
-    try {
-      setIsLoadingValidated(true);
-      const data: any = await adminApi.getValidatedProjects();
-      const projects = Array.isArray(data) ? data : data.results || [];
-      setValidatedProjectIds(projects.map((p: { _id: string }) => p._id));
-    } catch (err) {
-      console.error('Failed to fetch validated projects:', err);
-    } finally {
-      setIsLoadingValidated(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchPendingProjects();
-    fetchValidatedProjects();
-  }, [fetchPendingProjects, fetchValidatedProjects]);
-
   const handleValidate = useCallback(async (id: string) => {
     setActionLoading(id);
     try {
       await adminApi.validateProject(id);
-      setPendingProjectIds((prev) => prev.filter((pid) => pid !== id));
-      setValidatedProjectIds((prev) => [id, ...prev]);
       toast({
         title: t('toast.projectApproved'),
         description: t('toast.projectApprovedDesc'),
@@ -563,8 +541,6 @@ export function ProjectsPage() {
     setActionLoading(id);
     try {
       await adminApi.invalidateProject(id);
-      setValidatedProjectIds((prev) => prev.filter((pid) => pid !== id));
-      setPendingProjectIds((prev) => [id, ...prev]);
       toast({
         title: t('toast.projectInvalidated'),
         description: t('toast.projectInvalidatedDesc'),
@@ -586,7 +562,6 @@ export function ProjectsPage() {
     setActionLoading(id);
     try {
       await adminApi.rejectProject(id, reason);
-      setPendingProjectIds((prev) => prev.filter((pid) => pid !== id));
       toast({
         title: t('toast.projectRejected'),
         description: t('toast.projectRejectedDesc'),

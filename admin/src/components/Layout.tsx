@@ -15,7 +15,8 @@ import {
 
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
-import { adminApi } from '@/services/api';
+import { useAdminQuery } from '@/hooks/useAdminQuery';
+import { api } from '../../convex/_generated/api';
 import { cn } from '@/lib/utils';
 
 export function Layout() {
@@ -25,20 +26,12 @@ export function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [unreadContacts, setUnreadContacts] = useState(0);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   const isDark = theme === 'dark';
 
-  // Poll unread contact count
-  useEffect(() => {
-    const fetchCount = () => {
-      adminApi.getUnreadContactCount().then(setUnreadContacts).catch(() => {});
-    };
-    fetchCount();
-    const interval = setInterval(fetchCount, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  // Reactive unread contact count
+  const unreadContacts = useAdminQuery(api.admin.contacts.unreadCount as any) as number | undefined;
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -99,7 +92,7 @@ export function Layout() {
           <nav className="flex-1 p-4 space-y-1">
             {navigation.map((item) => {
               const isActive = location.pathname === item.href;
-              const badge = item.href === '/contacts' && unreadContacts > 0 ? unreadContacts : 0;
+              const badge = item.href === '/contacts' && (unreadContacts ?? 0) > 0 ? (unreadContacts ?? 0) : 0;
               return (
                 <Link
                   key={item.href}
@@ -112,7 +105,7 @@ export function Layout() {
                   <item.icon className="w-5 h-5" />
                   <span className="flex-1">{item.name}</span>
                   {badge > 0 && (
-                    <span className="flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-red-500 text-white text-xs font-bold">
+                    <span className="flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-blue-500 text-white text-xs font-bold">
                       {badge > 9 ? '9+' : badge}
                     </span>
                   )}
