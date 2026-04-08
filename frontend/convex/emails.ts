@@ -37,15 +37,18 @@ async function getAccessToken(): Promise<string> {
 }
 
 async function sendEmail(opts: { to: string; subject: string; html: string }): Promise<void> {
-  const sender = process.env.DEFAULT_FROM_EMAIL || "noreply@ecobilda.org";
+  // mailbox = the actual Azure AD user (for the API URL)
+  // fromAddress = what the recipient sees (can be an alias)
+  const mailbox = process.env.MS_GRAPH_MAILBOX || "admin@ecobilda.org";
+  const fromAddress = process.env.DEFAULT_FROM_EMAIL || "noreply@ecobilda.org";
   const token = await getAccessToken();
-  const url = GRAPH_SEND_URL.replace("{sender}", sender);
+  const url = GRAPH_SEND_URL.replace("{sender}", mailbox);
 
   const payload = {
     message: {
       subject: opts.subject,
       body: { contentType: "html", content: opts.html },
-      from: { emailAddress: { address: sender } },
+      from: { emailAddress: { address: fromAddress } },
       toRecipients: [{ emailAddress: { address: opts.to } }],
     },
     saveToSentItems: false,
