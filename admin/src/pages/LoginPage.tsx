@@ -34,8 +34,8 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-background px-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
+      <Card className="w-full max-w-md dark:bg-gray-900 dark:border-gray-800">
         <CardHeader className="text-center">
           <img src="/favicon.png" alt="Ecobilda" className="mx-auto w-12 h-12 mb-4" />
           <CardTitle className="text-2xl">{t('login.title')}</CardTitle>
