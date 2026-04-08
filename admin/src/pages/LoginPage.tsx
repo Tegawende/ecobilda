@@ -34,7 +34,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-background px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <img src="/favicon.png" alt="Ecobilda" className="mx-auto w-12 h-12 mb-4" />
@@ -46,7 +46,7 @@ export function LoginPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 text-red-700 text-sm">
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-400 text-sm">
                 <AlertCircle className="w-4 h-4" />
                 {error}
               </div>
