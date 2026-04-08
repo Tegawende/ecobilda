@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next';
@@ -7,32 +7,15 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tool
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { adminApi, type DashboardStats } from '@/services/api';
+import { type DashboardStats } from '@/services/api';
 import { cn } from '@/lib/utils';
+import { useAdminQuery } from '@/hooks/useAdminQuery';
+import { api } from '../../convex/_generated/api';
 
 export function DashboardPage() {
   const { t } = useTranslation();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchStats = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const data = await adminApi.getStats();
-      setStats(data);
-    } catch (err) {
-      setError(t('dashboard.failedToLoad'));
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
+  const stats = useAdminQuery(api.admin.dashboard.getStats as any) as DashboardStats | undefined;
+  const isLoading = stats === undefined;
 
   const statCards = useMemo(() => [
     {
@@ -119,17 +102,6 @@ export function DashboardPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-eco-primary" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-red-600">{error}</p>
-        <Button onClick={fetchStats} className="mt-4">
-          {t('common.retry')}
-        </Button>
       </div>
     );
   }

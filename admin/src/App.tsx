@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { ThemeProvider } from './hooks/useTheme';
+import { ConvexProvider } from './providers/ConvexProvider';
 import { Layout } from './components/Layout';
 import { Toaster } from './components/ui/toaster';
 import { LoginPage } from './pages/LoginPage';
@@ -101,11 +102,13 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <AppRoutes />
-        <Toaster />
-      </AuthProvider>
-    </ThemeProvider>
+    <ConvexProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <AppRoutes />
+          <Toaster />
+        </AuthProvider>
+      </ThemeProvider>
+    </ConvexProvider>
   );
 }

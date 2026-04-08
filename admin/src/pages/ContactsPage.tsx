@@ -1,7 +1,7 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Mail, Check, ExternalLink, Loader2, AlertCircle, Search, MessageSquare } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Mail, Check, ExternalLink, Loader2, Search, MessageSquare } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -9,42 +9,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { adminApi, type ContactMessage } from '@/services/api';
 import { formatDateTime } from '@/lib/utils';
 import { toast } from '@/hooks/useToast';
+import { useAdminQuery } from '@/hooks/useAdminQuery';
+import { api } from '../../convex/_generated/api';
 
 export function ContactsPage() {
   const { t } = useTranslation();
-  const [messages, setMessages] = useState<ContactMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const messages = (useAdminQuery(api.admin.contacts.list as any) ?? []) as ContactMessage[];
+  const isLoading = useAdminQuery(api.admin.contacts.list as any) === undefined;
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'new' | 'all'>('new');
 
-  const fetchMessages = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const data = await adminApi.getContactMessages();
-      setMessages(data);
-    } catch (err) {
-      setError(t('contacts.failedToLoad'));
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    fetchMessages();
-  }, [fetchMessages]);
-
   const handleMarkAsRead = async (id: string) => {
     setActionLoading(id);
     try {
       await adminApi.markContactAsRead(id);
-      setMessages((prev) =>
-        prev.map((m) => (m._id === id ? { ...m, status: 'read' } : m))
-      );
       toast({ title: t('contacts.markedAsRead') });
     } catch {
       toast({ title: t('common.error'), variant: 'destructive' });
@@ -57,9 +37,6 @@ export function ContactsPage() {
     setActionLoading(id + '-resolve');
     try {
       await adminApi.markContactAsResolved(id);
-      setMessages((prev) =>
-        prev.map((m) => (m._id === id ? { ...m, status: 'resolved' } : m))
-      );
       toast({ title: t('contacts.markedAsResolved') });
     } catch {
       toast({ title: t('common.error'), variant: 'destructive' });
@@ -82,15 +59,15 @@ export function ContactsPage() {
 
   const statusBadge = (status: string) => {
     const s = status ?? 'new';
-    if (s === 'new') return <Badge variant="default" className="bg-blue-500">{t('contacts.statusNew')}</Badge>;
-    if (s === 'read') return <Badge variant="secondary">{t('contacts.statusRead')}</Badge>;
-    return <Badge variant="outline" className="text-green-600 border-green-600">{t('contacts.statusResolved')}</Badge>;
+    if (s === 'new') return <Badge variant="default" className="bg-blue-500 dark:bg-blue-600 text-white">{t('contacts.statusNew')}</Badge>;
+    if (s === 'read') return <Badge variant="secondary" className="dark:bg-gray-700 dark:text-gray-300">{t('contacts.statusRead')}</Badge>;
+    return <Badge variant="outline" className="text-green-600 border-green-600 dark:text-green-400 dark:border-green-400">{t('contacts.statusResolved')}</Badge>;
   };
 
   const MessageCard = ({ msg }: { msg: ContactMessage }) => {
     const isExpanded = expandedId === msg._id;
     return (
-      <Card key={msg._id} className={msg.status === 'new' || !msg.status ? 'border-blue-200 bg-blue-50/30' : ''}>
+      <Card key={msg._id} className={msg.status === 'new' || !msg.status ? 'border-blue-200 bg-blue-50/30 dark:border-blue-800 dark:bg-blue-950/30' : ''}>
         <CardContent className="pt-4">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
@@ -144,7 +121,7 @@ export function ContactsPage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="text-green-700 border-green-300 hover:bg-green-50"
+                  className="text-green-700 border-green-300 hover:bg-green-50 dark:text-green-400 dark:border-green-700 dark:hover:bg-green-950"
                   onClick={() => handleMarkAsResolved(msg._id)}
                   disabled={actionLoading === msg._id + '-resolve'}
                 >
@@ -176,20 +153,13 @@ export function ContactsPage() {
         <p className="text-muted-foreground">{t('contacts.subtitle')}</p>
       </div>
 
-      {error && (
-        <div className="flex items-center gap-2 text-destructive bg-destructive/10 p-3 rounded-md">
-          <AlertCircle className="w-4 h-4" />
-          <span className="text-sm">{error}</span>
-        </div>
-      )}
-
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'new' | 'all')}>
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <TabsList>
             <TabsTrigger value="new">
               {t('contacts.tabNew')}
               {newMessages.length > 0 && (
-                <Badge className="ml-2 bg-blue-500 text-white text-xs px-1.5 py-0">{newMessages.length}</Badge>
+                <Badge className="ml-2 bg-blue-500 dark:bg-blue-600 text-white text-xs px-1.5 py-0">{newMessages.length}</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="all">{t('contacts.tabAll')}</TabsTrigger>

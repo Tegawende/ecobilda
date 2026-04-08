@@ -1,6 +1,6 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, X, Loader2, AlertCircle, Flag, Search } from 'lucide-react';
+import { Check, X, Loader2, Flag, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,14 +16,17 @@ import {
 import { adminApi, type Report } from '@/services/api';
 import { formatDateTime } from '@/lib/utils';
 import { toast } from '@/hooks/useToast';
+import { useAdminQuery } from '@/hooks/useAdminQuery';
+import { api } from '../../convex/_generated/api';
 
 export function ReportsPage() {
   const { t } = useTranslation();
-  const [pendingReports, setPendingReports] = useState<Report[]>([]);
-  const [allReports, setAllReports] = useState<Report[]>([]);
-  const [isLoadingPending, setIsLoadingPending] = useState(true);
-  const [isLoadingAll, setIsLoadingAll] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const pendingReportsData = useAdminQuery(api.admin.reports.getPending as any);
+  const allReportsData = useAdminQuery(api.admin.reports.list as any);
+  const pendingReports = ((pendingReportsData as any)?.results || pendingReportsData || []) as Report[];
+  const allReports = ((allReportsData as any)?.results || allReportsData || []) as Report[];
+  const isLoadingPending = pendingReportsData === undefined;
+  const isLoadingAll = allReportsData === undefined;
   const [filter, setFilter] = useState<'PENDING' | 'all'>('PENDING');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [resolvingId, setResolvingId] = useState<string | null>(null);
@@ -31,45 +34,11 @@ export function ReportsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [reasonFilter, setReasonFilter] = useState<string>('all');
 
-  const fetchPendingReports = useCallback(async () => {
-    setIsLoadingPending(true);
-    try {
-      const data = await adminApi.getPendingReports();
-      setPendingReports(data.results || data);
-    } catch (err) {
-      setError(t('reports.failedToLoad'));
-      console.error(err);
-    } finally {
-      setIsLoadingPending(false);
-    }
-  }, [t]);
-
-  const fetchAllReports = useCallback(async () => {
-    setIsLoadingAll(true);
-    try {
-      const data = await adminApi.getReports();
-      setAllReports(data.results || data);
-    } catch (err) {
-      console.error('Failed to fetch all reports:', err);
-    } finally {
-      setIsLoadingAll(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchPendingReports();
-    fetchAllReports();
-  }, [fetchPendingReports, fetchAllReports]);
-
   const handleResolve = useCallback(async (id: string, action: 'resolve' | 'dismiss') => {
     setActionLoading(id);
     try {
       const status = action === 'resolve' ? 'RESOLVED' as const : 'DISMISSED' as const;
       await adminApi.resolveReport(id, status, resolveNotes);
-      // Remove from pending reports
-      setPendingReports((prev) => prev.filter((r) => r._id !== id));
-      // Refresh all reports to get updated status
-      fetchAllReports();
       setResolvingId(null);
       setResolveNotes('');
       if (action === 'resolve') {
@@ -97,7 +66,7 @@ export function ReportsPage() {
     } finally {
       setActionLoading(null);
     }
-  }, [resolveNotes, fetchAllReports, t]);
+  }, [resolveNotes, t]);
 
   // Get current reports based on tab filter, then apply search and reason filter
   const reports = useMemo(() => {
@@ -186,13 +155,6 @@ export function ReportsPage() {
             </SelectContent>
           </Select>
         </div>
-
-        {error && (
-          <div className="flex items-center gap-2 p-4 rounded-lg bg-red-50 text-red-700">
-            <AlertCircle className="w-5 h-5" />
-            {error}
-          </div>
-        )}
 
         <Tabs value={filter} onValueChange={(v) => setFilter(v as 'PENDING' | 'all')} className="w-full">
           <div className="flex justify-start">

@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/useToast';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,6 +31,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { adminApi } from '@/services/api';
+import { useAdminQuery } from '@/hooks/useAdminQuery';
+import { api } from '../../convex/_generated/api';
 import {
   Users,
   Search,
@@ -122,19 +124,23 @@ export function UsersPage() {
   const [blockError, setBlockError] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  // Fetch users
-  const { data: allData, isLoading, error } = useQuery<UsersData>({
-    queryKey: ['admin-users', search, page, pageSize, verifiedFilter, sortField, sortOrder, activeTab],
-    queryFn: async () => {
-      const allUsers = await adminApi.getUsers(search || undefined, verifiedFilter ?? undefined) as User[];
-      const adminUsers = sortUsers(allUsers.filter(u => u.isStaff), sortField, sortOrder);
-      const normalUsers = sortUsers(allUsers.filter(u => !u.isStaff), sortField, sortOrder);
-      return {
-        admins: paginateUsers(adminUsers, activeTab === 'admins' ? page : 1, pageSize),
-        users: paginateUsers(normalUsers, activeTab === 'users' ? page : 1, pageSize),
-      };
-    },
-  });
+  // Fetch users reactively via Convex
+  const queryArgs: Record<string, any> = {};
+  if (search) queryArgs.search = search;
+  if (verifiedFilter !== null) queryArgs.emailVerified = verifiedFilter;
+  const rawUsers = useAdminQuery(api.admin.users.list as any, queryArgs) as User[] | undefined;
+  const isLoading = rawUsers === undefined;
+  const error = null;
+
+  const allData = useMemo<UsersData | undefined>(() => {
+    if (!rawUsers) return undefined;
+    const adminUsers = sortUsers(rawUsers.filter(u => u.isStaff), sortField, sortOrder);
+    const normalUsers = sortUsers(rawUsers.filter(u => !u.isStaff), sortField, sortOrder);
+    return {
+      admins: paginateUsers(adminUsers, activeTab === 'admins' ? page : 1, pageSize),
+      users: paginateUsers(normalUsers, activeTab === 'users' ? page : 1, pageSize),
+    };
+  }, [rawUsers, sortField, sortOrder, activeTab, page, pageSize]);
 
   const data = allData ? allData[activeTab] : undefined;
 
