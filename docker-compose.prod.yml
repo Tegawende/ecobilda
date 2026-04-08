@@ -31,6 +31,12 @@ services:
       - "127.0.0.1:3210:3210"
     environment:
       - CONVEX_BACKEND_DB_URL=postgres://${DB_USER:-ecobilda}:${DB_PASSWORD}@db:5432/${DB_NAME:-ecobilda}
+      - MS_GRAPH_TENANT_ID=${MS_GRAPH_TENANT_ID}
+      - MS_GRAPH_CLIENT_ID=${MS_GRAPH_CLIENT_ID}
+      - MS_GRAPH_CLIENT_SECRET=${MS_GRAPH_CLIENT_SECRET}
+      - MS_GRAPH_MAILBOX=${MS_GRAPH_MAILBOX:-admin@ecobilda.org}
+      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL:-noreply@ecobilda.org}
+      - FRONTEND_URL=${FRONTEND_URL:-https://ecobilda.org}
     depends_on:
       db:
         condition: service_healthy
