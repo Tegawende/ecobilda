@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, memo } from 'react';
-import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { Text, Group, Badge, Stack, ActionIcon, Skeleton } from '@mantine/core';
@@ -44,12 +43,11 @@ const CarouselImage = memo(({
   alt: string;
 }) => (
   <div className="relative w-full h-full flex-shrink-0">
-    <Image
+    <img
       src={src}
       alt={alt}
-      fill
-      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-      className="object-cover"
+      loading="lazy"
+      className="absolute inset-0 w-full h-full object-cover"
     />
   </div>
 ));
