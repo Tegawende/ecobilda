@@ -10,7 +10,7 @@ import { adminApi, type ContactMessage } from '@/services/api';
 import { formatDateTime } from '@/lib/utils';
 import { toast } from '@/hooks/useToast';
 import { useAdminQuery } from '@/hooks/useAdminQuery';
-import { api } from '../../convex/_generated/api';
+import { api } from '@convex/_generated/api';
 
 export function ContactsPage() {
   const { t } = useTranslation();

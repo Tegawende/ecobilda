@@ -32,7 +32,7 @@ import {
 } from '@/components/ui/dialog';
 import { adminApi } from '@/services/api';
 import { useAdminQuery } from '@/hooks/useAdminQuery';
-import { api } from '../../convex/_generated/api';
+import { api } from '@convex/_generated/api';
 import {
   Users,
   Search,
