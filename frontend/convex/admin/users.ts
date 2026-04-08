@@ -169,3 +169,15 @@ export const remove = mutation({
     return { success: true };
   },
 });
+
+// CLI utility: patch any user by email (no auth required — use from server only)
+// Usage: npx convex run admin/users:patchByEmail '{"email":"x@y.com","fields":{"firstName":"New"}}'
+export const patchByEmail = mutation({
+  args: { email: v.string(), fields: v.any() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.query("users").withIndex("by_email", (q: any) => q.eq("email", args.email)).first();
+    if (!user) throw new Error(`User ${args.email} not found`);
+    await ctx.db.patch(user._id, args.fields);
+    return { patched: user._id, email: args.email, fields: Object.keys(args.fields) };
+  },
+});
