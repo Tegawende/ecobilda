@@ -1,4 +1,6 @@
-import { mutation } from "./_generated/server";
+import { mutation, action, internalMutation } from "./_generated/server";
+import { v } from "convex/values";
+import { internal } from "./_generated/api";
 
 export const clearAll = mutation({
   args: {},
@@ -504,39 +506,79 @@ export const seedAll = mutation({
   },
 });
 
-// One-time fix: restore seed images to relative URLs (/projects/X/image_N.png)
-export const fixSeedImages = mutation({
+// Internal mutation to update a single image record with storage URL
+export const _updateImageStorage = internalMutation({
+  args: { imageId: v.id("projectImages"), storageId: v.id("_storage"), url: v.string() },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.imageId, { storageId: args.storageId, url: args.url });
+  },
+});
+
+// Upload seed images to Convex Storage (action — can fetch external URLs)
+export const uploadSeedImages = action({
   args: {},
   handler: async (ctx) => {
-    const projects = await ctx.db.query("projects").collect();
-    const folders = ["1", "2", "3", "10", "11", "20", "21", "22"];
-    const imageMap: Record<string, string> = {};
-    projects.forEach((p, idx) => {
-      if (idx < folders.length) imageMap[p._id] = folders[idx];
-    });
+    const baseUrl = process.env.FRONTEND_URL || "https://ecobilda.org";
 
-    let updated = 0;
-    const allImages = await ctx.db.query("projectImages").collect();
+    // Get all images that are still relative paths or ecobilda.org URLs
+    const allImages: any[] = await ctx.runQuery(internal.seed._getSeedImages as any);
 
-    const imagesByProject: Record<string, typeof allImages> = {};
+    let uploaded = 0;
+    let skipped = 0;
+
     for (const img of allImages) {
-      const pid = img.projectId as string;
-      if (!imagesByProject[pid]) imagesByProject[pid] = [];
-      imagesByProject[pid].push(img);
-    }
+      // Skip images already in Convex Storage
+      if (img.storageId) {
+        skipped++;
+        continue;
+      }
 
-    for (const [projectId, images] of Object.entries(imagesByProject)) {
-      const folder = imageMap[projectId];
-      if (!folder) continue;
-      images.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0));
-      for (let i = 0; i < images.length && i < 5; i++) {
-        const newUrl = `/projects/${folder}/image_${i + 1}.png`;
-        if (images[i].url !== newUrl) {
-          await ctx.db.patch(images[i]._id, { url: newUrl });
-          updated++;
+      // Build the full URL to fetch
+      let fetchUrl = img.url;
+      if (fetchUrl.startsWith("/")) {
+        fetchUrl = `${baseUrl}${fetchUrl}`;
+      }
+      // Skip if already a Convex storage URL
+      if (fetchUrl.includes("/api/storage/")) {
+        skipped++;
+        continue;
+      }
+
+      try {
+        // Fetch the image
+        const response = await fetch(fetchUrl);
+        if (!response.ok) {
+          console.log(`[UPLOAD] Failed to fetch ${fetchUrl}: ${response.status}`);
+          continue;
         }
+        const blob = await response.blob();
+
+        // Upload to Convex Storage
+        const storageId = await ctx.storage.store(blob);
+        const storageUrl = await ctx.storage.getUrl(storageId);
+
+        // Update the record
+        await ctx.runMutation(internal.seed._updateImageStorage, {
+          imageId: img._id,
+          storageId,
+          url: storageUrl!,
+        });
+
+        uploaded++;
+        console.log(`[UPLOAD] ${uploaded}/${allImages.length} — ${fetchUrl}`);
+      } catch (e: any) {
+        console.error(`[UPLOAD] Error for ${fetchUrl}: ${e.message}`);
       }
     }
-    return { updated };
+
+    return { uploaded, skipped, total: allImages.length };
+  },
+});
+
+// Internal query to get seed images
+export const _getSeedImages = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("projectImages").collect();
   },
 });
