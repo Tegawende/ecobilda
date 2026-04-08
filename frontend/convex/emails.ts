@@ -37,7 +37,7 @@ async function getAccessToken(): Promise<string> {
 }
 
 async function sendEmail(opts: { to: string; subject: string; html: string }): Promise<void> {
-  const sender = process.env.DEFAULT_FROM_EMAIL || "info@ecobilda.org";
+  const sender = process.env.DEFAULT_FROM_EMAIL || "admin@ecobilda.org";
   const token = await getAccessToken();
   const url = GRAPH_SEND_URL.replace("{sender}", sender);
 
