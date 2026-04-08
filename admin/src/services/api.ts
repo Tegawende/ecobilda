@@ -256,6 +256,16 @@ export const adminApi = {
     return await convexClient.query(api.admin.contacts.list, { token, status }) as any;
   },
 
+  async getUnreadContactCount(): Promise<number> {
+    const token = getSessionToken();
+    if (!token) return 0;
+    try {
+      return await convexClient.query(api.admin.contacts.unreadCount, { token }) as number;
+    } catch {
+      return 0;
+    }
+  },
+
   async markContactAsRead(id: string): Promise<void> {
     const token = getSessionToken();
     if (!token) throw new Error("Not authenticated");

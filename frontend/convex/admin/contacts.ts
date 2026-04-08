@@ -30,6 +30,15 @@ export const list = query({
   },
 });
 
+export const unreadCount = query({
+  args: { token: v.string() },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.token);
+    const messages = await ctx.db.query("contactMessages").collect();
+    return messages.filter((m) => !m.status || m.status === "new").length;
+  },
+});
+
 export const markAsRead = mutation({
   args: {
     token: v.string(),
