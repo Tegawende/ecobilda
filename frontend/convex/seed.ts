@@ -24,6 +24,31 @@ export const clearAll = mutation({
   },
 });
 
+// Set password for admin@ecobilda.org (uses same PBKDF2 hash as auth.ts)
+export const setAdminPassword = action({
+  args: { password: v.string() },
+  handler: async (ctx, args) => {
+    const encoder = new TextEncoder();
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const saltHex = Array.from(new Uint8Array(salt.buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    const keyMaterial = await crypto.subtle.importKey("raw", encoder.encode(args.password), "PBKDF2", false, ["deriveBits"]);
+    const derived = await crypto.subtle.deriveBits({ name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" }, keyMaterial, 256);
+    const hashHex = Array.from(new Uint8Array(derived)).map(b => b.toString(16).padStart(2, '0')).join('');
+    const hash = `pbkdf2$100000$${saltHex}$${hashHex}`;
+    await ctx.runMutation(internal.seed._setPasswordHash, { email: "admin@ecobilda.org", hash });
+    return { status: "done" };
+  },
+});
+
+export const _setPasswordHash = internalMutation({
+  args: { email: v.string(), hash: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.query("users").withIndex("by_email", (q: any) => q.eq("email", args.email)).first();
+    if (!user) throw new Error("User not found");
+    await ctx.db.patch(user._id, { legacyPasswordHash: args.hash, hasPassword: true });
+  },
+});
+
 export const makeAdmin = mutation({
   args: {},
   handler: async (ctx) => {
