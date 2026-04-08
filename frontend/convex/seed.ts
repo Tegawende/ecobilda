@@ -504,83 +504,17 @@ export const seedAll = mutation({
   },
 });
 
-// One-time fix: replace local seed image URLs with Unsplash URLs
+// One-time fix: make seed image URLs absolute so they work in prod
 export const fixSeedImages = mutation({
   args: {},
   handler: async (ctx) => {
-    const unsplashImages: Record<string, string[]> = {
-      "1": [
-        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800",
-        "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800",
-        "https://images.unsplash.com/photo-1592150621744-aca64f48394a?w=800",
-        "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800",
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=800",
-      ],
-      "2": [
-        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800",
-        "https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?w=800",
-        "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800",
-        "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800",
-        "https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?w=800",
-      ],
-      "3": [
-        "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=800",
-        "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?w=800",
-        "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800",
-        "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800",
-        "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=800",
-      ],
-      "10": [
-        "https://images.unsplash.com/photo-1510925758641-869d353cecc7?w=800",
-        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
-        "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800",
-        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
-        "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
-      ],
-      "11": [
-        "https://images.unsplash.com/photo-1595514535215-95a8e2570760?w=800",
-        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800",
-        "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=800",
-        "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800",
-        "https://images.unsplash.com/photo-1534237710431-e2fc698436d0?w=800",
-      ],
-      "20": [
-        "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800",
-        "https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=800",
-        "https://images.unsplash.com/photo-1597348989645-e2098f9b0eda?w=800",
-        "https://images.unsplash.com/photo-1449844908441-8829872d2607?w=800",
-        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800",
-      ],
-      "21": [
-        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800",
-        "https://images.unsplash.com/photo-1600566753086-00f18e6b0556?w=800",
-        "https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=800",
-        "https://images.unsplash.com/photo-1558036117-15d82a90b9b1?w=800",
-        "https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=800",
-      ],
-      "22": [
-        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800",
-        "https://images.unsplash.com/photo-1600585153490-76fb20a32601?w=800",
-        "https://images.unsplash.com/photo-1600573472591-ee6b68d14c68?w=800",
-        "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800",
-        "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=800",
-      ],
-    };
-
+    const baseUrl = process.env.FRONTEND_URL || "https://ecobilda.org";
     let updated = 0;
     const allImages = await ctx.db.query("projectImages").collect();
     for (const img of allImages) {
       if (img.url && img.url.startsWith("/projects/")) {
-        const match = img.url.match(/^\/projects\/(\d+)\/image_(\d+)\.png$/);
-        if (match) {
-          const folder = match[1];
-          const idx = parseInt(match[2]) - 1;
-          const newUrl = unsplashImages[folder]?.[idx];
-          if (newUrl) {
-            await ctx.db.patch(img._id, { url: newUrl });
-            updated++;
-          }
-        }
+        await ctx.db.patch(img._id, { url: `${baseUrl}${img.url}` });
+        updated++;
       }
     }
     return { updated };
