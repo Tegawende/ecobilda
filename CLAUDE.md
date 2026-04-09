@@ -83,6 +83,38 @@ npx convex env set KEY value
 docker compose exec convex-backend ./generate_admin_key.sh
 ```
 
+### Useful CLI Utilities (already deployed functions)
+
+These are mutations/actions you can run from CLI for direct DB ops without commit:
+
+```bash
+# Seed initial data + upload images to Convex Storage
+npx convex run seed:seedAll
+npx convex run seed:uploadSeedImages
+
+# Set admin password (for admin@ecobilda.org)
+npx convex run seed:setAdminPassword '{"password":"YourNewPassword!"}'
+
+# Patch any user by email (equivalent of SQL UPDATE)
+npx convex run 'admin/users:patchByEmail' '{"email":"x@y.com","fields":{"firstName":"New"}}'
+
+# Promote a user to admin
+npx convex run seed:makeAdmin
+```
+
+### Convex vs SQL — Important
+
+Convex has NO direct SQL access. All DB operations must go through TypeScript functions:
+- **query** = SELECT (reactive, auto-updates UI)
+- **mutation** = INSERT/UPDATE/DELETE (transactional)
+- **action** = mutation + can call external APIs (fetch, email)
+- **internalMutation/internalQuery** = server-only, callable from actions via `internal.*`
+
+For ad-hoc DB changes, either:
+1. Use the **Convex Dashboard** (http://localhost:6791 in dev, http://convex.ecobilda.org in prod) — edit documents one by one
+2. Use a deployed CLI utility like `admin/users:patchByEmail`
+3. Create a new mutation, deploy with `npx convex dev --once`, then run it
+
 ## Architecture
 
 ### Convex Backend (`frontend/convex/`)
@@ -112,15 +144,18 @@ frontend/convex/
   languages.ts           # Languages
   countries.ts           # Countries
   reports.ts             # Content reports
-  seed.ts                # Initial data seeding
+  seed.ts                # Initial data seeding + CLI utilities
+  emails.ts              # Transactional emails (Microsoft Graph API)
+  contact.ts             # Contact form submissions
   crons.ts               # Scheduled jobs
   cronHandlers.ts        # Cron job logic
   auth.config.ts         # Auth configuration
   admin/
     dashboard.ts         # Admin stats
     projects.ts          # Project validation/rejection
-    users.ts             # User management
+    users.ts             # User management + patchByEmail CLI utility
     reports.ts           # Report management
+    contacts.ts          # Contact messages + unread count
 ```
 
 ### Frontend (`frontend/src/`)
@@ -149,6 +184,10 @@ frontend/src/
 ### Admin Panel (`admin/src/`)
 
 Separate React app for platform administration. Uses Radix UI + Tailwind CSS.
+
+**Reactive Convex queries:** All admin pages use `useAdminQuery` (wraps `useQuery` from `convex/react`) for live data — no polling, instant updates after mutations. The `ConvexProvider` is wrapped only inside `ProtectedRoute` (not on the login page) to avoid WebSocket connections before authentication.
+
+**API imports:** Use the `@convex/_generated/api` alias (configured in `vite.config.ts`), NOT relative paths like `../../convex/_generated/api` — relative paths break the production build.
 
 ## Critical Business Logic
 
@@ -181,6 +220,19 @@ Reviews published when: both users submitted OR 30-day deadline expires.
 Admin must approve projects: PENDING -> ACTIVE/REJECTED.
 **Location:** `frontend/convex/admin/projects.ts`
 
+### 7. Email Sending (Microsoft Graph)
+**Location:** `frontend/convex/emails.ts`
+
+Uses Microsoft Graph API (NOT SMTP). Requires these env vars in Convex (set via `npx convex env set`):
+- `MS_GRAPH_TENANT_ID` — Azure AD tenant
+- `MS_GRAPH_CLIENT_ID` — App registration
+- `MS_GRAPH_CLIENT_SECRET` — App secret
+- `MS_GRAPH_MAILBOX` — The actual Azure mailbox user (e.g. `noreply@ecobilda.org`)
+- `DEFAULT_FROM_EMAIL` — What recipients see (can be the same as mailbox)
+- `FRONTEND_URL` — For email links (e.g. `https://ecobilda.org`)
+
+Important: `MS_GRAPH_MAILBOX` must be a real Azure AD user or shared mailbox, NOT just an alias. The Graph API URL `users/{mailbox}/sendMail` requires an actual mailbox identity. Aliases can only be used in the `from` field of the payload (and require Send As permissions).
+
 ## Code Style Rules
 
 **No Emojis:** Use icon components (`@tabler/icons-react` for frontend, `lucide-react` for admin).
@@ -203,4 +255,36 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
 ## Deployment
 
 **Dev:** Docker (Convex self-hosted with SQLite) + `npm run dev`
-**Prod:** Convex self-hosted on Hetzner (Docker + PostgreSQL backing) + Next.js (Node + Nginx)
+**Prod:** Convex self-hosted on Hetzner (Docker + PostgreSQL backing) + Next.js + Caddy reverse proxy
+
+### Production Architecture
+
+```
+Internet
+   ├── ecobilda.org              → Next.js (port 3000)
+   ├── ecobilda.org/api/storage/ → Convex (proxied via Caddy for image storage URLs)
+   ├── admin.ecobilda.org        → Static files (Vite build in /opt/ecobilda/admin-dist/)
+   └── convex.ecobilda.org       → Convex backend (port 3210)
+```
+
+The `/api/storage/*` proxy on `ecobilda.org` is configured in `/etc/caddy/Caddyfile` on the server. It routes Convex storage URLs (`/api/storage/UUID`) directly to the Convex backend so images stored in Convex Storage are accessible via the frontend domain.
+
+### Auto-deploy
+
+Push to `main` triggers GitHub Actions (`.github/workflows/deploy.yml`) which SSHes into the server and runs `scripts/deploy.sh`.
+
+The CI workflow:
+1. `git gc --prune=now` (clean stale refs)
+2. `git fetch --force --prune` (avoid ref lock errors)
+3. `git reset --hard origin/main`
+4. `bash scripts/deploy.sh` (build Docker images, deploy Convex functions, build admin panel)
+
+### Image Handling in Production
+
+Project images are stored in **Convex Storage** (not local files). Two ways images get there:
+1. **User uploads** — handled by `projects.ts` mutations using `ctx.storage.store()`
+2. **Seed images** — uploaded via `seed:uploadSeedImages` action which fetches from `frontend/public/projects/` and stores them in Convex
+
+Seed images URLs in `frontend/public/projects/N/image_X.png` are only used during initial seed upload — the actual served URLs are the Convex Storage IDs proxied via Caddy.
+
+**Important:** `Image` from `next/image` does NOT work with Convex storage URLs (`/api/storage/UUID`) because they're not in the `remotePatterns` whitelist. Use native `<img>` tags for project images, or add the patterns to `next.config.ts`.
