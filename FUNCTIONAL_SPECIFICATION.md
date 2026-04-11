@@ -2,9 +2,9 @@
 
 > **Document de reference** pour le developpement de la plateforme Ecobilda.
 >
-> **Version** : 3.0
-> **Date** : 5 avril 2026
-> **Statut** : Mise a jour refletant la migration Convex
+> **Version** : 3.1
+> **Date** : 11 avril 2026
+> **Statut** : Production deployee + admin reactif + email Graph API + infrastructure Caddy
 
 ---
 
@@ -657,8 +657,11 @@ Types definis dans le backend (`convex/notifications.ts`) :
 
 ## 11. Panel Administrateur
 
-Application React separee (Vite + Radix UI + Tailwind CSS) accessible a `http://localhost:5174`.
-Communique avec le backend Convex via `ConvexHttpClient` (memes fonctions que le frontend).
+Application React separee (Vite + Radix UI + Tailwind CSS) accessible a `http://localhost:5174` en dev et `https://admin.ecobilda.org` en prod.
+
+**Communication reactive avec Convex :** Toutes les pages utilisent `useQuery` de `convex/react` via un hook helper `useAdminQuery` qui injecte automatiquement le token d'authentification. Les donnees se mettent a jour en temps reel sans polling. Le `ConvexProvider` n'enveloppe que les routes authentifiees (dans `ProtectedRoute`) pour eviter d'ouvrir un WebSocket sur la page de login.
+
+Les mutations restent imperatives via `adminApi` (base sur `ConvexHttpClient`). Apres une mutation, les queries reactives se mettent automatiquement a jour.
 
 ### 11.1 Authentification admin [OK]
 
@@ -707,12 +710,25 @@ Communique avec le backend Convex via `ConvexHttpClient` (memes fonctions que le
 | Reviews | Total, note moyenne globale |
 | Messages | Volume d'echanges |
 
-### 11.7 Internationalisation admin [OK]
+### 11.7 Messages de contact [OK]
+
+Page dediee `/contacts` dans l'admin pour gerer les messages recus via le formulaire de contact public.
+- **Badge bleu** dans la sidebar affichant le nombre de messages non traites (reactif, mise a jour instantanee)
+- Statuts : `new` (nouveau), `read` (lu), `replied` (repondu)
+- Actions : Marquer comme lu, Marquer comme repondu, Repondre par email
+- Support dark mode complet
+- Backend : `convex/admin/contacts.ts` avec query `unreadCount` reactive
+
+### 11.8 Dark mode [OK]
+
+Le panel admin supporte dark/light mode avec persistence locale (`localStorage`). Le theme toggle est dans la sidebar.
+
+### 11.9 Internationalisation admin [OK]
 
 5 langues supportees dans le panel admin : EN, FR, ES, DE, PT
 (NL non inclus dans l'admin)
 
-### 11.8 Systeme de newsletters [PREVU V2]
+### 11.10 Systeme de newsletters [PREVU V2]
 
 Le systeme de newsletters et campagnes email interne au panel admin n'est **pas implemente** dans le MVP.
 
@@ -786,7 +802,67 @@ Le systeme de newsletters et campagnes email interne au panel admin n'est **pas 
 
 ## 14. Annexes
 
-### 14.1 Modele de donnees (Convex schema)
+### 14.0 Infrastructure production
+
+**Hebergement :** Serveur Hetzner (Ubuntu) avec Docker Compose
+
+**Architecture :**
+```
+Internet
+   |
+[Caddy - TLS + reverse proxy]
+   |
+   +-- ecobilda.org / www.ecobilda.org  -> Next.js (port 3000)
+   +-- ecobilda.org/api/storage/*       -> Convex (proxy pour images Convex Storage)
+   +-- admin.ecobilda.org               -> Fichiers statiques (Vite build)
+   +-- convex.ecobilda.org              -> Convex backend (port 3210)
+   |
+[Docker]
+   +-- ecobilda-frontend  (Next.js standalone)
+   +-- ecobilda-convex    (Convex self-hosted)
+   +-- ecobilda-db        (PostgreSQL 15)
+```
+
+**Proxy `/api/storage/*` :** Configure dans `/etc/caddy/Caddyfile` pour que les URLs des images stockees dans Convex Storage (`/api/storage/UUID`) soient accessibles via le domaine frontend et non via le subdomain Convex.
+
+**CI/CD :** GitHub Actions (`.github/workflows/deploy.yml`) se declenche a chaque push sur `main`. Le workflow SSHe sur le serveur et execute `scripts/deploy.sh` qui :
+1. `git gc --prune=now` + `git fetch --force --prune` (evite les refs corrompues)
+2. `git reset --hard origin/main`
+3. Build des images Docker (frontend)
+4. Deploy des fonctions Convex (`npx convex dev --once`)
+5. Build du panel admin et copie dans `/opt/ecobilda/admin-dist/`
+
+**Secrets GitHub requis :** `SERVER_IP`, `SSH_PRIVATE_KEY`
+
+### 14.1 Systeme d'email transactionnel [OK]
+
+**Fournisseur :** Microsoft Graph API (NOT SMTP)
+
+**Implementation :** `convex/emails.ts`
+
+**Types d'emails envoyes :**
+- Verification d'email (inscription)
+- Reinitialisation de mot de passe
+- Nouveau message (avec regle anti-spam 24h)
+- Nouvelle review
+- Reponse a une review
+
+**Variables d'environnement Convex (set via `npx convex env set`) :**
+
+| Variable | Description |
+|----------|-------------|
+| `MS_GRAPH_TENANT_ID` | Azure AD tenant ID |
+| `MS_GRAPH_CLIENT_ID` | App registration client ID |
+| `MS_GRAPH_CLIENT_SECRET` | App registration secret |
+| `MS_GRAPH_MAILBOX` | Mailbox reelle (`noreply@ecobilda.org` - shared mailbox) |
+| `DEFAULT_FROM_EMAIL` | Adresse affichee au destinataire |
+| `FRONTEND_URL` | URL pour les liens dans les emails |
+
+**Important :** `MS_GRAPH_MAILBOX` doit etre une vraie boite Azure AD (user ou shared mailbox), pas juste un alias. L'API Graph `users/{mailbox}/sendMail` necessite une identite reelle. Les alias ne peuvent etre utilises que dans le champ `from` du payload avec permission "Send As".
+
+**Templates multilingues :** Tous les emails sont traduits en 6 langues (EN, FR, ES, DE, NL, PT) avec templates HTML responsive definis dans `emails.ts`.
+
+### 14.2 Modele de donnees (Convex schema)
 
 ```
 users
@@ -920,7 +996,7 @@ sessions
 |-- expiresAt (timestamp)
 ```
 
-### 14.2 Recapitulatif des regles metier critiques
+### 14.3 Recapitulatif des regles metier critiques
 
 | Regle | Description | Localisation |
 |-------|-------------|-------------|
@@ -941,7 +1017,7 @@ sessions
 | Max 5 recherches sauvegardees | Limite par utilisateur | `convex/savedSearches.ts` |
 | PBKDF2 password hashing | 600k iterations SHA-256 | `convex/auth.ts` |
 
-### 14.3 Taches planifiees (Convex Crons)
+### 14.4 Taches planifiees (Convex Crons)
 
 | Tache | Frequence | Description |
 |-------|-----------|-------------|
@@ -954,7 +1030,7 @@ sessions
 - Rappel review J+7
 - Verification recherches sauvegardees (matching nouveaux projets)
 
-### 14.4 Pages du frontend [OK]
+### 14.5 Pages du frontend [OK]
 
 **Pages publiques :**
 
