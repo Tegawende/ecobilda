@@ -40,6 +40,7 @@ function LanguageFilter({
     const [search, setSearch] = useState('');
     const [open, setOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     const filtered = allLanguages.filter(
         l => !selected.includes(l.code) && l.name.toLowerCase().includes(search.toLowerCase())
@@ -55,27 +56,34 @@ function LanguageFilter({
         return () => document.removeEventListener('mousedown', handleClick);
     }, []);
 
+    // Auto-scroll dropdown into view when opened
+    useEffect(() => {
+        if (open && dropdownRef.current) {
+            dropdownRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }, [open]);
+
     return (
         <div className="space-y-3">
             <h3 className="font-semibold text-gray-900">{label}</h3>
             <div ref={containerRef} className="relative">
                 {/* Input box with selected chips inside */}
                 <div
-                    className="flex flex-wrap gap-1.5 min-h-[40px] px-3 py-2 border border-gray-300 rounded-lg cursor-text focus-within:border-gray-900"
+                    className="flex flex-wrap gap-2 min-h-[44px] px-3 py-2 border border-gray-300 rounded-lg cursor-text focus-within:border-gray-900"
                     onClick={() => { setOpen(true); (containerRef.current?.querySelector('input') as HTMLInputElement)?.focus(); }}
                 >
                     {selected.map(code => {
                         const lang = allLanguages.find(l => l.code === code);
                         if (!lang) return null;
                         return (
-                            <span key={code} className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-gray-900 text-white">
+                            <span key={code} className="flex items-center gap-1.5 pl-3 pr-1.5 py-1 rounded-full text-sm bg-gray-900 text-white">
                                 {lang.name}
                                 <button
                                     type="button"
                                     onMouseDown={e => { e.stopPropagation(); onChange(selected.filter(c => c !== code)); }}
-                                    className="hover:opacity-70 cursor-pointer leading-none"
+                                    className="flex items-center justify-center w-5 h-5 rounded-full hover:bg-white/20 cursor-pointer transition-colors"
                                 >
-                                    ×
+                                    <IconX size={14} stroke={2.5} />
                                 </button>
                             </span>
                         );
@@ -91,7 +99,7 @@ function LanguageFilter({
                 </div>
                 {/* Dropdown */}
                 {open && filtered.length > 0 && (
-                    <div className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
+                    <div ref={dropdownRef} className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
                         {filtered.map(lang => (
                             <button
                                 key={lang.code}
