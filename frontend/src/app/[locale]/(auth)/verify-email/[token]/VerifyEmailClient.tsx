@@ -64,7 +64,7 @@ export function VerifyEmailClient({ token }: { token: string }) {
   };
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center px-6">
+    <div className="min-h-[70vh] flex items-center justify-center px-6 bg-slate-50">
       <div className="bg-white p-8 sm:p-12 rounded-2xl shadow-xl border border-stone-100 text-center max-w-md w-full">
         {/* Status Icon */}
         <div className="flex justify-center mb-6">
