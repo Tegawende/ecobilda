@@ -90,7 +90,7 @@ export function LoginPage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full bg-eco-primary hover:bg-eco-primaryDark text-white" disabled={isLoading}>
               {isLoading ? t('login.signingIn') : t('login.signIn')}
             </Button>
           </form>
