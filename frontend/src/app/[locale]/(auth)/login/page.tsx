@@ -20,7 +20,7 @@ export default function LoginPage() {
 
   return (
     <Layout>
-      <div className="min-h-[80vh] flex items-center justify-center py-12 px-6">
+      <div className="min-h-[80vh] flex items-center justify-center py-12 px-6 bg-slate-50">
         <AuthenticationForm initialType="login" />
       </div>
     </Layout>

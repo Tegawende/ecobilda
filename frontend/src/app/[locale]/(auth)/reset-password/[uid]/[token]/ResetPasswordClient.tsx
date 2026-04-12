@@ -48,7 +48,7 @@ export function ResetPasswordClient() {
 
   return (
     <Layout>
-      <div className="min-h-[80vh] flex items-center justify-center py-12 px-4">
+      <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 bg-slate-50">
         <div className="bg-white p-8 sm:p-12 rounded-2xl shadow-xl border border-stone-100 text-center max-w-md w-full">
           {success ? (
             <>
