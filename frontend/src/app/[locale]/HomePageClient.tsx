@@ -52,7 +52,7 @@ export function HomePageClient() {
         />
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/70 via-black/30 to-black/20 sm:from-black/75 sm:via-black/20 sm:to-transparent" />
 
-        <div className="relative h-full flex flex-col justify-center items-start text-left px-6 sm:px-10 lg:px-16 pt-10 max-w-7xl mx-auto w-full">
+        <div className="relative h-full flex flex-col justify-center items-start text-left px-4 sm:px-8 lg:px-12 pt-10 w-full">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-white drop-shadow-2xl max-w-xl lg:max-w-2xl leading-[1.1]">
             {t('home.hero.title')}
           </h1>
