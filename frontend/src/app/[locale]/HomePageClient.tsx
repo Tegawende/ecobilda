@@ -50,16 +50,16 @@ export function HomePageClient() {
           alt={t('home.heroAlt')}
           className="absolute inset-0 -z-10 h-full w-full object-cover object-center"
         />
-        <div className="absolute inset-0 -z-10 bg-black/40" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/70 via-black/30 to-black/20 sm:from-black/75 sm:via-black/20 sm:to-transparent" />
 
-        <div className="relative h-full flex flex-col justify-center items-center text-center px-6 lg:px-8 pt-10">
-          <h1 className="text-5xl sm:text-[66px] font-display font-bold text-white drop-shadow-2xl max-w-6xl leading-[1.1]">
+        <div className="relative h-full flex flex-col justify-center items-start text-left px-6 sm:px-10 lg:px-16 pt-10 max-w-7xl mx-auto w-full">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-white drop-shadow-2xl max-w-xl lg:max-w-2xl leading-[1.1]">
             {t('home.hero.title')}
           </h1>
-          <p className="mt-8 text-lg sm:text-2xl text-white font-medium max-w-3xl drop-shadow-lg opacity-90">
+          <p className="mt-6 text-base sm:text-lg lg:text-xl text-white font-medium max-w-md lg:max-w-xl drop-shadow-lg opacity-90">
             {t('home.hero.subtitle')}
           </p>
-          <div className="mt-12 flex items-center justify-center gap-x-6">
+          <div className="mt-10 flex items-center gap-x-6">
             <Link
               href="/projects"
               className="rounded-full bg-[#67a36f] px-8 py-4 text-base font-bold text-white shadow-xl hover:bg-[#5a8f61] transform hover:-translate-y-1 transition-all duration-300"
