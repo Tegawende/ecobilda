@@ -24,4 +24,11 @@ crons.daily(
   internal.cronHandlers.cleanupSessions
 );
 
+// Mission lifecycle: PUBLISHED → IN_PROGRESS → COMPLETED + feedback reminders
+crons.daily(
+  "mission-lifecycle",
+  { hourUTC: 6, minuteUTC: 0 },
+  internal.cronHandlers.processMissionLifecycle
+);
+
 export default crons;

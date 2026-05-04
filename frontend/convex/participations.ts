@@ -10,37 +10,42 @@ async function getUserFromToken(ctx: any, token: string) {
   return await ctx.db.get(session.userId);
 }
 
-// Enrich participation with project and volunteer data
+// Enrich participation with mission, place, host and volunteer data
 async function enrichParticipation(ctx: any, participation: any) {
-  const project = await ctx.db.get(participation.projectId);
+  const mission = await ctx.db.get(participation.missionId);
   const volunteer = await ctx.db.get(participation.volunteerId);
 
-  let projectAddress = null;
-  if (project?.addressId) {
-    const addr = await ctx.db.get(project.addressId);
-    if (addr) {
-      let country = null;
-      if (addr.countryId) country = await ctx.db.get(addr.countryId);
-      projectAddress = { ...addr, country };
-    }
-  }
-
-  // Project cover image
+  let project: any = null;
+  let projectAddress: any = null;
   let coverImageUrl: string | null = null;
-  if (project) {
-    const coverImg = await ctx.db
-      .query("projectImages")
-      .withIndex("by_project", (q: any) => q.eq("projectId", project._id))
-      .first();
-    if (coverImg) {
-      coverImageUrl = coverImg.url ?? (coverImg.storageId ? await ctx.storage.getUrl(coverImg.storageId) : null);
-    }
-  }
+  let host: any = null;
 
-  // Host (project owner)
-  let host = null;
-  if (project?.ownerId) {
-    const owner = await ctx.db.get(project.ownerId);
+  if (mission) {
+    project = await ctx.db.get(mission.projectId);
+    if (project?.addressId) {
+      const addr = await ctx.db.get(project.addressId);
+      if (addr) {
+        const country = addr.countryId ? await ctx.db.get(addr.countryId) : null;
+        projectAddress = { ...addr, country };
+      }
+    }
+
+    // Mission cover (storage or first image)
+    if (mission.coverImageId) {
+      coverImageUrl = await ctx.storage.getUrl(mission.coverImageId);
+    } else {
+      const firstImg = await ctx.db
+        .query("missionImages")
+        .withIndex("by_mission", (q: any) => q.eq("missionId", mission._id))
+        .first();
+      if (firstImg) {
+        coverImageUrl =
+          firstImg.url ?? (firstImg.storageId ? await ctx.storage.getUrl(firstImg.storageId) : null);
+      }
+    }
+
+    // Host
+    const owner = await ctx.db.get(mission.ownerId);
     if (owner) {
       let hostPictureUrl = owner.profilePictureUrl ?? null;
       if (owner.profilePicture && !hostPictureUrl) {
@@ -60,14 +65,27 @@ async function enrichParticipation(ctx: any, participation: any) {
 
   return {
     ...participation,
+    mission: mission
+      ? {
+          _id: mission._id,
+          title: mission.title,
+          type: mission.type,
+          poste: mission.poste,
+          technique: mission.technique,
+          difficulty: mission.difficulty,
+          startDate: mission.startDate,
+          endDate: mission.endDate,
+          maxParticipants: mission.maxParticipants,
+          status: mission.status,
+          coverImageUrl,
+        }
+      : null,
     project: project
       ? {
           _id: project._id,
           title: project.title,
-          projectType: project.projectType,
-          address: projectAddress,
           ownerId: project.ownerId,
-          coverImageUrl,
+          address: projectAddress,
         }
       : null,
     host,
@@ -85,7 +103,6 @@ async function enrichParticipation(ctx: any, participation: any) {
   };
 }
 
-// Helper to find conversation for a participation request
 async function getConversationByRequest(ctx: any, requestId: any) {
   return await ctx.db
     .query("conversations")
@@ -106,11 +123,10 @@ export const getById = query({
     if (!user) return null;
     const request = await ctx.db.get(args.id);
     if (!request) return null;
-    // Only accessible to the volunteer or the project host
-    const project = await ctx.db.get(request.projectId);
-    if (!project) return null;
-    if (request.volunteerId !== user._id && project.ownerId !== user._id) return null;
-    return request;
+    const mission = await ctx.db.get(request.missionId);
+    if (!mission) return null;
+    if (request.volunteerId !== user._id && mission.ownerId !== user._id) return null;
+    return await enrichParticipation(ctx, request);
   },
 });
 
@@ -129,11 +145,7 @@ export const getMyRequests = query({
       .withIndex("by_volunteer", (q) => q.eq("volunteerId", user._id))
       .collect();
 
-    const enriched = [];
-    for (const r of requests) {
-      enriched.push(await enrichParticipation(ctx, r));
-    }
-    return enriched;
+    return await Promise.all(requests.map((r) => enrichParticipation(ctx, r)));
   },
 });
 
@@ -147,34 +159,33 @@ export const getReceivedRequests = query({
     const user = await getUserFromToken(ctx, args.token);
     if (!user) return [];
 
-    const myProjects = await ctx.db
-      .query("projects")
+    const myMissions = await ctx.db
+      .query("missions")
       .withIndex("by_owner", (q) => q.eq("ownerId", user._id))
       .collect();
 
-    const allRequests = [];
-    for (const project of myProjects) {
-      const requests = await ctx.db
+    const all: any[] = [];
+    for (const m of myMissions) {
+      const reqs = await ctx.db
         .query("participationRequests")
-        .withIndex("by_project", (q) => q.eq("projectId", project._id))
+        .withIndex("by_mission", (q) => q.eq("missionId", m._id))
         .collect();
-      for (const r of requests) {
-        allRequests.push(await enrichParticipation(ctx, r));
+      for (const r of reqs) {
+        all.push(await enrichParticipation(ctx, r));
       }
     }
-
-    return allRequests.sort((a, b) => b._creationTime - a._creationTime);
+    return all.sort((a, b) => b._creationTime - a._creationTime);
   },
 });
 
 // ============================================
-// Create Request → creates conversation + message immediately
+// Create Request → creates conversation + first message
 // ============================================
 
 export const create = mutation({
   args: {
     token: v.string(),
-    projectId: v.id("projects"),
+    missionId: v.id("missions"),
     motivation: v.string(),
     proposedStartDate: v.optional(v.string()),
     proposedEndDate: v.optional(v.string()),
@@ -183,57 +194,53 @@ export const create = mutation({
     const user = await getUserFromToken(ctx, args.token);
     if (!user) throw new Error("Not authenticated.");
 
-    const project = await ctx.db.get(args.projectId);
-    if (!project) throw new Error("Project not found.");
-    if (project.ownerId === user._id) throw new Error("Cannot apply to your own project.");
-    if (project.status !== "ACTIVE") throw new Error("Project is not active.");
+    const mission = await ctx.db.get(args.missionId);
+    if (!mission) throw new Error("Mission not found.");
+    if (mission.ownerId === user._id) throw new Error("Cannot apply to your own mission.");
+    if (mission.status !== "PUBLISHED") throw new Error("Mission is not open to applications.");
 
-    // Check duplicate pending request
+    // Duplicate guard
     const existing = await ctx.db
       .query("participationRequests")
       .withIndex("by_volunteer_status", (q) =>
         q.eq("volunteerId", user._id).eq("status", "PENDING")
       )
       .collect();
-    if (existing.find((r) => r.projectId === args.projectId)) {
-      throw new Error("You already have a pending request for this project.");
+    if (existing.find((r) => r.missionId === args.missionId)) {
+      throw new Error("You already have a pending request for this mission.");
     }
 
-    // Create participation request
     const requestId = await ctx.db.insert("participationRequests", {
       volunteerId: user._id,
-      projectId: args.projectId,
+      missionId: args.missionId,
       status: "PENDING",
       motivation: args.motivation,
       proposedStartDate: args.proposedStartDate,
       proposedEndDate: args.proposedEndDate,
     });
 
-    // Create conversation immediately (host=user1, volunteer=user2)
     const now = Date.now();
     const conversationId = await ctx.db.insert("conversations", {
-      user1Id: project.ownerId,
+      user1Id: mission.ownerId,
       user2Id: user._id,
       participationRequestId: requestId,
       lastMessageText: args.motivation,
       lastMessageAt: now,
-      unreadCountUser1: 1, // host hasn't read yet
+      unreadCountUser1: 1,
       unreadCountUser2: 0,
       user1Muted: false,
       user2Muted: false,
     });
 
-    // Insert motivation as first message
     await ctx.db.insert("messages", {
       conversationId,
       senderId: user._id,
       body: args.motivation,
     });
 
-    // Notify host — link directly to the conversation
     await ctx.db.insert("notifications", {
-      recipientId: project.ownerId,
-      type: "PROJECT",
+      recipientId: mission.ownerId,
+      type: "MISSION",
       title: `New application from ${user.firstName} ${user.lastName}`,
       message: args.motivation.slice(0, 200),
       linkUrl: `/messages/${conversationId}`,
@@ -245,7 +252,7 @@ export const create = mutation({
 });
 
 // ============================================
-// Accept Request (host only) — from messaging
+// Accept (host)
 // ============================================
 
 export const accept = mutation({
@@ -261,8 +268,8 @@ export const accept = mutation({
     const request = await ctx.db.get(args.requestId);
     if (!request) throw new Error("Request not found.");
 
-    const project = await ctx.db.get(request.projectId);
-    if (!project || project.ownerId !== user._id) throw new Error("Not authorized.");
+    const mission = await ctx.db.get(request.missionId);
+    if (!mission || mission.ownerId !== user._id) throw new Error("Not authorized.");
 
     await ctx.db.patch(args.requestId, {
       status: "ACCEPTED",
@@ -270,14 +277,11 @@ export const accept = mutation({
       respondedAt: Date.now(),
     });
 
-    // Find the conversation created at application time
     const conversation = await getConversationByRequest(ctx, args.requestId);
-
     if (conversation) {
-      // Send acceptance message in the conversation
       const acceptMsg = args.responseMessage
         ? args.responseMessage
-        : `✓ ${user.firstName} accepted your application for "${project.title}".`;
+        : `${user.firstName} accepted your application for "${mission.title}".`;
       const now = Date.now();
       await ctx.db.insert("messages", {
         conversationId: conversation._id,
@@ -285,19 +289,17 @@ export const accept = mutation({
         body: acceptMsg,
         isSystem: true,
       });
-      // Increment unread for volunteer (user2)
       await ctx.db.patch(conversation._id, {
         lastMessageText: acceptMsg,
         lastMessageAt: now,
         unreadCountUser2: (conversation.unreadCountUser2 ?? 0) + 1,
       });
 
-      // Notify volunteer with link to the conversation
       await ctx.db.insert("notifications", {
         recipientId: request.volunteerId,
-        type: "PROJECT",
+        type: "MISSION",
         title: `Your application was accepted!`,
-        message: `${user.firstName} accepted your application for "${project.title}"`,
+        message: `${user.firstName} accepted your application for "${mission.title}"`,
         linkUrl: `/messages/${conversation._id}`,
         isRead: false,
       });
@@ -308,7 +310,7 @@ export const accept = mutation({
 });
 
 // ============================================
-// Refuse Request (host only) — from messaging
+// Refuse (host)
 // ============================================
 
 export const refuse = mutation({
@@ -324,8 +326,8 @@ export const refuse = mutation({
     const request = await ctx.db.get(args.requestId);
     if (!request) throw new Error("Request not found.");
 
-    const project = await ctx.db.get(request.projectId);
-    if (!project || project.ownerId !== user._id) throw new Error("Not authorized.");
+    const mission = await ctx.db.get(request.missionId);
+    if (!mission || mission.ownerId !== user._id) throw new Error("Not authorized.");
 
     await ctx.db.patch(args.requestId, {
       status: "REFUSED",
@@ -333,13 +335,11 @@ export const refuse = mutation({
       respondedAt: Date.now(),
     });
 
-    // Find the conversation
     const conversation = await getConversationByRequest(ctx, args.requestId);
-
     if (conversation) {
       const refuseMsg = args.responseMessage
         ? args.responseMessage
-        : `✗ ${user.firstName} declined your application for "${project.title}".`;
+        : `${user.firstName} declined your application for "${mission.title}".`;
       const now = Date.now();
       await ctx.db.insert("messages", {
         conversationId: conversation._id,
@@ -353,12 +353,11 @@ export const refuse = mutation({
         unreadCountUser2: (conversation.unreadCountUser2 ?? 0) + 1,
       });
 
-      // Notify volunteer
       await ctx.db.insert("notifications", {
         recipientId: request.volunteerId,
-        type: "PROJECT",
+        type: "MISSION",
         title: `Your application was declined`,
-        message: `${user.firstName} declined your application for "${project.title}"`,
+        message: `${user.firstName} declined your application for "${mission.title}"`,
         linkUrl: `/messages/${conversation._id}`,
         isRead: false,
       });
@@ -369,7 +368,7 @@ export const refuse = mutation({
 });
 
 // ============================================
-// Cancel Request (volunteer only)
+// Cancel (volunteer)
 // ============================================
 
 export const cancel = mutation({
@@ -385,6 +384,20 @@ export const cancel = mutation({
     if (!request || request.volunteerId !== user._id) throw new Error("Not authorized.");
 
     await ctx.db.patch(args.requestId, { status: "CANCELLED" });
+
+    // Notify host
+    const mission = await ctx.db.get(request.missionId);
+    if (mission) {
+      await ctx.db.insert("notifications", {
+        recipientId: mission.ownerId,
+        type: "MISSION",
+        title: `Application cancelled`,
+        message: `${user.firstName} ${user.lastName} cancelled their application for "${mission.title}".`,
+        linkUrl: `/missions/${mission._id}`,
+        isRead: false,
+      });
+    }
+
     return { success: true };
   },
 });

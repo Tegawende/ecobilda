@@ -72,7 +72,7 @@ export function Navbar() {
           <Group gap="xs">
             {/* "Browse Projects" button - visible to all */}
             <Link
-              href="/projects"
+              href="/missions"
               className="text-sm font-semibold px-6 py-2.5 rounded-full transition-all hidden sm:block shadow-lg hover:-translate-y-0.5 bg-eco-primary text-white hover:bg-eco-primaryDark shadow-eco-primary/20 border border-transparent"
             >
               {t('home.hero.browseProjects')}
@@ -101,7 +101,7 @@ export function Navbar() {
                         {t('nav.userMenu.favorites')}
                       </Menu.Item>
 
-                      <Menu.Item component={Link} href="/my-projects" leftSection={<IconFolder size={16} />}>
+                      <Menu.Item component={Link} href="/my-missions" leftSection={<IconFolder size={16} />}>
                         {t('nav.userMenu.myProjects')}
                       </Menu.Item>
 
@@ -164,7 +164,7 @@ export function Navbar() {
 
           <Button
             component={Link}
-            href="/projects"
+            href="/missions"
             variant="filled"
             color="eco-primary"
             size="lg"
@@ -185,7 +185,7 @@ export function Navbar() {
                     {t('nav.userMenu.favorites')}
                   </Group>
                 </Anchor>
-                <Anchor component={Link} href="/my-projects" onClick={close} className="py-2" c="black">
+                <Anchor component={Link} href="/my-missions" onClick={close} className="py-2" c="black">
                   <Group gap="xs">
                     <IconFolder size={20} color="black" />
                     {t('nav.userMenu.myProjects')}

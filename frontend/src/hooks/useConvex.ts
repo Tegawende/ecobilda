@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useMutation } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { getSessionToken } from "@/lib/convexClient";
 
@@ -92,7 +92,7 @@ export function useUnreadCount() {
 }
 
 // ============================================
-// Conversations (reactive - replaces WebSocket)
+// Conversations
 // ============================================
 
 export function useConversations() {
@@ -137,27 +137,8 @@ export function useConversation(conversationId: string | null) {
 }
 
 // ============================================
-// Projects
+// Projects (= host's place container)
 // ============================================
-
-export function useProjects(filters?: {
-  keyword?: string;
-  skills?: string[];
-  countries?: string[];
-  languages?: string[];
-  projectType?: string;
-  internetProvided?: boolean;
-  familyFriendly?: boolean;
-  petsAllowed?: boolean;
-  smokingAllowed?: boolean;
-}) {
-  const projects = useQuery(api.projects.list, filters ?? {});
-
-  return {
-    projects: projects ?? [],
-    isLoading: projects === undefined,
-  };
-}
 
 export function useProject(id: string | null) {
   const project = useQuery(
@@ -171,25 +152,148 @@ export function useProject(id: string | null) {
   };
 }
 
-export function useMyProjects() {
+export function useMyPlaces() {
   const token = getSessionToken();
-  const projects = useQuery(
-    api.projects.getMyProjects,
+  const places = useQuery(
+    api.projects.getMyPlaces,
     token ? { token } : "skip"
   );
 
   return {
-    projects: projects ?? [],
-    isLoading: projects === undefined,
+    places: places ?? [],
+    isLoading: places === undefined,
   };
 }
 
-export function useMapData() {
-  const mapData = useQuery(api.projects.getMapData);
+// Backwards-compat alias
+export const useMyProjects = () => {
+  const { places, isLoading } = useMyPlaces();
+  return { projects: places, isLoading };
+};
 
+// ============================================
+// Missions
+// ============================================
+
+export interface UseMissionsFilters {
+  keyword?: string;
+  type?: "CHANTIER" | "FORMATION";
+  difficulty?: "DEBUTANT" | "INTERMEDIAIRE" | "EXPERT";
+  poste?: string;
+  technique?: string;
+  pricingMode?: "FREE" | "PAID";
+  skills?: string[];
+  countries?: string[];
+  languages?: string[];
+  startsAfter?: string;
+  endsBefore?: string;
+  excludeOwner?: string;
+}
+
+export function useMissions(filters?: UseMissionsFilters) {
+  const args: any = {};
+  if (filters?.keyword) args.keyword = filters.keyword;
+  if (filters?.type) args.type = filters.type;
+  if (filters?.difficulty) args.difficulty = filters.difficulty;
+  if (filters?.poste) args.poste = filters.poste;
+  if (filters?.technique) args.technique = filters.technique;
+  if (filters?.pricingMode) args.pricingMode = filters.pricingMode;
+  if (filters?.skills?.length) args.skills = filters.skills;
+  if (filters?.countries?.length) args.countries = filters.countries;
+  if (filters?.languages?.length) args.languages = filters.languages;
+  if (filters?.startsAfter) args.startsAfter = filters.startsAfter;
+  if (filters?.endsBefore) args.endsBefore = filters.endsBefore;
+  if (filters?.excludeOwner) args.excludeOwner = filters.excludeOwner;
+
+  const missions = useQuery(api.missions.list, args);
   return {
-    mapData: mapData ?? [],
-    isLoading: mapData === undefined,
+    missions: missions ?? [],
+    isLoading: missions === undefined,
+  };
+}
+
+export function useMission(id: string | null) {
+  const mission = useQuery(
+    api.missions.getById,
+    id ? { id: id as any } : "skip"
+  );
+  return {
+    mission: mission ?? null,
+    isLoading: mission === undefined,
+  };
+}
+
+export function useMyMissions() {
+  const token = getSessionToken();
+  const missions = useQuery(
+    api.missions.getMyMissions,
+    token ? { token } : "skip"
+  );
+  return {
+    missions: missions ?? [],
+    isLoading: missions === undefined,
+  };
+}
+
+export function useMissionsMapData() {
+  const data = useQuery(api.missions.getMapData);
+  return {
+    mapData: data ?? [],
+    isLoading: data === undefined,
+  };
+}
+
+// Backwards-compat alias for any older imports
+export const useMapData = useMissionsMapData;
+
+export function useMissionsByProject(projectId: string | null, excludeId?: string) {
+  const args = projectId
+    ? excludeId
+      ? { projectId: projectId as any, excludeId: excludeId as any }
+      : { projectId: projectId as any }
+    : "skip";
+  const missions = useQuery(api.missions.getByProject, args as any);
+  return {
+    missions: missions ?? [],
+    isLoading: missions === undefined,
+  };
+}
+
+export function useCompletedMissionsPublic(filters?: {
+  poste?: string;
+  technique?: string;
+  type?: string;
+}) {
+  const args: any = {};
+  if (filters?.poste) args.poste = filters.poste;
+  if (filters?.technique) args.technique = filters.technique;
+  if (filters?.type) args.type = filters.type;
+  const missions = useQuery(api.missions.getCompletedPublic, args);
+  return {
+    missions: missions ?? [],
+    isLoading: missions === undefined,
+  };
+}
+
+export function useMissionFeedback(missionId: string | null) {
+  const feedback = useQuery(
+    api.missionFeedback.getByMissionId,
+    missionId ? { missionId: missionId as any } : "skip"
+  );
+  return {
+    feedback: feedback ?? null,
+    isLoading: feedback === undefined,
+  };
+}
+
+export function useHelperMissionPhotos(missionId: string | null, publicOnly = false) {
+  const photos = useQuery(
+    api.missionFeedback.getHelperPhotos,
+    missionId ? { missionId: missionId as any, publicOnly } : "skip"
+  );
+  return {
+    photos: photos ?? [],
+    isLoading: photos === undefined,
   };
 }
 
@@ -210,7 +314,7 @@ export function useUserReviews(userId: string | null) {
 }
 
 // ============================================
-// Favorites
+// Favorites (now mission-based)
 // ============================================
 
 export function useFavorites() {
@@ -222,6 +326,8 @@ export function useFavorites() {
   );
 
   return {
+    favoriteMissionIds: favorites ?? [],
+    // Backwards-compat alias
     favoriteProjectIds: favorites ?? [],
     isLoading: favorites === undefined,
   };

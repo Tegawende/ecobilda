@@ -105,7 +105,6 @@ export const getDetail = query({
         _id: p._id,
         title: p.title,
         status: p.status,
-        projectType: p.projectType,
         _creationTime: p._creationTime,
       })),
       reviewsReceived: reviews

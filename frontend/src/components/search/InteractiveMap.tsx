@@ -200,7 +200,7 @@ export function InteractiveMap({ projects, onBoundsChange }: InteractiveMapProps
                     ${project.address?.city ?? ''}, ${project.address?.country?.name ?? ''}
                   </p>
                   <p style="font-size: 12px; color: #888;">
-                    ${project.projectType === 'PERM' ? 'Permaculture' : 'Natural Building'}
+                    ${project.title}
                   </p>
                 </div>
               `)

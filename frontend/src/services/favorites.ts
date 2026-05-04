@@ -2,7 +2,7 @@ import { convexClient, getSessionToken } from "@/lib/convexClient";
 import { api } from "../../convex/_generated/api";
 
 export const favoritesService = {
-  async getFavorites(): Promise<any[]> {
+  async getFavoriteMissionIds(): Promise<string[]> {
     const token = getSessionToken();
     if (!token) return [];
     const user = await convexClient.query(api.auth.me, { token });
@@ -11,32 +11,22 @@ export const favoritesService = {
     return results as any;
   },
 
-  async addFavorite(projectId: number | string): Promise<void> {
+  async toggle(missionId: string): Promise<{ action: "added" | "removed" }> {
     const token = getSessionToken();
     if (!token) throw new Error("Not authenticated");
     const user = await convexClient.query(api.auth.me, { token });
     if (!user) throw new Error("Not authenticated");
-    await convexClient.mutation(api.favorites.toggle, {
+    const res = await convexClient.mutation(api.favorites.toggle, {
       userId: user._id,
-      projectId: projectId as any,
+      missionId: missionId as any,
     });
+    return res as any;
   },
 
-  async removeFavorite(projectId: number | string): Promise<void> {
-    const token = getSessionToken();
-    if (!token) throw new Error("Not authenticated");
-    const user = await convexClient.query(api.auth.me, { token });
-    if (!user) throw new Error("Not authenticated");
-    await convexClient.mutation(api.favorites.toggle, {
-      userId: user._id,
-      projectId: projectId as any,
-    });
-  },
-
-  async isFavorite(projectId: number | string): Promise<boolean> {
+  async isFavorite(missionId: string): Promise<boolean> {
     try {
-      const favorites = await this.getFavorites();
-      return favorites.includes(projectId as any);
+      const ids = await this.getFavoriteMissionIds();
+      return ids.includes(missionId);
     } catch {
       return false;
     }

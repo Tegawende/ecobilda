@@ -395,7 +395,6 @@ export const getPublicProfile = query({
           return {
             _id: p._id,
             title: p.title,
-            projectType: p.projectType,
             coverImageUrl,
             address: projectAddress,
           };

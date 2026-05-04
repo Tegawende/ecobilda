@@ -15,7 +15,7 @@ import { favoritesService } from '@/services/favorites';
 import { isAuthenticated } from '@/lib/convexClient';
 
 interface FavoriteButtonProps {
-  projectId: string | number;
+  missionId: string;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'circle' | 'ghost';
   initialFavorite?: boolean;
@@ -34,7 +34,7 @@ const iconSizeMap = {
 };
 
 export function FavoriteButton({
-  projectId,
+  missionId,
   size = 'md',
   variant = 'circle',
   initialFavorite = false
@@ -50,15 +50,15 @@ export function FavoriteButton({
 
     const checkFavoriteStatus = async () => {
       try {
-        const favorites = await favoritesService.getFavorites();
-        setIsFavorite(favorites.includes(projectId));
+        const favorites = await favoritesService.getFavoriteMissionIds();
+        setIsFavorite(favorites.includes(missionId));
       } catch {
         // silently fail
       }
     };
 
     checkFavoriteStatus();
-  }, [projectId, isLoggedIn]);
+  }, [missionId, isLoggedIn]);
 
   const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -74,27 +74,16 @@ export function FavoriteButton({
     setIsFavorite(!previousState);
 
     try {
-      if (previousState) {
-        await favoritesService.removeFavorite(projectId);
-        notifications.show({
-          title: t('favorites.removedTitle'),
-          message: t('favorites.removedMessage'),
-          color: 'eco-primary',
-          icon: <IconCheck size={18} />,
-          position: 'bottom-right',
-        });
-      } else {
-        await favoritesService.addFavorite(projectId);
-        notifications.show({
-          title: t('favorites.addedTitle'),
-          message: t('favorites.addedMessage'),
-          color: 'eco-primary',
-          icon: <IconCheck size={18} />,
-          position: 'bottom-right',
-        });
-      }
-      const favorites = await favoritesService.getFavorites();
-      setIsFavorite(favorites.includes(projectId));
+      const res = await favoritesService.toggle(missionId);
+      const removed = res.action === 'removed';
+      notifications.show({
+        title: removed ? t('favorites.removedTitle') : t('favorites.addedTitle'),
+        message: removed ? t('favorites.removedMessage') : t('favorites.addedMessage'),
+        color: 'eco-primary',
+        icon: <IconCheck size={18} />,
+        position: 'bottom-right',
+      });
+      setIsFavorite(!removed);
     } catch {
       notifications.show({
         title: t('favorites.errorTitle'),

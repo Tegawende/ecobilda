@@ -63,7 +63,7 @@ export default defineSchema({
     emailNotifications: v.boolean(),
     newsletter: v.boolean(),
     inAppNotifications: v.boolean(),
-    notificationLanguage: v.string(), // "en" | "fr" | "es" | "de"
+    notificationLanguage: v.string(), // "en" | "fr" | "es" | "de" | "nl" | "pt"
 
     // Profile visibility
     isProfileVisible: v.boolean(),
@@ -104,20 +104,17 @@ export default defineSchema({
   }),
 
   // ============================================
-  // Projects
+  // Projects (= host's place / lieu d'accueil)
+  //
+  // Lightweight container that describes WHERE the host welcomes helpers.
+  // The actual bookable units are stored in `missions`.
   // ============================================
 
   projects: defineTable({
     ownerId: v.id("users"),
-    title: v.string(),
-    description: v.string(),
-    projectType: v.string(), // "PERM" | "NATB"
+    title: v.string(), // place name, e.g. "Le Domaine des Sources"
 
     addressId: v.optional(v.id("addresses")),
-
-    hoursPerDay: v.number(), // 1-10
-    daysPerWeek: v.number(), // 1-7
-    maxHelpers: v.number(), // min 1
 
     accommodationDetails: v.optional(v.string()),
     foodDetails: v.optional(v.string()),
@@ -127,13 +124,12 @@ export default defineSchema({
     petsAllowed: v.boolean(),
     smokingAllowed: v.boolean(),
 
-    skillIds: v.array(v.id("skills")),
     languageIds: v.optional(v.array(v.id("languages"))),
 
     isActive: v.boolean(),
     flaggedCount: v.number(),
 
-    // Admin validation
+    // Admin validation (one-shot per place)
     status: v.string(), // "PENDING" | "ACTIVE" | "REJECTED"
     rejectionReason: v.optional(v.string()),
     validatedAt: v.optional(v.number()),
@@ -143,53 +139,126 @@ export default defineSchema({
   })
     .index("by_owner", ["ownerId"])
     .index("by_status", ["status"])
-    .index("by_status_active", ["status", "isActive"])
-    .index("by_type_active", ["projectType", "isActive"])
-    .searchIndex("search_title", {
-      searchField: "title",
-      filterFields: ["status", "isActive"],
-    }),
-
-  availability: defineTable({
-    projectId: v.id("projects"),
-    year: v.number(),
-    january: v.boolean(),
-    february: v.boolean(),
-    march: v.boolean(),
-    april: v.boolean(),
-    may: v.boolean(),
-    june: v.boolean(),
-    july: v.boolean(),
-    august: v.boolean(),
-    september: v.boolean(),
-    october: v.boolean(),
-    november: v.boolean(),
-    december: v.boolean(),
-  }).index("by_project", ["projectId"]),
+    .index("by_status_active", ["status", "isActive"]),
 
   projectImages: defineTable({
     projectId: v.id("projects"),
-    storageId: v.optional(v.id("_storage")), // Convex file storage (user uploads)
-    url: v.optional(v.string()), // Direct URL (seed/static images)
+    storageId: v.optional(v.id("_storage")),
+    url: v.optional(v.string()),
     order: v.number(), // 0 = cover image
   }).index("by_project", ["projectId"]),
 
   // ============================================
+  // Missions (= bookable work unit on a project)
+  //
+  // Each mission has its own dates, type, difficulty, etc.
+  // This is the searchable / filterable / map-displayed unit.
+  // ============================================
+
+  missions: defineTable({
+    projectId: v.id("projects"),
+    ownerId: v.id("users"), // denormalized for cheap by_owner queries
+
+    type: v.string(), // "CHANTIER" | "FORMATION"
+    title: v.string(),
+    description: v.string(),
+
+    // CHANTIER-only fields
+    poste: v.optional(v.string()), // fondations | murs | toiture | sol | isolation | enduits | menuiseries | exterieur | autre
+    technique: v.optional(v.string()), // contextual to poste
+
+    difficulty: v.string(), // "DEBUTANT" | "INTERMEDIAIRE" | "EXPERT"
+
+    // Pricing (mainly for FORMATION)
+    pricingMode: v.string(), // "FREE" | "PAID"
+    priceEUR: v.optional(v.number()),
+
+    // Dates
+    startDate: v.string(), // ISO
+    endDate: v.string(), // ISO
+
+    maxParticipants: v.number(),
+    hoursPerDay: v.number(),
+    daysPerWeek: v.number(),
+
+    skillIds: v.array(v.id("skills")),
+
+    coverImageId: v.optional(v.id("_storage")),
+
+    // Status state machine
+    status: v.string(), // "DRAFT" | "PUBLISHED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED"
+    cancellationReason: v.optional(v.string()),
+
+    // Cron lifecycle tracking
+    feedbackNotifiedAt: v.optional(v.number()),
+    feedbackReminderSentAt: v.optional(v.number()),
+    feedbackDeadlineAt: v.optional(v.number()),
+
+    updatedAt: v.optional(v.number()),
+  })
+    .index("by_project", ["projectId"])
+    .index("by_owner", ["ownerId"])
+    .index("by_status", ["status"])
+    .index("by_status_published", ["status", "startDate"])
+    .index("by_type_status", ["type", "status"])
+    .searchIndex("search_title", {
+      searchField: "title",
+      filterFields: ["status", "type"],
+    }),
+
+  missionImages: defineTable({
+    missionId: v.id("missions"),
+    storageId: v.optional(v.id("_storage")),
+    url: v.optional(v.string()),
+    order: v.number(), // 0 = cover image
+  }).index("by_mission", ["missionId"]),
+
+  // 1-1 with mission, filled by host post-completion
+  missionFeedback: defineTable({
+    missionId: v.id("missions"),
+    totalCostEUR: v.optional(v.number()),
+    surfaceM2: v.optional(v.number()),
+    actualDurationDays: v.optional(v.number()),
+    result: v.optional(v.string()), // "SUCCESS" | "PARTIAL_SUCCESS" | "FAILURE"
+    difficultiesText: v.optional(v.string()), // max 500
+    learningsText: v.optional(v.string()), // max 500
+    photoIds: v.optional(v.array(v.id("_storage"))),
+    isPublic: v.boolean(),
+    submittedAt: v.number(),
+  })
+    .index("by_mission", ["missionId"])
+    .index("by_public_submitted", ["isPublic", "submittedAt"]),
+
+  // Photos uploaded by helpers post-mission, opt-in publication
+  helperMissionPhotos: defineTable({
+    missionId: v.id("missions"),
+    helperId: v.id("users"),
+    storageId: v.id("_storage"),
+    isPublic: v.boolean(), // default false, helper opts in
+    caption: v.optional(v.string()),
+  })
+    .index("by_mission", ["missionId"])
+    .index("by_helper", ["helperId"])
+    .index("by_mission_public", ["missionId", "isPublic"]),
+
+  // ============================================
   // Participations
+  //
+  // Now references missionId (was projectId). One participation per mission per volunteer.
   // ============================================
 
   participationRequests: defineTable({
     volunteerId: v.id("users"),
-    projectId: v.id("projects"),
+    missionId: v.id("missions"),
     status: v.string(), // "PENDING" | "ACCEPTED" | "REFUSED" | "CANCELLED" | "EXPIRED"
     motivation: v.string(),
-    proposedStartDate: v.optional(v.string()), // ISO date
-    proposedEndDate: v.optional(v.string()), // ISO date
+    proposedStartDate: v.optional(v.string()),
+    proposedEndDate: v.optional(v.string()),
     hostResponseMessage: v.optional(v.string()),
     respondedAt: v.optional(v.number()),
   })
-    .index("by_project", ["projectId"])
-    .index("by_project_status", ["projectId", "status"])
+    .index("by_mission", ["missionId"])
+    .index("by_mission_status", ["missionId", "status"])
     .index("by_volunteer", ["volunteerId"])
     .index("by_volunteer_status", ["volunteerId", "status"]),
 
@@ -245,7 +314,7 @@ export default defineSchema({
     feedback: v.string(),
     response: v.optional(v.string()),
     responseDate: v.optional(v.number()),
-    isPublished: v.boolean(), // Airbnb-style: published when both reviews exist or 30-day deadline
+    isPublished: v.boolean(),
     updatedAt: v.optional(v.number()),
   })
     .index("by_receiver", ["receiverId"])
@@ -258,7 +327,7 @@ export default defineSchema({
 
   notifications: defineTable({
     recipientId: v.id("users"),
-    type: v.string(), // "REVIEW" | "MESSAGE" | "ADMIN" | "PROJECT" | "SYSTEM"
+    type: v.string(), // "REVIEW" | "MESSAGE" | "ADMIN" | "PROJECT" | "MISSION" | "SYSTEM"
     title: v.string(),
     message: v.string(),
     linkUrl: v.optional(v.string()),
@@ -269,15 +338,15 @@ export default defineSchema({
     .index("by_recipient_unread", ["recipientId", "isRead"]),
 
   // ============================================
-  // Favorites
+  // Favorites (now on missions)
   // ============================================
 
   favorites: defineTable({
     userId: v.id("users"),
-    projectId: v.id("projects"),
+    missionId: v.id("missions"),
   })
     .index("by_user", ["userId"])
-    .index("by_user_project", ["userId", "projectId"]),
+    .index("by_user_mission", ["userId", "missionId"]),
 
   // ============================================
   // Reports
@@ -285,8 +354,8 @@ export default defineSchema({
 
   reports: defineTable({
     reporterId: v.id("users"),
-    targetType: v.string(), // "PROJECT" | "USER" | "REVIEW"
-    targetId: v.string(), // ID of the reported entity
+    targetType: v.string(), // "PROJECT" | "MISSION" | "USER" | "REVIEW"
+    targetId: v.string(),
     reason: v.string(),
     details: v.optional(v.string()),
     status: v.string(), // "PENDING" | "RESOLVED" | "DISMISSED"
@@ -325,8 +394,8 @@ export default defineSchema({
 
   sessions: defineTable({
     userId: v.id("users"),
-    token: v.string(), // random session token
-    expiresAt: v.number(), // timestamp
+    token: v.string(),
+    expiresAt: v.number(),
   })
     .index("by_token", ["token"])
     .index("by_user", ["userId"]),
@@ -349,6 +418,6 @@ export default defineSchema({
   typingIndicators: defineTable({
     userId: v.id("users"),
     conversationId: v.id("conversations"),
-    expiresAt: v.number(), // timestamp, auto-cleanup
+    expiresAt: v.number(),
   }).index("by_conversation", ["conversationId"]),
 });

@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDate(date: string | Date): string {
+export function formatDate(date: string | number | Date): string {
   return new Date(date).toLocaleDateString('fr-FR', {
     day: 'numeric',
     month: 'short',
@@ -13,7 +13,7 @@ export function formatDate(date: string | Date): string {
   });
 }
 
-export function formatDateTime(date: string | Date): string {
+export function formatDateTime(date: string | number | Date): string {
   return new Date(date).toLocaleString('fr-FR', {
     day: 'numeric',
     month: 'short',

@@ -45,7 +45,7 @@ export function ForVolunteersClient() {
 
           <div className="text-center">
             <Link
-              href="/projects"
+              href="/missions"
               className="inline-flex items-center gap-2 rounded-full bg-eco-primary px-8 py-4 text-base font-bold text-white shadow-lg hover:bg-eco-primaryDark transition-all"
             >
               {t('forVolunteers.cta')}

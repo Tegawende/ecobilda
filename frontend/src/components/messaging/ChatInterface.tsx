@@ -47,7 +47,8 @@ export function ChatInterface({ conversationId, onConversationUpdate }: ChatInte
   useEffect(() => {
     if (!conversation || !currentUser) return;
 
-    const unsubscribe = addMessageListener((data) => {
+    const unsubscribe = addMessageListener((rawData: unknown) => {
+      const data = rawData as any;
       if (data.type === 'new_message' || data.type === 'message_sent') {
         const newMessage = data.message;
         if (!newMessage) return;

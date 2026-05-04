@@ -1,290 +1,109 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import { useRouter } from '@/i18n/navigation';
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import {
-  Container,
-  Title,
-  Text,
-  Paper,
-  Stepper,
-  Alert,
-  Box,
-  Loader,
-  Center,
-} from '@mantine/core';
-import { IconAlertCircle } from '@tabler/icons-react';
-import { Layout } from '@/components/common/Layout';
-import { ProjectFormStep1 } from '@/components/projects/ProjectFormStep1';
-import { ProjectFormStep2 } from '@/components/projects/ProjectFormStep2';
-import { ProjectFormStep3 } from '@/components/projects/ProjectFormStep3';
-import { ProjectFormStep4 } from '@/components/projects/ProjectFormStep4';
+import { useRouter } from '@/i18n/navigation';
+import { Container, Stack, Title, Center, Loader, Text } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { IconCheck } from '@tabler/icons-react';
+import { PlaceForm, type PlaceFormValues } from '@/components/places/PlaceForm';
 import { projectsService } from '@/services/projects';
-import type { ProjectFormData } from '@/app/[locale]/(protected)/create-project/CreateProjectClient';
+import type { Project } from '@/types';
 
-export function EditProjectClient() {
+interface EditProjectClientProps {
+  id: string;
+}
+
+export function EditProjectClient({ id }: EditProjectClientProps) {
   const t = useTranslations();
   const router = useRouter();
-  const params = useParams();
-  const projectId = params?.id as string;
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const [formData, setFormData] = useState<ProjectFormData>({
-    title: '',
-    description: '',
-    projectType: 'PERM',
-    address: {
-      street: '',
-      streetNumber: '',
-      city: '',
-      postalCode: '',
-      countryCode: '',
-      latitude: 0,
-      longitude: 0,
-      formattedAddress: '',
-    },
-    hoursPerDay: 5,
-    daysPerWeek: 5,
-    maxHelpers: 2,
-    accommodationDetails: '',
-    foodDetails: '',
-    skills: [],
-    internetProvided: false,
-    familyFriendly: false,
-    petsAllowed: false,
-    smokingAllowed: false,
-    availabilities: [],
-    languages: [],
-    images: [],
-  });
+  const [place, setPlace] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProject = async () => {
-      try {
-        const project = await projectsService.getProject(projectId);
-        setFormData({
-          title: project.title || '',
-          description: project.description || '',
-          projectType: (project.projectType as 'PERM' | 'NATB') || 'PERM',
-          address: {
-            street: project.address?.street || '',
-            streetNumber: project.address?.streetNumber || '',
-            city: project.address?.city || '',
-            postalCode: project.address?.postalCode || '',
-            countryCode: project.address?.country?.code || '',
-            latitude: project.address?.latitude || 0,
-            longitude: project.address?.longitude || 0,
-            formattedAddress: project.address?.formattedAddress || '',
-          },
-          hoursPerDay: project.hoursPerDay || 5,
-          daysPerWeek: project.daysPerWeek || 5,
-          maxHelpers: project.maxHelpers || 2,
-          accommodationDetails: project.accommodationDetails || '',
-          foodDetails: project.foodDetails || '',
-          skills: project.skills?.map((s: any) => s.code || s._id) || [],
-          languages: project.languages?.map((l: any) => l.code) ?? [],
-          internetProvided: project.internetProvided || false,
-          familyFriendly: project.familyFriendly || false,
-          petsAllowed: project.petsAllowed || false,
-          smokingAllowed: project.smokingAllowed || false,
-          availabilities: project.availabilities?.map((a: any) => ({
-            year: a.year,
-            january: a.january ?? false,
-            february: a.february ?? false,
-            march: a.march ?? false,
-            april: a.april ?? false,
-            may: a.may ?? false,
-            june: a.june ?? false,
-            july: a.july ?? false,
-            august: a.august ?? false,
-            september: a.september ?? false,
-            october: a.october ?? false,
-            november: a.november ?? false,
-            december: a.december ?? false,
-          })) ?? [],
-          images: [],
-          existingImages: project.images?.map((img: any) => ({ url: img.url || img })).filter((img: any) => img.url) ?? [],
-        });
-      } catch (err) {
-        setError(t('myProjects.fetchError'));
-      } finally {
-        setIsLoading(false);
-      }
+    let mounted = true;
+    projectsService
+      .getProject(id)
+      .then((p) => mounted && setPlace(p))
+      .catch(() => mounted && setPlace(null))
+      .finally(() => mounted && setLoading(false));
+    return () => {
+      mounted = false;
     };
+  }, [id]);
 
-    if (projectId) fetchProject();
-  }, [projectId, t]);
-
-  const totalSteps = 4;
-
-  const handleNext = () => {
-    if (currentStep < totalSteps - 1) {
-      setCurrentStep(currentStep + 1);
-      window.scrollTo(0, 0);
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-      window.scrollTo(0, 0);
-    }
-  };
-
-  const updateFormData = (data: Partial<ProjectFormData>) => {
-    setFormData((prev) => ({ ...prev, ...data }));
-  };
-
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    setError(null);
-
+  const handleSubmit = async (values: PlaceFormValues) => {
     try {
-      await projectsService.updateProject(projectId, {
-        title: formData.title,
-        description: formData.description,
-        hoursPerDay: formData.hoursPerDay,
-        daysPerWeek: formData.daysPerWeek,
-        maxHelpers: formData.maxHelpers,
-        accommodationDetails: formData.accommodationDetails,
-        foodDetails: formData.foodDetails,
-        internetProvided: formData.internetProvided,
-        familyFriendly: formData.familyFriendly,
-        petsAllowed: formData.petsAllowed,
-        smokingAllowed: formData.smokingAllowed,
-        skills: formData.skills,
-        languages: formData.languages,
+      await projectsService.updateProject(id, {
+        title: values.title,
+        accommodationDetails: values.accommodationDetails || undefined,
+        foodDetails: values.foodDetails || undefined,
+        internetProvided: values.internetProvided,
+        familyFriendly: values.familyFriendly,
+        petsAllowed: values.petsAllowed,
+        smokingAllowed: values.smokingAllowed,
+        languageCodes: values.languages,
       });
-
-      // Save availabilities
-      for (const avail of formData.availabilities) {
-        await projectsService.saveAvailability(projectId, avail.year, {
-          january: avail.january,
-          february: avail.february,
-          march: avail.march,
-          april: avail.april,
-          may: avail.may,
-          june: avail.june,
-          july: avail.july,
-          august: avail.august,
-          september: avail.september,
-          october: avail.october,
-          november: avail.november,
-          december: avail.december,
-        });
-      }
-
-      // Upload new images if any
-      if (formData.images.length > 0) {
-        for (let i = 0; i < formData.images.length; i++) {
-          const isCover = i === 0 && (formData.existingImages?.length ?? 0) === 0;
-          await projectsService.uploadImage(projectId, formData.images[i], isCover);
-        }
-      }
-
-      router.push('/my-projects');
-    } catch (err: any) {
-      setError(err.message || t('createProject.error.createFailed'));
-    } finally {
-      setIsSubmitting(false);
+      notifications.show({
+        title: t('createPlace.editSuccessTitle'),
+        message: t('createPlace.editSuccessMessage'),
+        color: 'green',
+        icon: <IconCheck size={16} />,
+      });
+      router.push('/my-missions');
+    } catch (e: any) {
+      notifications.show({
+        title: t('common.error'),
+        message: e?.message ?? '',
+        color: 'red',
+      });
     }
   };
 
-  const stepLabels = [
-    t('createProject.steps.basicInfo'),
-    t('createProject.steps.locationWork'),
-    t('createProject.steps.skillsAmenities'),
-    t('createProject.steps.availabilityImages'),
-  ];
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <Layout>
-        <Center h="60vh">
-          <Loader size="lg" color="eco-blue" />
-        </Center>
-      </Layout>
+      <Center h={400}>
+        <Loader />
+      </Center>
+    );
+  }
+
+  if (!place) {
+    return (
+      <Container size="sm" py="xl">
+        <Text>{t('createPlace.notFound')}</Text>
+      </Container>
     );
   }
 
   return (
-    <Layout>
-      {/* Header */}
-      <Box bg="white" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
-        <Container size="md" py="xl">
-          <Title order={1} mb="xs">{t('myProjects.editProject')}</Title>
-          <Text c="dimmed">
-            {t('myProjects.editProjectDesc')}
-          </Text>
-        </Container>
-      </Box>
-
-      <Container size="md" py="xl">
-        {/* Stepper */}
-        <Stepper
-          active={currentStep}
-          mb="xl"
-          size="sm"
-          color="eco-blue"
-        >
-          {stepLabels.map((_, index) => (
-            <Stepper.Step key={index} />
-          ))}
-        </Stepper>
-
-        {/* Error Message */}
-        {error && (
-          <Alert icon={<IconAlertCircle size={18} />} color="red" mb="lg">
-            {error}
-          </Alert>
-        )}
-
-        {/* Step Content */}
-        <Paper shadow="sm" p="xl" radius="md" withBorder mb="lg">
-          {currentStep === 0 && (
-            <ProjectFormStep1
-              data={formData}
-              onUpdate={updateFormData}
-              onNext={handleNext}
-            />
-          )}
-
-          {currentStep === 1 && (
-            <ProjectFormStep2
-              data={formData}
-              onUpdate={updateFormData}
-              onNext={handleNext}
-              onBack={handleBack}
-            />
-          )}
-
-          {currentStep === 2 && (
-            <ProjectFormStep3
-              data={formData}
-              onUpdate={updateFormData}
-              onNext={handleNext}
-              onBack={handleBack}
-            />
-          )}
-
-          {currentStep === 3 && (
-            <ProjectFormStep4
-              data={formData}
-              onUpdate={updateFormData}
-              onSubmit={handleSubmit}
-              onBack={handleBack}
-              isSubmitting={isSubmitting}
-              error={error}
-              isEditing
-            />
-          )}
-        </Paper>
-      </Container>
-    </Layout>
+    <Container size="md" py="md">
+      <Stack gap="md">
+        <Title order={2}>{t('createPlace.editTitle')}</Title>
+        <PlaceForm
+          initialValues={{
+            title: place.title,
+            accommodationDetails: place.accommodationDetails ?? '',
+            foodDetails: place.foodDetails ?? '',
+            internetProvided: place.internetProvided,
+            familyFriendly: place.familyFriendly,
+            petsAllowed: place.petsAllowed,
+            smokingAllowed: place.smokingAllowed,
+            languages: place.languages?.map((l) => l.code) ?? [],
+            address: {
+              city: place.address?.city ?? '',
+              postalCode: place.address?.postalCode ?? '',
+              countryCode: place.address?.country?.code ?? '',
+              latitude: place.address?.latitude ?? 0,
+              longitude: place.address?.longitude ?? 0,
+              formattedAddress: place.address?.formattedAddress ?? '',
+            },
+          }}
+          onSubmit={handleSubmit}
+          onCancel={() => router.push('/my-missions')}
+          submitLabel={t('common.save')}
+        />
+      </Stack>
+    </Container>
   );
 }
