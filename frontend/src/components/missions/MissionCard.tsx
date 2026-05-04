@@ -1,61 +1,65 @@
 'use client';
 
 import { useState, useEffect, useCallback, memo } from 'react';
+import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { Text, Group, Badge, Stack, ActionIcon, Skeleton } from '@mantine/core';
 import {
   IconMapPin,
   IconUsers,
-  IconClock,
+  IconCalendar,
   IconHome,
-  IconLeaf,
-  IconWifi,
-  IconBabyCarriage,
-  IconDog,
+  IconSchool,
+  IconCash,
   IconEdit,
   IconChevronLeft,
   IconChevronRight,
   IconTrash,
 } from '@tabler/icons-react';
 import { FavoriteButton } from '../common/FavoriteButton';
-import type { Project } from '@/types';
+import type { Mission } from '@/types';
 
-interface ProjectCardProps {
-  project: Project;
+interface MissionCardProps {
+  mission: Mission;
   isHovered?: boolean;
-  onHover?: (project: Project | null) => void;
+  onHover?: (mission: Mission | null) => void;
   initialFavorite?: boolean;
   showEdit?: boolean;
   onEdit?: (id: string) => void;
-  onDelete?: (project: Project) => void;
+  onDelete?: (mission: Mission) => void;
   showStatus?: boolean;
-  /** Called on mobile clicks instead of navigation */
-  onMobileClick?: (project: Project) => void;
+  onMobileClick?: (mission: Mission) => void;
 }
 
-// Memoized image component for carousel slide
-const CarouselImage = memo(({
-  src,
-  alt,
-}: {
-  src: string;
-  alt: string;
-}) => (
-  <div className="relative w-full h-full flex-shrink-0">
-    <img
-      src={src}
-      alt={alt}
-      loading="lazy"
-      className="absolute inset-0 w-full h-full object-cover"
-    />
+const CarouselImage = memo(({ src, alt, loaded }: { src: string; alt: string; loaded: boolean }) => (
+  <div className="relative w-full h-full flex-shrink-0 bg-gray-100">
+    {loaded && (
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1536px) 33vw, 25vw"
+        className="object-cover"
+      />
+    )}
   </div>
 ));
-
 CarouselImage.displayName = 'CarouselImage';
 
-export function ProjectCard({
-  project,
+function formatDateRange(start: string, end: string, locale: string): string {
+  try {
+    const s = new Date(start);
+    const e = new Date(end);
+    const fmt = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' });
+    return `${fmt.format(s)} → ${fmt.format(e)}`;
+  } catch {
+    return `${start} → ${end}`;
+  }
+}
+
+export function MissionCard({
+  mission,
   isHovered = false,
   onHover,
   initialFavorite = false,
@@ -64,7 +68,8 @@ export function ProjectCard({
   onDelete,
   showStatus = false,
   onMobileClick,
-}: ProjectCardProps) {
+}: MissionCardProps) {
+  const t = useTranslations();
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
 
   useEffect(() => {
@@ -72,86 +77,81 @@ export function ProjectCard({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  const t = useTranslations();
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [maxLoadedIndex, setMaxLoadedIndex] = useState(0);
   const lastClickTime = useState<{ current: number }>({ current: 0 })[0];
 
-  const images = project.images && project.images.length > 0
-    ? project.images.map(img => img.url || '')
-    : ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'];
+  const images = mission.images && mission.images.length > 0
+    ? mission.images.map((img) => img.url || '')
+    : mission.coverImageUrl
+      ? [mission.coverImageUrl]
+      : ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'];
 
   const nextImage = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    // Throttle clicks (300ms) to prevent double-skipping or ghost clicks on mobile
     const now = Date.now();
     if (now - lastClickTime.current < 300) return;
     lastClickTime.current = now;
-
-    // Finite navigation - don't go past last image
-    setCurrentImageIndex((prev) => Math.min(prev + 1, images.length - 1));
+    setCurrentImageIndex((prev) => {
+      const next = Math.min(prev + 1, images.length - 1);
+      setMaxLoadedIndex((m) => Math.max(m, next));
+      return next;
+    });
   }, [images.length]);
 
   const prevImage = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    // Throttle clicks (300ms)
     const now = Date.now();
     if (now - lastClickTime.current < 300) return;
     lastClickTime.current = now;
-
-    // Finite navigation - don't go before first image
     setCurrentImageIndex((prev) => Math.max(prev - 1, 0));
-  }, [images.length]);
+  }, []);
 
-  const handleMouseEnter = useCallback(() => {
-    onHover?.(project);
-  }, [onHover, project]);
+  const handleMouseEnter = useCallback(() => onHover?.(mission), [onHover, mission]);
+  const handleMouseLeave = useCallback(() => onHover?.(null), [onHover]);
 
-  const handleMouseLeave = useCallback(() => {
-    onHover?.(null);
-  }, [onHover]);
+  const isFormation = mission.type === 'FORMATION';
 
-  const isNatB = project.projectType === 'NATB';
-
-  // Handle click - use modal on mobile if callback provided
   const handleClick = useCallback((e: React.MouseEvent) => {
     if (isMobile && onMobileClick) {
       e.preventDefault();
-      onMobileClick(project);
+      onMobileClick(mission);
     }
-  }, [isMobile, onMobileClick, project]);
+  }, [isMobile, onMobileClick, mission]);
+
+  const locale = typeof window !== 'undefined' ? document.documentElement.lang || 'fr' : 'fr';
+  const address = mission.project?.address;
 
   return (
-    <Link href={`/projects/${project._id}`}
+    <Link
+      href={`/missions/${mission._id}`}
       className={`block group cursor-pointer transition-all duration-200 ${isHovered ? 'scale-[1.02]' : ''}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
     >
-      {/* Sliding Image Carousel */}
       <div className="relative rounded-xl overflow-hidden aspect-[4/3] mb-3 bg-gray-100">
-        {/* Horizontal image strip with slide animation */}
         <div
           className="flex h-full transition-transform duration-300 ease-out"
           style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
         >
-          {images.map((imageSrc, idx) => (
+          {images.map((src, idx) => (
             <CarouselImage
-              key={imageSrc}
-              src={imageSrc}
-              alt={`${project.title} - Image ${idx + 1}`}
+              key={src + idx}
+              src={src}
+              alt={`${mission.title} - ${idx + 1}`}
+              loaded={idx <= maxLoadedIndex}
             />
           ))}
         </div>
 
-        {/* Favorite Button (Hidden if showEdit is true) */}
         {!showEdit && (
           <div className="absolute top-3 right-3 z-[5]">
             <FavoriteButton
-              projectId={project._id}
+              missionId={mission._id}
               variant="ghost"
               size="md"
               initialFavorite={initialFavorite}
@@ -159,12 +159,11 @@ export function ProjectCard({
           </div>
         )}
 
-        {/* Edit + Delete buttons */}
         {showEdit && (
           <div className="absolute top-3 right-3 z-30 flex gap-1.5">
             {onDelete && (
               <ActionIcon
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDelete(project); }}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDelete(mission); }}
                 variant="white"
                 radius="xl"
                 size="lg"
@@ -174,7 +173,7 @@ export function ProjectCard({
               </ActionIcon>
             )}
             <ActionIcon
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onEdit?.(project._id); }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onEdit?.(mission._id); }}
               variant="white"
               radius="xl"
               size="lg"
@@ -185,26 +184,36 @@ export function ProjectCard({
           </div>
         )}
 
-        {/* Type Badge */}
-        <div className="absolute top-3 left-3 z-10">
+        <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
           <Badge
             size="sm"
             radius="xl"
             variant="filled"
-            color={isNatB ? 'eco-primary' : 'eco-terracotta'}
-            leftSection={isNatB ? <IconHome size={12} /> : <IconLeaf size={12} />}
+            color={isFormation ? 'eco-terracotta' : 'eco-primary'}
+            leftSection={isFormation ? <IconSchool size={12} /> : <IconHome size={12} />}
             tt="uppercase"
             fw={700}
             styles={{ root: { letterSpacing: '0.05em', fontSize: '0.65rem' } }}
           >
-            {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
+            {t(`missions.types.${mission.type}`)}
           </Badge>
+          {isFormation && mission.priceEUR != null && (
+            <Badge
+              size="sm"
+              radius="xl"
+              variant="filled"
+              color="dark"
+              leftSection={<IconCash size={12} />}
+              fw={700}
+              styles={{ root: { fontSize: '0.65rem' } }}
+            >
+              {mission.priceEUR}€
+            </Badge>
+          )}
         </div>
 
-        {/* Image Navigation - Show only when not at boundary */}
         {images.length > 1 && (
           <>
-            {/* Previous button - hidden on first image */}
             {currentImageIndex > 0 && (
               <button
                 type="button"
@@ -214,7 +223,6 @@ export function ProjectCard({
                 <IconChevronLeft size={18} />
               </button>
             )}
-            {/* Next button - hidden on last image */}
             {currentImageIndex < images.length - 1 && (
               <button
                 type="button"
@@ -224,14 +232,11 @@ export function ProjectCard({
                 <IconChevronRight size={18} />
               </button>
             )}
-
-            {/* Dots */}
             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
               {images.map((_, idx) => (
                 <span
                   key={idx}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${idx === currentImageIndex ? 'bg-white w-2' : 'bg-white/50'
-                    }`}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${idx === currentImageIndex ? 'bg-white w-2' : 'bg-white/50'}`}
                 />
               ))}
             </div>
@@ -239,76 +244,83 @@ export function ProjectCard({
         )}
       </div>
 
-      {/* Content */}
       <Stack gap={4} px={4}>
         <Group justify="space-between" gap="xs" align="flex-start">
           <Text fw={700} size="sm" c="dark" className="group-hover:text-eco-primary transition-colors line-clamp-1" style={{ flex: 1 }}>
-            {project.title}
+            {mission.title}
           </Text>
           {showStatus && (
             <Badge
               size="xs"
               radius="xl"
               variant="light"
-              color={project.status === 'PENDING' ? 'yellow' : project.isActive ? 'green' : 'gray'}
+              color={
+                mission.status === 'PUBLISHED'
+                  ? 'green'
+                  : mission.status === 'IN_PROGRESS'
+                    ? 'blue'
+                    : mission.status === 'COMPLETED'
+                      ? 'gray'
+                      : mission.status === 'CANCELLED'
+                        ? 'red'
+                        : 'yellow'
+              }
               tt="uppercase"
               fw={700}
               mt={4}
               styles={{ root: { flexShrink: 0 } }}
             >
-              {project.status === 'PENDING'
-                ? t('common.pending')
-                : project.isActive
-                ? t('common.active')
-                : t('common.inactive')}
+              {t(`missions.status.${mission.status}`)}
             </Badge>
           )}
         </Group>
 
+        {address?.city && (
+          <Group gap={4} wrap="nowrap">
+            <IconMapPin size={14} className="text-gray-500 flex-shrink-0" />
+            <Text size="sm" c="dimmed" className="truncate">
+              {address.city}{address.country?.name ? `, ${address.country.name}` : ''}
+            </Text>
+          </Group>
+        )}
+
         <Group gap={4} wrap="nowrap">
-          <IconMapPin size={14} className="text-gray-500 flex-shrink-0" />
-          <Text size="sm" c="dimmed" className="truncate">{project.address?.city}, {project.address?.country?.name}</Text>
+          <IconCalendar size={14} className="text-gray-500 flex-shrink-0" />
+          <Text size="sm" c="dimmed" className="truncate">
+            {formatDateRange(mission.startDate, mission.endDate, locale)}
+          </Text>
         </Group>
 
         <Group gap="md">
           <Group gap={4}>
             <IconUsers size={14} className="text-gray-500" />
             <Text size="sm" c="dimmed">
-              {project.maxHelpers} {t('projects.volunteers')}
+              {mission.maxParticipants} {t('missions.helpers')}
             </Text>
           </Group>
-          <Group gap={4}>
-            <IconClock size={14} className="text-gray-500" />
-            <Text size="sm" c="dimmed">
-              {project.hoursPerDay}h/{t('common.day')}
-            </Text>
-          </Group>
+          <Badge size="xs" variant="light" color="gray" radius="xl">
+            {t(`missions.difficulty.${mission.difficulty}`)}
+          </Badge>
         </Group>
 
-        {/* Amenities */}
-        <Group gap="xs" pt={4}>
-          {project.internetProvided && (
-            <Badge size="xs" variant="light" color="gray" leftSection={<IconWifi size={10} />} radius="xl">
-              {t('projects.wifi')}
+        {mission.poste && (
+          <Group gap={6} pt={4}>
+            <Badge size="xs" variant="filled" color="eco-primary" radius="xl">
+              {t(`missions.poste.${mission.poste}`)}
             </Badge>
-          )}
-          {project.familyFriendly && (
-            <Badge size="xs" variant="light" color="gray" leftSection={<IconBabyCarriage size={10} />} radius="xl">
-              {t('projects.familyFriendly')}
-            </Badge>
-          )}
-          {project.petsAllowed && (
-            <Badge size="xs" variant="light" color="gray" leftSection={<IconDog size={10} />} radius="xl">
-              {t('projects.petsAllowed')}
-            </Badge>
-          )}
-        </Group>
+            {mission.technique && (
+              <Badge size="xs" variant="light" color="eco-primary" radius="xl">
+                {t(`missions.technique.${mission.technique}`)}
+              </Badge>
+            )}
+          </Group>
+        )}
       </Stack>
     </Link>
   );
 }
 
-export function ProjectCardSkeleton() {
+export function MissionCardSkeleton() {
   return (
     <Stack gap="xs">
       <Skeleton h={0} className="aspect-[4/3]" radius="xl" />

@@ -93,7 +93,7 @@ export function ProfileClient() {
           // Fetch reviews after getting user
           if (data?._id) {
             try {
-              const userReviews = await convexClient.query(api.reviews.getByUser, { userId: data._id });
+              const userReviews = await convexClient.query(api.reviews.getByUser, { userId: data._id as any });
               setReviews(userReviews ?? []);
             } catch {
               // Reviews are non-critical, fail silently

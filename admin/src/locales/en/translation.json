@@ -114,7 +114,10 @@
     "validatedOn": "Validated on",
     "searchPlaceholder": "Search by title or owner name...",
     "allTypes": "All types",
-    "noMatchingProjects": "No projects match your search"
+    "noMatchingProjects": "No projects match your search",
+    "placeLabel": "Place",
+    "missionsCount": "missions",
+    "publishedShort": "published"
   },
   "reports": {
     "title": "Reports",

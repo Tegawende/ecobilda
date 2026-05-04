@@ -107,7 +107,10 @@
     "enterInvalidationReason": "Introduza o motivo (opcional)...",
     "failedToLoad": "Erro ao carregar os projetos pendentes",
     "viewDetails": "Detalhes",
-    "validatedOn": "Validado em"
+    "validatedOn": "Validado em",
+    "placeLabel": "Place",
+    "missionsCount": "missions",
+    "publishedShort": "published"
   },
   "reports": {
     "title": "Denúncias",

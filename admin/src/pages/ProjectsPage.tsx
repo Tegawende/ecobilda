@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import i18n from 'i18next';
 import {
   Check,
   X,
@@ -12,13 +11,11 @@ import {
   Undo2,
   ChevronLeft,
   ChevronRight,
-  Clock,
   Users,
   Wifi,
   Dog,
   Baby,
   Home,
-  Leaf,
   Search,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,17 +23,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { adminApi, type ProjectDetail } from '@/services/api';
 import { formatDate } from '@/lib/utils';
 import { toast } from '@/hooks/useToast';
-import { getSkillIcon } from '@/lib/skillIcons';
 import { useAdminQuery } from '@/hooks/useAdminQuery';
 import { api } from '@convex/_generated/api';
 
@@ -143,8 +132,6 @@ function ProjectCard({
     return null;
   }
 
-  const isNatB = project.projectType === 'NATURAL_BUILDING' || project.projectType === 'NATB';
-
   return (
     <Card className="group overflow-hidden">
       <div className="flex flex-col sm:flex-row">
@@ -211,13 +198,11 @@ function ProjectCard({
             </div>
           )}
 
-          {/* Type Badge - Top Left */}
+          {/* Place badge - Top Left */}
           <div className="absolute top-3 left-3 z-10">
-            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold shadow-sm uppercase tracking-wider ${
-              isNatB ? 'bg-eco-primary text-white' : 'bg-amber-600 text-white'
-            }`}>
-              {isNatB ? <Home size={10} /> : <Leaf size={10} />}
-              {isNatB ? t('projects.ecoConstruction') : t('projects.permaculture')}
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold shadow-sm uppercase tracking-wider bg-eco-primary text-white">
+              <Home size={10} />
+              {t('projects.placeLabel')}
             </span>
           </div>
         </div>
@@ -237,12 +222,14 @@ function ProjectCard({
           </div>
 
           {/* Owner info */}
-          <p className="text-sm text-gray-500 mb-1">
-            {t('projects.by')} {project.owner.firstName} {project.owner.lastName}
-            {project.owner.email && (
-              <span className="text-gray-400 ml-1">({project.owner.email})</span>
-            )}
-          </p>
+          {project.owner && (
+            <p className="text-sm text-gray-500 mb-1">
+              {t('projects.by')} {project.owner.firstName} {project.owner.lastName}
+              {project.owner.email && (
+                <span className="text-gray-400 ml-1">({project.owner.email})</span>
+              )}
+            </p>
+          )}
 
           {/* Location */}
           <div className="flex items-center text-gray-500 text-sm mb-2">
@@ -252,23 +239,20 @@ function ProjectCard({
             </span>
           </div>
 
-          {/* Stats */}
+          {/* Stats — mission counts and amenities */}
           <div className="flex items-center gap-4 text-sm text-gray-500 mb-2">
-            {project.maxHelpers && (
-              <span className="flex items-center gap-1">
-                <Users size={14} />
-                {project.maxHelpers} {t('projectDetail.maxHelpers')}
-              </span>
-            )}
-            {project.hoursPerDay && (
-              <span className="flex items-center gap-1">
-                <Clock size={14} />
-                {project.hoursPerDay}h/{t('projectDetail.day')}
-              </span>
-            )}
+            <span className="flex items-center gap-1">
+              <Users size={14} />
+              {project.missionsCount ?? 0} {t('projects.missionsCount')}
+              {project.publishedMissionsCount != null && (
+                <span className="text-green-600 ml-1">
+                  ({project.publishedMissionsCount} {t('projects.publishedShort')})
+                </span>
+              )}
+            </span>
           </div>
 
-          {/* Amenities & Skills */}
+          {/* Amenities */}
           <div className="flex flex-wrap gap-1.5 mb-2">
             {project.internetProvided && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
@@ -284,20 +268,6 @@ function ProjectCard({
               <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
                 <Dog size={10} /> {t('projectDetail.pets')}
               </span>
-            )}
-            {project.skills && project.skills.slice(0, 3).map((skill) => {
-              const SkillIcon = getSkillIcon(skill.code);
-              return (
-                <Badge key={skill.code} variant="secondary" className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0">
-                  <SkillIcon size={9} />
-                  {i18n.language === 'fr' ? skill.displayNameFr : skill.displayNameEn}
-                </Badge>
-              );
-            })}
-            {project.skills && project.skills.length > 3 && (
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                +{project.skills.length - 3}
-              </Badge>
             )}
           </div>
 
@@ -367,7 +337,7 @@ function ProjectCard({
                   </Button>
                   <Button variant="outline" size="sm" asChild className="h-8">
                     <a
-                      href={`${import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173'}/projects/${projectId}`}
+                      href={`${import.meta.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/missions`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -440,7 +410,7 @@ function ProjectCard({
                   </Button>
                   <Button variant="outline" size="sm" asChild className="h-8">
                     <a
-                      href={`${import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173'}/projects/${projectId}`}
+                      href={`${import.meta.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/missions`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -477,7 +447,6 @@ export function ProjectsPage() {
   const [error] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'PERMACULTURE' | 'NATURAL_BUILDING'>('all');
   const [projectDetailsCache, setProjectDetailsCache] = useState<Map<string, ProjectDetail>>(new Map());
 
   const handleProjectLoaded = useCallback((id: string, detail: ProjectDetail) => {
@@ -493,11 +462,6 @@ export function ProjectsPage() {
     return ids.filter((id) => {
       const detail = projectDetailsCache.get(id);
       if (!detail) return true; // Show cards that haven't loaded yet
-      if (typeFilter !== 'all') {
-        const type = detail.projectType;
-        if (typeFilter === 'NATURAL_BUILDING' && type !== 'NATURAL_BUILDING' && type !== 'NATB') return false;
-        if (typeFilter === 'PERMACULTURE' && type !== 'PERMACULTURE' && type !== 'PERM') return false;
-      }
       if (query) {
         const title = detail.title?.toLowerCase() || '';
         const ownerName = `${detail.owner?.firstName || ''} ${detail.owner?.lastName || ''}`.toLowerCase();
@@ -505,7 +469,7 @@ export function ProjectsPage() {
       }
       return true;
     });
-  }, [searchQuery, typeFilter, projectDetailsCache]);
+  }, [searchQuery, projectDetailsCache]);
 
   const filteredPendingIds = useMemo(
     () => filterProjectIds(pendingProjectIds),
@@ -537,7 +501,7 @@ export function ProjectsPage() {
     }
   }, [t]);
 
-  const handleInvalidate = useCallback(async (id: string, reason?: string) => {
+  const handleInvalidate = useCallback(async (id: string, _reason?: string) => {
     setActionLoading(id);
     try {
       await adminApi.invalidateProject(id);
@@ -598,16 +562,6 @@ export function ProjectsPage() {
             className="pl-9"
           />
         </div>
-        <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as 'all' | 'PERMACULTURE' | 'NATURAL_BUILDING')}>
-          <SelectTrigger className="w-full sm:w-[200px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t('projects.allTypes')}</SelectItem>
-            <SelectItem value="PERMACULTURE">{t('projects.permaculture')}</SelectItem>
-            <SelectItem value="NATURAL_BUILDING">{t('projects.ecoConstruction')}</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       {error && (

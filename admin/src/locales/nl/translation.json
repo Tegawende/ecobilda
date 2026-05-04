@@ -114,7 +114,10 @@
     "validatedOn": "Gevalideerd op",
     "searchPlaceholder": "Zoek op titel of naam eigenaar...",
     "allTypes": "Alle typen",
-    "noMatchingProjects": "Geen projecten komen overeen met uw zoekopdracht"
+    "noMatchingProjects": "Geen projecten komen overeen met uw zoekopdracht",
+    "placeLabel": "Place",
+    "missionsCount": "missions",
+    "publishedShort": "published"
   },
   "reports": {
     "title": "Meldingen",

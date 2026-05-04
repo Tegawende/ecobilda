@@ -50,7 +50,7 @@ export function ForHelpersClient() {
           <h1 className="text-5xl font-bold mb-6">{t('forHelpers.title')}</h1>
           <p className="text-xl opacity-90 max-w-2xl mx-auto leading-relaxed">{t('forHelpers.subtitle')}</p>
           <Link
-            href="/projects"
+            href="/missions"
             className="inline-flex items-center gap-2 mt-10 rounded-full bg-white px-8 py-4 text-base font-bold shadow-lg transition-all hover:shadow-xl"
             style={{ color: 'var(--color-eco-blue)' }}
           >
@@ -151,7 +151,7 @@ export function ForHelpersClient() {
           <h2 className="text-3xl font-bold mb-4">{t('forHelpers.finalCta.title')}</h2>
           <p className="opacity-90 mb-8 leading-relaxed">{t('forHelpers.finalCta.desc')}</p>
           <Link
-            href="/projects"
+            href="/missions"
             className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-bold shadow-lg hover:shadow-xl transition-all"
             style={{ color: 'var(--color-eco-primary)' }}
           >

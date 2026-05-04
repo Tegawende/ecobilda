@@ -114,7 +114,10 @@
     "validatedOn": "Validé le",
     "searchPlaceholder": "Rechercher par titre ou nom du propriétaire...",
     "allTypes": "Tous les types",
-    "noMatchingProjects": "Aucun projet ne correspond à votre recherche"
+    "noMatchingProjects": "Aucun projet ne correspond à votre recherche",
+    "placeLabel": "Lieu",
+    "missionsCount": "missions",
+    "publishedShort": "publiées"
   },
   "reports": {
     "title": "Signalements",

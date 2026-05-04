@@ -35,8 +35,8 @@ export function ConversationDetails({
   const otherUser = conversation.otherUser;
   const isMuted = conversation.isMuted ?? false;
   const participationDetails = conversation.participationDetails;
-  const project = participationDetails?.project;
-  const isNatB = project?.projectType === 'NATB';
+  const mission = participationDetails?.mission;
+  const isFormation = (mission as any)?.type === 'FORMATION';
 
   const handleToggleMute = async () => {
     setIsTogglingMute(true);
@@ -88,16 +88,16 @@ export function ConversationDetails({
       <ScrollArea style={{ flex: 1 }}>
         <Stack gap={0}>
 
-          {/* Project Section */}
-          {project && (
+          {/* Mission Section */}
+          {mission && (
             <Box p="md">
               <Stack gap="sm">
                 {/* Cover image + type badge */}
-                <Link href={`/projects/${project._id}`}>
+                <Link href={`/missions/${mission._id}`}>
                   <div className="relative rounded-lg overflow-hidden aspect-[16/9] bg-gray-100">
                     <img
-                      src={project.coverImageUrl || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'}
-                      alt={project.title}
+                      src={mission.coverImageUrl || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'}
+                      alt={mission.title}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute top-2 right-2">
@@ -105,13 +105,13 @@ export function ConversationDetails({
                         size="xs"
                         radius="xl"
                         variant="filled"
-                        color={isNatB ? 'eco-primary' : 'eco-terracotta'}
-                        leftSection={isNatB ? <IconHome2 size={10} /> : <IconLeaf size={10} />}
+                        color={isFormation ? 'eco-terracotta' : 'eco-primary'}
+                        leftSection={isFormation ? <IconLeaf size={10} /> : <IconHome2 size={10} />}
                         tt="uppercase"
                         fw={700}
                         styles={{ root: { letterSpacing: '0.05em', fontSize: '0.6rem' } }}
                       >
-                        {isNatB ? t('projects.naturalBuilding') : t('projects.permaculture')}
+                        {isFormation ? t('missions.types.FORMATION') : t('missions.types.CHANTIER')}
                       </Badge>
                     </div>
                   </div>
@@ -119,38 +119,36 @@ export function ConversationDetails({
 
                 {/* Title + link */}
                 <Group justify="space-between" align="flex-start" wrap="nowrap" gap="xs">
-                  <Link href={`/projects/${project._id}`} className="no-underline flex-1 min-w-0">
+                  <Link href={`/missions/${mission._id}`} className="no-underline flex-1 min-w-0">
                     <Text fw={700} size="sm" c="dark" className="hover:text-eco-primary transition-colors line-clamp-2">
-                      {project.title}
+                      {mission.title}
                     </Text>
                   </Link>
-                  <Link href={`/projects/${project._id}`} style={{ flexShrink: 0 }}>
+                  <Link href={`/missions/${mission._id}`} style={{ flexShrink: 0 }}>
                     <IconExternalLink size={14} color="var(--mantine-color-gray-5)" />
                   </Link>
                 </Group>
 
                 {/* Location */}
-                {(project as any).address?.city && (
+                {(mission as any).address?.city && (
                   <Group gap={4} wrap="nowrap">
                     <IconMapPin size={12} className="text-gray-400 flex-shrink-0" />
                     <Text size="xs" c="dimmed" className="truncate">
-                      {[(project as any).address.city, (project as any).address.country?.name].filter(Boolean).join(', ')}
+                      {[(mission as any).address.city, (mission as any).address.country?.name].filter(Boolean).join(', ')}
                     </Text>
                   </Group>
                 )}
 
-                {/* Dates */}
-                {(participationDetails?.proposedStartDate || participationDetails?.proposedEndDate) && (
+                {/* Mission dates */}
+                {((mission as any).startDate || (mission as any).endDate) && (
                   <Group gap={4}>
                     <IconCalendar size={12} className="text-gray-400" />
                     <Text size="xs" c="dimmed">
-                      {participationDetails.proposedStartDate}
-                      {participationDetails.proposedEndDate && ` – ${participationDetails.proposedEndDate}`}
+                      {(mission as any).startDate}
+                      {(mission as any).endDate && ` – ${(mission as any).endDate}`}
                     </Text>
                   </Group>
                 )}
-
-
               </Stack>
             </Box>
           )}

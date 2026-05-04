@@ -405,7 +405,7 @@ export function MyParticipationsClient() {
                   <IconCompass size={64} className="text-gray-300" />
                   <Title order={3} className="font-display">{t('participations.noParticipations')}</Title>
                   <Text c="dimmed" maw={400}>{t('participations.noParticipationsDesc')}</Text>
-                  <Button component={Link} href="/projects" radius="xl" size="md" color="eco-primary">
+                  <Button component={Link} href="/missions" radius="xl" size="md" color="eco-primary">
                     {t('participations.browseProjects')}
                   </Button>
                 </Stack>

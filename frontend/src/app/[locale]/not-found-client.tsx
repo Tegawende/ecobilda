@@ -37,7 +37,7 @@ export function NotFoundClient() {
                     <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
                         <Button
                             component={Link}
-                            href="/projects"
+                            href="/missions"
                             leftSection={<IconHome size={18} />}
                             radius="xl"
                             size="md"

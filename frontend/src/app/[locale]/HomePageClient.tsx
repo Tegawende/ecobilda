@@ -24,7 +24,7 @@ export function HomePageClient() {
   // Redirect authenticated users to projects page
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace('/projects');
+      router.replace('/missions');
     }
   }, [isAuthenticated, isLoading, router]);
 
@@ -61,7 +61,7 @@ export function HomePageClient() {
           </p>
           <div className="mt-10 flex items-center gap-x-6">
             <Link
-              href="/projects"
+              href="/missions"
               className="rounded-full bg-[#67a36f] px-8 py-4 text-base font-bold text-white shadow-xl hover:bg-[#5a8f61] transform hover:-translate-y-1 transition-all duration-300"
             >
               {t('home.hero.browseProjects')}

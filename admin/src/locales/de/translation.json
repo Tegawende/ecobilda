@@ -107,7 +107,10 @@
     "enterInvalidationReason": "Grund eingeben (optional)...",
     "failedToLoad": "Fehler beim Laden der ausstehenden Projekte",
     "viewDetails": "Details",
-    "validatedOn": "Validiert am"
+    "validatedOn": "Validiert am",
+    "placeLabel": "Place",
+    "missionsCount": "missions",
+    "publishedShort": "published"
   },
   "reports": {
     "title": "Meldungen",

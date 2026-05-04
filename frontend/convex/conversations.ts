@@ -92,34 +92,38 @@ export const getById = query({
       otherUserPictureUrl = await ctx.storage.getUrl(otherUser.profilePicture);
     }
 
-    // Enrich with participation request and project details
-    let participationDetails = null;
+    // Enrich with participation request and mission details
+    let participationDetails: any = null;
     if (conv.participationRequestId) {
       const req = await ctx.db.get(conv.participationRequestId);
       if (req) {
-        const project = await ctx.db.get(req.projectId);
+        const mission = await ctx.db.get(req.missionId);
         let coverImageUrl: string | null = null;
-        if (project) {
-          const coverImg = await ctx.db
-            .query("projectImages")
-            .withIndex("by_project", (q) => q.eq("projectId", project._id))
-            .order("asc")
-            .first();
-          if (coverImg) {
-            if (coverImg.url) {
-              coverImageUrl = coverImg.url;
-            } else if (coverImg.storageId) {
-              coverImageUrl = await ctx.storage.getUrl(coverImg.storageId);
+        let projectAddress: any = null;
+        if (mission) {
+          // Mission cover image (storage or first mission image)
+          if (mission.coverImageId) {
+            coverImageUrl = await ctx.storage.getUrl(mission.coverImageId);
+          } else {
+            const coverImg = await ctx.db
+              .query("missionImages")
+              .withIndex("by_mission", (q) => q.eq("missionId", mission._id))
+              .order("asc")
+              .first();
+            if (coverImg) {
+              coverImageUrl =
+                coverImg.url ?? (coverImg.storageId ? await ctx.storage.getUrl(coverImg.storageId) : null);
             }
           }
-        }
-        let projectAddress = null;
-        if (project?.addressId) {
-          const addr = await ctx.db.get(project.addressId);
-          if (addr) {
-            let country = null;
-            if (addr.countryId) country = await ctx.db.get(addr.countryId);
-            projectAddress = { city: addr.city, country: country ? { name: country.name } : null };
+          // Project address via mission.projectId
+          const project = await ctx.db.get(mission.projectId);
+          if (project?.addressId) {
+            const addr = await ctx.db.get(project.addressId);
+            if (addr) {
+              let country = null;
+              if (addr.countryId) country = await ctx.db.get(addr.countryId);
+              projectAddress = { city: addr.city, country: country ? { name: country.name } : null };
+            }
           }
         }
         participationDetails = {
@@ -127,13 +131,15 @@ export const getById = query({
           proposedStartDate: req.proposedStartDate ?? null,
           proposedEndDate: req.proposedEndDate ?? null,
           status: req.status,
-          project: project
+          mission: mission
             ? {
-                _id: project._id,
-                title: project.title,
-                projectType: project.projectType,
-                address: projectAddress,
+                _id: mission._id,
+                title: mission.title,
+                type: mission.type,
+                startDate: mission.startDate,
+                endDate: mission.endDate,
                 coverImageUrl,
+                address: projectAddress,
               }
             : null,
         };

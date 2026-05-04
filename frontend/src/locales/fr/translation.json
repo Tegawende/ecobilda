@@ -34,7 +34,11 @@
     "offline": "Hors ligne",
     "more": "restant(s)",
     "pending": "En attente",
-    "email": "E-mail"
+    "email": "E-mail",
+    "any": "Tout",
+    "saved": "Enregistré",
+    "deleted": "Supprimé",
+    "rejected": "Rejeté"
   },
   "errors": {
     "notFound": {
@@ -89,7 +93,8 @@
     "errorTitle": "Erreur",
     "removeLabel": "Retirer des favoris",
     "removedMessage": "Projet retiré de vos favoris",
-    "removedTitle": "Retiré des favoris"
+    "removedTitle": "Retiré des favoris",
+    "browseMissions": "Parcourir les missions"
   },
   "nav": {
     "home": "Accueil",
@@ -1441,5 +1446,264 @@
       "title": "Prêt·e à trouver votre premier projet ?",
       "desc": "Des centaines de projets attendent des personnes motivées comme vous. Commencez à explorer maintenant."
     }
+  },
+  "missions": {
+    "title": "Missions",
+    "found": "{count} missions trouvées",
+    "empty": "Aucune mission ne correspond à vos critères.",
+    "helpers": "helpers",
+    "daysPerWeekSuffix": "j/sem",
+    "types": {
+      "CHANTIER": "Chantier participatif",
+      "FORMATION": "Formation"
+    },
+    "difficulty": {
+      "DEBUTANT": "Débutant",
+      "INTERMEDIAIRE": "Intermédiaire",
+      "EXPERT": "Expert"
+    },
+    "status": {
+      "DRAFT": "Brouillon",
+      "PUBLISHED": "Publiée",
+      "IN_PROGRESS": "En cours",
+      "COMPLETED": "Terminée",
+      "CANCELLED": "Annulée"
+    },
+    "poste": {
+      "fondations": "Fondations",
+      "murs": "Murs",
+      "toiture": "Toiture",
+      "sol": "Sol",
+      "isolation": "Isolation",
+      "enduits": "Enduits",
+      "menuiseries": "Menuiseries",
+      "exterieur": "Aménagement extérieur",
+      "autre": "Autre"
+    },
+    "technique": {
+      "pierre": "Pierre",
+      "beton": "Béton",
+      "pilotis": "Pilotis",
+      "pneu": "Pneu",
+      "paille_porteur": "Paille porteuse",
+      "paille_remplissage": "Paille (remplissage)",
+      "ossature_bois": "Ossature bois",
+      "terre_crue": "Terre crue",
+      "brique_terre": "Brique de terre",
+      "parpaing": "Parpaing",
+      "toit_vegetal": "Toit végétal",
+      "ardoise": "Ardoise",
+      "tuile": "Tuile",
+      "chaume": "Chaume",
+      "bardeau_bois": "Bardeau bois",
+      "ondule": "Tôle ondulée",
+      "terre_battue": "Terre battue",
+      "beton_chanvre": "Béton de chanvre",
+      "plancher_bois": "Plancher bois",
+      "dalle_chaux": "Dalle chaux",
+      "dalle_argile": "Dalle argile",
+      "paille": "Paille",
+      "laine_bois": "Laine de bois",
+      "chanvre": "Chanvre",
+      "liege": "Liège",
+      "ouate_cellulose": "Ouate de cellulose",
+      "laine_mouton": "Laine de mouton",
+      "verre_expanse": "Verre expansé",
+      "terre": "Terre",
+      "chaux": "Chaux",
+      "chaux_chanvre": "Chaux/chanvre",
+      "tadelakt": "Tadelakt",
+      "platre": "Plâtre",
+      "bois_massif": "Bois massif",
+      "recup": "Récupération",
+      "double_vitrage": "Double vitrage",
+      "simple_vitrage": "Simple vitrage",
+      "terrasse": "Terrasse",
+      "jardin_potager": "Jardin / potager",
+      "mare": "Mare",
+      "fosse": "Fosse",
+      "recuperation_eau": "Récupération d'eau",
+      "autre": "Autre"
+    },
+    "filters": {
+      "title": "Filtres",
+      "keywordPlaceholder": "Rechercher une mission…",
+      "type": "Type",
+      "difficulty": "Niveau",
+      "poste": "Poste",
+      "technique": "Technique",
+      "pricingMode": "Tarif",
+      "freeOnly": "Gratuit uniquement",
+      "startsAfter": "Commence après",
+      "endsBefore": "Finit avant",
+      "skills": "Compétences",
+      "languages": "Langues"
+    }
+  },
+  "missionDetail": {
+    "notFound": "Mission introuvable",
+    "backToMissions": "Retour aux missions",
+    "about": "À propos de la mission",
+    "aboutPlace": "Le lieu",
+    "applyTitle": "Rejoindre cette mission",
+    "applyDesc": "Envoie ta motivation à l'hôte. Une conversation s'ouvrira pour vous mettre en relation.",
+    "applyCta": "Postuler",
+    "loginToApply": "Se connecter pour postuler",
+    "notOpen": "Cette mission n'est pas ouverte aux candidatures.",
+    "youAreHost": "Tu es l'hôte de cette mission.",
+    "viewHost": "Voir le profil de l'hôte",
+    "otherMissionsHere": "Autres missions de ce lieu"
+  },
+  "createMission": {
+    "title": "Créer une mission",
+    "subtitle": "Décris la mission que tu proposes : chantier participatif ou formation.",
+    "submitDraft": "Sauvegarder en brouillon",
+    "publish": "Publier la mission",
+    "unpublish": "Repasser en brouillon",
+    "successTitle": "Mission créée",
+    "successMessage": "Tu peux maintenant ajouter des photos, puis publier la mission.",
+    "errorMessage": "Impossible de créer la mission. Réessaie.",
+    "editTitle": "Modifier la mission",
+    "editSuccessTitle": "Mission mise à jour",
+    "editSuccessMessage": "",
+    "publishedTitle": "Mission publiée",
+    "publishedMessage": "La mission est maintenant visible par les helpers.",
+    "cancelMissionTitle": "Annuler la mission ?",
+    "cancelMissionText": "Les helpers acceptés seront notifiés. Cette action peut être annulée.",
+    "cancelMissionConfirm": "Annuler la mission",
+    "noPlaceTitle": "Tu n'as pas encore de lieu",
+    "noPlaceMessage": "Pour créer une mission, tu dois d'abord créer ton lieu d'accueil.",
+    "createPlaceCta": "Créer mon lieu",
+    "placePendingTitle": "Lieu en attente de validation",
+    "placePendingMessage": "Ton lieu doit être validé par un administrateur avant que tu puisses publier des missions.",
+    "fields": {
+      "place": "Lieu d'accueil",
+      "placePlaceholder": "Sélectionne un lieu",
+      "type": "Type de mission",
+      "title": "Titre",
+      "titlePlaceholder": "Ex: Pose d'un mur en paille porteuse",
+      "description": "Description",
+      "descriptionPlaceholder": "Décris ce qui sera fait, le contexte, ce que les helpers vont apprendre…",
+      "difficulty": "Niveau",
+      "poste": "Poste",
+      "technique": "Technique",
+      "workSection": "Type de travaux",
+      "pricingSection": "Tarif",
+      "isPaid": "Formation payante",
+      "price": "Prix par participant",
+      "scheduleSection": "Dates et horaires",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "maxParticipants": "Nb max de participants",
+      "hoursPerDay": "Heures par jour",
+      "daysPerWeek": "Jours par semaine",
+      "skillsSection": "Compétences"
+    },
+    "validation": {
+      "projectRequired": "Choisis un lieu",
+      "titleMin": "Le titre doit faire au moins 5 caractères",
+      "descriptionMin": "La description doit faire au moins 30 caractères",
+      "startDateRequired": "Date de début requise",
+      "endDateRequired": "Date de fin requise",
+      "endAfterStart": "La date de fin doit être après le début",
+      "priceRequired": "Indique un prix > 0"
+    }
+  },
+  "myMissions": {
+    "title": "Mes missions",
+    "subtitle": "Gère les missions que tu proposes.",
+    "createNew": "Nouvelle mission",
+    "empty": "Tu n'as pas encore de mission. Crée-en une pour rencontrer des helpers.",
+    "drafts": "Brouillons",
+    "published": "Publiées / en cours",
+    "completed": "Terminées",
+    "deleteConfirmTitle": "Supprimer la mission ?",
+    "deleteConfirmText": "Cette action supprimera définitivement la mission \"{title}\".",
+    "tabs": {
+      "missions": "Missions"
+    }
+  },
+  "myPlaces": {
+    "createNew": "Ajouter un lieu",
+    "empty": "Tu n'as pas encore de lieu d'accueil.",
+    "addMission": "Ajouter une mission",
+    "missionsCount": "{count} missions",
+    "deleteConfirmTitle": "Supprimer ce lieu ?",
+    "deleteConfirmText": "Le lieu \"{title}\" sera supprimé. Tu dois d'abord supprimer toutes ses missions.",
+    "tabs": {
+      "places": "Mes lieux"
+    }
+  },
+  "createPlace": {
+    "title": "Créer mon lieu d'accueil",
+    "subtitle": "Décris où tu accueilles les helpers : adresse, hébergement, repas, équipements.",
+    "editTitle": "Modifier mon lieu",
+    "submit": "Créer le lieu",
+    "successTitle": "Lieu créé",
+    "successMessage": "Ton lieu est en attente de validation. Tu pourras créer des missions dès qu'il sera validé.",
+    "editSuccessTitle": "Lieu mis à jour",
+    "editSuccessMessage": "",
+    "notFound": "Lieu introuvable",
+    "fields": {
+      "title": "Nom du lieu",
+      "titlePlaceholder": "Ex: Le Domaine des Sources",
+      "address": "Adresse",
+      "addressPlaceholder": "Ville, code postal…",
+      "hostingSection": "Hébergement et repas",
+      "accommodation": "Hébergement",
+      "accommodationPlaceholder": "Décris où dorment les helpers (chambre, yourte, camping…)",
+      "food": "Repas",
+      "foodPlaceholder": "Décris ce qui est inclus (3 repas/jour, repas du midi, cuisine partagée…)",
+      "amenitiesSection": "Équipements",
+      "wifi": "WiFi",
+      "familyFriendly": "Familles bienvenues",
+      "petsAllowed": "Animaux acceptés",
+      "smokingAllowed": "Fumeurs acceptés",
+      "languagesSection": "Langues parlées sur place"
+    },
+    "validation": {
+      "titleMin": "Le nom doit faire au moins 3 caractères",
+      "cityRequired": "Adresse requise"
+    }
+  },
+  "missionFeedback": {
+    "form": {
+      "title": "Retour d'expérience",
+      "subtitle": "Partage ton retour sur la mission \"{title}\". Ces données aideront d'autres porteurs de projet.",
+      "submit": "Publier le retour",
+      "successTitle": "Retour publié",
+      "successMessage": "Merci pour ton partage.",
+      "tooLong": "Trop long (max 500 caractères)",
+      "numericSection": "Données chiffrées",
+      "narrativeSection": "Récit",
+      "photosSection": "Photos",
+      "totalCost": "Coût total",
+      "surface": "Surface",
+      "result": "Résultat",
+      "difficulties": "Difficultés rencontrées",
+      "learnings": "Ce que vous avez appris",
+      "addPhoto": "Ajouter une photo",
+      "isPublic": "Rendre ce retour public",
+      "isPublicHelp": "Si activé, ce retour sera visible sur la page \"Apprenez des autres\"."
+    },
+    "display": {
+      "title": "Retour d'expérience",
+      "totalCost": "Coût total",
+      "surface": "Surface",
+      "duration": "Durée",
+      "difficulties": "Difficultés",
+      "learnings": "Apprentissages",
+      "helperPhotos": "Photos des helpers"
+    },
+    "result": {
+      "SUCCESS": "Réussi",
+      "PARTIAL_SUCCESS": "Partiellement réussi",
+      "FAILURE": "Échec"
+    }
+  },
+  "learn": {
+    "title": "Apprenez des autres",
+    "subtitle": "Découvre les retours d'expérience des chantiers terminés sur Ecobilda.",
+    "empty": "Aucun retour d'expérience public pour le moment."
   }
 }

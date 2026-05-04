@@ -9,16 +9,16 @@ import { participationsService } from '@/services/participations';
 import { notifications } from '@mantine/notifications';
 
 interface ParticipationRequestModalProps {
-  projectId: number;
-  projectTitle: string;
+  missionId: string;
+  missionTitle: string;
   opened: boolean;
   onClose: () => void;
   onSuccess?: () => void;
 }
 
 export function ParticipationRequestModal({
-  projectId,
-  projectTitle,
+  missionId,
+  missionTitle,
   opened,
   onClose,
   onSuccess,
@@ -35,7 +35,7 @@ export function ParticipationRequestModal({
     setIsLoading(true);
     try {
       await participationsService.createRequest({
-        project: projectId,
+        missionId,
         motivation: motivation.trim(),
         proposedStartDate: startDate?.toISOString().split('T')[0],
         proposedEndDate: endDate?.toISOString().split('T')[0],
@@ -75,7 +75,7 @@ export function ParticipationRequestModal({
         <Text size="sm" c="dimmed">
           {t('participations.applyDesc')}
         </Text>
-        <Text size="sm" fw={600}>{projectTitle}</Text>
+        <Text size="sm" fw={600}>{missionTitle}</Text>
 
         <Textarea
           label={t('participations.motivation')}

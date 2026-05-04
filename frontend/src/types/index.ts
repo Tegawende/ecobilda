@@ -15,12 +15,13 @@ export interface User {
   emailNotifications?: boolean;
   newsletter?: boolean;
   inAppNotifications?: boolean;
-  notificationLanguage?: 'en' | 'fr' | 'es' | 'de';
+  notificationLanguage?: 'en' | 'fr' | 'es' | 'de' | 'nl' | 'pt';
   averageRating: number;
   reviewCount: number;
   hasPassword?: boolean;
   isStaff?: boolean;
   isActive?: boolean;
+  publicId?: string;
   _creationTime?: number;
   lastLoginAt?: number;
 }
@@ -65,64 +66,159 @@ export interface Skill {
   icon?: string;
 }
 
-// Project types
+// ============================================
+// Project (= host's PLACE / lieu d'accueil)
+// Lightweight container — descriptive fields about the location.
+// ============================================
+
 export interface Project {
   _id: string;
   owner?: User | null;
   ownerId?: string;
-  title: string;
-  description: string;
-  projectType: 'PERM' | 'NATB';
+  title: string; // place name
   status: 'PENDING' | 'ACTIVE' | 'REJECTED';
+  rejectionReason?: string;
   address?: Address | null;
   addressId?: string;
-  hoursPerDay: number;
-  daysPerWeek: number;
-  maxHelpers: number;
   accommodationDetails?: string;
   foodDetails?: string;
   internetProvided: boolean;
   familyFriendly: boolean;
   petsAllowed: boolean;
   smokingAllowed: boolean;
-  skills?: Skill[];
-  skillIds?: string[];
+  languages?: Language[];
   isActive: boolean;
   flaggedCount: number;
+  missionsCount?: number;
+  publishedMissionsCount?: number;
   _creationTime?: number;
   updatedAt?: number;
   validatedAt?: number | null;
   images?: ProjectImage[];
-  availabilities?: Availability[];
 }
 
 export interface ProjectImage {
   _id: string;
   projectId: string;
-  storageId: string;
+  storageId?: string;
   order: number;
-  url?: string; // Resolved URL from Convex storage
+  url?: string | null;
 }
 
-export interface Availability {
-  _id?: string;
+// ============================================
+// Mission (= bookable work unit)
+// ============================================
+
+export type MissionType = 'CHANTIER' | 'FORMATION';
+export type MissionStatus = 'DRAFT' | 'PUBLISHED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+export type MissionDifficulty = 'DEBUTANT' | 'INTERMEDIAIRE' | 'EXPERT';
+export type MissionPricingMode = 'FREE' | 'PAID';
+export type FeedbackResult = 'SUCCESS' | 'PARTIAL_SUCCESS' | 'FAILURE';
+
+export interface Mission {
+  _id: string;
   projectId: string;
-  year: number;
-  january: boolean;
-  february: boolean;
-  march: boolean;
-  april: boolean;
-  may: boolean;
-  june: boolean;
-  july: boolean;
-  august: boolean;
-  september: boolean;
-  october: boolean;
-  november: boolean;
-  december: boolean;
+  ownerId: string;
+  type: MissionType;
+  title: string;
+  description: string;
+  poste?: string;
+  technique?: string;
+  difficulty: MissionDifficulty;
+  pricingMode: MissionPricingMode;
+  priceEUR?: number;
+  startDate: string;
+  endDate: string;
+  maxParticipants: number;
+  hoursPerDay: number;
+  daysPerWeek: number;
+  skillIds?: string[];
+  skills?: Skill[];
+  coverImageId?: string;
+  coverImageUrl?: string | null;
+  status: MissionStatus;
+  cancellationReason?: string;
+  feedbackNotifiedAt?: number;
+  feedbackReminderSentAt?: number;
+  feedbackDeadlineAt?: number;
+  // Joined relations
+  project?: {
+    _id: string;
+    title: string;
+    ownerId?: string;
+    status?: string;
+    accommodationDetails?: string;
+    foodDetails?: string;
+    internetProvided?: boolean;
+    familyFriendly?: boolean;
+    petsAllowed?: boolean;
+    smokingAllowed?: boolean;
+    languages?: Language[];
+    address?: Address | null;
+  } | null;
+  owner?: User | null;
+  images?: MissionImage[];
+  feedback?: MissionFeedback | null;
+  participantsCount?: number;
+  _creationTime?: number;
+  updatedAt?: number;
 }
 
+export interface MissionImage {
+  _id: string;
+  missionId: string;
+  storageId?: string;
+  url?: string | null;
+  order: number;
+}
+
+export interface MissionFeedback {
+  _id: string;
+  missionId: string;
+  totalCostEUR?: number;
+  surfaceM2?: number;
+  actualDurationDays?: number;
+  result?: FeedbackResult;
+  difficultiesText?: string;
+  learningsText?: string;
+  photoIds?: string[];
+  photoUrls?: string[];
+  isPublic: boolean;
+  submittedAt: number;
+}
+
+export interface HelperMissionPhoto {
+  _id: string;
+  missionId: string;
+  helperId: string;
+  storageId: string;
+  url?: string | null;
+  isPublic: boolean;
+  caption?: string;
+  helper?: { _id: string; firstName: string; lastName: string } | null;
+  _creationTime?: number;
+}
+
+// Map marker payload (lightweight)
+export interface MissionMapPoint {
+  _id: string;
+  title: string;
+  type: MissionType;
+  difficulty: MissionDifficulty;
+  poste?: string;
+  startDate: string;
+  endDate: string;
+  pricingMode: MissionPricingMode;
+  priceEUR?: number;
+  latitude: number;
+  longitude: number;
+  city?: string;
+}
+
+// ============================================
 // Messaging types
+// ============================================
+
 export interface Conversation {
   _id: string;
   user1Id?: string;
@@ -147,7 +243,7 @@ export interface Conversation {
     proposedStartDate?: string | null;
     proposedEndDate?: string | null;
     status: string;
-    project?: {
+    mission?: {
       _id: string;
       title: string;
       coverImageUrl?: string | null;
@@ -174,7 +270,10 @@ export interface Message {
   _creationTime?: number;
 }
 
+// ============================================
 // Review types
+// ============================================
+
 export interface Review {
   _id: string;
   writer?: User | null;
@@ -190,11 +289,14 @@ export interface Review {
   updatedAt?: number;
 }
 
+// ============================================
 // Notification types
+// ============================================
+
 export interface Notification {
   _id: string;
   recipientId: string;
-  type: 'REVIEW' | 'MESSAGE' | 'ADMIN' | 'PROJECT' | 'SYSTEM';
+  type: 'REVIEW' | 'MESSAGE' | 'ADMIN' | 'PROJECT' | 'MISSION' | 'SYSTEM';
   title: string;
   message: string;
   linkUrl?: string;
@@ -203,18 +305,34 @@ export interface Notification {
   _creationTime?: number;
 }
 
-// Participation types
+// ============================================
+// Participation types (now mission-based)
+// ============================================
+
 export interface ParticipationRequest {
   _id: string;
   volunteerId: string;
-  projectId: string;
+  missionId: string;
+  mission?: {
+    _id: string;
+    title: string;
+    type: MissionType;
+    poste?: string;
+    technique?: string;
+    difficulty: MissionDifficulty;
+    startDate: string;
+    endDate: string;
+    maxParticipants?: number;
+    status: MissionStatus;
+    coverImageUrl?: string | null;
+  } | null;
   project?: {
     _id: string;
     title: string;
-    projectType: string;
-    address?: Address | null;
     ownerId?: string;
+    address?: Address | null;
   } | null;
+  host?: User | null;
   volunteer?: {
     _id: string;
     firstName: string;
@@ -233,7 +351,10 @@ export interface ParticipationRequest {
   _creationTime?: number;
 }
 
+// ============================================
 // Auth types
+// ============================================
+
 export interface LoginCredentials {
   email: string;
   password: string;

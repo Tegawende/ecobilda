@@ -130,6 +130,20 @@ const t: Record<string, Record<Locale, string>> = {
   responseTheirResponse: { en: "Their response", fr: "Sa r&eacute;ponse", es: "Su respuesta", de: "Ihre Antwort", nl: "Hun reactie", pt: "A resposta" },
   responseButton: { en: "View profile", fr: "Voir le profil", es: "Ver perfil", de: "Profil anzeigen", nl: "Profiel bekijken", pt: "Ver perfil" },
   responseSubject: { en: "Response to your review - Ecobilda", fr: "R&eacute;ponse &agrave; votre avis - Ecobilda", es: "Respuesta a su rese&ntilde;a - Ecobilda", de: "Antwort auf Ihre Bewertung - Ecobilda", nl: "Reactie op je beoordeling - Ecobilda", pt: "Resposta &agrave; sua avalia&ccedil;&atilde;o - Ecobilda" },
+
+  // Mission completed
+  missionCompletedTitle: { en: "Mission completed", fr: "Mission termin&eacute;e", es: "Misi&oacute;n completada", de: "Mission abgeschlossen", nl: "Missie voltooid", pt: "Miss&atilde;o conclu&iacute;da" },
+  missionCompletedHostBody: { en: "Your mission has ended. Share a feedback to help others learn from your experience.", fr: "Votre mission est termin&eacute;e. Partagez un retour pour aider les autres &agrave; apprendre de votre exp&eacute;rience.", es: "Su misi&oacute;n ha terminado. Comparta un feedback para ayudar a otros a aprender de su experiencia.", de: "Ihre Mission ist beendet. Teilen Sie ein Feedback, damit andere von Ihrer Erfahrung lernen k&ouml;nnen.", nl: "Je missie is be&euml;indigd. Deel feedback zodat anderen kunnen leren van je ervaring.", pt: "A sua miss&atilde;o terminou. Partilhe um feedback para ajudar outros a aprender com a sua experi&ecirc;ncia." },
+  missionCompletedHelperBody: { en: "Your mission has ended. You can now leave a review for the host and upload photos if you wish.", fr: "Votre mission est termin&eacute;e. Vous pouvez maintenant laisser un avis pour l'h&ocirc;te et publier des photos si vous le souhaitez.", es: "Su misi&oacute;n ha terminado. Ahora puede dejar una rese&ntilde;a para el anfitri&oacute;n y subir fotos si lo desea.", de: "Ihre Mission ist beendet. Sie k&ouml;nnen jetzt eine Bewertung f&uuml;r den Gastgeber hinterlassen und Fotos hochladen, wenn Sie m&ouml;chten.", nl: "Je missie is be&euml;indigd. Je kunt nu een beoordeling achterlaten voor de host en foto's uploaden als je dat wilt.", pt: "A sua miss&atilde;o terminou. Pode agora deixar uma avalia&ccedil;&atilde;o para o anfitri&atilde;o e carregar fotos se desejar." },
+  missionCompletedHostButton: { en: "Share my feedback", fr: "Partager mon retour", es: "Compartir mi feedback", de: "Feedback teilen", nl: "Feedback delen", pt: "Partilhar o meu feedback" },
+  missionCompletedHelperButton: { en: "View mission", fr: "Voir la mission", es: "Ver misi&oacute;n", de: "Mission ansehen", nl: "Missie bekijken", pt: "Ver miss&atilde;o" },
+  missionCompletedSubject: { en: "Mission completed: {title} - Ecobilda", fr: "Mission termin&eacute;e : {title} - Ecobilda", es: "Misi&oacute;n completada: {title} - Ecobilda", de: "Mission abgeschlossen: {title} - Ecobilda", nl: "Missie voltooid: {title} - Ecobilda", pt: "Miss&atilde;o conclu&iacute;da: {title} - Ecobilda" },
+
+  // Mission feedback reminder
+  feedbackDueTitle: { en: "Don't forget your feedback", fr: "N'oubliez pas votre retour d'exp&eacute;rience", es: "No olvide su feedback", de: "Vergessen Sie Ihr Feedback nicht", nl: "Vergeet je feedback niet", pt: "N&atilde;o se esque&ccedil;a do seu feedback" },
+  feedbackDueBody: { en: "It has been a few days since your mission ended. Share what you learned to help future builders.", fr: "Quelques jours se sont &eacute;coul&eacute;s depuis la fin de votre mission. Partagez ce que vous avez appris pour aider les futurs constructeurs.", es: "Han pasado algunos d&iacute;as desde el fin de su misi&oacute;n. Comparta lo aprendido para ayudar a futuros constructores.", de: "Es sind einige Tage vergangen, seit Ihre Mission beendet ist. Teilen Sie, was Sie gelernt haben.", nl: "Er zijn enkele dagen verstreken sinds het einde van je missie. Deel wat je hebt geleerd.", pt: "J&aacute; passaram alguns dias desde o fim da sua miss&atilde;o. Partilhe o que aprendeu." },
+  feedbackDueButton: { en: "Share my feedback", fr: "Partager mon retour", es: "Compartir mi feedback", de: "Feedback teilen", nl: "Feedback delen", pt: "Partilhar o meu feedback" },
+  feedbackDueSubject: { en: "Share your feedback - Ecobilda", fr: "Partagez votre retour d'exp&eacute;rience - Ecobilda", es: "Comparta su feedback - Ecobilda", de: "Teilen Sie Ihr Feedback - Ecobilda", nl: "Deel je feedback - Ecobilda", pt: "Partilhe o seu feedback - Ecobilda" },
 };
 
 function i(key: string, locale: Locale): string {
@@ -310,6 +324,42 @@ function reviewResponseTemplate(writerName: string, receiverName: string, origin
   `, locale);
 }
 
+function missionCompletedTemplate(recipientName: string, missionTitle: string, missionUrl: string, isHost: boolean, locale: Locale): string {
+  const body = isHost ? i("missionCompletedHostBody", locale) : i("missionCompletedHelperBody", locale);
+  const button = isHost ? i("missionCompletedHostButton", locale) : i("missionCompletedHelperButton", locale);
+  return baseTemplate(`
+<h1>${i("missionCompletedTitle", locale)}</h1>
+<p>${i("greeting", locale)} ${recipientName},</p>
+<p>${body}</p>
+<div class="message-box"><p><strong>${missionTitle}</strong></p></div>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr><td align="center" class="button-td">
+<a href="${missionUrl}" class="button">${button}</a>
+</td></tr>
+</table>
+<p class="text-small">${i("fallback", locale)}</p>
+<p class="fallback-url">${missionUrl}</p>
+<p class="closing">${i("closing", locale)}</p>
+  `, locale);
+}
+
+function missionFeedbackDueTemplate(recipientName: string, missionTitle: string, feedbackUrl: string, locale: Locale): string {
+  return baseTemplate(`
+<h1>${i("feedbackDueTitle", locale)}</h1>
+<p>${i("greeting", locale)} ${recipientName},</p>
+<p>${i("feedbackDueBody", locale)}</p>
+<div class="message-box"><p><strong>${missionTitle}</strong></p></div>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr><td align="center" class="button-td">
+<a href="${feedbackUrl}" class="button">${i("feedbackDueButton", locale)}</a>
+</td></tr>
+</table>
+<p class="text-small">${i("fallback", locale)}</p>
+<p class="fallback-url">${feedbackUrl}</p>
+<p class="closing">${i("closing", locale)}</p>
+  `, locale);
+}
+
 // ============================================
 // Exported Actions
 // ============================================
@@ -366,6 +416,58 @@ export const sendReviewResponseEmail = internalAction({
     const profileUrl = `${frontendUrl}/${locale}/profile`;
     const html = reviewResponseTemplate(args.writerName, args.receiverName, args.originalFeedback, args.response, profileUrl, locale);
     await sendEmail({ to: args.to, subject: i("responseSubject", locale), html });
+  },
+});
+
+export const sendMissionCompletedEmail = internalAction({
+  args: {
+    to: v.string(),
+    recipientName: v.string(),
+    missionTitle: v.string(),
+    missionId: v.string(),
+    isHost: v.boolean(),
+    locale: v.optional(v.string()),
+  },
+  handler: async (_ctx, args) => {
+    const locale = (args.locale || "en") as Locale;
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const missionUrl = args.isHost
+      ? `${frontendUrl}/${locale}/missions/${args.missionId}/feedback`
+      : `${frontendUrl}/${locale}/missions/${args.missionId}`;
+    const html = missionCompletedTemplate(
+      args.recipientName,
+      args.missionTitle,
+      missionUrl,
+      args.isHost,
+      locale
+    );
+    await sendEmail({
+      to: args.to,
+      subject: i("missionCompletedSubject", locale).replace("{title}", args.missionTitle),
+      html,
+    });
+  },
+});
+
+export const sendMissionFeedbackDueEmail = internalAction({
+  args: {
+    to: v.string(),
+    recipientName: v.string(),
+    missionTitle: v.string(),
+    missionId: v.string(),
+    locale: v.optional(v.string()),
+  },
+  handler: async (_ctx, args) => {
+    const locale = (args.locale || "en") as Locale;
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const feedbackUrl = `${frontendUrl}/${locale}/missions/${args.missionId}/feedback`;
+    const html = missionFeedbackDueTemplate(
+      args.recipientName,
+      args.missionTitle,
+      feedbackUrl,
+      locale
+    );
+    await sendEmail({ to: args.to, subject: i("feedbackDueSubject", locale), html });
   },
 });
 

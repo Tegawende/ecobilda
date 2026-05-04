@@ -49,32 +49,23 @@ export interface PendingProject {
     lastName: string;
     profilePictureUrl?: string | null;
   } | null;
-  projectType: string;
   _creationTime: number;
   address?: {
     city?: string;
     country?: { name: string; code: string } | null;
   } | null;
-  skills: Array<{
-    code: string;
-    displayNameEn: string;
-    displayNameFr: string;
-    category: string;
-  }>;
   images: Array<{
     _id: string;
-    storageId: string;
+    storageId?: string;
     url?: string | null;
     order: number;
   }>;
+  missionsCount?: number;
+  publishedMissionsCount?: number;
 }
 
 export interface ProjectDetail extends PendingProject {
-  description: string;
   status: string;
-  hoursPerDay: number;
-  daysPerWeek: number;
-  maxHelpers: number;
   internetProvided: boolean;
   petsAllowed: boolean;
   smokingAllowed: boolean;
@@ -134,7 +125,7 @@ export interface AdminUserDetail {
   } | null;
   languages: Array<{ code: string; name: string }>;
   skills: Array<{ code: string; displayNameEn: string; category: string }>;
-  projects: Array<{ _id: string; title: string; status: string; projectType: string; _creationTime: number }>;
+  projects: Array<{ _id: string; title: string; status: string; _creationTime: number }>;
   reviewsReceived: Array<{ _id: string; writerId: string; rating: number; feedback: string }>;
 }
 

@@ -34,7 +34,11 @@
     "offline": "Offline",
     "more": "weitere",
     "pending": "Ausstehend",
-    "email": "E-Mail"
+    "email": "E-Mail",
+    "any": "Any",
+    "saved": "Saved",
+    "deleted": "Deleted",
+    "rejected": "Rejected"
   },
   "errors": {
     "notFound": {
@@ -627,7 +631,8 @@
     "errorTitle": "Fehler",
     "removeLabel": "Aus Favoriten entfernen",
     "removedMessage": "Projekt aus Ihren Favoriten entfernt",
-    "removedTitle": "Aus Favoriten entfernt"
+    "removedTitle": "Aus Favoriten entfernt",
+    "browseMissions": "Browse missions"
   },
   "profile": {
     "personalInfo": "Persönliche Informationen",
@@ -1441,5 +1446,264 @@
       "title": "Bereit, dein erstes Projekt zu finden?",
       "desc": "Hunderte von Projekten warten auf motivierte Menschen wie dich. Fange jetzt an zu entdecken."
     }
+  },
+  "missions": {
+    "title": "Missions",
+    "found": "{count} missions found",
+    "empty": "No mission matches your criteria.",
+    "helpers": "helpers",
+    "daysPerWeekSuffix": "d/wk",
+    "types": {
+      "CHANTIER": "Participatory worksite",
+      "FORMATION": "Training"
+    },
+    "difficulty": {
+      "DEBUTANT": "Beginner",
+      "INTERMEDIAIRE": "Intermediate",
+      "EXPERT": "Expert"
+    },
+    "status": {
+      "DRAFT": "Draft",
+      "PUBLISHED": "Published",
+      "IN_PROGRESS": "In progress",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    },
+    "poste": {
+      "fondations": "Foundations",
+      "murs": "Walls",
+      "toiture": "Roofing",
+      "sol": "Floor",
+      "isolation": "Insulation",
+      "enduits": "Plasters",
+      "menuiseries": "Joinery",
+      "exterieur": "Exterior",
+      "autre": "Other"
+    },
+    "technique": {
+      "pierre": "Stone",
+      "beton": "Concrete",
+      "pilotis": "Stilts",
+      "pneu": "Tires",
+      "paille_porteur": "Load-bearing strawbale",
+      "paille_remplissage": "Strawbale infill",
+      "ossature_bois": "Timber frame",
+      "terre_crue": "Cob",
+      "brique_terre": "Earth brick",
+      "parpaing": "Cinder block",
+      "toit_vegetal": "Green roof",
+      "ardoise": "Slate",
+      "tuile": "Tiles",
+      "chaume": "Thatch",
+      "bardeau_bois": "Wood shingle",
+      "ondule": "Corrugated metal",
+      "terre_battue": "Rammed earth",
+      "beton_chanvre": "Hempcrete",
+      "plancher_bois": "Wood floor",
+      "dalle_chaux": "Lime slab",
+      "dalle_argile": "Clay slab",
+      "paille": "Straw",
+      "laine_bois": "Wood fiber",
+      "chanvre": "Hemp",
+      "liege": "Cork",
+      "ouate_cellulose": "Cellulose",
+      "laine_mouton": "Sheep wool",
+      "verre_expanse": "Expanded glass",
+      "terre": "Earth",
+      "chaux": "Lime",
+      "chaux_chanvre": "Lime/hemp",
+      "tadelakt": "Tadelakt",
+      "platre": "Plaster",
+      "bois_massif": "Solid wood",
+      "recup": "Reclaimed",
+      "double_vitrage": "Double glazing",
+      "simple_vitrage": "Single glazing",
+      "terrasse": "Terrace",
+      "jardin_potager": "Vegetable garden",
+      "mare": "Pond",
+      "fosse": "Pit",
+      "recuperation_eau": "Water harvesting",
+      "autre": "Other"
+    },
+    "filters": {
+      "title": "Filters",
+      "keywordPlaceholder": "Search a mission…",
+      "type": "Type",
+      "difficulty": "Difficulty",
+      "poste": "Work area",
+      "technique": "Technique",
+      "pricingMode": "Pricing",
+      "freeOnly": "Free only",
+      "startsAfter": "Starts after",
+      "endsBefore": "Ends before",
+      "skills": "Skills",
+      "languages": "Languages"
+    }
+  },
+  "missionDetail": {
+    "notFound": "Mission not found",
+    "backToMissions": "Back to missions",
+    "about": "About the mission",
+    "aboutPlace": "The place",
+    "applyTitle": "Join this mission",
+    "applyDesc": "Send your motivation to the host. A conversation will open.",
+    "applyCta": "Apply",
+    "loginToApply": "Log in to apply",
+    "notOpen": "This mission is not open to applications.",
+    "youAreHost": "You are the host of this mission.",
+    "viewHost": "View host profile",
+    "otherMissionsHere": "Other missions at this place"
+  },
+  "createMission": {
+    "title": "Create a mission",
+    "subtitle": "Describe the mission you offer: participatory worksite or training.",
+    "submitDraft": "Save as draft",
+    "publish": "Publish mission",
+    "unpublish": "Move back to draft",
+    "successTitle": "Mission created",
+    "successMessage": "You can now add photos, then publish the mission.",
+    "errorMessage": "Could not create the mission. Try again.",
+    "editTitle": "Edit mission",
+    "editSuccessTitle": "Mission updated",
+    "editSuccessMessage": "",
+    "publishedTitle": "Mission published",
+    "publishedMessage": "The mission is now visible to helpers.",
+    "cancelMissionTitle": "Cancel the mission?",
+    "cancelMissionText": "Accepted helpers will be notified. This can be undone.",
+    "cancelMissionConfirm": "Cancel mission",
+    "noPlaceTitle": "You do not have a place yet",
+    "noPlaceMessage": "To create a mission, first create your place.",
+    "createPlaceCta": "Create my place",
+    "placePendingTitle": "Place pending validation",
+    "placePendingMessage": "Your place must be validated by an admin before you can publish missions.",
+    "fields": {
+      "place": "Place",
+      "placePlaceholder": "Select a place",
+      "type": "Mission type",
+      "title": "Title",
+      "titlePlaceholder": "Ex: Load-bearing strawbale wall raising",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe what will be done, the context, what helpers will learn…",
+      "difficulty": "Difficulty",
+      "poste": "Work area",
+      "technique": "Technique",
+      "workSection": "Work details",
+      "pricingSection": "Pricing",
+      "isPaid": "Paid training",
+      "price": "Price per participant",
+      "scheduleSection": "Schedule",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "maxParticipants": "Max participants",
+      "hoursPerDay": "Hours per day",
+      "daysPerWeek": "Days per week",
+      "skillsSection": "Skills"
+    },
+    "validation": {
+      "projectRequired": "Choose a place",
+      "titleMin": "Title must be at least 5 characters",
+      "descriptionMin": "Description must be at least 30 characters",
+      "startDateRequired": "Start date required",
+      "endDateRequired": "End date required",
+      "endAfterStart": "End date must be after start date",
+      "priceRequired": "Price must be > 0"
+    }
+  },
+  "myMissions": {
+    "title": "My missions",
+    "subtitle": "Manage the missions you offer.",
+    "createNew": "New mission",
+    "empty": "You have no mission yet. Create one to meet helpers.",
+    "drafts": "Drafts",
+    "published": "Published / in progress",
+    "completed": "Completed",
+    "deleteConfirmTitle": "Delete the mission?",
+    "deleteConfirmText": "This will permanently delete the mission \"{title}\".",
+    "tabs": {
+      "missions": "Missions"
+    }
+  },
+  "myPlaces": {
+    "createNew": "Add a place",
+    "empty": "You have no place yet.",
+    "addMission": "Add a mission",
+    "missionsCount": "{count} missions",
+    "deleteConfirmTitle": "Delete this place?",
+    "deleteConfirmText": "The place \"{title}\" will be deleted. You must delete all its missions first.",
+    "tabs": {
+      "places": "My places"
+    }
+  },
+  "createPlace": {
+    "title": "Create my place",
+    "subtitle": "Describe where you welcome helpers: address, accommodation, food, amenities.",
+    "editTitle": "Edit my place",
+    "submit": "Create place",
+    "successTitle": "Place created",
+    "successMessage": "Your place is pending validation. You will be able to create missions once approved.",
+    "editSuccessTitle": "Place updated",
+    "editSuccessMessage": "",
+    "notFound": "Place not found",
+    "fields": {
+      "title": "Place name",
+      "titlePlaceholder": "Ex: Le Domaine des Sources",
+      "address": "Address",
+      "addressPlaceholder": "City, postal code…",
+      "hostingSection": "Hosting and food",
+      "accommodation": "Accommodation",
+      "accommodationPlaceholder": "Describe where helpers sleep (room, yurt, camping…)",
+      "food": "Food",
+      "foodPlaceholder": "Describe what is included (3 meals/day, lunch only, shared kitchen…)",
+      "amenitiesSection": "Amenities",
+      "wifi": "WiFi",
+      "familyFriendly": "Families welcome",
+      "petsAllowed": "Pets allowed",
+      "smokingAllowed": "Smokers allowed",
+      "languagesSection": "Languages spoken"
+    },
+    "validation": {
+      "titleMin": "Name must be at least 3 characters",
+      "cityRequired": "Address required"
+    }
+  },
+  "missionFeedback": {
+    "form": {
+      "title": "Mission feedback",
+      "subtitle": "Share your feedback for \"{title}\". This data will help other project owners.",
+      "submit": "Publish feedback",
+      "successTitle": "Feedback published",
+      "successMessage": "Thanks for sharing.",
+      "tooLong": "Too long (max 500 characters)",
+      "numericSection": "Numerical data",
+      "narrativeSection": "Story",
+      "photosSection": "Photos",
+      "totalCost": "Total cost",
+      "surface": "Surface",
+      "result": "Result",
+      "difficulties": "Difficulties encountered",
+      "learnings": "What you learned",
+      "addPhoto": "Add a photo",
+      "isPublic": "Make this feedback public",
+      "isPublicHelp": "If enabled, this feedback will be visible on the \"Learn from others\" page."
+    },
+    "display": {
+      "title": "Mission feedback",
+      "totalCost": "Total cost",
+      "surface": "Surface",
+      "duration": "Duration",
+      "difficulties": "Difficulties",
+      "learnings": "Learnings",
+      "helperPhotos": "Helper photos"
+    },
+    "result": {
+      "SUCCESS": "Success",
+      "PARTIAL_SUCCESS": "Partial success",
+      "FAILURE": "Failure"
+    }
+  },
+  "learn": {
+    "title": "Learn from others",
+    "subtitle": "Discover real feedback from completed worksites on Ecobilda.",
+    "empty": "No public feedback yet."
   }
 }
