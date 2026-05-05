@@ -70,12 +70,20 @@ export function Navbar() {
           </Link>
 
           <Group gap="xs">
-            {/* "Browse Projects" button - visible to all */}
+            {/* "Learn from others" link */}
+            <Link
+              href="/learn"
+              className="text-sm font-medium px-3 py-2 rounded-full transition-all hidden sm:block hover:bg-gray-100 text-gray-700"
+            >
+              {t('nav.learnFromOthers')}
+            </Link>
+
+            {/* "Browse Missions" button - visible to all */}
             <Link
               href="/missions"
               className="text-sm font-semibold px-6 py-2.5 rounded-full transition-all hidden sm:block shadow-lg hover:-translate-y-0.5 bg-eco-primary text-white hover:bg-eco-primaryDark shadow-eco-primary/20 border border-transparent"
             >
-              {t('home.hero.browseProjects')}
+              {t('home.hero.browseMissions')}
             </Link>
 
             {isAuthenticated ? (
@@ -102,7 +110,7 @@ export function Navbar() {
                       </Menu.Item>
 
                       <Menu.Item component={Link} href="/my-missions" leftSection={<IconFolder size={16} />}>
-                        {t('nav.userMenu.myProjects')}
+                        {t('nav.userMenu.myMissions')}
                       </Menu.Item>
 
                       <Menu.Item component={Link} href="/participations" leftSection={<IconCompass size={16} />}>
@@ -173,7 +181,7 @@ export function Navbar() {
             onClick={close}
             className="bg-eco-primary hover:bg-eco-primaryDark"
           >
-            {t('home.hero.browseProjects')}
+            {t('home.hero.browseMissions')}
           </Button>
 
           {isAuthenticated ? (
@@ -188,7 +196,7 @@ export function Navbar() {
                 <Anchor component={Link} href="/my-missions" onClick={close} className="py-2" c="black">
                   <Group gap="xs">
                     <IconFolder size={20} color="black" />
-                    {t('nav.userMenu.myProjects')}
+                    {t('nav.userMenu.myMissions')}
                   </Group>
                 </Anchor>
                 <Anchor component={Link} href="/participations" onClick={close} className="py-2" c="black">

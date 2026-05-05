@@ -44,7 +44,7 @@
     "notFound": {
       "title": "Página não encontrada",
       "description": "Ops! A página que procura não existe ou foi movida.",
-      "browseProjects": "Explorar projetos",
+      "browseProjects": "Explorar missões",
       "goBack": "Voltar"
     },
     "generic": {
@@ -79,8 +79,12 @@
       "participations": "As minhas participações",
       "messages": "Mensagens",
       "profile": "O meu perfil",
-      "settings": "Definições da conta"
-    }
+      "settings": "Definições da conta",
+      "myMissions": "My missions",
+      "myPlaces": "My places"
+    },
+    "missions": "Missions",
+    "learnFromOthers": "Learn from others"
   },
   "auth": {
     "registrationSuccess": {
@@ -202,8 +206,9 @@
     "hero": {
       "title": "Construção Natural em Todo o Mundo",
       "subtitle": "Conecte-se com projetos de eco-construção e permacultura em todo o mundo. Aprenda novas competências enquanto contribui para comunidades sustentáveis.",
-      "browseProjects": "Ver Projetos",
-      "register": "Começar"
+      "browseProjects": "Ver Missões",
+      "register": "Começar",
+      "browseMissions": "Browse missions"
     },
     "about": {
       "title": "Bem-vindo ao Ecobilda",
@@ -690,7 +695,7 @@
     "viewProject": "Ver projeto",
     "noParticipations": "Ainda sem participações",
     "noParticipationsDesc": "Comece a explorar projetos e candidate-se para participar!",
-    "browseProjects": "Explorar projetos",
+    "browseProjects": "Explorar missões",
     "applyDesc": "Envie um pedido de participação ao anfitrião.",
     "applyTitle": "Candidatar-se a este projeto",
     "cancelled": "Cancelado",
@@ -726,7 +731,7 @@
     "remove": "Remover dos favoritos",
     "noFavorites": "Ainda sem favoritos",
     "noFavoritesDesc": "Comece a explorar projetos e guarde os que gostar!",
-    "browseProjects": "Explorar projetos",
+    "browseProjects": "Explorar missões",
     "addLabel": "Adicionar aos favoritos",
     "addedMessage": "Projeto adicionado aos seus favoritos",
     "addedTitle": "Adicionado aos favoritos",
@@ -1537,7 +1542,22 @@
       "startsAfter": "Starts after",
       "endsBefore": "Ends before",
       "skills": "Skills",
-      "languages": "Languages"
+      "languages": "Languages",
+      "searchPlaceholder": "Where to?",
+      "searching": "Searching…",
+      "noResultsFor": "No results for",
+      "dates": "Dates",
+      "startingFrom": "Starting from",
+      "all": "All",
+      "paidOnly": "Paid only",
+      "amenities": "Amenities",
+      "hoursPerDay": "Hours per day",
+      "daysPerWeek": "Days per week",
+      "maxParticipants": "Number of participants"
+    },
+    "view": {
+      "split": "List + map",
+      "grid": "List"
     }
   },
   "missionDetail": {

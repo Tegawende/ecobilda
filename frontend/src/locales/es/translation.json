@@ -44,7 +44,7 @@
     "notFound": {
       "title": "Página no encontrada",
       "description": "¡Ups! La página que buscas no existe o ha sido movida.",
-      "browseProjects": "Explorar proyectos",
+      "browseProjects": "Explorar misiones",
       "goBack": "Volver"
     },
     "generic": {
@@ -194,15 +194,20 @@
       "participations": "Mis participaciones",
       "messages": "Mensajes",
       "profile": "Mi perfil",
-      "settings": "Configuración de cuenta"
-    }
+      "settings": "Configuración de cuenta",
+      "myMissions": "My missions",
+      "myPlaces": "My places"
+    },
+    "missions": "Missions",
+    "learnFromOthers": "Learn from others"
   },
   "home": {
     "hero": {
       "title": "Construcción Natural en Todo el Mundo",
       "subtitle": "Conecta con proyectos de eco-construcción y permacultura en todo el mundo. Aprende nuevas habilidades mientras contribuyes a comunidades sostenibles.",
-      "browseProjects": "Ver Proyectos",
-      "register": "Empezar"
+      "browseProjects": "Ver Misiones",
+      "register": "Empezar",
+      "browseMissions": "Browse missions"
     },
     "about": {
       "title": "Bienvenido a Ecobilda",
@@ -690,7 +695,7 @@
     "viewProject": "Ver proyecto",
     "noParticipations": "Aún no hay participaciones",
     "noParticipationsDesc": "¡Comienza a explorar proyectos y postúlate para unirte!",
-    "browseProjects": "Explorar proyectos",
+    "browseProjects": "Explorar misiones",
     "applyDesc": "Envíe una solicitud de participación al anfitrión.",
     "applyTitle": "Postularse a este proyecto",
     "cancelled": "Cancelado",
@@ -726,7 +731,7 @@
     "remove": "Quitar de favoritos",
     "noFavorites": "Aún no hay favoritos",
     "noFavoritesDesc": "¡Comienza a explorar proyectos y guarda los que te gusten!",
-    "browseProjects": "Explorar proyectos",
+    "browseProjects": "Explorar misiones",
     "addLabel": "Añadir a favoritos",
     "addedMessage": "Proyecto añadido a sus favoritos",
     "addedTitle": "Añadido a favoritos",
@@ -1537,7 +1542,22 @@
       "startsAfter": "Starts after",
       "endsBefore": "Ends before",
       "skills": "Skills",
-      "languages": "Languages"
+      "languages": "Languages",
+      "searchPlaceholder": "Where to?",
+      "searching": "Searching…",
+      "noResultsFor": "No results for",
+      "dates": "Dates",
+      "startingFrom": "Starting from",
+      "all": "All",
+      "paidOnly": "Paid only",
+      "amenities": "Amenities",
+      "hoursPerDay": "Hours per day",
+      "daysPerWeek": "Days per week",
+      "maxParticipants": "Number of participants"
+    },
+    "view": {
+      "split": "List + map",
+      "grid": "List"
     }
   },
   "missionDetail": {

@@ -44,7 +44,7 @@
     "notFound": {
       "title": "Seite nicht gefunden",
       "description": "Hoppla! Die gesuchte Seite existiert nicht oder wurde verschoben.",
-      "browseProjects": "Projekte durchsuchen",
+      "browseProjects": "Missionen durchsuchen",
       "goBack": "Zurück"
     },
     "generic": {
@@ -79,8 +79,12 @@
       "participations": "Meine Teilnahmen",
       "messages": "Nachrichten",
       "profile": "Mein Profil",
-      "settings": "Kontoeinstellungen"
-    }
+      "settings": "Kontoeinstellungen",
+      "myMissions": "My missions",
+      "myPlaces": "My places"
+    },
+    "missions": "Missions",
+    "learnFromOthers": "Learn from others"
   },
   "auth": {
     "loginTitle": "Bei Ecobilda anmelden",
@@ -587,7 +591,7 @@
     "viewProject": "Projekt anzeigen",
     "noParticipations": "Noch keine Teilnahmen",
     "noParticipationsDesc": "Beginnen Sie, Projekte zu erkunden und bewerben Sie sich, um teilzunehmen!",
-    "browseProjects": "Projekte durchsuchen",
+    "browseProjects": "Missionen durchsuchen",
     "applyDesc": "Senden Sie eine Teilnahmeanfrage an den Gastgeber.",
     "applyTitle": "Für dieses Projekt bewerben",
     "cancelled": "Abgesagt",
@@ -623,7 +627,7 @@
     "remove": "Aus Favoriten entfernen",
     "noFavorites": "Noch keine Favoriten",
     "noFavoritesDesc": "Beginnen Sie, Projekte zu erkunden und speichern Sie die, die Ihnen gefallen!",
-    "browseProjects": "Projekte durchsuchen",
+    "browseProjects": "Missionen durchsuchen",
     "addLabel": "Zu Favoriten hinzufügen",
     "addedMessage": "Projekt zu Ihren Favoriten hinzugefügt",
     "addedTitle": "Zu Favoriten hinzugefügt",
@@ -856,8 +860,9 @@
     "hero": {
       "title": "Natürliches Bauen auf der ganzen Welt",
       "subtitle": "Vernetzen Sie sich mit Öko-Bau- und Permakulturprojekten weltweit. Lernen Sie neue Fähigkeiten, während Sie zu nachhaltigen Gemeinschaften beitragen.",
-      "browseProjects": "Projekte durchsuchen",
-      "register": "Loslegen"
+      "browseProjects": "Missionen durchsuchen",
+      "register": "Loslegen",
+      "browseMissions": "Browse missions"
     },
     "about": {
       "title": "Willkommen bei Ecobilda",
@@ -1537,7 +1542,22 @@
       "startsAfter": "Starts after",
       "endsBefore": "Ends before",
       "skills": "Skills",
-      "languages": "Languages"
+      "languages": "Languages",
+      "searchPlaceholder": "Where to?",
+      "searching": "Searching…",
+      "noResultsFor": "No results for",
+      "dates": "Dates",
+      "startingFrom": "Starting from",
+      "all": "All",
+      "paidOnly": "Paid only",
+      "amenities": "Amenities",
+      "hoursPerDay": "Hours per day",
+      "daysPerWeek": "Days per week",
+      "maxParticipants": "Number of participants"
+    },
+    "view": {
+      "split": "List + map",
+      "grid": "List"
     }
   },
   "missionDetail": {
