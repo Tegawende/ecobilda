@@ -44,7 +44,7 @@
     "notFound": {
       "title": "Page non trouvée",
       "description": "Oups ! La page que vous recherchez n'existe pas ou a été déplacée.",
-      "browseProjects": "Parcourir les projets",
+      "browseProjects": "Parcourir les missions",
       "goBack": "Retour"
     },
     "generic": {
@@ -85,7 +85,7 @@
     "remove": "Retirer des favoris",
     "noFavorites": "Aucun favori pour l'instant",
     "noFavoritesDesc": "Commencez à explorer les projets et sauvegardez ceux qui vous plaisent !",
-    "browseProjects": "Parcourir les projets",
+    "browseProjects": "Parcourir les missions",
     "addLabel": "Ajouter aux favoris",
     "addedMessage": "Projet ajouté à vos favoris",
     "addedTitle": "Ajouté aux favoris",
@@ -110,8 +110,12 @@
       "participations": "Mes participations",
       "messages": "Messages",
       "profile": "Mon profil",
-      "settings": "Paramètres du compte"
-    }
+      "settings": "Paramètres du compte",
+      "myMissions": "Mes missions",
+      "myPlaces": "Mes lieux"
+    },
+    "missions": "Missions",
+    "learnFromOthers": "Apprenez des autres"
   },
   "about": {
     "hero": {
@@ -688,7 +692,7 @@
     "viewProject": "Voir le projet",
     "noParticipations": "Aucune participation pour l'instant",
     "noParticipationsDesc": "Commencez à explorer les projets et postulez pour les rejoindre !",
-    "browseProjects": "Parcourir les projets",
+    "browseProjects": "Parcourir les missions",
     "applyDesc": "Envoyez une demande de participation à l'hôte.",
     "applyTitle": "Postuler à ce projet",
     "cancelled": "Annulé",
@@ -977,8 +981,9 @@
     "hero": {
       "title": "Construction naturelle dans le monde entier",
       "subtitle": "Connectez-vous avec des projets d'éco-construction et de permaculture dans le monde entier. Apprenez de nouvelles compétences tout en contribuant à des communautés durables.",
-      "browseProjects": "Parcourir les projets",
-      "register": "Commencer"
+      "browseProjects": "Parcourir les missions",
+      "register": "Commencer",
+      "browseMissions": "Parcourir les missions"
     },
     "heroAlt": "Chantier d'éco-construction",
     "about": {
@@ -1537,7 +1542,22 @@
       "startsAfter": "Commence après",
       "endsBefore": "Finit avant",
       "skills": "Compétences",
-      "languages": "Langues"
+      "languages": "Langues",
+      "searchPlaceholder": "Où allez-vous ?",
+      "searching": "Recherche...",
+      "noResultsFor": "Aucun résultat pour",
+      "dates": "Dates",
+      "startingFrom": "À partir du",
+      "all": "Tous",
+      "paidOnly": "Payant uniquement",
+      "amenities": "Équipements",
+      "hoursPerDay": "Heures par jour",
+      "daysPerWeek": "Jours par semaine",
+      "maxParticipants": "Nombre de participants"
+    },
+    "view": {
+      "split": "Liste + carte",
+      "grid": "Liste"
     }
   },
   "missionDetail": {

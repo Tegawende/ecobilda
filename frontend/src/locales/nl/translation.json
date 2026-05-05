@@ -44,7 +44,7 @@
     "notFound": {
       "title": "Pagina niet gevonden",
       "description": "Oeps! De pagina die je zoekt bestaat niet of is verplaatst.",
-      "browseProjects": "Projecten bekijken",
+      "browseProjects": "Missies bekijken",
       "goBack": "Terug"
     },
     "generic": {
@@ -85,7 +85,7 @@
     "remove": "Uit favorieten verwijderen",
     "noFavorites": "Nog geen favorieten",
     "noFavoritesDesc": "Begin met het verkennen van projecten en sla de projecten op die u leuk vindt!",
-    "browseProjects": "Projecten doorbladeren",
+    "browseProjects": "Missies doorbladeren",
     "addLabel": "Toevoegen aan favorieten",
     "addedMessage": "Project toegevoegd aan uw favorieten",
     "addedTitle": "Toegevoegd aan favorieten",
@@ -110,8 +110,12 @@
       "participations": "Mijn deelnames",
       "messages": "Berichten",
       "profile": "Mijn profiel",
-      "settings": "Accountinstellingen"
-    }
+      "settings": "Accountinstellingen",
+      "myMissions": "My missions",
+      "myPlaces": "My places"
+    },
+    "missions": "Missions",
+    "learnFromOthers": "Learn from others"
   },
   "about": {
     "hero": {
@@ -303,8 +307,9 @@
     "hero": {
       "title": "Natuurlijk Bouwen Overal",
       "subtitle": "Verbind met eco-bouw- en permacultuurprojecten wereldwijd. Leer nieuwe vaardigheden terwijl je bijdraagt aan duurzame gemeenschappen.",
-      "browseProjects": "Bekijk Projecten",
-      "register": "Aan de slag"
+      "browseProjects": "Bekijk Missies",
+      "register": "Aan de slag",
+      "browseMissions": "Browse missions"
     },
     "about": {
       "title": "Welkom bij Ecobilda",
@@ -777,7 +782,7 @@
     "viewProject": "Project bekijken",
     "noParticipations": "Nog geen deelnames",
     "noParticipationsDesc": "Begin met het verkennen van projecten en solliciteer om deel te nemen!",
-    "browseProjects": "Projecten doorbladeren",
+    "browseProjects": "Missies doorbladeren",
     "applyDesc": "Stuur een deelnameverzoek naar de gastgever.",
     "applyTitle": "Solliciteren voor dit project",
     "cancelled": "Geannuleerd",
@@ -1537,7 +1542,22 @@
       "startsAfter": "Starts after",
       "endsBefore": "Ends before",
       "skills": "Skills",
-      "languages": "Languages"
+      "languages": "Languages",
+      "searchPlaceholder": "Where to?",
+      "searching": "Searching…",
+      "noResultsFor": "No results for",
+      "dates": "Dates",
+      "startingFrom": "Starting from",
+      "all": "All",
+      "paidOnly": "Paid only",
+      "amenities": "Amenities",
+      "hoursPerDay": "Hours per day",
+      "daysPerWeek": "Days per week",
+      "maxParticipants": "Number of participants"
+    },
+    "view": {
+      "split": "List + map",
+      "grid": "List"
     }
   },
   "missionDetail": {

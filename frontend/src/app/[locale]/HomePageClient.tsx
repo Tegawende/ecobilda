@@ -64,7 +64,7 @@ export function HomePageClient() {
               href="/missions"
               className="rounded-full bg-[#67a36f] px-8 py-4 text-base font-bold text-white shadow-xl hover:bg-[#5a8f61] transform hover:-translate-y-1 transition-all duration-300"
             >
-              {t('home.hero.browseProjects')}
+              {t('home.hero.browseMissions')}
             </Link>
           </div>
         </div>
