@@ -19,6 +19,7 @@ import {
   Box,
 } from '@mantine/core';
 import { IconCalendar, IconCash, IconBulb, IconAlertCircle } from '@tabler/icons-react';
+import { Layout } from '@/components/common/Layout';
 import { useCompletedMissionsPublic } from '@/hooks/useConvex';
 import { POSTE_OPTIONS, MISSION_TYPE_OPTIONS, TECHNIQUES_BY_POSTE, type Poste, techniqueI18nKey } from '@/types/missions';
 
@@ -42,6 +43,7 @@ export function LearnFromOthersClient() {
     : [];
 
   return (
+    <Layout>
     <Container size="xl" py="md">
       <Stack gap="md">
         <Stack gap={4}>
@@ -199,5 +201,6 @@ export function LearnFromOthersClient() {
         )}
       </Stack>
     </Container>
+    </Layout>
   );
 }

@@ -5,6 +5,7 @@ import { useRouter } from '@/i18n/navigation';
 import { Container, Stack, Title, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconCheck } from '@tabler/icons-react';
+import { Layout } from '@/components/common/Layout';
 import { PlaceForm, type PlaceFormValues } from '@/components/places/PlaceForm';
 import { projectsService } from '@/services/projects';
 
@@ -49,18 +50,20 @@ export function CreateProjectClient() {
   };
 
   return (
-    <Container size="md" py="md">
-      <Stack gap="md">
-        <Stack gap={4}>
-          <Title order={2}>{t('createPlace.title')}</Title>
-          <Text c="dimmed">{t('createPlace.subtitle')}</Text>
+    <Layout>
+      <Container size="md" py="md">
+        <Stack gap="md">
+          <Stack gap={4}>
+            <Title order={2}>{t('createPlace.title')}</Title>
+            <Text c="dimmed">{t('createPlace.subtitle')}</Text>
+          </Stack>
+          <PlaceForm
+            onSubmit={handleSubmit}
+            onCancel={() => router.push('/my-missions')}
+            submitLabel={t('createPlace.submit')}
+          />
         </Stack>
-        <PlaceForm
-          onSubmit={handleSubmit}
-          onCancel={() => router.push('/my-missions')}
-          submitLabel={t('createPlace.submit')}
-        />
-      </Stack>
-    </Container>
+      </Container>
+    </Layout>
   );
 }

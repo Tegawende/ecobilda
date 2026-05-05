@@ -33,6 +33,7 @@ import {
   type Poste,
   techniqueI18nKey,
 } from '@/types/missions';
+import { Layout } from '@/components/common/Layout';
 import { missionsService } from '@/services/missions';
 import { useMission, useSkills } from '@/hooks/useConvex';
 
@@ -192,15 +193,18 @@ export function EditMissionClient({ id }: EditMissionClientProps) {
 
   if (isLoading || !mission) {
     return (
-      <Center h={400}>
-        <Loader />
-      </Center>
+      <Layout>
+        <Center h={400}>
+          <Loader />
+        </Center>
+      </Layout>
     );
   }
 
   const isPublished = mission.status === 'PUBLISHED' || mission.status === 'IN_PROGRESS';
 
   return (
+    <Layout>
     <Container size="md" py="md">
       <Stack gap="md">
         <Group justify="space-between">
@@ -390,5 +394,6 @@ export function EditMissionClient({ id }: EditMissionClientProps) {
         </form>
       </Stack>
     </Container>
+    </Layout>
   );
 }
