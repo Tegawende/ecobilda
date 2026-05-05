@@ -33,6 +33,7 @@ import {
   type Poste,
   techniqueI18nKey,
 } from '@/types/missions';
+import { Layout } from '@/components/common/Layout';
 import { missionsService } from '@/services/missions';
 import { projectsService } from '@/services/projects';
 import { useSkills } from '@/hooks/useConvex';
@@ -157,46 +158,53 @@ export function CreateMissionClient() {
 
   if (loadingPlaces) {
     return (
-      <Center h={400}>
-        <Loader />
-      </Center>
+      <Layout>
+        <Center h={400}>
+          <Loader />
+        </Center>
+      </Layout>
     );
   }
 
   if (places.length === 0) {
     return (
-      <Container size="sm" py="xl">
-        <Alert
-          color="yellow"
-          icon={<IconAlertCircle size={20} />}
-          title={t('createMission.noPlaceTitle')}
-        >
-          <Stack gap="sm">
-            <Text size="sm">{t('createMission.noPlaceMessage')}</Text>
-            <Button component={Link} href="/create-project" radius="xl" color="eco-primary">
-              {t('createMission.createPlaceCta')}
-            </Button>
-          </Stack>
-        </Alert>
-      </Container>
+      <Layout>
+        <Container size="sm" py="xl">
+          <Alert
+            color="yellow"
+            icon={<IconAlertCircle size={20} />}
+            title={t('createMission.noPlaceTitle')}
+          >
+            <Stack gap="sm">
+              <Text size="sm">{t('createMission.noPlaceMessage')}</Text>
+              <Button component={Link} href="/create-project" radius="xl" color="eco-primary">
+                {t('createMission.createPlaceCta')}
+              </Button>
+            </Stack>
+          </Alert>
+        </Container>
+      </Layout>
     );
   }
 
   if (validatedPlaces.length === 0) {
     return (
-      <Container size="sm" py="xl">
-        <Alert
-          color="yellow"
-          icon={<IconAlertCircle size={20} />}
-          title={t('createMission.placePendingTitle')}
-        >
-          {t('createMission.placePendingMessage')}
-        </Alert>
-      </Container>
+      <Layout>
+        <Container size="sm" py="xl">
+          <Alert
+            color="yellow"
+            icon={<IconAlertCircle size={20} />}
+            title={t('createMission.placePendingTitle')}
+          >
+            {t('createMission.placePendingMessage')}
+          </Alert>
+        </Container>
+      </Layout>
     );
   }
 
   return (
+    <Layout>
     <Container size="md" py="md">
       <Stack gap="md">
         <Title order={2}>{t('createMission.title')}</Title>
@@ -386,5 +394,6 @@ export function CreateMissionClient() {
         </form>
       </Stack>
     </Container>
+    </Layout>
   );
 }

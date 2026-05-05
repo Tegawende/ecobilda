@@ -311,3 +311,266 @@ export const seedLanguages = mutation({
     return { status: "done", added };
   },
 });
+
+// ============================================
+// seedSampleMissions — creates 2 hosts + 2 places + 4 demo missions
+// (1 PUBLISHED CHANTIER, 1 PUBLISHED FORMATION, 2 COMPLETED with public feedback)
+// Re-runnable: skips if any mission already exists.
+// ============================================
+
+export const seedSampleMissions = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const existing = await ctx.db.query("missions").first();
+    if (existing) return { status: "missions already exist, skipped" };
+
+    const skills = await ctx.db.query("skills").collect();
+    const langs = await ctx.db.query("languages").collect();
+    const countries = await ctx.db.query("countries").collect();
+    const skillByCode = (code: string) => skills.find((s) => s.code === code)?._id;
+    const langByCode = (code: string) => langs.find((l) => l.code === code)?._id;
+    const countryByCode = (code: string) => countries.find((c) => c.code === code)?._id;
+
+    // Helper hosts (Marie + Jean). Created without password — admin patches them later if needed.
+    const findOrCreateUser = async (
+      email: string,
+      firstName: string,
+      lastName: string,
+      bio: string,
+      langCodes: string[]
+    ): Promise<any> => {
+      const existing = await ctx.db
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", email))
+        .first();
+      if (existing) return existing._id;
+      return await ctx.db.insert("users", {
+        email,
+        firstName,
+        lastName,
+        bio,
+        languageIds: langCodes.map(langByCode).filter(Boolean) as any,
+        skillIds: [],
+        emailVerified: true,
+        hasPassword: false,
+        emailNotifications: true,
+        newsletter: false,
+        inAppNotifications: true,
+        notificationLanguage: "fr",
+        isProfileVisible: true,
+        averageRating: 0,
+        reviewCount: 0,
+        isStaff: false,
+        isSuperuser: false,
+        isActive: true,
+      });
+    };
+
+    const marieId = await findOrCreateUser(
+      "marie@ecobilda.demo",
+      "Marie",
+      "Dupont",
+      "Passionnée de permaculture et d'éco-construction depuis 10 ans. J'ai construit ma maison en paille et terre.",
+      ["fr", "en"]
+    );
+    const jeanId = await findOrCreateUser(
+      "jean@ecobilda.demo",
+      "Jean",
+      "Martin",
+      "Charpentier de formation, je me suis tourné vers les techniques de construction naturelle.",
+      ["fr", "en", "es"]
+    );
+
+    // Addresses
+    const addr1 = await ctx.db.insert("addresses", {
+      city: "Namur",
+      postalCode: "5000",
+      countryId: countryByCode("BE"),
+      latitude: 50.4674,
+      longitude: 4.8720,
+      formattedAddress: "Namur, Belgium",
+    });
+    const addr2 = await ctx.db.insert("addresses", {
+      city: "Toulouse",
+      postalCode: "31000",
+      countryId: countryByCode("FR"),
+      latitude: 43.6047,
+      longitude: 1.4442,
+      formattedAddress: "Toulouse, France",
+    });
+
+    // Place 1 — Marie (Namur)
+    const place1 = await ctx.db.insert("projects", {
+      ownerId: marieId,
+      title: "Le Domaine des Sources",
+      addressId: addr1,
+      accommodationDetails: "Yourte privée avec électricité et chauffage. Douche et toilettes sèches partagées.",
+      foodDetails: "Trois repas bio par jour, légumes du jardin. Régimes végétariens bienvenus.",
+      internetProvided: true,
+      familyFriendly: true,
+      petsAllowed: false,
+      smokingAllowed: false,
+      languageIds: [langByCode("fr"), langByCode("en")].filter(Boolean) as any,
+      isActive: true,
+      flaggedCount: 0,
+      status: "ACTIVE",
+      validatedAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+
+    // Place 2 — Jean (Toulouse)
+    const place2 = await ctx.db.insert("projects", {
+      ownerId: jeanId,
+      title: "Ferme rénovée du Sud",
+      addressId: addr2,
+      accommodationDetails: "Chambre partagée dans la ferme. Salle de bain avec eau chaude.",
+      foodDetails: "Repas du midi fournis. Cuisine équipée disponible.",
+      internetProvided: true,
+      familyFriendly: false,
+      petsAllowed: true,
+      smokingAllowed: false,
+      languageIds: [langByCode("fr"), langByCode("en"), langByCode("es")].filter(Boolean) as any,
+      isActive: true,
+      flaggedCount: 0,
+      status: "ACTIVE",
+      validatedAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+
+    const now = Date.now();
+    const dayMs = 24 * 60 * 60 * 1000;
+
+    // Helper to format ISO date
+    const iso = (d: Date) => d.toISOString().split("T")[0];
+
+    // Mission 1 — PUBLISHED, CHANTIER, Marie, mur paille (in 2 weeks)
+    const m1Start = new Date(now + 14 * dayMs);
+    const m1End = new Date(now + 19 * dayMs);
+    await ctx.db.insert("missions", {
+      projectId: place1,
+      ownerId: marieId,
+      type: "CHANTIER",
+      title: "Pose d'un mur en paille porteur",
+      description: "Sur 5 jours, on monte ensemble un mur ouest en paille porteuse. Tu apprendras à compresser, ajuster et préparer la structure pour l'enduit. Niveau débutant accepté.",
+      poste: "murs",
+      technique: "paille_porteur",
+      difficulty: "DEBUTANT",
+      pricingMode: "FREE",
+      startDate: iso(m1Start),
+      endDate: iso(m1End),
+      maxParticipants: 4,
+      hoursPerDay: 6,
+      daysPerWeek: 5,
+      skillIds: [skillByCode("strawbale_building"), skillByCode("carpentry")].filter(Boolean) as any,
+      status: "PUBLISHED",
+      updatedAt: now,
+    });
+
+    // Mission 2 — PUBLISHED, FORMATION PAYANTE, Jean, enduit terre (in 1 month)
+    const m2Start = new Date(now + 30 * dayMs);
+    const m2End = new Date(now + 33 * dayMs);
+    await ctx.db.insert("missions", {
+      projectId: place2,
+      ownerId: jeanId,
+      type: "FORMATION",
+      title: "Formation enduit terre intérieur — 3 jours intensifs",
+      description: "Formation complète sur l'enduit terre : préparation du support, dosage du mélange (terre + sable + paille hachée), application en 2 couches, finition. Repas inclus.",
+      poste: "enduits",
+      technique: "terre",
+      difficulty: "INTERMEDIAIRE",
+      pricingMode: "PAID",
+      priceEUR: 250,
+      startDate: iso(m2Start),
+      endDate: iso(m2End),
+      maxParticipants: 6,
+      hoursPerDay: 7,
+      daysPerWeek: 5,
+      skillIds: [skillByCode("earthen_plaster"), skillByCode("masonry")].filter(Boolean) as any,
+      status: "PUBLISHED",
+      updatedAt: now,
+    });
+
+    // Mission 3 — COMPLETED + public feedback — Marie, fondations (3 months ago)
+    const m3Start = new Date(now - 90 * dayMs);
+    const m3End = new Date(now - 80 * dayMs);
+    const m3Id = await ctx.db.insert("missions", {
+      projectId: place1,
+      ownerId: marieId,
+      type: "CHANTIER",
+      title: "Fondations drainantes — hérisson ventilé",
+      description: "On a construit les fondations en pierre sèche + hérisson ventilé pour une nouvelle annexe. Apprentissage du nivellement et des écoulements.",
+      poste: "fondations",
+      technique: "pierre",
+      difficulty: "DEBUTANT",
+      pricingMode: "FREE",
+      startDate: iso(m3Start),
+      endDate: iso(m3End),
+      maxParticipants: 3,
+      hoursPerDay: 6,
+      daysPerWeek: 5,
+      skillIds: [skillByCode("masonry")].filter(Boolean) as any,
+      status: "COMPLETED",
+      feedbackNotifiedAt: now - 75 * dayMs,
+      feedbackDeadlineAt: now - 68 * dayMs,
+      updatedAt: now,
+    });
+    await ctx.db.insert("missionFeedback", {
+      missionId: m3Id,
+      totalCostEUR: 850,
+      surfaceM2: 12,
+      actualDurationDays: 11,
+      result: "SUCCESS",
+      difficultiesText:
+        "Le drainage en zone argileuse a demandé plus de pierres que prévu. Bien anticiper les volumes.",
+      learningsText:
+        "Nivellement précis avant de poser les pierres. Penser à la pente d'écoulement (1 cm/m mini).",
+      photoIds: [],
+      isPublic: true,
+      submittedAt: now - 70 * dayMs,
+    });
+
+    // Mission 4 — COMPLETED + public feedback — Jean, toiture (2 months ago)
+    const m4Start = new Date(now - 60 * dayMs);
+    const m4End = new Date(now - 53 * dayMs);
+    const m4Id = await ctx.db.insert("missions", {
+      projectId: place2,
+      ownerId: jeanId,
+      type: "CHANTIER",
+      title: "Toiture végétalisée extensive",
+      description: "Pose d'une toiture végétalisée sur 30m² : étanchéité, drainage, substrat, plantes sedum.",
+      poste: "toiture",
+      technique: "toit_vegetal",
+      difficulty: "INTERMEDIAIRE",
+      pricingMode: "FREE",
+      startDate: iso(m4Start),
+      endDate: iso(m4End),
+      maxParticipants: 4,
+      hoursPerDay: 7,
+      daysPerWeek: 5,
+      skillIds: [skillByCode("carpentry"), skillByCode("garden_maintenance")].filter(Boolean) as any,
+      status: "COMPLETED",
+      feedbackNotifiedAt: now - 50 * dayMs,
+      feedbackDeadlineAt: now - 43 * dayMs,
+      updatedAt: now,
+    });
+    await ctx.db.insert("missionFeedback", {
+      missionId: m4Id,
+      totalCostEUR: 1850,
+      surfaceM2: 30,
+      actualDurationDays: 8,
+      result: "PARTIAL_SUCCESS",
+      difficultiesText:
+        "L'étanchéité EPDM est plus délicate qu'on pensait, surtout sur les angles. On a dû refaire 2 jonctions.",
+      learningsText:
+        "Prévoir 30% de marge sur le substrat. Les sedums prennent 6 mois pour bien couvrir.",
+      photoIds: [],
+      isPublic: true,
+      submittedAt: now - 45 * dayMs,
+    });
+
+    return {
+      status: "seeded",
+      counts: { hosts: 2, places: 2, missions: 4, feedbacks: 2 },
+    };
+  },
+});

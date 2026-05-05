@@ -20,6 +20,7 @@ import {
 import { IconPlus, IconHomeCog, IconExternalLink, IconEdit, IconTrash } from '@tabler/icons-react';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
+import { Layout } from '@/components/common/Layout';
 import { useMyMissions, useMyPlaces } from '@/hooks/useConvex';
 import { MissionCard } from '@/components/missions/MissionCard';
 import { missionsService } from '@/services/missions';
@@ -90,6 +91,7 @@ export function MyMissionsClient() {
   const completedMissions = missions.filter((m: any) => m.status === 'COMPLETED');
 
   return (
+    <Layout>
     <Container size="xl" py="md">
       <Stack gap="md">
         <Group justify="space-between" wrap="nowrap">
@@ -316,5 +318,6 @@ export function MyMissionsClient() {
         </Tabs>
       </Stack>
     </Container>
+    </Layout>
   );
 }

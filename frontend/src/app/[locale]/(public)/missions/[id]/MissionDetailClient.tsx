@@ -34,6 +34,7 @@ import {
   IconStar,
   IconArrowLeft,
 } from '@tabler/icons-react';
+import { Layout } from '@/components/common/Layout';
 import { useMission, useMissionsByProject, useCurrentUser } from '@/hooks/useConvex';
 import { FavoriteButton } from '@/components/common/FavoriteButton';
 import { ParticipationRequestModal } from '@/components/participations/ParticipationRequestModal';
@@ -52,30 +53,34 @@ export function MissionDetailClient({ id }: MissionDetailClientProps) {
 
   if (isLoading) {
     return (
-      <Container size="xl" py="xl">
-        <Stack gap="md">
-          <Skeleton h={48} w="60%" />
-          <Skeleton h={400} radius="lg" />
-          <Skeleton h={120} />
-        </Stack>
-      </Container>
+      <Layout>
+        <Container size="xl" py="xl">
+          <Stack gap="md">
+            <Skeleton h={48} w="60%" />
+            <Skeleton h={400} radius="lg" />
+            <Skeleton h={120} />
+          </Stack>
+        </Container>
+      </Layout>
     );
   }
 
   if (!mission) {
     return (
-      <Container size="md" py="xl">
-        <Center h={400}>
-          <Stack align="center">
-            <Text size="lg" fw={600}>
-              {t('missionDetail.notFound')}
-            </Text>
-            <Button component={Link} href="/missions" leftSection={<IconArrowLeft size={16} />}>
-              {t('missionDetail.backToMissions')}
-            </Button>
-          </Stack>
-        </Center>
-      </Container>
+      <Layout>
+        <Container size="md" py="xl">
+          <Center h={400}>
+            <Stack align="center">
+              <Text size="lg" fw={600}>
+                {t('missionDetail.notFound')}
+              </Text>
+              <Button component={Link} href="/missions" leftSection={<IconArrowLeft size={16} />}>
+                {t('missionDetail.backToMissions')}
+              </Button>
+            </Stack>
+          </Center>
+        </Container>
+      </Layout>
     );
   }
 
@@ -95,6 +100,7 @@ export function MissionDetailClient({ id }: MissionDetailClientProps) {
     !!user && !isOwner && (mission.status === 'PUBLISHED' || mission.status === 'IN_PROGRESS');
 
   return (
+    <Layout>
     <Container size="xl" py="md">
       <Group justify="space-between" mb="md" wrap="nowrap">
         <Button
@@ -434,5 +440,6 @@ export function MissionDetailClient({ id }: MissionDetailClientProps) {
         onClose={() => setApplyOpen(false)}
       />
     </Container>
+    </Layout>
   );
 }

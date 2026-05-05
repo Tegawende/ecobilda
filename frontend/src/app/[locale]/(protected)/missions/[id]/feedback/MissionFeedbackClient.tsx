@@ -26,6 +26,7 @@ import {
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconUpload, IconX } from '@tabler/icons-react';
+import { Layout } from '@/components/common/Layout';
 import { useMission, useMissionFeedback } from '@/hooks/useConvex';
 import { missionFeedbackService } from '@/services/missionFeedback';
 import { FEEDBACK_RESULTS, feedbackResultI18nKey } from '@/types/missions';
@@ -124,13 +125,16 @@ export function MissionFeedbackClient({ id }: Props) {
 
   if (isLoading || !mission) {
     return (
-      <Center h={400}>
-        <Loader />
-      </Center>
+      <Layout>
+        <Center h={400}>
+          <Loader />
+        </Center>
+      </Layout>
     );
   }
 
   return (
+    <Layout>
     <Container size="md" py="md">
       <Stack gap="md">
         <Stack gap={4}>
@@ -250,5 +254,6 @@ export function MissionFeedbackClient({ id }: Props) {
         </form>
       </Stack>
     </Container>
+    </Layout>
   );
 }

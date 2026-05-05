@@ -17,6 +17,7 @@ import {
 } from '@mantine/core';
 import { IconHeart } from '@tabler/icons-react';
 import type { Mission } from '@/types';
+import { Layout } from '@/components/common/Layout';
 import { useFavorites } from '@/hooks/useConvex';
 import { MissionCard, MissionCardSkeleton } from '@/components/missions/MissionCard';
 
@@ -32,6 +33,7 @@ export function FavoritesClient() {
     favLoading || (favoriteMissionIds.length > 0 && favoriteMissions === undefined);
 
   return (
+    <Layout>
     <Container size="xl" py="md">
       <Stack gap="lg">
         <Stack gap={4}>
@@ -72,5 +74,6 @@ export function FavoritesClient() {
         )}
       </Stack>
     </Container>
+    </Layout>
   );
 }
