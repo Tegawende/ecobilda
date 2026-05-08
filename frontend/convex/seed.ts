@@ -1,4 +1,4 @@
-import { mutation, action, internalMutation } from "./_generated/server";
+import { mutation, action, internalMutation, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 
@@ -653,5 +653,123 @@ export const seedSampleMissions = mutation({
       status: "seeded",
       counts: { hosts: 2, places: 2, missions: 4, feedbacks: 2 },
     };
+  },
+});
+
+// ============================================
+// uploadSeedImages — fetch seed images from the frontend public folder
+// (e.g. `/projects/1/image_1.png`) and upload them into Convex Storage
+// for the seeded projects.
+//
+// Idempotent: skips projects that already have images.
+//
+// Usage:
+//   npx convex run seed:uploadSeedImages
+//   npx convex run seed:uploadSeedImages '{"frontendUrl":"https://ecobilda.org"}'
+// ============================================
+
+const SEED_IMAGE_MAP: Array<{ title: string; folder: number; count: number }> = [
+  { title: "Le Domaine des Sources", folder: 1, count: 5 },
+  { title: "Ferme rénovée du Sud", folder: 2, count: 5 },
+];
+
+export const _listSeedProjectsWithImageStatus = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const results: Array<{
+      projectId: any;
+      title: string;
+      hasImages: boolean;
+    }> = [];
+    for (const entry of SEED_IMAGE_MAP) {
+      const project = await ctx.db
+        .query("projects")
+        .filter((q) => q.eq(q.field("title"), entry.title))
+        .first();
+      if (!project) continue;
+      const existing = await ctx.db
+        .query("projectImages")
+        .withIndex("by_project", (q: any) => q.eq("projectId", project._id))
+        .first();
+      results.push({
+        projectId: project._id,
+        title: project.title,
+        hasImages: !!existing,
+      });
+    }
+    return results;
+  },
+});
+
+export const _insertProjectImage = internalMutation({
+  args: {
+    projectId: v.id("projects"),
+    storageId: v.id("_storage"),
+    order: v.number(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.insert("projectImages", {
+      projectId: args.projectId,
+      storageId: args.storageId,
+      order: args.order,
+    });
+  },
+});
+
+export const uploadSeedImages = action({
+  args: { frontendUrl: v.optional(v.string()) },
+  handler: async (
+    ctx,
+    args
+  ): Promise<{
+    status: string;
+    uploaded: number;
+    skipped: number;
+    errors: string[];
+  }> => {
+    const frontendUrl =
+      args.frontendUrl ?? process.env.FRONTEND_URL ?? "http://localhost:3000";
+
+    const projects: Array<{ projectId: any; title: string; hasImages: boolean }> =
+      await ctx.runQuery(internal.seed._listSeedProjectsWithImageStatus, {});
+
+    let uploaded = 0;
+    let skipped = 0;
+    const errors: string[] = [];
+
+    for (const entry of SEED_IMAGE_MAP) {
+      const match = projects.find((p) => p.title === entry.title);
+      if (!match) {
+        errors.push(`Project not found: ${entry.title}`);
+        continue;
+      }
+      if (match.hasImages) {
+        skipped += entry.count;
+        continue;
+      }
+
+      for (let i = 1; i <= entry.count; i++) {
+        const url = `${frontendUrl}/projects/${entry.folder}/image_${i}.png`;
+        try {
+          const res = await fetch(url);
+          if (!res.ok) {
+            errors.push(`Fetch ${url} → ${res.status}`);
+            continue;
+          }
+          const blob = await res.blob();
+          const storageId = await ctx.storage.store(blob);
+          await ctx.runMutation(internal.seed._insertProjectImage, {
+            projectId: match.projectId,
+            storageId,
+            order: i - 1,
+          });
+          uploaded++;
+        } catch (e: any) {
+          errors.push(`Error on ${url}: ${e?.message ?? String(e)}`);
+        }
+      }
+    }
+
+    return { status: "done", uploaded, skipped, errors };
   },
 });
