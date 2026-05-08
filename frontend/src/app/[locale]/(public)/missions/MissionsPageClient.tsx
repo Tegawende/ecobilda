@@ -12,6 +12,7 @@ import {
   Button,
   Grid,
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconList, IconMap } from '@tabler/icons-react';
 import { Layout } from '@/components/common/Layout';
 import { useMissions, useMissionsMapData, useFavorites } from '@/hooks/useConvex';
@@ -27,6 +28,8 @@ import type { Mission, MissionMapPoint } from '@/types';
 export function MissionsPageClient() {
   const t = useTranslations();
   const locale = useLocale();
+  // Default to desktop during SSR so the map renders on first paint for desktop users.
+  const isDesktop = useMediaQuery('(min-width: 1024px)', true);
   const [filters, setFilters] = useState<MissionFiltersState>(initialMissionFilters);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -100,12 +103,11 @@ export function MissionsPageClient() {
     );
   }, [visiblePoints, mapBounds]);
 
-  // Missions visible in list = filtered + clipped by current map bounds
   const missionsForList = useMemo(() => {
-    if (!mapBounds) return filteredMissions;
+    if (!mapBounds || !isDesktop) return filteredMissions;
     const visIds = new Set(visiblePointsInBounds.map((p) => p._id));
     return filteredMissions.filter((m) => visIds.has(m._id));
-  }, [filteredMissions, mapBounds, visiblePointsInBounds]);
+  }, [filteredMissions, mapBounds, visiblePointsInBounds, isDesktop]);
 
   useEffect(() => {
     if (selectedId) {
@@ -120,6 +122,10 @@ export function MissionsPageClient() {
     }
   }, [filters.location]);
 
+  // Layout decisions
+  const showList = isDesktop || !mobileShowMap;
+  const showMap = isDesktop || mobileShowMap;
+
   return (
     <Layout>
       <MissionFilters
@@ -128,137 +134,146 @@ export function MissionsPageClient() {
         onLocationSelect={(lat, lng) => mapRef.current?.flyTo(lat, lng)}
       />
 
-      {/* Split layout: list (left) + map (right). Map always visible on desktop. */}
       <Box
         style={{
           display: 'flex',
-          height: 'calc(100vh - 64px - 56px)', // 64 navbar + 56 filters
+          flexDirection: 'row',
+          height: 'calc(100vh - 64px - 56px)',
+          overflow: 'hidden',
         }}
       >
         {/* List side */}
-        <Box
-          className={mobileShowMap ? 'hidden lg:flex' : 'flex'}
-          style={{
-            flexDirection: 'column',
-            flex: '1 1 auto',
-            width: '100%',
-            maxWidth: '100%',
-            overflow: 'hidden',
-            backgroundColor: 'white',
-            borderRight: '1px solid var(--mantine-color-gray-2)',
-          }}
-          w={{ base: '100%', lg: '55%', xl: '52%' }}
-        >
-          <Box px="md" py="xs" style={{ borderBottom: '1px solid #f3f4f6' }}>
-            <Text size="xs" fw={500} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
-              {missionsForList.length}{' '}
-              {missionsForList.length <= 1 ? t('missions.foundSingle') : t('missions.found', { count: missionsForList.length })}
-            </Text>
-          </Box>
+        {showList && (
+          <Box
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flex: isDesktop ? '0 0 55%' : '1 1 100%',
+              width: isDesktop ? '55%' : '100%',
+              maxWidth: isDesktop ? '55%' : '100%',
+              minWidth: 0,
+              backgroundColor: 'white',
+              borderRight: isDesktop ? '1px solid var(--mantine-color-gray-2)' : 'none',
+              overflow: 'hidden',
+            }}
+          >
+            <Box px="md" py="xs" style={{ borderBottom: '1px solid #f3f4f6', flexShrink: 0 }}>
+              <Text size="xs" fw={500} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+                {missionsForList.length}{' '}
+                {missionsForList.length <= 1
+                  ? t('missions.foundSingle')
+                  : t('missions.found', { count: missionsForList.length })}
+              </Text>
+            </Box>
 
-          <Box style={{ flex: 1, overflowY: 'auto' }}>
-            {isLoading ? (
-              <Box p="md">
-                <Grid gutter="md">
-                  {[...Array(6)].map((_, i) => (
-                    <Grid.Col key={i} span={{ base: 12, sm: 6, xl: 4 }}>
-                      <MissionCardSkeleton />
-                    </Grid.Col>
-                  ))}
-                </Grid>
-              </Box>
-            ) : missionsForList.length === 0 ? (
-              <Center h="100%">
-                <Stack align="center" py="xl" px="lg" ta="center" gap="md">
-                  <Text c="dimmed">{t('missions.empty')}</Text>
-                  <Button variant="subtle" onClick={() => setFilters(initialMissionFilters)}>
-                    {t('common.reset')}
-                  </Button>
-                </Stack>
-              </Center>
-            ) : (
-              <Box p="md">
-                <Grid gutter="md">
-                  {missionsForList.map((mission) => (
-                    <Grid.Col key={mission._id} span={{ base: 12, sm: 6, xl: 4 }}>
-                      <MissionCard
-                        mission={mission}
-                        isHovered={hoveredId === mission._id}
-                        onHover={(m) => setHoveredId(m?._id ?? null)}
-                        initialFavorite={(favoriteMissionIds as string[]).includes(mission._id)}
-                      />
-                    </Grid.Col>
-                  ))}
-                </Grid>
-              </Box>
-            )}
+            <Box style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+              {isLoading ? (
+                <Box p="md">
+                  <Grid gutter="md">
+                    {[...Array(6)].map((_, i) => (
+                      <Grid.Col key={i} span={{ base: 12, sm: 6, xl: 4 }}>
+                        <MissionCardSkeleton />
+                      </Grid.Col>
+                    ))}
+                  </Grid>
+                </Box>
+              ) : missionsForList.length === 0 ? (
+                <Center h="100%">
+                  <Stack align="center" py="xl" px="lg" ta="center" gap="md">
+                    <Text c="dimmed">{t('missions.empty')}</Text>
+                    <Button variant="subtle" onClick={() => setFilters(initialMissionFilters)}>
+                      {t('common.reset')}
+                    </Button>
+                  </Stack>
+                </Center>
+              ) : (
+                <Box p="md">
+                  <Grid gutter="md">
+                    {missionsForList.map((mission) => (
+                      <Grid.Col key={mission._id} span={{ base: 12, sm: 6, xl: 4 }}>
+                        <MissionCard
+                          mission={mission}
+                          isHovered={hoveredId === mission._id}
+                          onHover={(m) => setHoveredId(m?._id ?? null)}
+                          initialFavorite={(favoriteMissionIds as string[]).includes(mission._id)}
+                        />
+                      </Grid.Col>
+                    ))}
+                  </Grid>
+                </Box>
+              )}
+            </Box>
           </Box>
-        </Box>
+        )}
 
         {/* Map side */}
-        <Box
-          className={mobileShowMap ? 'flex' : 'hidden lg:flex'}
-          style={{
-            flex: '1 1 auto',
-            position: 'relative',
-            minHeight: 0,
-          }}
-        >
-          <MissionsMap
-            ref={mapRef}
-            points={visiblePoints}
-            allPoints={visiblePoints}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            onBoundsChange={setMapBounds}
-            hoveredId={hoveredId}
-            locale={locale}
-          />
-          {isLoading && (
-            <div
-              style={{
-                position: 'absolute',
-                top: 16,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                background: 'white',
-                borderRadius: 999,
-                padding: '6px 14px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                zIndex: 10,
-              }}
-            >
-              <Loader size="xs" />
-              <Text size="xs" c="dimmed" fw={500}>
-                {t('common.loading')}
-              </Text>
-            </div>
-          )}
-        </Box>
+        {showMap && (
+          <Box
+            style={{
+              flex: isDesktop ? '1 1 45%' : '1 1 100%',
+              width: isDesktop ? '45%' : '100%',
+              minWidth: 0,
+              minHeight: 0,
+              position: 'relative',
+            }}
+          >
+            <MissionsMap
+              ref={mapRef}
+              points={visiblePoints}
+              allPoints={visiblePoints}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+              onBoundsChange={setMapBounds}
+              hoveredId={hoveredId}
+              locale={locale}
+            />
+            {isLoading && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 16,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  background: 'white',
+                  borderRadius: 999,
+                  padding: '6px 14px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  zIndex: 10,
+                }}
+              >
+                <Loader size="xs" />
+                <Text size="xs" c="dimmed" fw={500}>
+                  {t('common.loading')}
+                </Text>
+              </div>
+            )}
+          </Box>
+        )}
       </Box>
 
       {/* Mobile-only floating toggle */}
-      <Button
-        radius="xl"
-        size="md"
-        color="dark"
-        leftSection={mobileShowMap ? <IconList size={18} /> : <IconMap size={18} />}
-        onClick={() => setMobileShowMap((m) => !m)}
-        className="lg:hidden"
-        style={{
-          position: 'fixed',
-          bottom: 24,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 30,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-        }}
-      >
-        {mobileShowMap ? t('missions.view.list') : t('missions.view.map')}
-      </Button>
+      {!isDesktop && (
+        <Button
+          radius="xl"
+          size="md"
+          color="dark"
+          leftSection={mobileShowMap ? <IconList size={18} /> : <IconMap size={18} />}
+          onClick={() => setMobileShowMap((m) => !m)}
+          style={{
+            position: 'fixed',
+            bottom: 24,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 30,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+          }}
+        >
+          {mobileShowMap ? t('missions.view.list') : t('missions.view.map')}
+        </Button>
+      )}
     </Layout>
   );
 }
