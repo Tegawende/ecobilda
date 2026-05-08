@@ -70,14 +70,23 @@ export function Navbar() {
           </Link>
 
           <Group gap="xs">
-            {/* "Learn from others" link — hidden on landing page */}
+            {/* "Learn from others" — hidden on landing page; pill button when authenticated */}
             {!isHomePage && (
-              <Link
-                href="/learn"
-                className="text-sm font-medium px-3 py-2 rounded-full transition-all hidden sm:block hover:bg-gray-100 text-gray-700"
-              >
-                {t('nav.learnFromOthers')}
-              </Link>
+              isAuthenticated ? (
+                <Link
+                  href="/learn"
+                  className="text-sm font-semibold px-5 py-2 rounded-full transition-all hidden sm:block border border-gray-300 hover:border-gray-400 hover:bg-gray-50 text-gray-800"
+                >
+                  {t('nav.learnFromOthers')}
+                </Link>
+              ) : (
+                <Link
+                  href="/learn"
+                  className="text-sm font-medium px-3 py-2 rounded-full transition-all hidden sm:block hover:bg-gray-100 text-gray-700"
+                >
+                  {t('nav.learnFromOthers')}
+                </Link>
+              )
             )}
 
             {/* "Browse Missions" button - visible to all */}
