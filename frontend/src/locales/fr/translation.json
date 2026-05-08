@@ -1643,7 +1643,8 @@
     "deleteConfirmTitle": "Supprimer la mission ?",
     "deleteConfirmText": "Cette action supprimera définitivement la mission \"{title}\".",
     "tabs": {
-      "missions": "Missions"
+      "missions": "Missions",
+      "all": "Toutes"
     }
   },
   "myPlaces": {
