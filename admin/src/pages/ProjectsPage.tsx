@@ -210,7 +210,7 @@ function ProjectCard({
         {/* Content - Right Side */}
         <CardContent className="flex-1 p-4 flex flex-col">
           <div className="flex items-start justify-between gap-2 mb-2">
-            <h3 className="font-bold text-gray-900 text-lg flex-1">
+            <h3 className="font-bold text-gray-900 dark:text-gray-100 text-lg flex-1">
               {project.title}
             </h3>
             {/* Status Badge */}
