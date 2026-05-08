@@ -1557,8 +1557,11 @@
     },
     "view": {
       "split": "List + map",
-      "grid": "List"
-    }
+      "grid": "List",
+      "list": "List",
+      "map": "Map"
+    },
+    "foundSingle": "mission found"
   },
   "missionDetail": {
     "notFound": "Mission not found",

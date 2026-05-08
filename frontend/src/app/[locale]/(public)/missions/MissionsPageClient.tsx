@@ -10,10 +10,9 @@ import {
   Loader,
   Center,
   Button,
-  SegmentedControl,
   Grid,
 } from '@mantine/core';
-import { IconMap, IconLayoutGrid } from '@tabler/icons-react';
+import { IconList, IconMap } from '@tabler/icons-react';
 import { Layout } from '@/components/common/Layout';
 import { useMissions, useMissionsMapData, useFavorites } from '@/hooks/useConvex';
 import { MissionCard, MissionCardSkeleton } from '@/components/missions/MissionCard';
@@ -25,19 +24,16 @@ import {
 import { MissionsMap, type MissionsMapRef, type MapBounds } from '@/components/missions/MissionsMap';
 import type { Mission, MissionMapPoint } from '@/types';
 
-type ViewMode = 'split' | 'grid';
-
 export function MissionsPageClient() {
   const t = useTranslations();
   const locale = useLocale();
   const [filters, setFilters] = useState<MissionFiltersState>(initialMissionFilters);
-  const [viewMode, setViewMode] = useState<ViewMode>('split');
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mapBounds, setMapBounds] = useState<MapBounds | null>(null);
+  const [mobileShowMap, setMobileShowMap] = useState(false);
   const mapRef = useRef<MissionsMapRef | null>(null);
 
-  // Backend filters supported by api.missions.list
   const backendFilters = useMemo(
     () => ({
       type: filters.type === 'all' ? undefined : filters.type,
@@ -57,7 +53,6 @@ export function MissionsPageClient() {
   const { mapData } = useMissionsMapData();
   const { favoriteMissionIds } = useFavorites();
 
-  // Apply frontend-only filters (amenities, hours/days/participants ranges, location radius)
   const filteredMissions: Mission[] = useMemo(() => {
     let list = rawMissions as Mission[];
 
@@ -77,7 +72,6 @@ export function MissionsPageClient() {
     );
 
     if (filters.location) {
-      // Approximate radius: filter to within ~50km
       const RADIUS_DEG = 0.5;
       const { lat, lng } = filters.location;
       list = list.filter((m) => {
@@ -90,15 +84,13 @@ export function MissionsPageClient() {
     return list;
   }, [rawMissions, filters]);
 
-  // Map points: only those visible in the current filtered list
   const visiblePoints: MissionMapPoint[] = useMemo(() => {
     const ids = new Set(filteredMissions.map((m) => m._id));
     return (mapData as MissionMapPoint[]).filter((p) => ids.has(p._id));
   }, [filteredMissions, mapData]);
 
-  // Apply map bounds clipping when user pans
   const visiblePointsInBounds = useMemo(() => {
-    if (!mapBounds || viewMode !== 'split') return visiblePoints;
+    if (!mapBounds) return visiblePoints;
     return visiblePoints.filter(
       (p) =>
         p.latitude >= mapBounds.south &&
@@ -106,14 +98,14 @@ export function MissionsPageClient() {
         p.longitude >= mapBounds.west &&
         p.longitude <= mapBounds.east
     );
-  }, [visiblePoints, mapBounds, viewMode]);
+  }, [visiblePoints, mapBounds]);
 
-  // Missions visible in the list = filtered + (clipped to map bounds when split view)
+  // Missions visible in list = filtered + clipped by current map bounds
   const missionsForList = useMemo(() => {
-    if (viewMode !== 'split' || !mapBounds) return filteredMissions;
+    if (!mapBounds) return filteredMissions;
     const visIds = new Set(visiblePointsInBounds.map((p) => p._id));
     return filteredMissions.filter((m) => visIds.has(m._id));
-  }, [filteredMissions, viewMode, mapBounds, visiblePointsInBounds]);
+  }, [filteredMissions, mapBounds, visiblePointsInBounds]);
 
   useEffect(() => {
     if (selectedId) {
@@ -122,7 +114,6 @@ export function MissionsPageClient() {
     }
   }, [selectedId, visiblePoints]);
 
-  // Reset map view when location filter changes
   useEffect(() => {
     if (filters.location) {
       mapRef.current?.flyTo(filters.location.lat, filters.location.lng);
@@ -137,47 +128,37 @@ export function MissionsPageClient() {
         onLocationSelect={(lat, lng) => mapRef.current?.flyTo(lat, lng)}
       />
 
-      <Box px={{ base: 'md', sm: 'lg' }} py="md">
-        <Group justify="space-between" align="center" mb="md" wrap="wrap">
-          <Stack gap={0}>
-            <Text fw={700} size="xl">
-              {t('missions.title')}
+      {/* Split layout: list (left) + map (right). Map always visible on desktop. */}
+      <Box
+        style={{
+          display: 'flex',
+          height: 'calc(100vh - 64px - 56px)', // 64 navbar + 56 filters
+        }}
+      >
+        {/* List side */}
+        <Box
+          className={mobileShowMap ? 'hidden lg:flex' : 'flex'}
+          style={{
+            flexDirection: 'column',
+            flex: '1 1 auto',
+            width: '100%',
+            maxWidth: '100%',
+            overflow: 'hidden',
+            backgroundColor: 'white',
+            borderRight: '1px solid var(--mantine-color-gray-2)',
+          }}
+          w={{ base: '100%', lg: '55%', xl: '52%' }}
+        >
+          <Box px="md" py="xs" style={{ borderBottom: '1px solid #f3f4f6' }}>
+            <Text size="xs" fw={500} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+              {missionsForList.length}{' '}
+              {missionsForList.length <= 1 ? t('missions.foundSingle') : t('missions.found', { count: missionsForList.length })}
             </Text>
-            <Text size="sm" c="dimmed">
-              {isLoading
-                ? t('common.loading')
-                : t('missions.found', { count: missionsForList.length })}
-            </Text>
-          </Stack>
-          <SegmentedControl
-            size="xs"
-            value={viewMode}
-            onChange={(v) => setViewMode(v as ViewMode)}
-            data={[
-              {
-                value: 'split',
-                label: (
-                  <Group gap={6} wrap="nowrap">
-                    <IconMap size={14} /> <span>{t('missions.view.split')}</span>
-                  </Group>
-                ) as any,
-              },
-              {
-                value: 'grid',
-                label: (
-                  <Group gap={6} wrap="nowrap">
-                    <IconLayoutGrid size={14} /> <span>{t('missions.view.grid')}</span>
-                  </Group>
-                ) as any,
-              },
-            ]}
-          />
-        </Group>
+          </Box>
 
-        {viewMode === 'split' ? (
-          <Grid gutter="md">
-            <Grid.Col span={{ base: 12, lg: 7 }}>
-              {isLoading ? (
+          <Box style={{ flex: 1, overflowY: 'auto' }}>
+            {isLoading ? (
+              <Box p="md">
                 <Grid gutter="md">
                   {[...Array(6)].map((_, i) => (
                     <Grid.Col key={i} span={{ base: 12, sm: 6, xl: 4 }}>
@@ -185,16 +166,18 @@ export function MissionsPageClient() {
                     </Grid.Col>
                   ))}
                 </Grid>
-              ) : missionsForList.length === 0 ? (
-                <Center h={300}>
-                  <Stack align="center">
-                    <Text c="dimmed">{t('missions.empty')}</Text>
-                    <Button variant="subtle" onClick={() => setFilters(initialMissionFilters)}>
-                      {t('common.reset')}
-                    </Button>
-                  </Stack>
-                </Center>
-              ) : (
+              </Box>
+            ) : missionsForList.length === 0 ? (
+              <Center h="100%">
+                <Stack align="center" py="xl" px="lg" ta="center" gap="md">
+                  <Text c="dimmed">{t('missions.empty')}</Text>
+                  <Button variant="subtle" onClick={() => setFilters(initialMissionFilters)}>
+                    {t('common.reset')}
+                  </Button>
+                </Stack>
+              </Center>
+            ) : (
+              <Box p="md">
                 <Grid gutter="md">
                   {missionsForList.map((mission) => (
                     <Grid.Col key={mission._id} span={{ base: 12, sm: 6, xl: 4 }}>
@@ -207,66 +190,75 @@ export function MissionsPageClient() {
                     </Grid.Col>
                   ))}
                 </Grid>
-              )}
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, lg: 5 }} visibleFrom="lg">
-              <div style={{ position: 'sticky', top: 144, height: 'calc(100vh - 160px)' }}>
-                <MissionsMap
-                  ref={mapRef}
-                  points={visiblePoints}
-                  allPoints={visiblePoints}
-                  selectedId={selectedId}
-                  onSelect={setSelectedId}
-                  onBoundsChange={setMapBounds}
-                  hoveredId={hoveredId}
-                  locale={locale}
-                />
-              </div>
-            </Grid.Col>
-          </Grid>
-        ) : (
-          // Grid view (no map)
-          <>
-            {isLoading ? (
-              <Grid gutter="md">
-                {[...Array(8)].map((_, i) => (
-                  <Grid.Col key={i} span={{ base: 12, sm: 6, lg: 4, xl: 3 }}>
-                    <MissionCardSkeleton />
-                  </Grid.Col>
-                ))}
-              </Grid>
-            ) : filteredMissions.length === 0 ? (
-              <Center h={300}>
-                <Stack align="center">
-                  <Text c="dimmed">{t('missions.empty')}</Text>
-                  <Button variant="subtle" onClick={() => setFilters(initialMissionFilters)}>
-                    {t('common.reset')}
-                  </Button>
-                </Stack>
-              </Center>
-            ) : (
-              <Grid gutter="md">
-                {filteredMissions.map((mission) => (
-                  <Grid.Col key={mission._id} span={{ base: 12, sm: 6, lg: 4, xl: 3 }}>
-                    <MissionCard
-                      mission={mission}
-                      isHovered={hoveredId === mission._id}
-                      onHover={(m) => setHoveredId(m?._id ?? null)}
-                      initialFavorite={(favoriteMissionIds as string[]).includes(mission._id)}
-                    />
-                  </Grid.Col>
-                ))}
-              </Grid>
+              </Box>
             )}
-          </>
-        )}
+          </Box>
+        </Box>
 
-        {isLoading && (
-          <Center mt="md">
-            <Loader size="sm" />
-          </Center>
-        )}
+        {/* Map side */}
+        <Box
+          className={mobileShowMap ? 'flex' : 'hidden lg:flex'}
+          style={{
+            flex: '1 1 auto',
+            position: 'relative',
+            minHeight: 0,
+          }}
+        >
+          <MissionsMap
+            ref={mapRef}
+            points={visiblePoints}
+            allPoints={visiblePoints}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            onBoundsChange={setMapBounds}
+            hoveredId={hoveredId}
+            locale={locale}
+          />
+          {isLoading && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 16,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: 'white',
+                borderRadius: 999,
+                padding: '6px 14px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                zIndex: 10,
+              }}
+            >
+              <Loader size="xs" />
+              <Text size="xs" c="dimmed" fw={500}>
+                {t('common.loading')}
+              </Text>
+            </div>
+          )}
+        </Box>
       </Box>
+
+      {/* Mobile-only floating toggle */}
+      <Button
+        radius="xl"
+        size="md"
+        color="dark"
+        leftSection={mobileShowMap ? <IconList size={18} /> : <IconMap size={18} />}
+        onClick={() => setMobileShowMap((m) => !m)}
+        className="lg:hidden"
+        style={{
+          position: 'fixed',
+          bottom: 24,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 30,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+        }}
+      >
+        {mobileShowMap ? t('missions.view.list') : t('missions.view.map')}
+      </Button>
     </Layout>
   );
 }

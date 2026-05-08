@@ -1557,8 +1557,11 @@
     },
     "view": {
       "split": "Liste + carte",
-      "grid": "Liste"
-    }
+      "grid": "Liste",
+      "list": "Liste",
+      "map": "Carte"
+    },
+    "foundSingle": "mission trouvée"
   },
   "missionDetail": {
     "notFound": "Mission introuvable",

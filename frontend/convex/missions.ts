@@ -339,22 +339,50 @@ export const getMapData = query({
       if (!project || project.status !== "ACTIVE" || project.flaggedCount >= 3) continue;
       if (!project.addressId) continue;
       const addr = await ctx.db.get(project.addressId);
-      if (addr && addr.latitude && addr.longitude) {
-        result.push({
-          _id: m._id,
-          title: m.title,
-          type: m.type,
-          difficulty: m.difficulty,
-          poste: m.poste,
-          startDate: m.startDate,
-          endDate: m.endDate,
-          pricingMode: m.pricingMode,
-          priceEUR: m.priceEUR,
-          latitude: addr.latitude,
-          longitude: addr.longitude,
-          city: addr.city,
-        });
+      if (!addr || !addr.latitude || !addr.longitude) continue;
+      const country = addr.countryId ? await ctx.db.get(addr.countryId) : null;
+
+      // Mission images (resolve URLs)
+      const rawImages = await ctx.db
+        .query("missionImages")
+        .withIndex("by_mission", (q) => q.eq("missionId", m._id))
+        .collect();
+      const images: string[] = [];
+      // Cover from coverImageId first
+      if (m.coverImageId) {
+        const u = await ctx.storage.getUrl(m.coverImageId);
+        if (u) images.push(u);
       }
+      for (const img of rawImages) {
+        if (img.url) images.push(img.url);
+        else if (img.storageId) {
+          const u = await ctx.storage.getUrl(img.storageId);
+          if (u) images.push(u);
+        }
+      }
+
+      result.push({
+        _id: m._id,
+        title: m.title,
+        type: m.type,
+        difficulty: m.difficulty,
+        poste: m.poste,
+        startDate: m.startDate,
+        endDate: m.endDate,
+        pricingMode: m.pricingMode,
+        priceEUR: m.priceEUR,
+        latitude: addr.latitude,
+        longitude: addr.longitude,
+        city: addr.city,
+        countryName: country?.name ?? null,
+        maxParticipants: m.maxParticipants,
+        hoursPerDay: m.hoursPerDay,
+        daysPerWeek: m.daysPerWeek,
+        internetProvided: project.internetProvided,
+        familyFriendly: project.familyFriendly,
+        petsAllowed: project.petsAllowed,
+        images,
+      });
     }
     return result;
   },
