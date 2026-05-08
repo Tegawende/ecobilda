@@ -1630,7 +1630,14 @@
       "endDateRequired": "End date required",
       "endAfterStart": "End date must be after start date",
       "priceRequired": "Price must be > 0"
-    }
+    },
+    "placeSection": "Place",
+    "missionSection": "Mission",
+    "useExistingPlace": "Use an existing place",
+    "createNewPlace": "Create a new place",
+    "newPlaceHint": "Describe your place. It will be submitted for admin approval before this mission can be published.",
+    "successPendingPlace": "Mission created as draft. Your place must be approved by an admin before you can publish.",
+    "placePendingNotice": "This place is pending approval. You can save the mission as draft, but it can only be published once the place is approved."
   },
   "myMissions": {
     "title": "My missions",

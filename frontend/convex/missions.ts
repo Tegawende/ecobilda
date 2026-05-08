@@ -480,13 +480,12 @@ export const create = mutation({
       throw new Error("endDate must be >= startDate.");
     }
 
-    // Verify project ownership and status
+    // Verify project ownership. Place validation status is checked at PUBLISH
+    // time (in setStatus), not at create time. This lets a host create a place
+    // and its first mission in one go, then publish once the place is approved.
     const project = await ctx.db.get(args.projectId);
     if (!project) throw new Error("Place not found.");
     if (project.ownerId !== user._id) throw new Error("Not authorized.");
-    if (project.status !== "ACTIVE") {
-      throw new Error("Your place must be approved by an admin before publishing missions.");
-    }
 
     // Resolve skill codes
     const allSkills = await ctx.db.query("skills").collect();
