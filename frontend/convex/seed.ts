@@ -773,3 +773,471 @@ export const uploadSeedImages = action({
     return { status: "done", uploaded, skipped, errors };
   },
 });
+
+// ============================================
+// uploadMissionImages — fetch seed images from /projects/[folder]/image_N.png
+// and attach them to missions that have none. Used to populate gallery on
+// mission/learn detail pages.
+//
+// Usage:
+//   npx convex run seed:uploadMissionImages
+//   npx convex run seed:uploadMissionImages '{"frontendUrl":"https://ecobilda.org"}'
+// ============================================
+
+// Map mission title → seed image folder. Add entries here as new seed missions are created.
+const SEED_MISSION_IMAGE_MAP: Array<{ title: string; folder: number; count: number }> = [
+  { title: "Pose d'un mur en paille porteur", folder: 3, count: 5 },
+  { title: "Formation enduit terre intérieur — 3 jours intensifs", folder: 11, count: 5 },
+  { title: "Fondations drainantes — hérisson ventilé", folder: 20, count: 5 },
+  { title: "Toiture végétalisée extensive", folder: 21, count: 5 },
+];
+
+export const _listSeedMissionsWithImageStatus = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const results: Array<{ missionId: any; title: string; hasImages: boolean }> = [];
+    for (const entry of SEED_MISSION_IMAGE_MAP) {
+      const mission = await ctx.db
+        .query("missions")
+        .filter((q) => q.eq(q.field("title"), entry.title))
+        .first();
+      if (!mission) continue;
+      const existing = await ctx.db
+        .query("missionImages")
+        .withIndex("by_mission", (q: any) => q.eq("missionId", mission._id))
+        .first();
+      results.push({
+        missionId: mission._id,
+        title: mission.title,
+        hasImages: !!existing,
+      });
+    }
+    return results;
+  },
+});
+
+export const _insertMissionImage = internalMutation({
+  args: {
+    missionId: v.id("missions"),
+    storageId: v.id("_storage"),
+    order: v.number(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.insert("missionImages", {
+      missionId: args.missionId,
+      storageId: args.storageId,
+      order: args.order,
+    });
+  },
+});
+
+export const uploadMissionImages = action({
+  args: { frontendUrl: v.optional(v.string()) },
+  handler: async (
+    ctx,
+    args
+  ): Promise<{
+    status: string;
+    uploaded: number;
+    skipped: number;
+    errors: string[];
+  }> => {
+    const frontendUrl =
+      args.frontendUrl ?? process.env.FRONTEND_URL ?? "http://localhost:3000";
+
+    const missions: Array<{ missionId: any; title: string; hasImages: boolean }> =
+      await ctx.runQuery(internal.seed._listSeedMissionsWithImageStatus, {});
+
+    let uploaded = 0;
+    let skipped = 0;
+    const errors: string[] = [];
+
+    for (const entry of SEED_MISSION_IMAGE_MAP) {
+      const match = missions.find((m) => m.title === entry.title);
+      if (!match) {
+        errors.push(`Mission not found: ${entry.title}`);
+        continue;
+      }
+      if (match.hasImages) {
+        skipped += entry.count;
+        continue;
+      }
+      for (let i = 1; i <= entry.count; i++) {
+        const url = `${frontendUrl}/projects/${entry.folder}/image_${i}.png`;
+        try {
+          const res = await fetch(url);
+          if (!res.ok) {
+            errors.push(`Fetch ${url} → ${res.status}`);
+            continue;
+          }
+          const blob = await res.blob();
+          const storageId = await ctx.storage.store(blob);
+          await ctx.runMutation(internal.seed._insertMissionImage, {
+            missionId: match.missionId,
+            storageId,
+            order: i - 1,
+          });
+          uploaded++;
+        } catch (e: any) {
+          errors.push(`Error on ${url}: ${e?.message ?? String(e)}`);
+        }
+      }
+    }
+
+    return { status: "done", uploaded, skipped, errors };
+  },
+});
+
+// ============================================
+// seedMissionLearnDemo — for each COMPLETED mission, create 2 helper users
+// + ACCEPTED participation requests + 2 helper photos with captions each
+// (so /learn/[id] pages have realistic helper testimonials).
+//
+// Idempotent: skips per-mission if helper photos already exist.
+//
+// Usage:
+//   npx convex run seed:seedMissionLearnDemo
+//   npx convex run seed:seedMissionLearnDemo '{"frontendUrl":"https://ecobilda.org"}'
+// ============================================
+
+const HELPER_DEMO_FOLDERS = [22, 10] as const; // 22 = Sophie, 10 = Lucas
+
+export const _ensureHelperUser = internalMutation({
+  args: {
+    email: v.string(),
+    firstName: v.string(),
+    lastName: v.string(),
+    bio: v.string(),
+    languageCodes: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .first();
+    if (existing) return existing._id;
+    const langs = await ctx.db.query("languages").collect();
+    const langIds = args.languageCodes
+      .map((c) => langs.find((l) => l.code === c)?._id)
+      .filter(Boolean) as any[];
+    return await ctx.db.insert("users", {
+      email: args.email,
+      firstName: args.firstName,
+      lastName: args.lastName,
+      bio: args.bio,
+      languageIds: langIds,
+      skillIds: [],
+      emailVerified: true,
+      hasPassword: false,
+      emailNotifications: true,
+      newsletter: false,
+      inAppNotifications: true,
+      notificationLanguage: "fr",
+      isProfileVisible: true,
+      averageRating: 0,
+      reviewCount: 0,
+      isStaff: false,
+      isSuperuser: false,
+      isActive: true,
+    });
+  },
+});
+
+export const _listCompletedMissionsForDemo = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const missions = await ctx.db
+      .query("missions")
+      .withIndex("by_status", (q: any) => q.eq("status", "COMPLETED"))
+      .collect();
+    const results: Array<{
+      missionId: any;
+      ownerId: any;
+      title: string;
+      hasHelperPhotos: boolean;
+    }> = [];
+    for (const m of missions) {
+      const existing = await ctx.db
+        .query("helperMissionPhotos")
+        .withIndex("by_mission", (q: any) => q.eq("missionId", m._id))
+        .first();
+      results.push({
+        missionId: m._id,
+        ownerId: m.ownerId,
+        title: m.title,
+        hasHelperPhotos: !!existing,
+      });
+    }
+    return results;
+  },
+});
+
+export const _ensureAcceptedParticipation = internalMutation({
+  args: {
+    missionId: v.id("missions"),
+    volunteerId: v.id("users"),
+    motivation: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("participationRequests")
+      .withIndex("by_volunteer", (q: any) => q.eq("volunteerId", args.volunteerId))
+      .filter((q) => q.eq(q.field("missionId"), args.missionId))
+      .first();
+    if (existing) {
+      if (existing.status !== "ACCEPTED") {
+        await ctx.db.patch(existing._id, { status: "ACCEPTED", respondedAt: Date.now() });
+      }
+      return existing._id;
+    }
+    return await ctx.db.insert("participationRequests", {
+      volunteerId: args.volunteerId,
+      missionId: args.missionId,
+      status: "ACCEPTED",
+      motivation: args.motivation,
+      respondedAt: Date.now(),
+    });
+  },
+});
+
+export const _insertHelperMissionPhoto = internalMutation({
+  args: {
+    missionId: v.id("missions"),
+    helperId: v.id("users"),
+    storageId: v.id("_storage"),
+    isPublic: v.boolean(),
+    caption: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.insert("helperMissionPhotos", {
+      missionId: args.missionId,
+      helperId: args.helperId,
+      storageId: args.storageId,
+      isPublic: args.isPublic,
+      caption: args.caption,
+    });
+  },
+});
+
+export const _enrichFeedbackForMission = internalMutation({
+  args: {
+    missionId: v.id("missions"),
+    difficultiesText: v.string(),
+    learningsText: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const fb = await ctx.db
+      .query("missionFeedback")
+      .withIndex("by_mission", (q: any) => q.eq("missionId", args.missionId))
+      .first();
+    if (!fb) return;
+    await ctx.db.patch(fb._id, {
+      difficultiesText: args.difficultiesText,
+      learningsText: args.learningsText,
+    });
+  },
+});
+
+// Demo testimonials per mission title → 2 helpers each with 2 captions.
+const HELPER_TESTIMONIALS: Record<
+  string,
+  Array<{ helperIndex: 0 | 1; caption: string }>
+> = {
+  "Fondations drainantes — hérisson ventilé": [
+    {
+      helperIndex: 0,
+      caption:
+        "Sophie : première fois que je manipulais des pierres de cette taille. Marie nous a vraiment pris le temps d'expliquer le tri et le calage. Le nivellement laser m'a impressionnée.",
+    },
+    {
+      helperIndex: 0,
+      caption:
+        "Sophie : je repars avec l'envie de refaire ça chez mes parents pour leur cabane de jardin.",
+    },
+    {
+      helperIndex: 1,
+      caption:
+        "Lucas : super accueil, repas du jardin top. Le gros défi a été la pluie le 3e jour, on a dû bâcher les fouilles. Bonne leçon sur l'anticipation météo.",
+    },
+    {
+      helperIndex: 1,
+      caption:
+        "Lucas : la pose du géotextile + gravier de drainage est plus technique qu'on imagine, mais c'est devenu naturel après 2 jours.",
+    },
+  ],
+  "Toiture végétalisée extensive": [
+    {
+      helperIndex: 0,
+      caption:
+        "Sophie : projet hyper formateur. La membrane EPDM en grand format demande de la patience et 4 mains minimum. Belle ambiance avec Jean et l'équipe.",
+    },
+    {
+      helperIndex: 0,
+      caption:
+        "Sophie : on a planté les sedums en damier — je n'imaginais pas que ça prenait 6 mois pour vraiment couvrir.",
+    },
+    {
+      helperIndex: 1,
+      caption:
+        "Lucas : très content d'avoir pu monter sur la toiture en sécurité (Jean a installé une ligne de vie nickel). Le drainage avec les modules en plastique recyclé est ingénieux.",
+    },
+    {
+      helperIndex: 1,
+      caption:
+        "Lucas : pour ceux qui hésitent — ne pas sous-estimer le poids du substrat humide, prévoyez une structure costaud.",
+    },
+  ],
+  "Pose d'un mur en paille porteur": [
+    {
+      helperIndex: 0,
+      caption:
+        "Sophie : la compression des bottes au cric est un coup à prendre — Marie nous montre tout pas-à-pas. Le mur monte vite à 4.",
+    },
+    {
+      helperIndex: 1,
+      caption:
+        "Lucas : pas de mauvaise surprise sur les outils, tout était sur place. Belle yourte pour dormir.",
+    },
+  ],
+  "Formation enduit terre intérieur — 3 jours intensifs": [
+    {
+      helperIndex: 0,
+      caption:
+        "Sophie : formation très complète, on a fait plusieurs ratios pour comprendre la différence. Repas du midi excellents.",
+    },
+    {
+      helperIndex: 1,
+      caption:
+        "Lucas : je reviendrai pour la formation enduit chaux. Niveau pédagogique au top.",
+    },
+  ],
+};
+
+const HOST_FEEDBACK_OVERRIDES: Record<
+  string,
+  { difficultiesText: string; learningsText: string }
+> = {
+  "Fondations drainantes — hérisson ventilé": {
+    difficultiesText:
+      "On a sous-estimé le volume de pierres nécessaires en zone argileuse — il a fallu deux livraisons supplémentaires. La pluie au jour 3 nous a forcés à bâcher et patienter une demi-journée. Les helpers ont été super patients.",
+    learningsText:
+      "Toujours commander +20% de pierres en zone humide. Nivellement précis avant pose (laser indispensable). Pente d'écoulement minimum 1 cm/m, sinon stagnation à 6 mois. La pose en 2 équipes (tri / calage) double la cadence.",
+  },
+  "Toiture végétalisée extensive": {
+    difficultiesText:
+      "L'étanchéité EPDM en grand format est plus délicate sur les angles que ce que je pensais — on a dû refaire 2 jonctions le 4e jour. Le poids du substrat humide a aussi forcé un renforcement de panne qu'on n'avait pas anticipé.",
+    learningsText:
+      "Prévoir 30% de marge sur le volume de substrat. Tester l'étanchéité à l'eau avant de poser le drainage et le substrat. Les sedums ont besoin de 4 à 6 mois pour couvrir : prévenir les helpers que le rendu final n'est pas immédiat. Toujours valider la portance de la charpente sous charge humide saturée.",
+  },
+};
+
+export const seedMissionLearnDemo = action({
+  args: { frontendUrl: v.optional(v.string()) },
+  handler: async (
+    ctx,
+    args
+  ): Promise<{
+    status: string;
+    uploaded: number;
+    skipped: number;
+    missionsTouched: number;
+    errors: string[];
+  }> => {
+    const frontendUrl =
+      args.frontendUrl ?? process.env.FRONTEND_URL ?? "http://localhost:3000";
+
+    // 1. Ensure 2 helper users exist
+    const sophieId: any = await ctx.runMutation(internal.seed._ensureHelperUser, {
+      email: "sophie@ecobilda.demo",
+      firstName: "Sophie",
+      lastName: "Lefèvre",
+      bio: "Architecte en reconversion vers l'éco-construction. Je cherche à mettre les mains dans la matière.",
+      languageCodes: ["fr", "en"],
+    });
+    const lucasId: any = await ctx.runMutation(internal.seed._ensureHelperUser, {
+      email: "lucas@ecobilda.demo",
+      firstName: "Lucas",
+      lastName: "Bernard",
+      bio: "Ébéniste curieux des techniques traditionnelles. WWOOFer chronique.",
+      languageCodes: ["fr", "es"],
+    });
+    const helperIds = [sophieId, lucasId];
+
+    // 2. Iterate completed missions
+    const completed: Array<{
+      missionId: any;
+      ownerId: any;
+      title: string;
+      hasHelperPhotos: boolean;
+    }> = await ctx.runQuery(internal.seed._listCompletedMissionsForDemo, {});
+
+    let uploaded = 0;
+    let skipped = 0;
+    let missionsTouched = 0;
+    const errors: string[] = [];
+
+    for (const m of completed) {
+      const testimonials = HELPER_TESTIMONIALS[m.title];
+      if (!testimonials) continue;
+
+      // Enrich host feedback if override exists
+      const fbOverride = HOST_FEEDBACK_OVERRIDES[m.title];
+      if (fbOverride) {
+        await ctx.runMutation(internal.seed._enrichFeedbackForMission, {
+          missionId: m.missionId,
+          difficultiesText: fbOverride.difficultiesText,
+          learningsText: fbOverride.learningsText,
+        });
+      }
+
+      if (m.hasHelperPhotos) {
+        skipped += testimonials.length;
+        continue;
+      }
+
+      // Ensure both helpers have ACCEPTED participations
+      await ctx.runMutation(internal.seed._ensureAcceptedParticipation, {
+        missionId: m.missionId,
+        volunteerId: sophieId,
+        motivation: "Très motivée pour apprendre cette technique en conditions réelles.",
+      });
+      await ctx.runMutation(internal.seed._ensureAcceptedParticipation, {
+        missionId: m.missionId,
+        volunteerId: lucasId,
+        motivation: "Curieux d'observer ton approche, je peux dépanner sur la partie outillage.",
+      });
+
+      // Upload photos with captions
+      let photoIndex = 1;
+      for (const t of testimonials) {
+        const folder = HELPER_DEMO_FOLDERS[t.helperIndex];
+        // Cycle through 5 available images
+        const imgNum = ((photoIndex - 1) % 5) + 1;
+        const url = `${frontendUrl}/projects/${folder}/image_${imgNum}.png`;
+        try {
+          const res = await fetch(url);
+          if (!res.ok) {
+            errors.push(`Fetch ${url} → ${res.status}`);
+            continue;
+          }
+          const blob = await res.blob();
+          const storageId = await ctx.storage.store(blob);
+          await ctx.runMutation(internal.seed._insertHelperMissionPhoto, {
+            missionId: m.missionId,
+            helperId: helperIds[t.helperIndex],
+            storageId,
+            isPublic: true,
+            caption: t.caption,
+          });
+          uploaded++;
+          photoIndex++;
+        } catch (e: any) {
+          errors.push(`Error on ${url}: ${e?.message ?? String(e)}`);
+        }
+      }
+      missionsTouched++;
+    }
+
+    return { status: "done", uploaded, skipped, missionsTouched, errors };
+  },
+});

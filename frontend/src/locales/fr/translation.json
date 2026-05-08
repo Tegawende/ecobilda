@@ -1648,7 +1648,7 @@
     "createNew": "Nouvelle mission",
     "empty": "Tu n'as pas encore de mission. Crée-en une pour rencontrer des helpers.",
     "drafts": "Brouillons",
-    "published": "Publiées / en cours",
+    "published": "En cours",
     "completed": "Terminées",
     "deleteConfirmTitle": "Supprimer la mission ?",
     "deleteConfirmText": "Cette action supprimera définitivement la mission \"{title}\".",

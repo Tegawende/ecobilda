@@ -1648,7 +1648,7 @@
     "createNew": "New mission",
     "empty": "You have no mission yet. Create one to meet helpers.",
     "drafts": "Drafts",
-    "published": "Published / in progress",
+    "published": "Em curso",
     "completed": "Completed",
     "deleteConfirmTitle": "Delete the mission?",
     "deleteConfirmText": "This will permanently delete the mission \"{title}\".",
