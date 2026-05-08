@@ -21,7 +21,6 @@ import {
 } from '@mantine/core';
 import {
   IconPlus,
-  IconHomeCog,
   IconEdit,
   IconTrash,
   IconHome,
@@ -109,15 +108,6 @@ export function MyMissionsClient() {
               </Text>
             </Stack>
             <Group gap="xs">
-              <Button
-                component={Link}
-                href="/create-project"
-                variant="default"
-                leftSection={<IconHomeCog size={16} />}
-                radius="xl"
-              >
-                {t('myPlaces.createNew')}
-              </Button>
               <Button
                 component={Link}
                 href="/create-mission"
@@ -263,11 +253,12 @@ function PlacesGrid({
           <Text c="dimmed">{t('myPlaces.empty')}</Text>
           <Button
             component={Link}
-            href="/create-project"
-            leftSection={<IconHomeCog size={16} />}
+            href="/create-mission"
+            leftSection={<IconPlus size={16} />}
             radius="xl"
+            color="eco-primary"
           >
-            {t('myPlaces.createNew')}
+            {t('myMissions.createNew')}
           </Button>
         </Stack>
       </Center>

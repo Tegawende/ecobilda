@@ -1630,7 +1630,14 @@
       "endDateRequired": "Date de fin requise",
       "endAfterStart": "La date de fin doit être après le début",
       "priceRequired": "Indique un prix > 0"
-    }
+    },
+    "placeSection": "Lieu d'accueil",
+    "missionSection": "Mission",
+    "useExistingPlace": "Utiliser un lieu existant",
+    "createNewPlace": "Créer un nouveau lieu",
+    "newPlaceHint": "Décris ton lieu d'accueil. Il sera soumis à validation par un admin avant que la mission puisse être publiée.",
+    "successPendingPlace": "Mission créée en brouillon. Ton lieu doit être validé par un admin avant que tu puisses la publier.",
+    "placePendingNotice": "Ce lieu est en attente de validation. Tu peux créer la mission en brouillon, mais elle ne pourra être publiée qu'une fois le lieu validé."
   },
   "myMissions": {
     "title": "Mes missions",
