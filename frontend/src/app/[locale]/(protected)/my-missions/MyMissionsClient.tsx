@@ -23,7 +23,7 @@ import { MissionCard, MissionCardSkeleton } from '@/components/missions/MissionC
 import { missionsService } from '@/services/missions';
 import type { Mission } from '@/types';
 
-type MissionTab = 'all' | 'DRAFT' | 'PUBLISHED' | 'COMPLETED' | 'CANCELLED';
+type MissionTab = 'all' | 'DRAFT' | 'PUBLISHED' | 'COMPLETED';
 
 export function MyMissionsClient() {
   const t = useTranslations();
@@ -111,7 +111,6 @@ export function MyMissionsClient() {
                 { value: 'DRAFT', label: `${t('missions.status.DRAFT')} (${counts.DRAFT ?? 0})` },
                 { value: 'PUBLISHED', label: `${t('myMissions.published')} (${counts.PUBLISHED ?? 0})` },
                 { value: 'COMPLETED', label: `${t('missions.status.COMPLETED')} (${counts.COMPLETED ?? 0})` },
-                { value: 'CANCELLED', label: `${t('missions.status.CANCELLED')} (${counts.CANCELLED ?? 0})` },
               ].map((b) => (
                 <button
                   key={b.value}
