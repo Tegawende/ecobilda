@@ -163,6 +163,17 @@ export const MissionsMap = forwardRef<MissionsMapRef, MissionsMapProps>(function
       });
       el.addEventListener('click', () => {
         onSelect(pt._id);
+        // Pan the map so the marker sits in the lower third of the viewport,
+        // leaving room above it for the popup (which opens upward by default).
+        if (map.current && pt.latitude && pt.longitude) {
+          const containerHeight = map.current.getContainer().clientHeight;
+          const verticalOffset = Math.min(160, containerHeight * 0.25);
+          map.current.easeTo({
+            center: [pt.longitude, pt.latitude],
+            offset: [0, verticalOffset],
+            duration: 400,
+          });
+        }
         showPopup(pt);
         onMarkerClick?.(pt);
       });
@@ -369,6 +380,7 @@ export const MissionsMap = forwardRef<MissionsMapRef, MissionsMapProps>(function
       closeOnClick: false,
       maxWidth: '280px',
       offset: 25,
+      anchor: 'bottom',
       className: 'mission-popup',
     })
       .setLngLat([pt.longitude, pt.latitude])
