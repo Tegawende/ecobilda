@@ -30,6 +30,8 @@ interface MissionCardProps {
   onDelete?: (mission: Mission) => void;
   showStatus?: boolean;
   onMobileClick?: (mission: Mission) => void;
+  /** Override the link target. Defaults to `/missions/[id]`. */
+  href?: string;
 }
 
 const CarouselImage = memo(({ src, alt, loaded }: { src: string; alt: string; loaded: boolean }) => (
@@ -68,7 +70,9 @@ export function MissionCard({
   onDelete,
   showStatus = false,
   onMobileClick,
+  href,
 }: MissionCardProps) {
+  const targetHref = (href ?? `/missions/${mission._id}`) as any;
   const t = useTranslations();
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
 
@@ -127,7 +131,7 @@ export function MissionCard({
 
   return (
     <Link
-      href={`/missions/${mission._id}`}
+      href={targetHref}
       className={`block group cursor-pointer transition-all duration-200 ${isHovered ? 'scale-[1.02]' : ''}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

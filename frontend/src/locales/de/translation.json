@@ -853,7 +853,9 @@
       "limePlaster": "Kalkputz",
       "hempcrete": "Hanfbeton",
       "tadelaktPlaster": "Tadelakt-Putz"
-    }
+    },
+    "natbCategory": "Natural Building",
+    "permCategory": "Permaculture"
   },
   "home": {
     "heroAlt": "Ökobau-Baustelle",
@@ -1561,7 +1563,8 @@
       "list": "List",
       "map": "Map"
     },
-    "foundSingle": "mission found"
+    "foundSingle": "mission found",
+    "noImages": "No images"
   },
   "missionDetail": {
     "notFound": "Mission not found",
@@ -1735,6 +1738,9 @@
   "learn": {
     "title": "Learn from others",
     "subtitle": "Discover real feedback from completed worksites on Ecobilda.",
-    "empty": "No public feedback yet."
+    "empty": "No public feedback yet.",
+    "backToLearn": "Back to feedback list",
+    "numbers": "Numbers",
+    "browseOpenMissions": "Browse open missions"
   }
 }
