@@ -70,13 +70,15 @@ export function Navbar() {
           </Link>
 
           <Group gap="xs">
-            {/* "Learn from others" link */}
-            <Link
-              href="/learn"
-              className="text-sm font-medium px-3 py-2 rounded-full transition-all hidden sm:block hover:bg-gray-100 text-gray-700"
-            >
-              {t('nav.learnFromOthers')}
-            </Link>
+            {/* "Learn from others" link — hidden on landing page */}
+            {!isHomePage && (
+              <Link
+                href="/learn"
+                className="text-sm font-medium px-3 py-2 rounded-full transition-all hidden sm:block hover:bg-gray-100 text-gray-700"
+              >
+                {t('nav.learnFromOthers')}
+              </Link>
+            )}
 
             {/* "Browse Missions" button - visible to all */}
             <Link
