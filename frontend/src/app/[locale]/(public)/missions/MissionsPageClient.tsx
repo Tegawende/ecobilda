@@ -185,9 +185,8 @@ export function MissionsPageClient() {
           >
             <Box px="md" py="xs" style={{ borderBottom: '1px solid #f3f4f6', flexShrink: 0 }}>
               <Text size="xs" fw={500} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
-                {missionsForList.length}{' '}
                 {missionsForList.length <= 1
-                  ? t('missions.foundSingle')
+                  ? `${missionsForList.length} ${t('missions.foundSingle')}`
                   : t('missions.found', { count: missionsForList.length })}
               </Text>
             </Box>
