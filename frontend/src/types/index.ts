@@ -199,7 +199,7 @@ export interface HelperMissionPhoto {
   _creationTime?: number;
 }
 
-// Map marker payload (lightweight)
+// Map marker payload (rich enough for popup)
 export interface MissionMapPoint {
   _id: string;
   title: string;
@@ -213,6 +213,14 @@ export interface MissionMapPoint {
   latitude: number;
   longitude: number;
   city?: string;
+  countryName?: string | null;
+  maxParticipants?: number;
+  hoursPerDay?: number;
+  daysPerWeek?: number;
+  internetProvided?: boolean;
+  familyFriendly?: boolean;
+  petsAllowed?: boolean;
+  images?: string[];
 }
 
 // ============================================
