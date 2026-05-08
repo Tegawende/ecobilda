@@ -122,6 +122,32 @@ export function MissionsPageClient() {
     }
   }, [filters.location]);
 
+  // Reset bounds-clipping whenever filters change so the list updates
+  // immediately, before the map re-fits. The map will then auto-fit to
+  // the new set without re-emitting bounds (programmatic moves are filtered
+  // in MissionsMap).
+  useEffect(() => {
+    setMapBounds(null);
+  }, [
+    filters.type,
+    filters.difficulty,
+    filters.poste,
+    filters.technique,
+    filters.pricingMode,
+    filters.skills,
+    filters.languages,
+    filters.dateRange.start,
+    filters.dateRange.end,
+    filters.location,
+    filters.internetProvided,
+    filters.familyFriendly,
+    filters.petsAllowed,
+    filters.smokingAllowed,
+    filters.hoursPerDay,
+    filters.daysPerWeek,
+    filters.maxParticipants,
+  ]);
+
   // Layout decisions
   const showList = isDesktop || !mobileShowMap;
   const showMap = isDesktop || mobileShowMap;

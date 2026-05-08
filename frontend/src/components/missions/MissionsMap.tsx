@@ -89,8 +89,14 @@ export const MissionsMap = forwardRef<MissionsMapRef, MissionsMapProps>(function
     });
     map.current.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
     map.current.on('load', () => setReady(true));
-    map.current.on('moveend', () => {
+    map.current.on('moveend', (e: any) => {
       if (!map.current || !onBoundsChangeRef.current) return;
+      // Only emit bounds when the movement was caused by direct user interaction
+      // (panning / zooming with the mouse, wheel, touch, keyboard).
+      // Programmatic fitBounds / flyTo have no originalEvent and we don't want
+      // those to trigger the list bounds-clipping (causes flash of "no results"
+      // while the map auto-zooms to a newly filtered marker).
+      if (!e || !e.originalEvent) return;
       const b = map.current.getBounds();
       if (!b) return;
       onBoundsChangeRef.current({
