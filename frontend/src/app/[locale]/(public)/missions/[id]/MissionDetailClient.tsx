@@ -9,6 +9,7 @@ import {
   Stack,
   Group,
   Text,
+  Title,
   Button,
   Badge,
   Card,
@@ -39,6 +40,7 @@ import { useMission, useMissionsByProject, useCurrentUser } from '@/hooks/useCon
 import { FavoriteButton } from '@/components/common/FavoriteButton';
 import { ParticipationRequestModal } from '@/components/participations/ParticipationRequestModal';
 import { MissionFeedbackDisplay } from '@/components/missions/MissionFeedbackDisplay';
+import { MissionImageGallery } from '@/components/missions/MissionImageGallery';
 
 interface MissionDetailClientProps {
   id: string;
@@ -88,13 +90,12 @@ export function MissionDetailClient({ id }: MissionDetailClientProps) {
   const isFormation = mission.type === 'FORMATION';
   const project = mission.project;
   const address = project?.address;
-  const images =
+  const galleryImages: string[] =
     mission.images && mission.images.length > 0
-      ? mission.images
+      ? mission.images.map((i: any) => i.url).filter(Boolean)
       : mission.coverImageUrl
-        ? [{ _id: 'cover', missionId: mission._id, order: 0, url: mission.coverImageUrl } as any]
+        ? [mission.coverImageUrl]
         : [];
-  const heroImage = images[0]?.url ?? 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600';
 
   const canApply =
     !!user && !isOwner && (mission.status === 'PUBLISHED' || mission.status === 'IN_PROGRESS');
@@ -102,7 +103,7 @@ export function MissionDetailClient({ id }: MissionDetailClientProps) {
   return (
     <Layout>
     <Container size="xl" py="md">
-      <Group justify="space-between" mb="md" wrap="nowrap">
+      <Group mb="md">
         <Button
           component={Link}
           href="/missions"
@@ -112,82 +113,68 @@ export function MissionDetailClient({ id }: MissionDetailClientProps) {
         >
           {t('missionDetail.backToMissions')}
         </Button>
-        {!isOwner && <FavoriteButton missionId={mission._id} size="md" />}
       </Group>
 
-      {/* Hero */}
-      <Box style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', aspectRatio: '16 / 7', backgroundColor: '#eee' }}>
-        <img
-          src={heroImage}
-          alt={mission.title}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
-        <Group gap="xs" style={{ position: 'absolute', top: 16, left: 16 }}>
-          <Badge
-            size="lg"
-            radius="xl"
-            variant="filled"
-            color={isFormation ? 'eco-terracotta' : 'eco-primary'}
-            leftSection={isFormation ? <IconSchool size={14} /> : <IconHome size={14} />}
-            tt="uppercase"
-            fw={700}
-          >
-            {t(`missions.types.${mission.type}`)}
-          </Badge>
-          <Badge size="lg" radius="xl" variant="filled" color="dark">
-            {t(`missions.difficulty.${mission.difficulty}`)}
-          </Badge>
-          {isFormation && mission.priceEUR != null && (
+      {/* Title row */}
+      <Stack gap="sm" mb="lg">
+        <Group justify="space-between" wrap="nowrap" align="flex-start">
+          <Group gap="xs" wrap="wrap">
             <Badge
-              size="lg"
+              size="md"
               radius="xl"
               variant="filled"
-              color="dark"
-              leftSection={<IconCash size={14} />}
+              color={isFormation ? 'eco-terracotta' : 'eco-primary'}
+              leftSection={isFormation ? <IconSchool size={12} /> : <IconHome size={12} />}
+              tt="uppercase"
+              fw={700}
+              styles={{ root: { letterSpacing: '0.05em' } }}
             >
-              {mission.priceEUR}€
+              {t(`missions.types.${mission.type}`)}
             </Badge>
-          )}
-          <Badge
-            size="lg"
-            radius="xl"
-            variant="filled"
-            color={
-              mission.status === 'PUBLISHED'
-                ? 'green'
-                : mission.status === 'IN_PROGRESS'
-                  ? 'blue'
-                  : mission.status === 'COMPLETED'
-                    ? 'gray'
-                    : mission.status === 'CANCELLED'
-                      ? 'red'
-                      : 'yellow'
-            }
-          >
-            {t(`missions.status.${mission.status}`)}
-          </Badge>
+            <Badge size="md" radius="xl" variant="light" color="dark">
+              {t(`missions.difficulty.${mission.difficulty}`)}
+            </Badge>
+            {isFormation && mission.priceEUR != null && (
+              <Badge
+                size="md"
+                radius="xl"
+                variant="filled"
+                color="dark"
+                leftSection={<IconCash size={12} />}
+              >
+                {mission.priceEUR}€
+              </Badge>
+            )}
+          </Group>
+          {!isOwner && <FavoriteButton missionId={mission._id} size="md" />}
         </Group>
-      </Box>
+
+        <Title order={1} className="text-3xl sm:text-4xl">
+          {mission.title}
+        </Title>
+
+        {address?.city && (
+          <Group gap={6}>
+            <IconMapPin size={18} />
+            <Text c="dimmed">
+              {address.city}
+              {address.country?.name ? `, ${address.country.name}` : ''}
+            </Text>
+          </Group>
+        )}
+      </Stack>
+
+      {/* Image gallery (Airbnb-style) */}
+      {galleryImages.length > 0 && (
+        <div className="mb-8">
+          <MissionImageGallery images={galleryImages} title={mission.title} />
+        </div>
+      )}
 
       <Grid gutter="xl" mt="xl">
         <Grid.Col span={{ base: 12, md: 8 }}>
           <Stack gap="lg">
-            <Stack gap={4}>
-              <Text fw={800} size="xl">
-                {mission.title}
-              </Text>
-              {address?.city && (
-                <Group gap={6}>
-                  <IconMapPin size={16} />
-                  <Text c="dimmed">
-                    {address.city}
-                    {address.country?.name ? `, ${address.country.name}` : ''}
-                  </Text>
-                </Group>
-              )}
-            </Stack>
-
-            <Group gap="lg">
+            <Group gap="lg" wrap="wrap">
               <Group gap={6}>
                 <IconCalendar size={16} />
                 <Text size="sm">

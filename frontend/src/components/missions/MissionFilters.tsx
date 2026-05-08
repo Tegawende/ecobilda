@@ -11,19 +11,15 @@ import {
   IconX,
   IconLoader2,
   IconMapPin,
+  IconWifi,
+  IconBabyCarriage,
+  IconDog,
+  IconSmoking,
 } from '@tabler/icons-react';
 import {
-  Modal,
-  Stack,
   Group,
-  Text,
   Button,
-  Switch,
   Badge,
-  Select,
-  Box,
-  ScrollArea,
-  Divider,
   RangeSlider,
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
@@ -399,235 +395,374 @@ export function MissionFilters({ filters, onChange, onLocationSelect, onReset }:
         </div>
       </div>
 
-      <Modal
-        opened={showModal}
-        onClose={() => setShowModal(false)}
-        title={
-          <Group justify="space-between" w="100%">
-            <Text fw={700}>{t('common.filter')}</Text>
-            <Button variant="subtle" size="xs" onClick={resetModal}>
-              {t('common.reset')}
-            </Button>
-          </Group>
-        }
-        size="lg"
-        radius="lg"
-        centered
-      >
-        <ScrollArea h="60vh" type="auto">
-          <Stack gap="md" p="xs">
-            <Box>
-              <Text size="sm" fw={600} mb={6}>
-                {t('missions.filters.difficulty')}
-              </Text>
-              <Group gap="xs">
-                {DIFFICULTY_OPTIONS.map((d) => (
-                  <Badge
-                    key={d.value}
-                    variant={tempFilters.difficulty === d.value ? 'filled' : 'light'}
-                    color="dark"
-                    radius="xl"
-                    size="lg"
-                    style={{ cursor: 'pointer' }}
+      {/* Filter Modal — same style as the old projects modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowModal(false)} />
+          <div className="relative bg-white rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden shadow-2xl mx-4 flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <button
+                onClick={() => setShowModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-full cursor-pointer"
+              >
+                <IconX size={20} />
+              </button>
+              <h2 className="font-display font-bold text-lg">{t('common.filter')}</h2>
+              <button
+                onClick={resetModal}
+                className="text-sm font-semibold text-gray-600 hover:text-gray-900 cursor-pointer"
+              >
+                {t('common.reset')}
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 overflow-y-auto space-y-8" style={{ maxHeight: '60vh' }}>
+              {/* Difficulty */}
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-4">
+                  {t('missions.filters.difficulty')}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {DIFFICULTY_OPTIONS.map((d) => {
+                    const isActive = tempFilters.difficulty === d.value;
+                    return (
+                      <button
+                        key={d.value}
+                        onClick={() =>
+                          setTemp(
+                            'difficulty',
+                            isActive ? undefined : (d.value as any)
+                          )
+                        }
+                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer border-2 ${
+                          isActive
+                            ? 'border-gray-900 bg-gray-900 text-white'
+                            : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                        }`}
+                      >
+                        {t(d.i18nKey)}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Poste / technique */}
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-4">
+                  {t('missions.filters.poste')}
+                </h3>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {POSTE_OPTIONS.map((p) => {
+                    const isActive = tempFilters.poste === p.value;
+                    return (
+                      <button
+                        key={p.value}
+                        onClick={() =>
+                          setTempFilters({
+                            ...tempFilters,
+                            poste: isActive ? undefined : p.value,
+                            technique: undefined,
+                          })
+                        }
+                        className={`px-3 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer border-2 ${
+                          isActive
+                            ? 'border-eco-primary bg-eco-primary/10 text-eco-primary'
+                            : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                        }`}
+                      >
+                        {t(p.i18nKey)}
+                      </button>
+                    );
+                  })}
+                </div>
+                {tempFilters.poste && techOptionsTemp.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {techOptionsTemp.map((tech) => {
+                      const isActive = tempFilters.technique === tech.value;
+                      return (
+                        <button
+                          key={tech.value}
+                          onClick={() =>
+                            setTemp('technique', isActive ? undefined : (tech.value as any))
+                          }
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer border ${
+                            isActive
+                              ? 'border-eco-primary bg-eco-primary text-white'
+                              : 'border-gray-300 text-gray-600 hover:border-gray-400'
+                          }`}
+                        >
+                          {tech.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Pricing */}
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-4">
+                  {t('missions.filters.pricingMode')}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  <button
                     onClick={() =>
-                      setTemp(
-                        'difficulty',
-                        tempFilters.difficulty === d.value ? undefined : (d.value as any)
-                      )
+                      setTemp('pricingMode', tempFilters.pricingMode === 'FREE' ? undefined : 'FREE')
                     }
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer border-2 ${
+                      tempFilters.pricingMode === 'FREE'
+                        ? 'border-green-600 bg-green-600 text-white'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
                   >
-                    {t(d.i18nKey)}
-                  </Badge>
-                ))}
-              </Group>
-            </Box>
+                    {t('missions.filters.freeOnly')}
+                  </button>
+                  <button
+                    onClick={() =>
+                      setTemp('pricingMode', tempFilters.pricingMode === 'PAID' ? undefined : 'PAID')
+                    }
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer border-2 ${
+                      tempFilters.pricingMode === 'PAID'
+                        ? 'border-orange-600 bg-orange-600 text-white'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    {t('missions.filters.paidOnly')}
+                  </button>
+                </div>
+              </div>
 
-            <Divider />
+              {/* Amenities */}
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-4">
+                  {t('missions.filters.amenities')}
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <AmenityToggle
+                    value={tempFilters.internetProvided}
+                    onChange={(v) => setTemp('internetProvided', v)}
+                    icon={IconWifi}
+                    label={t('createPlace.fields.wifi')}
+                  />
+                  <AmenityToggle
+                    value={tempFilters.familyFriendly}
+                    onChange={(v) => setTemp('familyFriendly', v)}
+                    icon={IconBabyCarriage}
+                    label={t('createPlace.fields.familyFriendly')}
+                  />
+                  <AmenityToggle
+                    value={tempFilters.petsAllowed}
+                    onChange={(v) => setTemp('petsAllowed', v)}
+                    icon={IconDog}
+                    label={t('createPlace.fields.petsAllowed')}
+                  />
+                  <AmenityToggle
+                    value={tempFilters.smokingAllowed}
+                    onChange={(v) => setTemp('smokingAllowed', v)}
+                    icon={IconSmoking}
+                    label={t('createPlace.fields.smokingAllowed')}
+                  />
+                </div>
+              </div>
 
-            <Box>
-              <Text size="sm" fw={600} mb={6}>
-                {t('missions.filters.poste')}
-              </Text>
-              <Select
-                data={POSTE_OPTIONS.map((o) => ({ value: o.value, label: t(o.i18nKey) }))}
-                value={tempFilters.poste ?? null}
-                onChange={(v) => setTempFilters({ ...tempFilters, poste: v ?? undefined, technique: undefined })}
-                clearable
-                placeholder={t('common.any')}
-              />
-              {tempFilters.poste && techOptionsTemp.length > 0 && (
-                <Select
-                  mt="xs"
-                  data={techOptionsTemp}
-                  value={tempFilters.technique ?? null}
-                  onChange={(v) => setTemp('technique', (v ?? undefined) as any)}
-                  clearable
-                  placeholder={t('missions.filters.technique')}
-                />
+              {/* Hours / days / participants */}
+              <div className="space-y-6">
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-semibold text-gray-900">
+                      {t('missions.filters.hoursPerDay')}
+                    </h3>
+                    <span className="text-sm text-gray-500">
+                      {tempFilters.hoursPerDay[0]}h – {tempFilters.hoursPerDay[1]}h
+                    </span>
+                  </div>
+                  <RangeSlider
+                    min={1}
+                    max={10}
+                    value={tempFilters.hoursPerDay}
+                    onChange={(v) => setTemp('hoursPerDay', v as [number, number])}
+                  />
+                </div>
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-semibold text-gray-900">
+                      {t('missions.filters.daysPerWeek')}
+                    </h3>
+                    <span className="text-sm text-gray-500">
+                      {tempFilters.daysPerWeek[0]} – {tempFilters.daysPerWeek[1]}
+                    </span>
+                  </div>
+                  <RangeSlider
+                    min={1}
+                    max={7}
+                    value={tempFilters.daysPerWeek}
+                    onChange={(v) => setTemp('daysPerWeek', v as [number, number])}
+                  />
+                </div>
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-semibold text-gray-900">
+                      {t('missions.filters.maxParticipants')}
+                    </h3>
+                    <span className="text-sm text-gray-500">
+                      {tempFilters.maxParticipants[0]} – {tempFilters.maxParticipants[1]}
+                    </span>
+                  </div>
+                  <RangeSlider
+                    min={1}
+                    max={30}
+                    value={tempFilters.maxParticipants}
+                    onChange={(v) => setTemp('maxParticipants', v as [number, number])}
+                  />
+                </div>
+              </div>
+
+              {/* Skills split by category */}
+              {skills.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-4">
+                    {t('missions.filters.skills')}
+                  </h3>
+
+                  {/* Natural Building */}
+                  <div className="mb-3">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <IconHome size={14} className="text-gray-500" />
+                      <span className="text-sm font-medium text-gray-500">
+                        {t('skills.natbCategory')}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {skills
+                        .filter((s: any) => s.category === 'NATB')
+                        .map((skill: any) => {
+                          const isActive = tempFilters.skills.includes(skill.code);
+                          return (
+                            <button
+                              key={skill.code}
+                              onClick={() => toggleTempSkill(skill.code)}
+                              className={`px-3 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer border-2 ${
+                                isActive
+                                  ? 'border-eco-primary bg-eco-primary/10 text-eco-primary'
+                                  : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                              }`}
+                            >
+                              {skill.displayNameFr || skill.displayNameEn}
+                            </button>
+                          );
+                        })}
+                    </div>
+                  </div>
+
+                  {/* Permaculture */}
+                  <div>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className="text-sm font-medium text-gray-500">
+                        {t('skills.permCategory')}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {skills
+                        .filter((s: any) => s.category === 'PERM')
+                        .map((skill: any) => {
+                          const isActive = tempFilters.skills.includes(skill.code);
+                          return (
+                            <button
+                              key={skill.code}
+                              onClick={() => toggleTempSkill(skill.code)}
+                              className={`px-3 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer border-2 ${
+                                isActive
+                                  ? 'border-eco-terracotta bg-eco-terracotta/10 text-eco-terracotta'
+                                  : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                              }`}
+                            >
+                              {skill.displayNameFr || skill.displayNameEn}
+                            </button>
+                          );
+                        })}
+                    </div>
+                  </div>
+                </div>
               )}
-            </Box>
 
-            <Divider />
+              {/* Languages */}
+              {languages.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-4">
+                    {t('missions.filters.languages')}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {languages.slice(0, 30).map((lang: any) => {
+                      const isActive = tempFilters.languages.includes(lang.code);
+                      return (
+                        <button
+                          key={lang.code}
+                          onClick={() => toggleTempLang(lang.code)}
+                          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer ${
+                            isActive
+                              ? 'bg-gray-900 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {lang.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
 
-            <Box>
-              <Text size="sm" fw={600} mb={6}>
-                {t('missions.filters.pricingMode')}
-              </Text>
-              <Group gap="xs">
-                <Badge
-                  variant={tempFilters.pricingMode === 'FREE' ? 'filled' : 'light'}
-                  color="green"
-                  radius="xl"
-                  size="lg"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() =>
-                    setTemp('pricingMode', tempFilters.pricingMode === 'FREE' ? undefined : 'FREE')
-                  }
-                >
-                  {t('missions.filters.freeOnly')}
-                </Badge>
-                <Badge
-                  variant={tempFilters.pricingMode === 'PAID' ? 'filled' : 'light'}
-                  color="orange"
-                  radius="xl"
-                  size="lg"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() =>
-                    setTemp('pricingMode', tempFilters.pricingMode === 'PAID' ? undefined : 'PAID')
-                  }
-                >
-                  {t('missions.filters.paidOnly')}
-                </Badge>
-              </Group>
-            </Box>
-
-            <Divider />
-
-            <Box>
-              <Text size="sm" fw={600} mb={6}>
-                {t('missions.filters.amenities')}
-              </Text>
-              <Stack gap={4}>
-                <Switch
-                  label={t('createPlace.fields.wifi')}
-                  checked={tempFilters.internetProvided}
-                  onChange={(e) => setTemp('internetProvided', e.currentTarget.checked)}
-                />
-                <Switch
-                  label={t('createPlace.fields.familyFriendly')}
-                  checked={tempFilters.familyFriendly}
-                  onChange={(e) => setTemp('familyFriendly', e.currentTarget.checked)}
-                />
-                <Switch
-                  label={t('createPlace.fields.petsAllowed')}
-                  checked={tempFilters.petsAllowed}
-                  onChange={(e) => setTemp('petsAllowed', e.currentTarget.checked)}
-                />
-                <Switch
-                  label={t('createPlace.fields.smokingAllowed')}
-                  checked={tempFilters.smokingAllowed}
-                  onChange={(e) => setTemp('smokingAllowed', e.currentTarget.checked)}
-                />
-              </Stack>
-            </Box>
-
-            <Divider />
-
-            <Box>
-              <Text size="sm" fw={600} mb={6}>
-                {t('missions.filters.hoursPerDay')}: {tempFilters.hoursPerDay[0]}–{tempFilters.hoursPerDay[1]}h
-              </Text>
-              <RangeSlider
-                min={1}
-                max={10}
-                value={tempFilters.hoursPerDay}
-                onChange={(v) => setTemp('hoursPerDay', v as [number, number])}
-              />
-            </Box>
-            <Box>
-              <Text size="sm" fw={600} mb={6}>
-                {t('missions.filters.daysPerWeek')}: {tempFilters.daysPerWeek[0]}–{tempFilters.daysPerWeek[1]}
-              </Text>
-              <RangeSlider
-                min={1}
-                max={7}
-                value={tempFilters.daysPerWeek}
-                onChange={(v) => setTemp('daysPerWeek', v as [number, number])}
-              />
-            </Box>
-            <Box>
-              <Text size="sm" fw={600} mb={6}>
-                {t('missions.filters.maxParticipants')}: {tempFilters.maxParticipants[0]}–{tempFilters.maxParticipants[1]}
-              </Text>
-              <RangeSlider
-                min={1}
-                max={30}
-                value={tempFilters.maxParticipants}
-                onChange={(v) => setTemp('maxParticipants', v as [number, number])}
-              />
-            </Box>
-
-            <Divider />
-
-            <Box>
-              <Text size="sm" fw={600} mb={6}>
-                {t('missions.filters.skills')}
-              </Text>
-              <Group gap={6}>
-                {skills.map((s: any) => {
-                  const checked = tempFilters.skills.includes(s.code);
-                  return (
-                    <Badge
-                      key={s.code}
-                      variant={checked ? 'filled' : 'light'}
-                      color="eco-primary"
-                      radius="xl"
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => toggleTempSkill(s.code)}
-                    >
-                      {s.displayNameFr || s.displayNameEn}
-                    </Badge>
-                  );
-                })}
-              </Group>
-            </Box>
-
-            <Divider />
-
-            <Box>
-              <Text size="sm" fw={600} mb={6}>
-                {t('missions.filters.languages')}
-              </Text>
-              <Group gap={6}>
-                {languages.slice(0, 20).map((l: any) => {
-                  const checked = tempFilters.languages.includes(l.code);
-                  return (
-                    <Badge
-                      key={l.code}
-                      variant={checked ? 'filled' : 'light'}
-                      color="dark"
-                      radius="xl"
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => toggleTempLang(l.code)}
-                    >
-                      {l.name}
-                    </Badge>
-                  );
-                })}
-              </Group>
-            </Box>
-          </Stack>
-        </ScrollArea>
-        <Divider my="sm" />
-        <Group justify="flex-end">
-          <Button variant="default" onClick={() => setShowModal(false)} radius="xl">
-            {t('common.cancel')}
-          </Button>
-          <Button onClick={applyModal} color="eco-primary" radius="xl">
-            {t('common.apply')}
-          </Button>
-        </Group>
-      </Modal>
+            {/* Footer */}
+            <div className="flex items-center justify-between p-4 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={resetModal}
+                className="text-sm font-semibold text-gray-600 hover:text-gray-900 underline cursor-pointer"
+              >
+                {t('common.reset')}
+              </button>
+              <button
+                onClick={applyModal}
+                className="px-6 py-2.5 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-all cursor-pointer"
+              >
+                {t('common.apply')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
+
+const AmenityToggle = ({
+  value,
+  onChange,
+  icon: Icon,
+  label,
+}: {
+  value: boolean;
+  onChange: (val: boolean) => void;
+  icon: React.ElementType;
+  label: string;
+}) => (
+  <button
+    onClick={() => onChange(!value)}
+    className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer w-full ${
+      value ? 'border-eco-primary bg-eco-primary/10' : 'border-gray-200 hover:border-gray-300'
+    }`}
+  >
+    <Icon size={24} className={value ? 'text-eco-primary' : 'text-gray-400'} />
+    <span className="text-sm font-medium text-gray-700 flex-1 text-left">{label}</span>
+    <div className={`w-10 h-6 rounded-full transition-all ${value ? 'bg-eco-primary' : 'bg-gray-300'}`}>
+      <div
+        className={`w-5 h-5 rounded-full bg-white shadow-sm transform transition-all mt-0.5 ${
+          value ? 'translate-x-[18px] ml-0.5' : 'translate-x-0.5'
+        }`}
+      />
+    </div>
+  </button>
+);

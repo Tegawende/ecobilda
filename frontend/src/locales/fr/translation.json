@@ -937,7 +937,9 @@
       "limePlaster": "Enduit chaux",
       "hempcrete": "Béton de chanvre",
       "tadelaktPlaster": "Tadelakt"
-    }
+    },
+    "natbCategory": "Éco-construction",
+    "permCategory": "Permaculture"
   },
   "faq": {
     "title": "Foire Aux Questions",
@@ -1561,7 +1563,8 @@
       "list": "Liste",
       "map": "Carte"
     },
-    "foundSingle": "mission trouvée"
+    "foundSingle": "mission trouvée",
+    "noImages": "Aucune image"
   },
   "missionDetail": {
     "notFound": "Mission introuvable",
@@ -1735,6 +1738,9 @@
   "learn": {
     "title": "Apprenez des autres",
     "subtitle": "Découvre les retours d'expérience des chantiers terminés sur Ecobilda.",
-    "empty": "Aucun retour d'expérience public pour le moment."
+    "empty": "Aucun retour d'expérience public pour le moment.",
+    "backToLearn": "Retour aux retours d'expérience",
+    "numbers": "Données chiffrées",
+    "browseOpenMissions": "Voir les missions ouvertes"
   }
 }
