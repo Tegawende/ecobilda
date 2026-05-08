@@ -1655,7 +1655,8 @@
     "tabs": {
       "missions": "Missions",
       "all": "All"
-    }
+    },
+    "emptyDesc": "Create your first mission to offer a participatory worksite or a training session."
   },
   "myPlaces": {
     "createNew": "Add a place",

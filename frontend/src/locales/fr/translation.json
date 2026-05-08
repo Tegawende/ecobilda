@@ -1655,7 +1655,8 @@
     "tabs": {
       "missions": "Missions",
       "all": "Toutes"
-    }
+    },
+    "emptyDesc": "Crée ta première mission pour proposer un chantier participatif ou une formation."
   },
   "myPlaces": {
     "createNew": "Ajouter un lieu",
