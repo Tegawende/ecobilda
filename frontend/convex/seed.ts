@@ -69,6 +69,87 @@ export const _setPasswordHash = internalMutation({
   },
 });
 
+// Create-or-update an admin account with a hashed password.
+// Usage: npx convex run 'seed:setupAdminAccount' '{"email":"admin2@ecobilda.org","password":"Admin123!"}'
+export const setupAdminAccount = action({
+  args: {
+    email: v.string(),
+    password: v.string(),
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
+  },
+  handler: async (ctx, args): Promise<{ status: string; email: string }> => {
+    const encoder = new TextEncoder();
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const saltHex = Array.from(new Uint8Array(salt.buffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    const keyMaterial = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(args.password),
+      "PBKDF2",
+      false,
+      ["deriveBits"]
+    );
+    const derived = await crypto.subtle.deriveBits(
+      { name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" },
+      keyMaterial,
+      256
+    );
+    const hashHex = Array.from(new Uint8Array(derived))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    const hash = `pbkdf2$100000$${saltHex}$${hashHex}`;
+    await ctx.runMutation(internal.seed._upsertAdminUser, {
+      email: args.email,
+      hash,
+      firstName: args.firstName ?? "Admin",
+      lastName: args.lastName ?? "User",
+    });
+    return { status: "done", email: args.email };
+  },
+});
+
+export const _upsertAdminUser = internalMutation({
+  args: { email: v.string(), hash: v.string(), firstName: v.string(), lastName: v.string() },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q: any) => q.eq("email", args.email))
+      .first();
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        legacyPasswordHash: args.hash,
+        hasPassword: true,
+        isStaff: true,
+        isSuperuser: true,
+        emailVerified: true,
+        isActive: true,
+      });
+      return { action: "updated" as const, userId: existing._id };
+    }
+    const userId = await ctx.db.insert("users", {
+      email: args.email,
+      firstName: args.firstName,
+      lastName: args.lastName,
+      legacyPasswordHash: args.hash,
+      emailVerified: true,
+      hasPassword: true,
+      emailNotifications: false,
+      newsletter: false,
+      inAppNotifications: true,
+      notificationLanguage: "en",
+      isProfileVisible: false,
+      averageRating: 0,
+      reviewCount: 0,
+      isStaff: true,
+      isSuperuser: true,
+      isActive: true,
+    });
+    return { action: "created" as const, userId };
+  },
+});
+
 export const makeAdmin = mutation({
   args: {},
   handler: async (ctx) => {
