@@ -203,7 +203,7 @@ strong { color:#1a1a1a; }
 <tr><td align="center" style="padding:24px 12px;">
 <table role="presentation" class="email-container" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:580px;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
 <tr><td class="header-td" bgcolor="#70A771" style="background-color:#70A771;padding:22px 24px;text-align:center;">
-<img src="https://i.ibb.co/RG91Dq0d/logo-white2.png" alt="Ecobilda" width="180" style="display:inline-block;width:180px;height:auto;">
+<img src="https://ecobilda.org/logo-white2.png" alt="Ecobilda" width="180" style="display:inline-block;width:180px;height:auto;">
 </td></tr>
 <tr><td class="content-td" bgcolor="#ffffff" style="background-color:#fff;padding:32px 28px 24px;">
 ${content}
