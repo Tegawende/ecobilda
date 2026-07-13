@@ -1,58 +1,44 @@
 # ---- Production Docker Compose ----
-# Backend: Convex self-hosted (see docker-compose.yml for dev Convex)
-# Frontend: Next.js
+# Convex self-hosted (official image, SQLite backend) + Next.js frontend
+# Admin panel is served as static files by Caddy (see Caddyfile)
 
 services:
-  # PostgreSQL Database (for Convex backend storage)
-  db:
-    image: postgres:15-alpine
-    container_name: ecobilda-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${DB_NAME:-ecobilda}
-      POSTGRES_USER: ${DB_USER:-ecobilda}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-ecobilda}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - internal
-
-  # Convex Backend (self-hosted)
   convex-backend:
-    image: convex-local-backend
+    image: ghcr.io/get-convex/convex-backend:latest
     container_name: ecobilda-convex
     restart: unless-stopped
+    stop_grace_period: 10s
+    stop_signal: SIGINT
     ports:
       - "127.0.0.1:3210:3210"
+      - "127.0.0.1:3211:3211"
+    volumes:
+      - convex_data:/convex/data
     environment:
-      - CONVEX_BACKEND_DB_URL=postgres://${DB_USER:-ecobilda}:${DB_PASSWORD}@db:5432/${DB_NAME:-ecobilda}
-      - MS_GRAPH_TENANT_ID=${MS_GRAPH_TENANT_ID}
-      - MS_GRAPH_CLIENT_ID=${MS_GRAPH_CLIENT_ID}
-      - MS_GRAPH_CLIENT_SECRET=${MS_GRAPH_CLIENT_SECRET}
-      - MS_GRAPH_MAILBOX=${MS_GRAPH_MAILBOX:-admin@ecobilda.org}
-      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL:-noreply@ecobilda.org}
-      - FRONTEND_URL=${FRONTEND_URL:-https://ecobilda.org}
-      - CONVEX_SITE_URL=https://convex.ecobilda.org
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - internal
+      - CONVEX_CLOUD_ORIGIN=https://convex.ecobilda.org
+      - CONVEX_SITE_ORIGIN=https://convex.ecobilda.org
+      - APPLICATION_MAX_CONCURRENT_MUTATIONS=16
+      - APPLICATION_MAX_CONCURRENT_NODE_ACTIONS=16
+      - APPLICATION_MAX_CONCURRENT_QUERIES=16
+      - APPLICATION_MAX_CONCURRENT_V8_ACTIONS=16
+      - DOCUMENT_RETENTION_DELAY=172800
+      - DISABLE_METRICS_ENDPOINT=true
+      - RUST_LOG=info
+    healthcheck:
+      test: curl -f http://localhost:3210/version
+      interval: 10s
+      start_period: 30s
+      timeout: 5s
+      retries: 5
 
-  # Next.js Frontend
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_CONVEX_URL: ${NEXT_PUBLIC_CONVEX_URL:-http://convex-backend:3210}
+        NEXT_PUBLIC_CONVEX_URL: https://convex.ecobilda.org
         NEXT_PUBLIC_MAPBOX_TOKEN: ${NEXT_PUBLIC_MAPBOX_TOKEN}
-        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
         NEXT_PUBLIC_APP_NAME: Ecobilda
         NEXT_PUBLIC_DEFAULT_LANGUAGE: en
     container_name: ecobilda-frontend
@@ -60,15 +46,8 @@ services:
     ports:
       - "127.0.0.1:3000:3000"
     depends_on:
-      - convex-backend
-    environment:
-      - CONVEX_INTERNAL_URL=http://convex-backend:3210
-    networks:
-      - internal
+      convex-backend:
+        condition: service_healthy
 
 volumes:
-  postgres_data:
-
-networks:
-  internal:
-    driver: bridge
+  convex_data:
