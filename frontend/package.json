@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@convex-dev/auth": "^0.0.91",
+    "@convex-dev/auth": "^0.0.94",
     "@mantine/carousel": "^7.17.8",
     "@mantine/core": "^7.17.8",
     "@mantine/dates": "^7.17.8",
